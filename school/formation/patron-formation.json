@@ -1,0 +1,58 @@
+{
+  "formation": {
+    "files": [
+      "emargement.adoc",
+      "evaluation.adoc",
+      "fiche-produit.adoc",
+      "formalisation-reponse.adoc",
+      "formation.adoc",
+      "inscription.adoc",
+      "livret-apprenant.adoc",
+      "satisfaction.adoc",
+      "SPG.adoc"
+    ],
+    "directories": {
+      "modules": {
+        "files": [
+          "emargement.adoc",
+          "evaluation.adoc",
+          "fiche-produit.adoc",
+          "inscription.adoc",
+          "livret-apprenant.adoc",
+          "satisfaction.adoc",
+          "SPD.adoc",
+          "SPG.adoc"
+        ],
+        "directories": {
+          "parties": {
+            "directories": {
+              "sequences": {
+                "files": [
+                  "emargement.adoc",
+                  "evaluation.adoc",
+                  "livret-apprenant.adoc",
+                  "satisfaction.adoc",
+                  "scenario_remediation.adoc",
+                  "SPD.adoc",
+                  "SPG.adoc"
+                ],
+                "directories": {
+                  "seances": {
+                    "files": [
+                      "emargement.adoc",
+                      "evaluation.adoc",
+                      "fiche-resources.adoc",
+                      "livret-apprenant.adoc",
+                      "satisfaction.adoc",
+                      "SPD.adoc"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

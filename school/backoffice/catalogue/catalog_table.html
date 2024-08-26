@@ -1,0 +1,63 @@
+<div id="catalogueComponent">
+    <h2>Catalogue des formations</h2>
+    <style>
+        /* Styles spécifiques à la table */
+        #catalogueTable {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #catalogueTable th, #catalogueTable td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+    <table id="catalogueTable">
+        <!-- Table content will be added dynamically -->
+    </table>
+
+    <script>
+        // Function to load and process the CSV file
+        function loadCSV() {
+            // URL of the CSV file on GitHub
+            var csvUrl = 'https://raw.githubusercontent.com/cheroliv/formateur/master/codes/talaria/catalogue/catalogue_formations-COURSE.csv';
+
+            // Using Fetch to retrieve the CSV file content
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(data => {
+                    // Call the function to populate the table with CSV data
+                    populateTable(data);
+                })
+                .catch(error => console.error('Error loading CSV file:', error));
+        }
+
+        // Function to populate the table with CSV data
+        function populateTable(csvData) {
+            var table = document.getElementById('catalogueTable');
+            var rows = csvData.split('\n');
+
+            // Header of the table
+            var headers = rows[0].split(',');
+            var headerRow = table.insertRow(0);
+            for (var i = 0; i < headers.length; i++) {
+                var headerCell = headerRow.insertCell(i);
+                headerCell.textContent = headers[i];
+            }
+
+            // Body of the table
+            for (var j = 1; j < rows.length; j++) {
+                var cells = rows[j].split(',');
+                var row = table.insertRow(j);
+                for (var k = 0; k < cells.length; k++) {
+                    var cell = row.insertCell(k);
+                    cell.textContent = cells[k];
+                }
+            }
+        }
+
+        // Call the function to load the CSV when the page loads
+        window.onload = loadCSV;
+    </script>
+</div>

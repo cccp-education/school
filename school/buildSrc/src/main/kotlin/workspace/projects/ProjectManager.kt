@@ -1,0 +1,3 @@
+package workspace.projects
+
+object ProjectManager

@@ -1,0 +1,31 @@
+{
+  "health": {
+    "title": "Status controle",
+    "refresh.button": "Ververs",
+    "stacktrace": "Stacktrace",
+    "details": {
+      "details": "Details",
+      "properties": "Eigenschappen",
+      "name": "Naam",
+      "value": "Waarde",
+      "error": "Fout"
+    },
+    "indicator": {
+      "diskSpace": "Schijfruimte",
+      "mail": "Email",
+      "livenessState": "Liveness state",
+      "readinessState": "Readiness state",
+      "ping": "Application",
+      "mongo": "MongoDB"
+    },
+    "table": {
+      "service": "Dienstnaam",
+      "status": "Status"
+    },
+    "status": {
+      "UNKNOWN": "UNKNOWN",
+      "UP": "UP",
+      "DOWN": "DOWN"
+    }
+  }
+}

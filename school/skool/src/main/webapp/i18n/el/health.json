@@ -1,0 +1,31 @@
+{
+  "health": {
+    "title": "Έλεγχοι υγείας",
+    "refresh.button": "Ανανέωση",
+    "stacktrace": "Stacktrace",
+    "details": {
+      "details": "Λεπτομέρειες",
+      "properties": "Ιδιότητες",
+      "name": "Ονομασία",
+      "value": "Τιμή",
+      "error": "Σφάλμα"
+    },
+    "indicator": {
+      "diskSpace": "Χώρος σκληρού δίσκου",
+      "mail": "Email",
+      "livenessState": "Liveness state",
+      "readinessState": "Readiness state",
+      "ping": "Application",
+      "mongo": "MongoDB"
+    },
+    "table": {
+      "service": "Υπηρεσία",
+      "status": "Κατάσταση"
+    },
+    "status": {
+      "UNKNOWN": "UNKNOWN",
+      "UP": "ΠΑΝΩ",
+      "DOWN": "ΚΑΤΩ"
+    }
+  }
+}

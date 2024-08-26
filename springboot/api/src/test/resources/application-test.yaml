@@ -1,0 +1,39 @@
+##############################################################################
+webapp:
+  message: hello test
+  mail:
+    base-url: http://127.0.0.1:8080
+    from: webapp-r2dbc-jwt@localhost
+    password: password
+    enabled: true
+    host: localhost
+    port: 587
+    property:
+      debug: true
+      transport:
+        protocol: smtp
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+    token: 2e2a7d47-0476-4046-9c66-9f990f8d6d35-f840450f-e853-43a5-b3f4-bbc
+  mailbox:
+    test:
+      token: 2e2a7d47-0476-4046-9c66-9f990f8d6d35-f840450f-e853-43a5-b3f4-bbc
+
+
+##############################################################################
+spring:
+  devtools:
+    restart:
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
+##############################################################################
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG
+        org.hibernate.SQL: DEBUG
+##############################################################################

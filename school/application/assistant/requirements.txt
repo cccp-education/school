@@ -1,0 +1,6 @@
+langchain==0.2.14
+langchain-openai==0.1.21
+assertpy~=1.1
+langchainhub==0.1.21
+langserve[all]==0.2.2
+langgraph==0.2.3

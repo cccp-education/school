@@ -1,0 +1,9 @@
+managed-jbake-context.yml
+e3p0.yaml
+venv
+*.iml
+.idea
+*.ipr
+*.iws
+Pipfile.lock
+../config.py

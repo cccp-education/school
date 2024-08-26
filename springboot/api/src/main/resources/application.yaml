@@ -1,0 +1,77 @@
+webapp:
+  message: hello
+  item: item
+  go-visit-message: https://cheroliv.github.io/
+  clientApp:
+    name: 'server'
+  mail:
+    base-url: http://127.0.0.1:8080
+    from: webapp-r2dbc-jwt@localhost
+    password: password
+    enabled: true
+    host: localhost
+    port: 587
+    property:
+      debug: true
+      transport:
+        protocol: smtp
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+    token: 2e2a7d47-0476-4046-9c66-9f990f8d6d35-f840450f-e853-43a5-b3f4-bbc
+
+  security:
+    authentication:
+      jwt:
+        secret: secret
+        base64-secret: MjNlZmQzMzgwM2MzN2FmMGNhZTY3NDllMDJiODg2YWRlMmY0ZDUzMzg2ODI4MTgxNmIxNzQ1OGEzMmNmNjY2OTA3Nzk4MzRkNDUzZWFlMTljZjJmNDU5NDNjOWI3NjRhNDg3MGYzODhiYjVjZWU5MmNhMDA2MDU3ZjA2NjJhODE=
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
+  cors:
+    allowed-origins: '*'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count'
+    allow-credentials: true
+    max-age: 1800
+
+##############################################################################
+
+spring:
+  profiles:
+    default: dev
+  application:
+    name: server
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: r2dbc:h2:file:///build/testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+  devtools:
+    restart:
+      enabled: true
+  thymeleaf:
+    mode: HTML
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+  webflux:
+    problemdetails:
+      enabled: true
+  web:
+    locale: en
+##############################################################################
+
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: INFO
+        org.hibernate.SQL: INFO
+
+##############################################################################
+
+server:
+  port: 8080
+##############################################################################

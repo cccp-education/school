@@ -1,0 +1,20 @@
+
+pluginManagement {
+    repositories {
+        // jhipster-needle-gradle-plugin-management-repositories - JHipster will add additional entries here
+        google()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    plugins {
+        id 'com.gorylenko.gradle-git-properties' version "${gitPropertiesPluginVersion}"
+        // jhipster-needle-gradle-plugin-management-plugins - JHipster will add additional entries here
+//        kotlin("jvm").version(extra["kotlin.version"].toString())
+//        kotlin("plugin.serialization").version(extra["kotlin.version"].toString())
+//        kotlin("plugin.allopen").version(extra["kotlin.version"].toString())
+//        kotlin("plugin.noarg").version(extra["kotlin.version"].toString())
+//        kotlin("plugin.spring").version(extra["kotlin.version"].toString())
+    }
+}
+
+rootProject.name = "skool"

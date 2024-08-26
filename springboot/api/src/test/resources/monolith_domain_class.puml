@@ -1,0 +1,197 @@
+@startuml
+'https://plantuml.com/class-diagram
+scale 750 width
+
+
+package backend"Domains.kt" <<Folder>> {
+  class Account{
+    id: UUID
+    login: String
+    firstName: String
+    lastName: String
+    email: String
+    imageUrl: String
+    activated: Boolean
+    langKey: String
+    createdBy: String
+    createdDate: Instant
+    lastModifiedBy: String
+    lastModifiedDate: Instant
+    authorities: Set<String>
+    + fun isActivated(): Boolean
+  }
+
+  class AccountCredentials {
+        id: UUID
+        login: String
+        firstName: String
+        lastName: String
+        email: String
+        password:String
+        activationKey:String
+        imageUrl: String
+        activated: Boolean
+        langKey: String
+        createdBy: String
+        createdDate: Instant
+        lastModifiedBy: String
+        lastModifiedDate: Instant
+        authorities: Set<String>
+  }
+
+  class Avatar {
+    id: UUID
+    login: String
+  }
+
+  class KeyAndPassword {
+    key: String
+    newPassword: String
+  }
+
+  class Login {
+   username: String
+   password: String
+   rememberMe: Boolean
+  }
+
+  class PasswordChange {
+   currentPassword: String
+   newPassword: String
+  }
+}
+
+json AccountJSON {
+   "id":"1",
+   "login":"admin",
+   "authorities":["ADMIN", "USER"],
+   "first_name":"Administrator",
+   "last_name":"Administrator",
+   "email":"admin@localhost",
+   "image_url":"",
+   "activated":"",
+   "lang_key":"",
+   "created_by":"",
+   "last_modified_by":""
+
+}
+
+AccountJSON  <|-- Account
+json AccountCredentialsJSON {
+   "password":"admin",
+   "activationKey":"",
+   "id":"1",
+   "login":"admin",
+   "authorities":["USER"],
+   "first_name":"Administrator",
+   "last_name":"Administrator",
+   "email":"admin@localhost",
+   "image_url":"",
+   "activated":"",
+   "lang_key":"",
+   "created_by":"",
+   "last_modified_by":""
+}
+'id;login;password_hash;first_name;last_name;email;image_url;activated;lang_key;created_by;last_modified_by
+'2;user;$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K;User;User;user@localhost;;true;fr;system;system
+
+
+AccountCredentialsJSON  <|-- AccountCredentials
+
+
+package backend"Services.kt" <<Node>> {
+    class SignUpService
+    class AccountService
+}
+
+package backend"Repositories.kt" <<Node>>{
+  interface AccountRepository{
+    + suspend fun findOneByLogin(login: String): Account
+    + suspend fun findOneByEmail(email: String): Account
+    + suspend fun save(accountCredentials: AccountCredentials): Account
+    + suspend fun delete(account: Account)
+    + suspend fun findActivationKeyByLogin(login: String): String
+  }
+
+  interface AuthorityRepository
+  interface AccountAuthorityRepository
+
+  class AccountRepositoryR2dbc implements AccountRepository
+  class AccountRepositoryInMemory implements AccountRepository
+  class AuthorityRepositoryR2dbc implements AuthorityRepository
+  class AuthorityRepositoryInMemory implements AuthorityRepository
+  class AccountAuthorityRepositoryR2dbc implements AccountAuthorityRepository
+  class AccountAuthorityRepositoryInMemory implements AccountAuthorityRepository
+
+
+'  extends
+'  AccountRepository <|-- AccountRepositoryR2dbc
+
+}
+
+
+package backend"Entities.kt" <<Database>> {
+
+  class AuthorityEntity{
+    role: String
+    + override fun getId()
+    + override fun isNew()
+  }
+
+  class EmailEntity{
+    value: String
+    + override fun getId()
+    + override fun isNew()
+  }
+
+  class PhoneEntity{
+      id: UUID
+      value: String
+  }
+
+  class AccountEntity{
+    id: UUID
+    login: String
+    password: String
+    lastName: String
+    email: String
+    activated: Boolean
+    langKey: String
+    imageUrl: String
+    activationKey: String
+    resetKey: String
+    resetDate: Instant
+    authorities: MutableSet<Authority>
+    createdBy: String
+    createdDate: Instant
+    lastModifiedBy: String
+    lastModifiedDate: Instant
+    version: Long
+    + fun toAccount(): Account
+  }
+
+  class AccountAuthorityEntity{
+      id: Long
+      userId: UUID
+      role: String
+  }
+
+}
+
+
+package backend"Controllers.kt" <<Cloud>> {
+
+  class SignUpController {
+    private accountService: AccountService
+    + suspend fun signup(ac: AccountCredentials)
+    + suspend fun activate(key: String)
+  }
+
+  class AccountException {
+    message: String
+  }
+'  inner
+  SignUpController +-- AccountException
+}
+
+@enduml

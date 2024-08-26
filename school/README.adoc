@@ -1,0 +1,68 @@
+= Bureau
+
+image::rsrc/img/lang-fr-red.svg[link=README.fr.adoc]
+
+== Goal
+The Bureau project aims to organize and structure my activity as a trainer and developer.
+
+The Bureau project is based on the link:https://gradle.org/[Gradle] software as a task automation tool.
+
+== How ?
+.The planned tasks are:
+- Creating a website for an independent professional, tests, construction, and deployment.
+- Creating a website for a training organization, tests, construction, and deployment.
+- Creating a Moodle instance as an educational system, launching locally for development, and deploying to an online host.
+
+.Practical implementation:
+- Training organization site: link:http://cheroliv.github.io/talaria[cheroliv.github.io/talaria]
+
+.System prerequisites
+- Java 17
+- Docker Desktop
+
+.How to launch a task in the terminal
+
+_Windows_
+[source,bash]
+----
+.\gradlew.bat :hello
+----
+
+_Linux & Mac_
+[source,bash]
+----
+./gradlew :hello
+----
+
+_Output_
+----
+> Task :hello
+Hello from the SchoolPlugin
+----
+
+== Available tasks
+
+.School
+- `:initWorkspace` - Initialize workspace configuration.
+- `:printDossierProfessionnelle` - Displays the internal structure of the professional dossier document in the terminal.
+
+.School Frontend
+- `:schoolFrontendServe` - Run the school site locally.
+- `:schoolFrontendDesign` - Design the school site in Storybook.
+- `:schoolFrontendTests` - Test the school site.
+- `:schoolFrontendPublish` - Publish the school site to CDN.
+
+.School Backoffice
+- `:schoolBackofficeTests` - Test the school backoffice.
+- `:schoolBackofficePush` - Pushes the school backoffice script to the Google Workspace.
+
+.School Moodle
+- `:projects:school:school-gradle-plugin:initMoodle` - Initializes the Moodle docker image in localhost.
+- `:projects:school:school-gradle-plugin:launchMoodleDev` - Launches the Moodle docker image in localhost.
+- `:projects:school:school-gradle-plugin:stopMoodleDev` - Stops the Moodle docker image in localhost.
+
+.Utilities
+- `:hello` - Greetings output
+- `:lsWorkingDir` - Executes the `ls` command on the current module directory.
+- `:confToYaml` - Utility task for development: displays configuration in yaml.
+- `:printEnvVars` - Retrieves environment variables.

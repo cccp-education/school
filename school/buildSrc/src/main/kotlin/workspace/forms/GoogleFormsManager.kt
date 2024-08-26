@@ -1,0 +1,3 @@
+package workspace.forms
+
+object GoogleFormsManager

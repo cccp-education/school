@@ -1,0 +1,37 @@
+spring-cli-standalone
+compose-samples
+*.code-workspace
+.idea
+# *.odt
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# android props
+local.properties
+
+# Visual studio code
+.vs
+
+# binaries
+bin
+
+# maven destination
+target
+
+# build destination
+output
+
+# extra private
+workspace.yml
+e3p0.yaml
+managed-jbake-context.yml
+private.properties
+
+# windows personalisation
+desktop.ini
+training-institut-2598582b592a.json
+.next

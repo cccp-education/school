@@ -1,0 +1,4 @@
+= README : google apps script & Google-Forms
+
+.Exemples :
+* https://developers.google.com/apps-script/add-ons/editors/forms/quickstart/forms-notifications?hl=fr#code.gs

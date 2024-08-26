@@ -1,0 +1,31 @@
+{
+  "health": {
+    "title": "Sağlık",
+    "refresh.button": "Yenile",
+    "stacktrace": "Yığın İzleme",
+    "details": {
+      "details": "Detaylar",
+      "properties": "Ozellikler",
+      "name": "Ad",
+      "value": "Deger",
+      "error": "Hata"
+    },
+    "indicator": {
+      "diskSpace": "Disk alanı",
+      "mail": "E-posta",
+      "livenessState": "Liveness state",
+      "readinessState": "Readiness state",
+      "ping": "Application",
+      "mongo": "MongoDB"
+    },
+    "table": {
+      "service": "Hizmetin adı",
+      "status": "Durum"
+    },
+    "status": {
+      "UNKNOWN": "UNKNOWN",
+      "UP": "AKTİF",
+      "DOWN": "DEAKTİF"
+    }
+  }
+}

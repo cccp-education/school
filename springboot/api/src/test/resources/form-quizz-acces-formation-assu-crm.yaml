@@ -1,0 +1,20 @@
+form:
+    name: evaluation-acces-formation-assu-crm
+    description: Evaluation d'acces en formation Assu-CRM
+    form-type: Quizz
+    questions:
+      Question:
+        statement: Qu'est-ce que Google Form Script ?
+        propositions:
+          - proposition: Un service de traitement de texte en ligne
+          - proposition: Un langage de programmation pour automatiser des actions dans Google Forms
+          - proposition: Un outil de conception graphique pour formulaires
+      correction:
+        - index-reponse: 1
+      explication: Google Form Script est un langage de programmation permettant d'automatiser des actions dans Google Forms à l'aide de scripts associés.
+      skillz:
+        - skill:
+            bloc-name: Google Form Script
+            level: Expert
+      taxonomy:
+        level: 1

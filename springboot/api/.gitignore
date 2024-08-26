@@ -1,0 +1,26 @@
+# Project exclude paths
+e3p0.yaml
+/browser/build/
+/build/
+/build/js/packages/section-browser/kotlin/
+/common/build/
+/desktop/build/
+.gradle
+.idea
+gradle/wrapper/gradle-wrapper.jar
+data
+section.code-workspace
+simple-server/bin
+kotlin-js-store/yarn.lock
+local.properties
+private
+bin
+.classpath
+.project
+.settings
+src/main/resources/application-mailslurp.yml
+.vscode
+kotlin-springboot.code-workspace
+*.iws
+*.iml
+*.ipr

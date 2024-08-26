@@ -1,0 +1,23 @@
+= Static site based on JBake, Gradle and Git
+
+https://docs.gradle.org/current/userguide/userguide.html[Gradle]
++ https://jbake.org/[JBake]
++ https://pages.github.com/[Github Pages]
+
+==== To make the script executable.
+```
+chmod u+x jbake.sh
+```
+
+
+== Run in live local mode :
+```
+./jbake.sh
+```
+
+
+== Deploy to Github Pages
+
+```
+./gradlew publishSite
+```

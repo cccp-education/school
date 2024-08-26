@@ -1,0 +1,523 @@
+= kotlin-springboot
+
+== *springboot codebase*
+
+.stack:
+* webflux
+* r2dbc spring-data h2
+* rest api
+* spring security jwt
+* coroutines
+* Http problem details RFC7807
+* junit5
+* gradle
+* gradle-kotlin-dsl
+* google-jib
+* google-appengine
+* mailSlurp-api
+* gmail-api
+* task scheduling
+* cli: command line interface
+* github-action(todo)
+
+.features:
+* Signup account
+* Password reset and update
+* Account settings
+* Users management
+
+== Running
+
+==== **to test the app**
+
+Open terminal and run : ```./gradlew check``` +
+
+
+==== **to run the app**
+
+Open terminal and run : ```./gradlew bootRun``` +
+
+
+and launch http://localhost:8080/
+
+==== **to run the cli**
+
+Open terminal and run : ```./gradlew cli```
+
+
+== REST-API
+
+=== *user-resource: /api/admin/users*
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/admin/users
+2+^.e|Parameters
+|Name |Description
+|page +
+_integer_ +
+(query)
+m|Zero-based page index (0..N)
+|size +
+_integer_ +
+(query)
+m|The size of the page to be returned
+|sort +
+_array[string]_ +
+(query)
+m|Sorting criteria in the format: property,(asc\|desc).
+Default sort order is ascending. Multiple sort criteria are supported.
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: AdminUserDTO
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|PUT /api/admin/users
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain user object
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: AdminUserDTO
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/admin/users
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body required containing user object
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: User
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/admin/users/{login}
+2+^.e|Parameters
+|Name |Description
+|login *required +
+_string_ +
+(path) +
+m|login
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: AdminUserDTO
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|DELETE /api/admin/users/{login}
+2+^.e|Parameters
+|Name |Description
+|login *required +
+_string_ +
+(path) +
+m|login
+2+^.e|Responses
+|Code |Description
+|200
+|OK
+|===
+======
+
+=== *account-resource*
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/register
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain ManagedUserVM object
+2+^.e|Responses
+|Code |Description
+|201
+|CREATED
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/authenticate
+2+^.e|Parameters
+2+m| no parameters
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: string +
+current role
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/account
+2+^.e|Parameters
+2+m| no parameters
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: AdminUserDTO
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/account
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain ManagedUserVM object
+2+^.e|Responses
+|Code |Description
+|200
+|OK
+|===
+======
+
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/account/reset-password/init
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain email string
+2+^.e|Responses
+|Code |Description
+|200
+|OK
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/account/reset-password/finish
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain PasswordChangeDTO object
+2+^.e|Responses
+|Code |Description
+|200
+|OK
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/account/reset-password/finish
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain KeyAndPasswordVM object
+2+^.e|Responses
+|Code |Description
+|200
+|OK
+|===
+======
+
+
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/account/change-password
+2+^.e|Parameters
+2+m|no parameters
+2+m|Request body *required must contain PasswordChangeDTO object
+2+^.e|Responses
+|Code|Description
+|200
+|OK
+|===
+======
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/activate
+2+^.e|Parameters
+|Name |Description
+|key *required +
+_string_ +
+(query) +
+m|activation key
+|===
+======
+
+=== *user-jwt-controller: /api/authenticate*
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|POST /api/authenticate
+2+^.e|Parameters
+2+m| no parameters
+2+m| Request body *required must contain LoginVM object
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: JWTToken
+|===
+======
+
+
+=== *public-user-resource*
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/users
+2+^.e|Parameters
+|Name |Description
+|page +
+_integer_ +
+(query)
+m|Zero-based page index (0..N)
+|size +
+_integer_ +
+(query)
+m|The size of the page to be returned
+|sort +
+_array[string]_ +
+(query)
+m|Sorting criteria in the format: property,(asc\|desc).
+Default sort order is ascending. Multiple sort criteria are supported.
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: UserDTO
+|===
+======
+
+
+======
+[grid=rows,frame=topbot,width=100%]
+|===
+2+^.h|GET /api/authorities
+2+^.e|Parameters
+2+m| no parameters
+2+^.e|Responses
+|Code |Description
+|200
+|OK +
+Media type: \*/* +
+Controls Accept header. +
+Schema: string array of authorities
+|===
+======
+
+=== *schemas*
+
+
+======
+.AdminUserDTO
+[source]
+----
+AdminUserDTO {
+id	integer($int64)
+login*	string
+maxLength: 50
+minLength: 1
+pattern: ^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$
+firstName	string
+maxLength: 50
+minLength: 0
+lastName	string
+maxLength: 50
+minLength: 0
+email	string
+maxLength: 254
+minLength: 5
+imageUrl	string
+maxLength: 256
+minLength: 0
+activated	boolean
+langKey	string
+maxLength: 10
+minLength: 2
+createdBy	string
+createdDate	string($date-time)
+lastModifiedBy	string
+lastModifiedDate	string($date-time)
+authorities	[
+uniqueItems: true
+string]
+}
+----
+======
+
+======
+.ManagedUserVM
+[source]
+----
+ManagedUserVM {
+id	integer($int64)
+login*	string
+maxLength: 50
+minLength: 1
+pattern: ^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$
+firstName	string
+maxLength: 50
+minLength: 0
+lastName	string
+maxLength: 50
+minLength: 0
+email	string
+maxLength: 254
+minLength: 5
+imageUrl	string
+maxLength: 256
+minLength: 0
+activated	boolean
+langKey	string
+maxLength: 10
+minLength: 2
+createdBy	string
+createdDate	string($date-time)
+lastModifiedBy	string
+lastModifiedDate	string($date-time)
+authorities	[...]
+password	string
+maxLength: 100
+minLength: 4
+}
+----
+======
+
+======
+.LoginVM
+[source]
+----
+LoginVM {
+username*	string
+maxLength: 50
+minLength: 1
+password*	string
+maxLength: 100
+minLength: 4
+rememberMe	boolean
+}
+----
+======
+
+======
+.JWTToken
+[source]
+----
+JWTToken {
+id_token	string
+}
+----
+======
+
+======
+.User
+[source]
+----
+User {
+id	integer($int64)
+login*	string
+maxLength: 50
+minLength: 1
+pattern: ^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$
+firstName	string
+maxLength: 50
+minLength: 0
+lastName	string
+maxLength: 50
+minLength: 0
+email	string
+maxLength: 254
+minLength: 5
+activated*	boolean
+langKey	string
+maxLength: 10
+minLength: 2
+imageUrl	string
+maxLength: 256
+minLength: 0
+resetDate	string($date-time)
+}
+----
+======
+
+======
+.KeyAndPasswordVM
+[source]
+----
+KeyAndPasswordVM {
+key	string
+newPassword	string
+}
+----
+======
+
+======
+.PasswordChangeDTO
+[source]
+----
+PasswordChangeDTO {
+currentPassword	string
+newPassword	string
+}
+----
+======
+
+======
+.UserDTO
+[source]
+----
+UserDTO {
+id	integer($int64)
+login	string
+}
+----
+======
+
+== link:cadrage_webapp.adoc[Project phases in french]

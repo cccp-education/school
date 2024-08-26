@@ -1,0 +1,8 @@
+= Pokedex et pagination
+
+
+Challenge:
+Afficher la liste des pokemons avec pagination à partir de la précédente version. +
+Les sources sont dans le dossier 03_pokedex_pagination +
+
+link:../README.adoc#toc[acceuil]

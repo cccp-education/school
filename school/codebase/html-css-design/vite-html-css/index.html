@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS + Bootstrap</title>
+</head>
+
+<body>
+    <div class="container py-4 px-3 mx-auto">
+        <h1>Catalogue</h1>
+        <p class="read-the-docs">Formations</p>
+        <nav id="pokedex_pagination" aria-label="pokemon navigation">
+            <ul class="pagination pagination-lg">
+                <li class="page-item">
+                    <a href="#" class="page-link">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">&lt;</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">1</a>
+                </li>
+                <li class="page-item active">
+                    <a href="#" class="page-link">2</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">3</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">4</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">5</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">&gt;</a>
+                </li>
+                <li class="page-item">
+                    <a href="#" class="page-link">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+        <table id="data-table" class="table table-bordered table-hover">
+            <thead id="table-head" class="table-warning">
+                <tr>
+                    <!-- <th scope="col">Index</th> -->
+                    <th scope="col">Name</th>
+                    <th scope="col">Id</th>
+                </tr>
+            </thead>
+            <tbody id="table-body" class="table-group-divider"></tbody>
+        </table>
+
+    <div id="hero">
+        <a href="https://vitejs.dev" target="_blank">
+            <img src="${viteLogo}" class="logo vanilla" alt="Vite logo" />
+        </a>
+        <a href="https://www.typescriptlang.org/" target="_blank">
+            <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
+        </a>
+        <a href="https://getbootstrap.com/" target="_blank">
+            <img src="${bootstrapLogo}" class="logo vanilla" alt="Bootstrap logo" />
+        </a>
+    </div>
+    </div>
+    <!-- <script type="module" src="/src/pokemons.ts"> -->
+    <script type="module" src="src/index.ts">
+    </script>
+</body>
+
+</html>

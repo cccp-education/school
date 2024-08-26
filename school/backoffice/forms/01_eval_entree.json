@@ -1,0 +1,102 @@
+[
+  {
+    "question": "Qu'est-ce que Google Form Script ?",
+    "propositions": [
+      "Un service de traitement de texte en ligne",
+      "Un langage de programmation pour automatiser des actions dans Google Forms",
+      "Un outil de conception graphique pour formulaires"
+    ],
+    "index_correction": 1,
+    "explication": "Google Form Script est un langage de programmation permettant d'automatiser des actions dans Google Forms à l'aide de scripts associés."
+  },
+  {
+    "question": "Quel est l'objectif principal de la section : Création d'un Formulaire Google et d'un Script associé ?",
+    "propositions": [
+      "Explorer les fonctionnalités avancées de Google Forms",
+      "Apprendre à lier des formulaires à des scripts dans Google Apps Script",
+      "Configurer des déclencheurs pour automatiser des tâches"
+    ],
+    "index_correction": 1,
+    "explication": "Cette section vise à montrer comment créer un formulaire dans Google Forms et à le lier à un script dans Google Apps Script."
+  },
+  {
+    "question": "Quelle est l'utilité du déclencheur 'on submit' dans Google Form Script ?",
+    "propositions": [
+      "Pour déclencher une alerte à chaque soumission de formulaire",
+      "Pour automatiser des actions lorsqu'un formulaire est soumis",
+      "Pour archiver les formulaires après leur soumission"
+    ],
+    "index_correction": 1,
+    "explication": "Le déclencheur 'on submit' permet d'automatiser des actions spécifiques lorsqu'un utilisateur soumet le formulaire."
+  },
+  {
+    "question": "Comment peut-on configurer un déclencheur 'on submit' dans Google Form Script ?",
+    "propositions": [
+      "Via l'interface graphique de Google Forms",
+      "En utilisant l'éditeur de script dans Google Sheets",
+      "En créant une nouvelle feuille de calcul Google"
+    ],
+    "index_correction": 1,
+    "explication": "Le déclencheur 'on submit' est configuré dans l'éditeur de script associé à Google Sheets."
+  },
+  {
+    "question": "Quelle est la fonction principale du script dans la section 'Automatisation de la Tâche de Sauvegarde' ?",
+    "propositions": [
+      "Calculer la somme des réponses dans le formulaire",
+      "Extraire les données du formulaire et les sauvegarder dans un fichier Excel",
+      "Afficher un message de remerciement aux participants du formulaire"
+    ],
+    "index_correction": 1,
+    "explication": "Le script extrait les données du formulaire Google et les sauvegarde dans un fichier Excel."
+  },
+  {
+    "question": "Quel type de fichier est utilisé pour sauvegarder les données dans la section 'Automatisation de la Tâche de Sauvegarde' ?",
+    "propositions": [
+      "CSV",
+      "PDF",
+      "TXT"
+    ],
+    "index_correction": 0,
+    "explication": "Le format CSV est utilisé pour sauvegarder les données du formulaire en raison de sa simplicité et de sa compatibilité."
+  },
+  {
+    "question": "Quelle étape est incluse dans la section 'Analyse des Résultats et Bonnes Pratiques' ?",
+    "propositions": [
+      "Vérification des résultats de l'automatisation",
+      "Configuration du formulaire initial",
+      "Création d'un nouveau formulaire"
+    ],
+    "index_correction": 0,
+    "explication": "L'analyse des résultats inclut la vérification pour s'assurer que l'automatisation fonctionne correctement."
+  },
+  {
+    "question": "Que permet de faire le script au déclencheur 'on submit' vu en formation google forms script ?",
+    "propositions": [
+      "Ajouter des colonnes au formulaire Google",
+      "Modifier le texte des questions dans le formulaire",
+      "Automatiser des actions en réponse à la soumission d'un formulaire"
+    ],
+    "index_correction": 2,
+    "explication": "Le script est déclenché automatiquement à chaque soumission du formulaire."
+  },
+  {
+    "question": "Quel est l'avantage principal de l'automatisation dans Google Form Script ?",
+    "propositions": [
+      "Ajouter des fonctionnalités avancées au formulaire",
+      "Gagner du temps en automatisant des tâches répétitives",
+      "Renforcer la sécurité du formulaire"
+    ],
+    "index_correction": 1,
+    "explication": "L'automatisation permet de gagner du temps en exécutant automatiquement des actions qui seraient autrement répétitives."
+  },
+  {
+    "question": "Pourquoi est-il important de suivre les bonnes pratiques lors de l'automatisation avec Google Form Script ?",
+    "propositions": [
+      "Pour rendre les scripts plus compliqués",
+      "Pour assurer la compatibilité avec d'autres applications",
+      "Pour garantir la fiabilité et la maintenance du code"
+    ],
+    "index_correction": 2,
+    "explication": "Suivre les bonnes pratiques assure la fiabilité du code et facilite la maintenance à long terme."
+  }
+]
