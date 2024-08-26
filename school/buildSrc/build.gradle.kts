@@ -39,8 +39,6 @@ dependencies {
             "io.arrow-kt:arrow-fx-coroutines:$arrowKtVersion",
             "io.arrow-kt:arrow-integrations-jackson-module:0.14.1",
             "org.apache.poi:poi-ooxml:5.2.5",
-            "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
-            "dev.langchain4j:langchain4j:$langchain4jVersion",
             "org.jbake:jbake-gradle-plugin:5.5.0",
             "org.slf4j:slf4j-simple:2.0.7",
             "org.asciidoctor:asciidoctorj-diagram:2.3.1",
@@ -48,8 +46,10 @@ dependencies {
             "org.asciidoctor:asciidoctor-gradle-base:$asciidoctorGradleVersion",
             "org.asciidoctor:asciidoctor-gradle-jvm-gems:$asciidoctorGradleVersion",
             "com.burgstaller:okhttp-digest:1.10",
-            "org.ysb33r.gradle:grolifant:0.12.1"
-        )
+            "org.ysb33r.gradle:grolifant:0.12.1",
+            "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
+            "dev.langchain4j:langchain4j:$langchain4jVersion",
+            )
     }
     deps.forEach(::implementation)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
