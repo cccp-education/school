@@ -1,39 +1,36 @@
 package workspace.ai
 
+import dev.langchain4j.model.openai.OpenAiChatModel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import  workspace.ai.AssistantManager.apiKey
 
-/*
-val Project.apiKey: String
-    get() = Properties().apply {
-        "$projectDir/private.properties"
-            .let(::File)
-            .inputStream()
-            .use(::load)
-    }["OPENAI_API_KEY"] as String
 
-tasks.register("displayOpenAIKey") {
-    group = "school-ai"
-    description = "Display the open ai api keys stored in private.properties"
-    doFirst { println("apiKey : $apiKey") }
-}
-
-tasks.register("helloChatGPT") {
-    group = "school-ai"
-    description = "Display the open ai chatgpt hello prompt request."
-    doFirst {
-        OpenAiChatModel
-            .withApiKey(apiKey)
-            .generate("Say 'Hello World'")
-            .apply(::println)
-    }
-}*/
-
-@Suppress("unused")
 class AssistantPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.task("helloAssistant") {
-            doFirst { println("Hello from assistant") }
+        project.run {
+            task("helloAssistant") {
+                group = "school-ai"
+                description = "Greetings from AI assistant!"
+                doFirst { println("Hello from assistant") }
+            }
+
+            task("displayOpenAIKey") {
+                group = "school-ai"
+                description = "Display the open ai api keys stored in private.properties"
+                doFirst { println("apiKey : ${project.apiKey}") }
+            }
+
+            task("helloOpenAiChatGPT") {
+                group = "school-ai"
+                description = "Display the open ai chatgpt hello prompt request."
+                doFirst {
+                    OpenAiChatModel
+                        .withApiKey(apiKey)
+                        .generate("Say 'Hello World'")
+                        .apply(::println)
+                }
+            }
         }
     }
 }

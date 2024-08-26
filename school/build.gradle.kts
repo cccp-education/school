@@ -15,7 +15,6 @@ apply<workspace.forms.FormPlugin>()
 apply<JBakeGhPagesPlugin>()
 apply<AssistantPlugin>()
 
-
 purchaseArtifact()
 
 tasks.wrapper {
