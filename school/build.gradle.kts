@@ -23,3 +23,10 @@ tasks.wrapper {
 }
 
 //kotlin { jvmToolchain(22) }
+tasks.withType<JavaExec> {
+    jvmArgs = listOf(
+        "--add-modules=jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "--enable-preview"
+    )
+}

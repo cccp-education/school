@@ -49,6 +49,7 @@ dependencies {
             "org.ysb33r.gradle:grolifant:0.12.1",
             "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
             "dev.langchain4j:langchain4j:$langchain4jVersion",
+            "com.avast.gradle:gradle-docker-compose-plugin:0.14.2"
             )
     }
     deps.forEach(::implementation)
@@ -72,3 +73,11 @@ tasks.named<Task>("check") { dependsOn(functionalTest) }
 tasks.named<Test>("test") { useJUnitPlatform() }
 
 //kotlin { jvmToolchain(JavaVersion.VERSION_21.ordinal) }
+
+tasks.withType<JavaExec> {
+    jvmArgs = listOf(
+        "--add-modules=jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "--enable-preview"
+    )
+}

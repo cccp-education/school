@@ -3,7 +3,7 @@ package workspace.ai
 import dev.langchain4j.model.openai.OpenAiChatModel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import  workspace.ai.AssistantManager.apiKey
+import workspace.ai.AssistantManager.apiKey
 
 
 class AssistantPlugin : Plugin<Project> {
