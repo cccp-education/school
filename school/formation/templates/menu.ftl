@@ -40,8 +40,7 @@
 
             <ul class="nav navbar-nav">
                 <li><a href="mailto:talaria.school@gmail.com" target="_blank"><i class="fa-regular fa-envelope fa-lg"></i></a></li>
-<#--                <li><a href="https://www.linkedin.com/in/TODO/" target="_blank"><i class="fa-brands fa-linkedin fa-lg"></i></a></li>-->
-<#--                <li><a href="https://github.com/TODO" target="_blank"><i class="fa-brands fa-github fa-lg"></i></a></li>-->
+                <li><a href="https://github.com/cheroliv" target="_blank"><i class="fa-brands fa-github fa-lg"></i></a></li>
                 <li><a href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>${config.feed_file}"><i class="fa fa-rss fa-lg"></i></a></li>
             </ul>
 
