@@ -22,7 +22,6 @@ tasks.wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-//kotlin { jvmToolchain(22) }
 tasks.withType<JavaExec> {
     jvmArgs = listOf(
         "--add-modules=jdk.incubator.vector",
