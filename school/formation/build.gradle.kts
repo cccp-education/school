@@ -1,3 +1,5 @@
+@file:Suppress("ImplicitThis")
+
 import Build_gradle.Formation.JSON_FILE
 import Build_gradle.Formation.ROOT_NODE
 import Build_gradle.RepositoryConfiguration.Companion.CNAME
@@ -30,6 +32,10 @@ plugins {
 }
 
 repositories { ruby { gems() } }
+
+
+//TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
+
 
 tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
     group = "slider"
