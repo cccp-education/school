@@ -36,16 +36,16 @@ repositories { ruby { gems() } }
 
 //TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
 
-tasks.register("deploySlides") {
-    group = "slider"
-    description = "Deploy sliders to remote repository"
-    dependsOn("asciidoctor")
-    doLast {
-        println(layout.buildDirectory.get().asFile.absolutePath + "/docs/asciidocRevealJs/")
-//        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
-//            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
-    }
-}
+//tasks.register("deploySlides") {
+//    group = "slider"
+//    description = "Deploy sliders to remote repository"
+//    dependsOn("asciidoctor")
+//    doLast {
+//        println(layout.buildDirectory.get().asFile.absolutePath + "/docs/asciidocRevealJs/")
+////        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
+////            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+//    }
+//}
 
 
 
@@ -194,10 +194,10 @@ data class BakeConfiguration(
     val cname: String?,
 )
 
-data class SlidesConfiguration(
-    val srcPath: String,
-    val pushPage: GitPushConfiguration,
-)
+//data class SlidesConfiguration(
+//    val srcPath: String,
+//    val pushPage: GitPushConfiguration,
+//)
 
 
 sealed class FileOperationResult {
