@@ -1,6 +1,4 @@
 import workspace.WorkspaceUtils.purchaseArtifact
-import workspace.ai.AssistantPlugin
-import workspace.jamstack.JBakeGhPagesPlugin
 
 
 plugins {
@@ -11,8 +9,8 @@ plugins {
 
 apply<workspace.school.SchoolPlugin>()
 apply<workspace.forms.FormPlugin>()
-apply<JBakeGhPagesPlugin>()
-apply<AssistantPlugin>()
+apply<workspace.jamstack.JBakeGhPagesPlugin>()
+apply<workspace.ai.AssistantPlugin>()
 
 purchaseArtifact()
 
