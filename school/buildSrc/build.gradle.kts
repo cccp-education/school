@@ -17,7 +17,7 @@ dependencies {
     val arrowKtVersion = "1.2.4"
     val jgitVersion = "6.8.0.202311291450-r"
     val langchain4jVersion = "0.33.0"
-    val asciidoctorGradleVersion="4.0.0-alpha.1"
+    val asciidoctorGradleVersion = "4.0.0-alpha.1"
     val deps by lazy {
         setOf(
             "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
@@ -47,10 +47,11 @@ dependencies {
             "org.asciidoctor:asciidoctor-gradle-jvm-gems:$asciidoctorGradleVersion",
             "com.burgstaller:okhttp-digest:1.10",
             "org.ysb33r.gradle:grolifant:0.12.1",
-            "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
+            "com.avast.gradle:gradle-docker-compose-plugin:0.14.2",
+//            "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
             "dev.langchain4j:langchain4j:$langchain4jVersion",
-            "com.avast.gradle:gradle-docker-compose-plugin:0.14.2"
-            )
+
+        )
     }
     deps.forEach(::implementation)
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

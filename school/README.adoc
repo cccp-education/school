@@ -66,3 +66,18 @@ Hello from the SchoolPlugin
 - `:lsWorkingDir` - Executes the `ls` command on the current module directory.
 - `:confToYaml` - Utility task for development: displays configuration in yaml.
 - `:printEnvVars` - Retrieves environment variables.
+
+
+== Databases
+
+.postgresql
+[bash,source]
+----
+sudo docker compose -f ~/workspace/atelier/school/database/postgresql/postgresql.yml up -d
+----
+
+.mongodb
+[bash,source]
+----
+sudo docker compose -f ~/workspace/atelier/school/database/mongodb/mongodb.yml up -d
+----

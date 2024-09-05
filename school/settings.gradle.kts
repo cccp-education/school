@@ -12,6 +12,7 @@ pluginManagement {
     }
     plugins {
         id("org.jbake.site").version("5.5.0")
+        id("com.github.node-gradle.node").version("7.0.1")
 //        id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
 //        id("org.asciidoctor:asciidoctor-gradle-jvm-slides") version (asciidoctorGradleVersion)
 //        id("org.asciidoctor:asciidoctor-gradle-base") version (asciidoctorGradleVersion)
