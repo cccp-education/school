@@ -36,6 +36,18 @@ repositories { ruby { gems() } }
 
 //TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
 
+tasks.register("deploySlides") {
+    group = "slider"
+    description = "Deploy sliders to remote repository"
+    dependsOn("asciidoctor")
+    doLast {
+        println(layout.buildDirectory.get().asFile.absolutePath + "/docs/asciidocRevealJs/")
+//        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
+//            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+    }
+}
+
+
 
 tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
     group = "slider"
@@ -109,7 +121,6 @@ tasks.register("cleanBuild") {
     }
 }
 
-
 tasks.register<Exec>("openFirefox") {
     group = "slider"
     description = "Open the default.deck.file presentation in firefox"
@@ -182,6 +193,12 @@ data class BakeConfiguration(
     val destDirPath: String,
     val cname: String?,
 )
+
+data class SlidesConfiguration(
+    val srcPath: String,
+    val pushPage: GitPushConfiguration,
+)
+
 
 sealed class FileOperationResult {
     sealed class GitOperationResult {

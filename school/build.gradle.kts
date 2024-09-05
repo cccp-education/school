@@ -1,4 +1,3 @@
-
 import workspace.WorkspaceUtils.purchaseArtifact
 import workspace.ai.AssistantPlugin
 import workspace.jamstack.JBakeGhPagesPlugin
