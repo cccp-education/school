@@ -33,22 +33,6 @@ plugins {
 
 repositories { ruby { gems() } }
 
-
-//TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
-
-//tasks.register("deploySlides") {
-//    group = "slider"
-//    description = "Deploy sliders to remote repository"
-//    dependsOn("asciidoctor")
-//    doLast {
-//        println(layout.buildDirectory.get().asFile.absolutePath + "/docs/asciidocRevealJs/")
-////        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
-////            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
-//    }
-//}
-
-
-
 tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
     group = "slider"
     description = "Slider settings"
@@ -118,6 +102,32 @@ tasks.register("cleanBuild") {
                 ?.filter { it.isFile && it.name.endsWith(".html") }
                 ?.forEach { it.delete() }
         }
+    }
+}
+
+//TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
+
+tasks.register("deploySlides") {
+    group = "slider"
+    description = "Deploy sliders to remote repository"
+    dependsOn("asciidoctor")
+    doFirst { println("Task description :\n\t$description") }
+    doLast {
+        println("path :\n\t${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/")
+////        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
+////            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+
+//        fun pushPages(
+//            destPath: () -> String, pathTo: () -> String
+//        ) = pathTo().run(::createRepoDir).let { it: File ->
+//            copyBakedFilesToRepo(destPath(), it).takeIf { it is FileOperationResult.Success }?.run {
+//                initAddCommit(it, localConf)
+//                push(it, localConf)
+//                it.deleteRecursively()
+//                destPath().let(::File).deleteRecursively()
+//            }
+//        }
+
     }
 }
 
@@ -194,10 +204,10 @@ data class BakeConfiguration(
     val cname: String?,
 )
 
-//data class SlidesConfiguration(
-//    val srcPath: String,
-//    val pushPage: GitPushConfiguration,
-//)
+data class RevealConfiguration(
+    val srcPath: String,
+    val pushPage: GitPushConfiguration,
+)
 
 
 sealed class FileOperationResult {
