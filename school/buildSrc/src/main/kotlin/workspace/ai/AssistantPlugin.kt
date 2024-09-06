@@ -5,7 +5,6 @@ import dev.langchain4j.model.openai.OpenAiChatModel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import workspace.ai.AssistantManager.apiKey
-import java.time.Duration
 import java.time.Duration.ofSeconds
 
 
@@ -29,24 +28,32 @@ class AssistantPlugin : Plugin<Project> {
                 group = "school-ai"
                 description = "Display the open ai chatgpt hello prompt request."
                 doFirst {
-                    OllamaChatModel.builder()
+                    OllamaChatModel
+                        .builder()
                         .baseUrl("http://localhost:11434")
                         .modelName("phi3")
                         .temperature(0.8)
                         .timeout(ofSeconds(6000))
+                        .logRequests(true)
+                        .logResponses(true)
                         .build()
                         .run {
                             println(
                                 generate(
                                     """config```--lang=fr```. 
-                            |Salut, je te baptise E3P0 tu es mon assistant,
-                            | je suis développeur logiciel dans l'EdTech et formateur.
-                            | ta mission est de m'aider dans mon activité. répon moi en maximum 350 mots""".trimMargin()
+                            | Salut appel moi ${System.getProperty("user.name")}, 
+                            | toi je te nommerai E3P0, tu es mon assistant.
+                            | Notre coeur de métier est le développement logiciel dans l'EdTech 
+                            | et la formation professionnelle pour adulte. 
+                            | Notre spécialisation est dans l'ingenieurie de pédagogie pour adulte,
+                            | et le software carftmanship avec les méthodes agiles.
+                            | ta mission est de m'aider dans mon activité d'ecriture de formation et generation de code.
+                            | Réponds moi à ce premier échange uniquement en maximum 200 mots""".trimMargin()
                                 )
                             )
                         }
                 }
-                doLast{
+                doLast {
                     /*import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
