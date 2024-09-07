@@ -9,9 +9,29 @@ import java.time.Duration.ofSeconds
 
 
 class AssistantPlugin : Plugin<Project> {
+    companion object {
+        val prompt = """config```--lang=fr;```. 
+                            | Salut je suis ${System.getProperty("user.name")}, 
+                            | toi tu es E3P0, tu es mon assistant.
+                            | Le coeur de métier de ${System.getProperty("user.name")} est le développement logiciel dans l'EdTech 
+                            | et la formation professionnelle pour adulte. 
+                            | La spécialisation de ${System.getProperty("user.name")} est dans l'ingenieurie de pédagogie pour adulte,
+                            | et le software craftmanship avec les méthodes agiles.
+                            | E3P0 ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
+                            | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
+            .trimMargin()
+    }
 
     override fun apply(project: Project) {
         project.run {
+
+            task("displayAIPrompt") {
+                group = "school-ai"
+                description = "Dislpay on console AI prompt assistant"
+                doFirst { prompt.let(::println) }
+            }
+
+
             task("helloAssistant") {
                 group = "school-ai"
                 description = "Greetings from AI assistant!"
@@ -31,27 +51,13 @@ class AssistantPlugin : Plugin<Project> {
                     OllamaChatModel
                         .builder()
                         .baseUrl("http://localhost:11434")
-                        .modelName("phi3")
+                        .modelName("phi3.5")
                         .temperature(0.8)
                         .timeout(ofSeconds(6000))
                         .logRequests(true)
                         .logResponses(true)
                         .build()
-                        .run {
-                            println(
-                                generate(
-                                    """config```--lang=fr```. 
-                            | Salut appel moi ${System.getProperty("user.name")}, 
-                            | toi je te nommerai E3P0, tu es mon assistant.
-                            | Notre coeur de métier est le développement logiciel dans l'EdTech 
-                            | et la formation professionnelle pour adulte. 
-                            | Notre spécialisation est dans l'ingenieurie de pédagogie pour adulte,
-                            | et le software carftmanship avec les méthodes agiles.
-                            | ta mission est de m'aider dans mon activité d'ecriture de formation et generation de code.
-                            | Réponds moi à ce premier échange uniquement en maximum 200 mots""".trimMargin()
-                                )
-                            )
-                        }
+                        .run { generate(prompt).let(::println) }
                 }
                 doLast {
                     /*import dev.langchain4j.data.message.AiMessage;
