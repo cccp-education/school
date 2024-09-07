@@ -90,10 +90,10 @@ class AssistantPlugin : Plugin<Project> {
                             .run {
                                 when (val answer = generateStreamingResponse(this, prompt)) {
                                     is Either.Right ->
-                                        "\nComplete response received: ${answer.value.content().text()}".run(::println)
+                                        "Complete response received: \n${answer.value.content().text()}".run(::println)
 
                                     is Either.Left ->
-                                        "\nError during response generation: ${answer.value}".run(::println)
+                                        "Error during response generation: \n${answer.value}".run(::println)
                                 }
                             }
                     }
