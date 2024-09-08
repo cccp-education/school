@@ -8,8 +8,6 @@ import arrow.core.getOrElse
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.model.StreamingResponseHandler
 import dev.langchain4j.model.chat.StreamingChatLanguageModel
-import dev.langchain4j.model.ollama.OllamaChatModel
-import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
 import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.runBlocking
@@ -17,32 +15,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import workspace.ai.AssistantManager.apiKey
-import java.time.Duration.ofSeconds
+import workspace.ai.OllamaChat.createOllamaChatModel
+import workspace.ai.OllamaChat.createOllamaStreamingChatModel
 import kotlin.coroutines.resume
 
-
 class AssistantPlugin : Plugin<Project> {
-
-    private suspend fun generateStreamingResponse(
-        model: StreamingChatLanguageModel,
-        promptMessage: String
-    ): Either<Throwable, Response<AiMessage>> = catch {
-        suspendCancellableCoroutine { continuation ->
-            model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
-                override fun onNext(token: String) {
-                    print(token)
-                }
-
-                override fun onComplete(response: Response<AiMessage>) {
-                    continuation.resume(response)
-                }
-
-                override fun onError(error: Throwable) {
-                    continuation.resume(Left(error).getOrElse { throw it })
-                }
-            })
-        }
-    }
 
     companion object {
         val prompt = """config```--lang=fr;```. 
@@ -55,29 +32,6 @@ class AssistantPlugin : Plugin<Project> {
                             | E3P0 ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
                             | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
             .trimMargin()
-
-        fun Project.createOllamaChatModel(): OllamaChatModel =
-            OllamaChatModel.builder().apply {
-                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                timeout(ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                logRequests(true)
-                logResponses(true)
-            }.build()
-
-
-        fun Project.createOllamaStreamingChatModel(): OllamaStreamingChatModel =
-            OllamaStreamingChatModel
-                .builder()
-                .apply {
-                    baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                    modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                    temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                    timeout(ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                    logRequests(true)
-                    logResponses(true)
-                }.build()
     }
 
     override fun apply(project: Project) {
@@ -128,6 +82,28 @@ class AssistantPlugin : Plugin<Project> {
                         .run(::println)
                 }
             }
+        }
+    }
+
+
+    private suspend fun generateStreamingResponse(
+        model: StreamingChatLanguageModel,
+        promptMessage: String
+    ): Either<Throwable, Response<AiMessage>> = catch {
+        suspendCancellableCoroutine { continuation ->
+            model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
+                override fun onNext(token: String) {
+                    print(token)
+                }
+
+                override fun onComplete(response: Response<AiMessage>) {
+                    continuation.resume(response)
+                }
+
+                override fun onError(error: Throwable) {
+                    continuation.resume(Left(error).getOrElse { throw it })
+                }
+            })
         }
     }
 }

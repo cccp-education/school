@@ -16,9 +16,10 @@ dependencies {
     val jacksonVersion = "2.17.2"
     val arrowKtVersion = "1.2.4"
     val jgitVersion = "6.8.0.202311291450-r"
-    val langchain4jVersion = "0.33.0"
+    val langchain4jVersion = "0.34.0"
     val asciidoctorGradleVersion = "4.0.0-alpha.1"
     val koinVersion = "3.5.4"
+    val testcontainersVersion="1.20.1"
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
@@ -50,9 +51,9 @@ dependencies {
         "com.avast.gradle:gradle-docker-compose-plugin:0.14.2",
         "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
         "dev.langchain4j:langchain4j:$langchain4jVersion",
-        "dev.langchain4j:langchain4j-ollama:0.34.0",
-        "org.testcontainers:testcontainers:1.20.1",
-        "org.testcontainers:ollama:1.20.1",
+        "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
+        "org.testcontainers:testcontainers:$testcontainersVersion",
+        "org.testcontainers:ollama:$testcontainersVersion",
         "io.insert-koin:koin-core-coroutines:$koinVersion",
         "io.insert-koin:koin-logger-slf4j:$koinVersion",
     ).forEach(::implementation)
