@@ -1,45 +1,25 @@
 package workspace.ai
 
-import arrow.core.Either
-import arrow.core.Either.Companion.catch
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.getOrElse
-import dev.langchain4j.data.message.AiMessage
-import dev.langchain4j.model.StreamingResponseHandler
-import dev.langchain4j.model.chat.StreamingChatLanguageModel
 import dev.langchain4j.model.openai.OpenAiChatModel
-import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import workspace.ai.AssistantManager.apiKey
-import workspace.ai.OllamaChat.createOllamaChatModel
-import workspace.ai.OllamaChat.createOllamaStreamingChatModel
-import kotlin.coroutines.resume
+import workspace.ai.AssistantManager.createOllamaChatModel
+import workspace.ai.AssistantManager.createOllamaStreamingChatModel
+import workspace.ai.AssistantManager.generateStreamingResponse
+import workspace.ai.AssistantManager.userMessage
 
 class AssistantPlugin : Plugin<Project> {
-
-    companion object {
-        val prompt = """config```--lang=fr;```. 
-                            | Salut je suis ${System.getProperty("user.name")}, 
-                            | toi tu es E3P0, tu es mon assistant.
-                            | Le coeur de métier de ${System.getProperty("user.name")} est le développement logiciel dans l'EdTech 
-                            | et la formation professionnelle pour adulte. 
-                            | La spécialisation de ${System.getProperty("user.name")} est dans l'ingenieurie de pédagogie pour adulte,
-                            | et le software craftmanship avec les méthodes agiles.
-                            | E3P0 ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
-                            | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
-            .trimMargin()
-    }
 
     override fun apply(project: Project) {
         project.run {
             task("helloOllama") {
                 group = "school-ai"
                 description = "Display the ollama chatgpt prompt request."
-                doFirst { createOllamaChatModel().run { generate(prompt).let(::println) } }
+                doFirst { createOllamaChatModel().run { generate(userMessage).let(::println) } }
             }
 
             task("helloOllamaStream") {
@@ -48,7 +28,7 @@ class AssistantPlugin : Plugin<Project> {
                 doFirst {
                     runBlocking {
                         createOllamaStreamingChatModel().run {
-                            when (val answer = generateStreamingResponse(this, prompt)) {
+                            when (val answer = generateStreamingResponse(this, userMessage)) {
                                 is Right ->
                                     "Complete response received: \n${answer.value.content().text()}".run(::println)
 
@@ -63,7 +43,7 @@ class AssistantPlugin : Plugin<Project> {
             task("displayAIPrompt") {
                 group = "school-ai"
                 description = "Dislpay on console AI prompt assistant"
-                doFirst { prompt.let(::println) }
+                doFirst { userMessage.let(::println) }
             }
 
             task("displayOpenAIKey") {
@@ -82,28 +62,6 @@ class AssistantPlugin : Plugin<Project> {
                         .run(::println)
                 }
             }
-        }
-    }
-
-
-    private suspend fun generateStreamingResponse(
-        model: StreamingChatLanguageModel,
-        promptMessage: String
-    ): Either<Throwable, Response<AiMessage>> = catch {
-        suspendCancellableCoroutine { continuation ->
-            model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
-                override fun onNext(token: String) {
-                    print(token)
-                }
-
-                override fun onComplete(response: Response<AiMessage>) {
-                    continuation.resume(response)
-                }
-
-                override fun onError(error: Throwable) {
-                    continuation.resume(Left(error).getOrElse { throw it })
-                }
-            })
         }
     }
 }
