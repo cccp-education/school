@@ -1,6 +1,9 @@
 package workspace.ai
 
 import arrow.core.Either
+import arrow.core.Either.Companion.catch
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.getOrElse
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.model.StreamingResponseHandler
@@ -23,7 +26,7 @@ class AssistantPlugin : Plugin<Project> {
     private suspend fun generateStreamingResponse(
         model: StreamingChatLanguageModel,
         promptMessage: String
-    ): Either<Throwable, Response<AiMessage>> = Either.catch {
+    ): Either<Throwable, Response<AiMessage>> = catch {
         suspendCancellableCoroutine { continuation ->
             model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
                 override fun onNext(token: String) {
@@ -35,7 +38,7 @@ class AssistantPlugin : Plugin<Project> {
                 }
 
                 override fun onError(error: Throwable) {
-                    continuation.resume(Either.Left(error).getOrElse { throw it })
+                    continuation.resume(Left(error).getOrElse { throw it })
                 }
             })
         }
@@ -52,6 +55,29 @@ class AssistantPlugin : Plugin<Project> {
                             | E3P0 ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
                             | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
             .trimMargin()
+
+        fun Project.createOllamaChatModel(): OllamaChatModel =
+            OllamaChatModel.builder().apply {
+                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
+                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
+                timeout(ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+                logRequests(true)
+                logResponses(true)
+            }.build()
+
+
+        fun Project.createOllamaStreamingChatModel(): OllamaStreamingChatModel =
+            OllamaStreamingChatModel
+                .builder()
+                .apply {
+                    baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+                    modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
+                    temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
+                    timeout(ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+                    logRequests(true)
+                    logResponses(true)
+                }.build()
     }
 
     override fun apply(project: Project) {
@@ -59,18 +85,7 @@ class AssistantPlugin : Plugin<Project> {
             task("helloOllama") {
                 group = "school-ai"
                 description = "Display the ollama chatgpt prompt request."
-                doFirst {
-                    OllamaChatModel
-                        .builder()
-                        .baseUrl("http://localhost:11434")
-                        .modelName("phi3.5")
-                        .temperature(0.8)
-                        .timeout(ofSeconds(6000))
-                        .logRequests(true)
-                        .logResponses(true)
-                        .build()
-                        .run { generate(prompt).let(::println) }
-                }
+                doFirst { createOllamaChatModel().run { generate(prompt).let(::println) } }
             }
 
             task("helloOllamaStream") {
@@ -78,24 +93,15 @@ class AssistantPlugin : Plugin<Project> {
                 description = "Display the ollama chatgpt stream prompt request."
                 doFirst {
                     runBlocking {
-                        OllamaStreamingChatModel
-                            .builder()
-                            .baseUrl("http://localhost:11434")
-                            .modelName("phi3.5")
-                            .temperature(0.8)
-                            .timeout(ofSeconds(6000))
-                            .logRequests(true)
-                            .logResponses(true)
-                            .build()
-                            .run {
-                                when (val answer = generateStreamingResponse(this, prompt)) {
-                                    is Either.Right ->
-                                        "Complete response received: \n${answer.value.content().text()}".run(::println)
+                        createOllamaStreamingChatModel().run {
+                            when (val answer = generateStreamingResponse(this, prompt)) {
+                                is Right ->
+                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
 
-                                    is Either.Left ->
-                                        "Error during response generation: \n${answer.value}".run(::println)
-                                }
+                                is Left ->
+                                    "Error during response generation: \n${answer.value}".run(::println)
                             }
+                        }
                     }
                 }
             }

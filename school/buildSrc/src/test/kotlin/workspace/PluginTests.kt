@@ -95,7 +95,7 @@ class PluginTests {
                 "projects",
                 "form",
                 "cred"
-            ) to "/home/foo/Workspace/Bureau/cred.json"
+            ) to "/home/foo/workspace/bureau/cred.json"
         )
 
     }
