@@ -19,18 +19,17 @@ import kotlin.coroutines.resume
 
 object AssistantManager {
 
-
     val userName = System.getProperty("user.name")
-    val aiName = "E-3PO"
+    val assistantName = "E-3PO"
 
     val userMessage = """config```--lang=fr;```. 
                             | Salut je suis $userName, 
-                            | toi tu es $aiName, tu es mon assistant.
+                            | toi tu es $assistantName, tu es mon assistant.
                             | Le coeur de métier de ${System.getProperty("user.name")} est le développement logiciel dans l'EdTech 
                             | et la formation professionnelle pour adulte. 
                             | La spécialisation de ${System.getProperty("user.name")} est dans l'ingenieurie de pédagogie pour adulte,
                             | et le software craftmanship avec les méthodes agiles.
-                            | $aiName ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
+                            | $assistantName ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
                             | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
         .trimMargin()
 
