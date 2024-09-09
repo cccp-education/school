@@ -41,7 +41,7 @@ dependencies {
         "io.arrow-kt:arrow-integrations-jackson-module:0.14.1",
         "org.apache.poi:poi-ooxml:5.2.5",
         "org.jbake:jbake-gradle-plugin:5.5.0",
-        "org.slf4j:slf4j-simple:2.0.7",
+        "org.slf4j:slf4j-simple:2.0.16",
         "org.asciidoctor:asciidoctorj-diagram:2.3.1",
         "org.asciidoctor:asciidoctor-gradle-jvm-slides:$asciidoctorGradleVersion",
         "org.asciidoctor:asciidoctor-gradle-base:$asciidoctorGradleVersion",
@@ -54,13 +54,11 @@ dependencies {
         "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
         "org.testcontainers:testcontainers:$testcontainersVersion",
         "org.testcontainers:ollama:$testcontainersVersion",
-        "io.insert-koin:koin-core-coroutines:$koinVersion",
-        "io.insert-koin:koin-logger-slf4j:$koinVersion",
     ).forEach(::implementation)
 
     setOf(
-        "io.insert-koin:koin-test-junit5:$koinVersion",
-        "io.insert-koin:koin-test:$koinVersion",
+//        "io.insert-koin:koin-test-junit5:$koinVersion",
+//        "io.insert-koin:koin-test:$koinVersion",
         "org.jetbrains.kotlin:kotlin-test-junit5"
     ).forEach(::testImplementation)
 

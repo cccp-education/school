@@ -12,7 +12,6 @@ import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Project
-import org.koin.dsl.module
 import java.io.File
 import java.time.Duration
 import java.util.*
@@ -21,14 +20,17 @@ import kotlin.coroutines.resume
 object AssistantManager {
 
 
+    val userName = System.getProperty("user.name")
+    val aiName = "E-3PO"
+
     val userMessage = """config```--lang=fr;```. 
-                            | Salut je suis ${System.getProperty("user.name")}, 
-                            | toi tu es E3P0, tu es mon assistant.
+                            | Salut je suis $userName, 
+                            | toi tu es $aiName, tu es mon assistant.
                             | Le coeur de métier de ${System.getProperty("user.name")} est le développement logiciel dans l'EdTech 
                             | et la formation professionnelle pour adulte. 
                             | La spécialisation de ${System.getProperty("user.name")} est dans l'ingenieurie de pédagogie pour adulte,
                             | et le software craftmanship avec les méthodes agiles.
-                            | E3P0 ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
+                            | $aiName ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
                             | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
         .trimMargin()
 
@@ -63,29 +65,6 @@ object AssistantManager {
                 logResponses(true)
             }.build()
 
-    fun ollamaModule(project: Project) = module {
-        single {
-            OllamaChatModel.builder().apply {
-                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                logRequests(true)
-                logResponses(true)
-            }.build()
-        }
-
-        single {
-            OllamaStreamingChatModel.builder().apply {
-                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                logRequests(true)
-                logResponses(true)
-            }.build()
-        }
-    }
 
     suspend fun generateStreamingResponse(
         model: StreamingChatLanguageModel,
