@@ -12,14 +12,14 @@ repositories {
 
 
 dependencies {
+    val langchain4jVersion = "0.34.0"
+    val testcontainersVersion="1.20.1"
+    val asciidoctorGradleVersion = "4.0.0-alpha.1"
     val commonsIoVersion = "2.13.0"
     val jacksonVersion = "2.17.2"
     val arrowKtVersion = "1.2.4"
-    val jgitVersion = "6.8.0.202311291450-r"
-    val langchain4jVersion = "0.34.0"
-    val asciidoctorGradleVersion = "4.0.0-alpha.1"
-    val koinVersion = "3.5.4"
-    val testcontainersVersion="1.20.1"
+    val jgitVersion = "6.10.0.202406032230-r"
+
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
@@ -56,11 +56,8 @@ dependencies {
         "org.testcontainers:ollama:$testcontainersVersion",
     ).forEach(::implementation)
 
-    setOf(
-//        "io.insert-koin:koin-test-junit5:$koinVersion",
-//        "io.insert-koin:koin-test:$koinVersion",
-        "org.jetbrains.kotlin:kotlin-test-junit5"
-    ).forEach(::testImplementation)
+    setOf("org.jetbrains.kotlin:kotlin-test-junit5")
+        .forEach(::testImplementation)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
