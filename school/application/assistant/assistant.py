@@ -4,7 +4,10 @@ import json
 
 from datasets import load_dataset
 
+from data_test import display_placeholders
+
 dataset = load_dataset("imdb")
+
 
 def format_dataset_to_json(dataset, index, keys=None):
     """
@@ -28,17 +31,15 @@ def format_dataset_to_json(dataset, index, keys=None):
         dataset_dict = {key: value for key, value in data.items()}
 
     # Convert the dictionary to JSON
-    json_data = json.dumps(dataset_dict)
+    json_data: str = json.dumps(dataset_dict)
 
     return json_data
 
 
 if __name__ == '__main__':
-    for placeholder in [
-        "foo", "bar", "baz", "qux", "quux",
-        "corge", "grault", "garply", "waldo",
-        "fred", "plugh", "xyzzy", "thud"
-    ]: print(placeholder.title())
-
-    json_string = format_dataset_to_json(dataset, 100, keys=["text", "label"])
+    display_placeholders()
+    json_string = format_dataset_to_json(
+        dataset, 100,
+        keys=["text", "label"]
+    )
     print(json_string)
