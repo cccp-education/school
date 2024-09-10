@@ -113,6 +113,7 @@ data class User(
             CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_email`
             ON $TABLE_NAME ($EMAIL_FIELD);
 """
+      @Suppress("SqlDialectInspection")
       const val INSERT = """
             insert into $TABLE_NAME (
                 $LOGIN_FIELD, $EMAIL_FIELD,
