@@ -2,12 +2,11 @@ import os
 from unittest import TestCase, main
 
 from assertpy import assert_that
+from datasets import load_dataset
 from langchain_openai import ChatOpenAI
 
+from assistant import format_dataset_to_json
 from assistant_utils import ASSISTANT_ENV, set_environment
-
-from datasets import load_dataset
-
 from config import OPENAI_API_KEY
 
 
@@ -28,7 +27,6 @@ class AssistantTestCase(TestCase):
     #         assert_that(os.environ).contains_key(key)
     #         assert_that(os.environ[key]).is_equal_to(value)
 
-
     @staticmethod
     def test_environment_contains_assistant_env_after_set_environment_functionnal():
         # Vérifier que aucune clé de ASSISTANT_ENV est présente dans os.environ avant set_environment
@@ -42,7 +40,6 @@ class AssistantTestCase(TestCase):
                              ASSISTANT_ENV.keys()))
                     ).is_equal_to([True] * len(ASSISTANT_ENV))
 
-
     @staticmethod
     def test_openapi_chat_connection():
         if OPENAI_API_KEY not in os.environ:
@@ -54,27 +51,11 @@ class AssistantTestCase(TestCase):
     @staticmethod
     def test_dataset():
         dataset = load_dataset("imdb")
-        print(dataset["train"][100])
-        print(
-            """"{'text': "Terrible movie. Nuff Said.<br /><br />
-            These Lines are Just Filler. The movie was bad.
-            Why I have to expand on that I don't know.
-            This is already a waste of my time.
-            I just wanted to warn others. Avoid this movie.
-            The acting sucks and the writing is just moronic.
-            Bad in every way.
-            The only nice thing about the movie are Deniz Akkaya's breasts.
-            Even that was ruined though by a terrible and unneeded rape scene.
-            The movie is a poorly contrived and totally unbelievable piece of garbage.
-            <br /><br />
-            OK now I am just going to rag on IMDb for this stupid rule
-            of 10 lines of text minimum.
-            First I waste my time watching this offal.
-            Then feeling compelled to warn others I create an account with IMDb
-            only to discover that I have to write a friggen essay
-            on the film just to express how bad I think it is. Totally unnecessary.",
-            'label': 0}"""
-        )
+        assert_that(format_dataset_to_json(
+            dataset,
+            100, keys=["text", "label"])
+        ).is_not_empty()
 
-        if __name__ == '__main__':
-            main()
+
+if __name__ == '__main__':
+    main()
