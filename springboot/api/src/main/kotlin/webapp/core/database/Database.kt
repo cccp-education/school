@@ -29,6 +29,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.text.Charsets.UTF_8
 
+@Suppress("ImplicitSubclassInspection")
 @Configuration
 @EnableTransactionManagement
 @EnableR2dbcRepositories("webapp")
@@ -39,6 +40,7 @@ class Database(private val config: Config) {
         i("Creating system user")
     }
 
+    @Suppress("ImplicitSubclassInspection")
     @Bean
     fun inMemoryConnectionFactory(
         @Qualifier("connectionFactory")

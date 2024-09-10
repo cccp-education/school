@@ -21,18 +21,14 @@ def format_dataset_to_json(dataset, index, keys=None):
     Returns:
         A JSON string representing the formatted element.
     """
-
     data = dataset["train"][index]  # Assuming it's a dictionary
-
     # Create a new dictionary with specified or all keys
     if keys:
         dataset_dict = {key: data.get(key) for key in keys}
     else:
         dataset_dict = {key: value for key, value in data.items()}
-
     # Convert the dictionary to JSON
     json_data: str = json.dumps(dataset_dict)
-
     return json_data
 
 
