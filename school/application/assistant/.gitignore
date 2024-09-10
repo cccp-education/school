@@ -1,5 +1,5 @@
 managed-jbake-context.yml
-e3p0.yaml
+e-3po.yaml
 venv
 *.iml
 .idea
