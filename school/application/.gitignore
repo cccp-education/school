@@ -5,4 +5,4 @@
 build
 
 *.iml
-config.py
+assistant/config.py

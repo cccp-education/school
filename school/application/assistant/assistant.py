@@ -10,3 +10,5 @@ if __name__ == '__main__':
         "corge", "grault", "garply", "waldo",
         "fred", "plugh", "xyzzy", "thud"
     ]: print(placeholder.title())
+
+    print(dataset["train"][100])

@@ -6,3 +6,4 @@ langchainhub==0.1.21
 langserve[all]==0.2.2
 langgraph==0.2.3
 datasets == 2.21.0
+pytest == 8.3.3

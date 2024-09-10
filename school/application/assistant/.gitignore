@@ -6,4 +6,4 @@ venv
 *.ipr
 *.iws
 Pipfile.lock
-../config.py
+config.py
