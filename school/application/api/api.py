@@ -3,8 +3,9 @@ School FastAPI application.
 """
 
 from typing import Union
-from fastapi import FastAPI
+
 import uvicorn
+from fastapi import FastAPI
 
 api = FastAPI()
 
@@ -20,4 +21,4 @@ async def read_item(item_id: int, q: Union[str, None] = None):
 
 
 if __name__ == "__main__":
-    uvicorn.run('school:api', reload=True)
+    uvicorn.run('api:api', reload=True,port=8888)

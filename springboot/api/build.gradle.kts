@@ -135,10 +135,10 @@ dependencies {
   implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
 
 //    // Spring AI
-    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
+//    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
 //
 //    // OpenAI
-    implementation("org.springframework.ai:spring-ai-openai")
+//    implementation("org.springframework.ai:spring-ai-openai")
 //    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
 
   // misc

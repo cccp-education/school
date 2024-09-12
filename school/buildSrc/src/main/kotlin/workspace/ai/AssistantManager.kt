@@ -33,24 +33,16 @@ object AssistantManager {
                             | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
         .trimMargin()
 
-    val Project.apiKey: String
-        get() = Properties().apply {
-            "$projectDir/private.properties"
-                .let(::File)
-                .inputStream()
-                .use(::load)
-        }["OPENAI_API_KEY"] as String
-
     fun Project.createOllamaChatModel(): OllamaChatModel =
-        OllamaChatModel.builder().apply {
-            baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-            modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-            temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-            timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-            logRequests(true)
-            logResponses(true)
-        }.build()
-
+        OllamaChatModel.builder()
+            .apply {
+                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
+                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
+                timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+                logRequests(true)
+                logResponses(true)
+            }.build()
 
     fun Project.createOllamaStreamingChatModel(): OllamaStreamingChatModel =
         OllamaStreamingChatModel
@@ -85,4 +77,12 @@ object AssistantManager {
             })
         }
     }
+
+    val Project.apiKey: String
+        get() = Properties().apply {
+            "$projectDir/private.properties"
+                .let(::File)
+                .inputStream()
+                .use(::load)
+        }["OPENAI_API_KEY"] as String
 }

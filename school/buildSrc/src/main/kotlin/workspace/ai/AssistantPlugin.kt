@@ -1,19 +1,9 @@
 package workspace.ai
 
-import arrow.core.Either
-import arrow.core.Either.Companion.catch
 import arrow.core.Either.Left
 import arrow.core.Either.Right
-import arrow.core.getOrElse
-import dev.langchain4j.data.message.AiMessage
-import dev.langchain4j.model.StreamingResponseHandler
-import dev.langchain4j.model.chat.StreamingChatLanguageModel
-import dev.langchain4j.model.ollama.OllamaChatModel
-import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
-import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import workspace.ai.AssistantManager.apiKey
@@ -21,10 +11,6 @@ import workspace.ai.AssistantManager.createOllamaChatModel
 import workspace.ai.AssistantManager.createOllamaStreamingChatModel
 import workspace.ai.AssistantManager.generateStreamingResponse
 import workspace.ai.AssistantManager.userMessage
-import java.io.File
-import java.time.Duration
-import java.util.Properties
-import kotlin.coroutines.resume
 
 class AssistantPlugin : Plugin<Project> {
 
