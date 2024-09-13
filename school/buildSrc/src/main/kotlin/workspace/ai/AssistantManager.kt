@@ -34,8 +34,7 @@ object AssistantManager {
         .trimMargin()
 
     fun Project.createOllamaChatModel(): OllamaChatModel =
-        OllamaChatModel.builder()
-            .apply {
+        OllamaChatModel.builder().apply {
                 baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
                 modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
                 temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)

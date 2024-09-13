@@ -1,6 +1,5 @@
 import workspace.WorkspaceUtils.purchaseArtifact
 
-
 plugins {
     idea
     id("com.github.node-gradle.node")

@@ -84,7 +84,10 @@ tasks.register<AsciidoctorTask>("asciidoctor") {
 fun Project.deckFile(key: String): String = buildString {
     append("build/docs/asciidocRevealJs/")
     append(Properties().apply {
-        "$projectDir/deck.properties".let(::File).inputStream().use(::load)
+        "$projectDir/deck.properties"
+            .let(::File)
+            .inputStream()
+            .use(::load)
     }[key].toString())
 }
 
@@ -106,6 +109,8 @@ tasks.register("cleanBuild") {
 }
 
 //TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
+val slideSrcPath = "${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/"
+val slideDestDirPath: String get() = localConf.bake.destDirPath
 
 tasks.register("deploySlides") {
     group = "slider"
@@ -114,22 +119,55 @@ tasks.register("deploySlides") {
     doFirst { println("Task description :\n\t$description") }
     doLast {
         println("path :\n\t${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/")
-////        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
-////            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+        slideSrcPath
+            .let(::File)
+            .listFiles()!!
+            .forEach { it.name.let(::println) }
 
-//        fun pushPages(
-//            destPath: () -> String, pathTo: () -> String
-//        ) = pathTo().run(::createRepoDir).let { it: File ->
-//            copyBakedFilesToRepo(destPath(), it).takeIf { it is FileOperationResult.Success }?.run {
-//                initAddCommit(it, localConf)
-//                push(it, localConf)
-//                it.deleteRecursively()
-//                destPath().let(::File).deleteRecursively()
-//            }
-//        }
-
+        doLast {
+            pushSlides(destPath = { slideDestDirPath },
+                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+        }
     }
 }
+
+fun pushSlides(
+    destPath: () -> String,
+    pathTo: () -> String
+) = pathTo()
+    .run(::createRepoDir)
+    .let { it: File ->
+        copySlideFilesToRepo(destPath(), it)
+            .takeIf { it is FileOperationResult.Success }
+            ?.run {
+                initAddCommit(it, localConf)
+                push(it, localConf)
+                it.deleteRecursively()
+                destPath()
+                    .let(::File)
+                    .deleteRecursively()
+            }
+    }
+
+fun copySlideFilesToRepo(
+    slidesDirPath: String,
+    repoDir: File
+): FileOperationResult = try {
+    slidesDirPath
+        .let(::File)
+        .apply {
+            when {
+                !copyRecursively(
+                    repoDir,
+                    true
+                ) -> throw Exception("Unable to copy slides directory to build directory")
+            }
+        }.deleteRecursively()
+    FileOperationResult.Success
+} catch (e: Exception) {
+    FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
+}
+
 
 tasks.register<Exec>("openFirefox") {
     group = "slider"
@@ -209,7 +247,6 @@ data class RevealConfiguration(
     val pushPage: GitPushConfiguration,
 )
 
-
 sealed class FileOperationResult {
     sealed class GitOperationResult {
         data class Success(
@@ -223,18 +260,15 @@ sealed class FileOperationResult {
     data class Failure(val error: String) : FileOperationResult()
 }
 
-
 val mapper: ObjectMapper by lazy {
     YAMLFactory().let(::ObjectMapper).disable(WRITE_DATES_AS_TIMESTAMPS).registerKotlinModule()
 }
-
 
 val localConf: SiteConfiguration by lazy {
     readSiteConfigurationFile {
         "$rootDir${getDefault().separator}${properties["managed_config_path"]}"
     }
 }
-
 
 fun readSiteConfigurationFile(
     configPath: () -> String
@@ -251,12 +285,9 @@ fun readSiteConfigurationFile(
     )
 }
 
-
 val bakeSrcPath: String get() = localConf.bake.srcPath
 
-
 val bakeDestDirPath: String get() = localConf.bake.destDirPath
-
 
 fun createCnameFile() {
     when {
@@ -281,7 +312,6 @@ fun createCnameFile() {
     }
 }
 
-
 fun createRepoDir(path: String): File = path.let(::File).apply {
     when {
         exists() && !isDirectory -> when {
@@ -300,7 +330,6 @@ fun createRepoDir(path: String): File = path.let(::File).apply {
         }
     }
 }
-
 
 fun copyBakedFilesToRepo(
     bakeDirPath: String, repoDir: File
@@ -338,7 +367,6 @@ fun initAddCommit(
         }
 }
 
-
 fun push(repoDir: File, conf: SiteConfiguration): MutableIterable<PushResult>? = FileRepositoryBuilder().setGitDir(
     "${repoDir.absolutePath}${getDefault().separator}.git".let(::File)
 ).readEnvironment()
@@ -363,7 +391,6 @@ fun push(repoDir: File, conf: SiteConfiguration): MutableIterable<PushResult>? =
         }.call()
     }
 
-
 fun pushPages(
     destPath: () -> String, pathTo: () -> String
 ) = pathTo().run(::createRepoDir).let { it: File ->
@@ -374,8 +401,6 @@ fun pushPages(
         destPath().let(::File).deleteRecursively()
     }
 }
-
-
 
 tasks.register("schoolProcess") {
     group = "school"
@@ -399,7 +424,6 @@ En résumé, cette formation offre une préparation complète pour ceux qui aspi
     ).split("\\s+".toRegex()).size
     doFirst { "word count : ${text.wordCount()}".let(::println) }
 }
-
 
 data class DirectoryStructure(
     val files: List<String> = emptyList(), val directories: Map<String, DirectoryStructure> = emptyMap()
