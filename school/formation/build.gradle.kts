@@ -1,28 +1,23 @@
 @file:Suppress("ImplicitThis")
 
-import Build_gradle.Formation.JSON_FILE
-import Build_gradle.Formation.ROOT_NODE
-import Build_gradle.RepositoryConfiguration.Companion.CNAME
-import Build_gradle.RepositoryConfiguration.Companion.ORIGIN
-import Build_gradle.RepositoryConfiguration.Companion.REMOTE
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+
+import workspace.courses.Formation.JSON_FILE
+import workspace.courses.Formation.ROOT_NODE
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
-import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Git.init
 import org.eclipse.jgit.revwalk.RevCommit
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import workspace.*
+import workspace.RepositoryConfiguration.Companion.CNAME
+import workspace.RepositoryConfiguration.Companion.ORIGIN
+import workspace.WorkspaceManager.printConf
+import workspace.WorkspaceManager.push
+import workspace.WorkspaceUtils.yamlMapper
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileSystems.getDefault
 import java.util.*
-
 
 plugins {
     idea
@@ -121,9 +116,12 @@ tasks.register("deploySlides") {
         slideSrcPath
             .let(::File)
             .listFiles()!!
-            .forEach { it.name.let(::println) }
+//            .forEach { it.name.let(::println) }
 //            pushSlides(destPath = { slideDestDirPath },
 //                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+        println("Affiche la config slide")
+        printConf()
+
     }
 }
 
@@ -164,7 +162,6 @@ fun copySlideFilesToRepo(
     FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
 }
 
-
 tasks.register<Exec>("openFirefox") {
     group = "slider"
     description = "Open the default.deck.file presentation in firefox"
@@ -203,62 +200,11 @@ tasks.register("publishSite") {
     }
 }
 
-data class GitPushConfiguration(
-    val from: String,
-    val to: String,
-    val repo: RepositoryConfiguration,
-    val branch: String,
-    val message: String,
-)
 
-data class RepositoryConfiguration(
-    val name: String,
-    val repository: String,
-    val credentials: RepositoryCredentials,
-) {
-    companion object {
-        const val ORIGIN = "origin"
-        const val CNAME = "CNAME"
-        const val REMOTE = "remote"
-    }
-}
-
-data class RepositoryCredentials(val username: String, val password: String)
-
-data class SiteConfiguration(
-    val bake: BakeConfiguration,
-    val pushPage: GitPushConfiguration,
-    val pushSource: GitPushConfiguration? = null,
-    val pushTemplate: GitPushConfiguration? = null,
-)
-
-data class BakeConfiguration(
-    val srcPath: String,
-    val destDirPath: String,
-    val cname: String?,
-)
-
-data class RevealConfiguration(
+data class SlidesConfiguration(
     val srcPath: String,
     val pushPage: GitPushConfiguration,
 )
-
-sealed class FileOperationResult {
-    sealed class GitOperationResult {
-        data class Success(
-            val commit: RevCommit, val pushResults: MutableIterable<PushResult>?
-        ) : GitOperationResult()
-
-        data class Failure(val error: String) : GitOperationResult()
-    }
-
-    object Success : FileOperationResult()
-    data class Failure(val error: String) : FileOperationResult()
-}
-
-val mapper: ObjectMapper by lazy {
-    YAMLFactory().let(::ObjectMapper).disable(WRITE_DATES_AS_TIMESTAMPS).registerKotlinModule()
-}
 
 val localConf: SiteConfiguration by lazy {
     readSiteConfigurationFile {
@@ -269,7 +215,7 @@ val localConf: SiteConfiguration by lazy {
 fun readSiteConfigurationFile(
     configPath: () -> String
 ): SiteConfiguration = try {
-    configPath().let(::File).let(mapper::readValue)
+    configPath().let(::File).let(yamlMapper::readValue)
 } catch (e: Exception) {
 // Handle exception or log error
     SiteConfiguration(
@@ -363,40 +309,18 @@ fun initAddCommit(
         }
 }
 
-fun push(repoDir: File, conf: SiteConfiguration): MutableIterable<PushResult>? = FileRepositoryBuilder().setGitDir(
-    "${repoDir.absolutePath}${getDefault().separator}.git".let(::File)
-).readEnvironment()
-    .findGitDir()
-    .setMustExist(true)
-    .build()
-    .also {
-        it.config.apply { getString(REMOTE, ORIGIN, conf.pushPage.repo.repository) }.save()
-// No previous commit in branch
-//    if (!it.isBare) throw Exception("Repo dir should be bare")
-    }.let(::Git)
-    .run {
-        push().apply {
-            setCredentialsProvider(
-                UsernamePasswordCredentialsProvider(
-                    conf.pushPage.repo.credentials.username,
-                    conf.pushPage.repo.credentials.password
-                )
-            )
-            remote = ORIGIN
-            isForce = true
-        }.call()
-    }
-
 fun pushPages(
-    destPath: () -> String, pathTo: () -> String
-) = pathTo().run(::createRepoDir).let { it: File ->
-    copyBakedFilesToRepo(destPath(), it).takeIf { it is FileOperationResult.Success }?.run {
-        initAddCommit(it, localConf)
-        push(it, localConf)
-        it.deleteRecursively()
-        destPath().let(::File).deleteRecursively()
+    destPath: () -> String,
+    pathTo: () -> String
+) = pathTo()
+    .run(::createRepoDir).let { it: File ->
+        copyBakedFilesToRepo(destPath(), it).takeIf { it is FileOperationResult.Success }?.run {
+            initAddCommit(it, localConf)
+            push(it, localConf)
+            it.deleteRecursively()
+            destPath().let(::File).deleteRecursively()
+        }
     }
-}
 
 tasks.register("schoolProcess") {
     group = "school"
@@ -425,10 +349,7 @@ data class DirectoryStructure(
     val files: List<String> = emptyList(), val directories: Map<String, DirectoryStructure> = emptyMap()
 )
 
-object Formation {
-    const val JSON_FILE = "patron-formation.json"
-    const val ROOT_NODE = "formation"
-}
+
 
 tasks.register("createPatronFormation") {
     group = "school"
@@ -459,7 +380,7 @@ tasks.register("createPatronFormation") {
         }
 
 // Démarrer la création de l'arborescence depuis le dossier de formation
-        mapper.readValue<Map<String, DirectoryStructure>>(
+        yamlMapper.readValue<Map<String, DirectoryStructure>>(
             "${layout.projectDirectory}/$JSON_FILE".let(::File)
         )[ROOT_NODE].let(
             File(
@@ -472,3 +393,5 @@ tasks.register("createPatronFormation") {
         )
     }
 }
+
+

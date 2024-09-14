@@ -35,3 +35,5 @@ private.properties
 desktop.ini
 training-institut-2598582b592a.json
 .next
+
+*.hprof

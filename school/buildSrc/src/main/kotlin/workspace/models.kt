@@ -12,9 +12,9 @@ package workspace
 //Bureau-
 
 data class Office(
-    val bibliotheque: Bibliotheque?=null,
+    val bibliotheque: Bibliotheque? = null,
     val workspace: Workspace,
-    val humanResources: HumanResources?=null
+    val humanResources: HumanResources? = null
 ) {
     data class Bibliotheque(
         val courses: MutableMap<String, Course>?,
@@ -62,7 +62,13 @@ data class RepositoryConfiguration(
     val name: String,
     val repository: String,
     val credentials: RepositoryCredentials,
-)
+) {
+    companion object {
+        const val ORIGIN = "origin"
+        const val CNAME = "CNAME"
+        const val REMOTE = "remote"
+    }
+}
 
 data class RepositoryCredentials(
     val username: String, val password: String

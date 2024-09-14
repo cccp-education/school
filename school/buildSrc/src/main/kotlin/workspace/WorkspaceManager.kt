@@ -18,6 +18,7 @@ import workspace.WorkspaceUtils.createDirectory
 import workspace.WorkspaceUtils.sep
 import workspace.WorkspaceUtils.yamlMapper
 import java.io.File
+import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
 
 
@@ -101,6 +102,7 @@ object WorkspaceManager {
         }
     }
 
+//    @Throws(IOException::class)
     fun Project.push(
         repoDir: File,
         conf: SiteConfiguration,
@@ -118,7 +120,7 @@ object WorkspaceManager {
                     conf.pushPage.repo.repository
                 )
             }.save()
-            if (!isBare) throw Exception("Repo is not bare")
+            if (isBare) throw IOException("Repo dir should not be bare")
         }
         .let(::Git)
         .run {
