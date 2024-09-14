@@ -1,8 +1,6 @@
 @file:Suppress("ImplicitThis")
 
 
-import workspace.courses.Formation.JSON_FILE
-import workspace.courses.Formation.ROOT_NODE
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
@@ -15,9 +13,12 @@ import workspace.RepositoryConfiguration.Companion.ORIGIN
 import workspace.WorkspaceManager.printConf
 import workspace.WorkspaceManager.push
 import workspace.WorkspaceUtils.yamlMapper
+import workspace.courses.Courses.JSON_FILE
+import workspace.courses.Courses.ROOT_NODE
+import workspace.courses.DirectoryStructure
+import workspace.slides.SlideManager.deckFile
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileSystems.getDefault
-import java.util.*
 
 plugins {
     idea
@@ -74,16 +75,6 @@ tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
 tasks.register<AsciidoctorTask>("asciidoctor") {
     group = "slider"
     dependsOn(tasks.asciidoctorRevealJs)
-}
-
-fun Project.deckFile(key: String): String = buildString {
-    append("build/docs/asciidocRevealJs/")
-    append(Properties().apply {
-        "$projectDir/deck.properties"
-            .let(::File)
-            .inputStream()
-            .use(::load)
-    }[key].toString())
 }
 
 tasks.register("cleanBuild") {
@@ -345,9 +336,7 @@ En résumé, cette formation offre une préparation complète pour ceux qui aspi
     doFirst { "word count : ${text.wordCount()}".let(::println) }
 }
 
-data class DirectoryStructure(
-    val files: List<String> = emptyList(), val directories: Map<String, DirectoryStructure> = emptyMap()
-)
+
 
 
 
