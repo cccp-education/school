@@ -1,6 +1,5 @@
 @file:Suppress("ImplicitThis")
 
-
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
@@ -191,12 +190,6 @@ tasks.register("publishSite") {
     }
 }
 
-
-data class SlidesConfiguration(
-    val srcPath: String,
-    val pushPage: GitPushConfiguration,
-)
-
 val localConf: SiteConfiguration by lazy {
     readSiteConfigurationFile {
         "$rootDir${getDefault().separator}${properties["managed_config_path"]}"
@@ -335,10 +328,6 @@ En résumé, cette formation offre une préparation complète pour ceux qui aspi
     ).split("\\s+".toRegex()).size
     doFirst { "word count : ${text.wordCount()}".let(::println) }
 }
-
-
-
-
 
 tasks.register("createPatronFormation") {
     group = "school"
