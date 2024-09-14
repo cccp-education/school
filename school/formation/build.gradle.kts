@@ -91,7 +91,6 @@ fun Project.deckFile(key: String): String = buildString {
     }[key].toString())
 }
 
-
 tasks.register("cleanBuild") {
     group = "slider"
     description = "Delete generated presentation in build directory."
@@ -123,11 +122,8 @@ tasks.register("deploySlides") {
             .let(::File)
             .listFiles()!!
             .forEach { it.name.let(::println) }
-
-        doLast {
-            pushSlides(destPath = { slideDestDirPath },
-                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
-        }
+//            pushSlides(destPath = { slideDestDirPath },
+//                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
     }
 }
 
