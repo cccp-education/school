@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import workspace.WorkspaceUtils.purchaseArtifact
 
 plugins {
@@ -15,7 +16,7 @@ purchaseArtifact()
 
 tasks.wrapper {
     gradleVersion = "8.6"
-    distributionType = Wrapper.DistributionType.ALL
+    distributionType = ALL
 }
 
 tasks.withType<JavaExec> {

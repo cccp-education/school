@@ -2,6 +2,9 @@ spring-cli-standalone
 compose-samples
 *.code-workspace
 .idea
+*.ipr
+*.iws
+*.iml
 # *.odt
 
 # Ignore Gradle project-specific cache directory
