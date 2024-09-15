@@ -11,6 +11,7 @@ import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.Project
+import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.WorkspaceError.FileNotFound
 import workspace.WorkspaceError.ParsingError
 import workspace.WorkspaceUtils.copyFilesTo
@@ -20,6 +21,7 @@ import workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.FileSystems.getDefault
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -210,5 +212,30 @@ object WorkspaceManager {
                 )
             )
         )
+
+
+    fun Project.createCnameFile() {
+        when {
+            localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() -> "${project.layout.buildDirectory.get().asFile.absolutePath}${
+                getDefault().separator
+            }${
+                localConf.bake.destDirPath
+            }${getDefault().separator}$CNAME".let(::File).run {
+                when {
+                    exists() && isDirectory -> deleteRecursively()
+                    exists() -> delete()
+                }
+                when {
+                    exists() -> throw Exception("Destination path should exists : $this")
+                    !createNewFile() -> throw Exception("Can't create path : $this")
+                    else -> {
+                        appendText(localConf.bake.cname ?: "", UTF_8)
+                        if ((exists() && !isDirectory).not()) throw Exception("Destination created but not a directory : $this")
+                    }
+                }
+            }
+        }
+    }
+
 }
 

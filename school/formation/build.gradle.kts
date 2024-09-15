@@ -7,11 +7,11 @@ import org.eclipse.jgit.api.Git.init
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.URIish
 import workspace.FileOperationResult
-import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.RepositoryConfiguration.Companion.ORIGIN
 import workspace.SiteConfiguration
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.bakeSrcPath
+import workspace.WorkspaceManager.createCnameFile
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.printConf
 import workspace.WorkspaceManager.push
@@ -21,7 +21,6 @@ import workspace.courses.Courses.ROOT_NODE
 import workspace.courses.DirectoryStructure
 import workspace.slides.SlideManager.deckFile
 import workspace.slides.SlideManager.slideSrcPath
-import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileSystems.getDefault
 
 plugins {
@@ -193,28 +192,6 @@ tasks.register("publishSite") {
     }
 }
 
-fun Project.createCnameFile() {
-    when {
-        localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() -> "${project.layout.buildDirectory.get().asFile.absolutePath}${
-            getDefault().separator
-        }${
-            localConf.bake.destDirPath
-        }${getDefault().separator}$CNAME".let(::File).run {
-            when {
-                exists() && isDirectory -> deleteRecursively()
-                exists() -> delete()
-            }
-            when {
-                exists() -> throw Exception("Destination path should exists : $this")
-                !createNewFile() -> throw Exception("Can't create path : $this")
-                else -> {
-                    appendText(localConf.bake.cname ?: "", UTF_8)
-                    if ((exists() && !isDirectory).not()) throw Exception("Destination created but not a directory : $this")
-                }
-            }
-        }
-    }
-}
 
 fun createRepoDir(path: String): File = path.let(::File).apply {
     when {
