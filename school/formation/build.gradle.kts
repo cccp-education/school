@@ -6,9 +6,13 @@ import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
 import org.eclipse.jgit.api.Git.init
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.URIish
-import workspace.*
+import workspace.FileOperationResult
 import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.RepositoryConfiguration.Companion.ORIGIN
+import workspace.SiteConfiguration
+import workspace.WorkspaceManager.bakeDestDirPath
+import workspace.WorkspaceManager.bakeSrcPath
+import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.printConf
 import workspace.WorkspaceManager.push
 import workspace.WorkspaceUtils.yamlMapper
@@ -16,6 +20,7 @@ import workspace.courses.Courses.JSON_FILE
 import workspace.courses.Courses.ROOT_NODE
 import workspace.courses.DirectoryStructure
 import workspace.slides.SlideManager.deckFile
+import workspace.slides.SlideManager.slideSrcPath
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileSystems.getDefault
 
@@ -76,7 +81,7 @@ tasks.register<AsciidoctorTask>("asciidoctor") {
     dependsOn(tasks.asciidoctorRevealJs)
 }
 
-tasks.register("cleanBuild") {
+tasks.register<DefaultTask>("cleanBuild") {
     group = "slider"
     description = "Delete generated presentation in build directory."
     doFirst {
@@ -93,8 +98,6 @@ tasks.register("cleanBuild") {
 }
 
 //TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
-val slideSrcPath = "${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/"
-val slideDestDirPath: String get() = localConf.bake.destDirPath
 
 tasks.register("deploySlides") {
     group = "slider"
@@ -190,32 +193,7 @@ tasks.register("publishSite") {
     }
 }
 
-val localConf: SiteConfiguration by lazy {
-    readSiteConfigurationFile {
-        "$rootDir${getDefault().separator}${properties["managed_config_path"]}"
-    }
-}
-
-fun readSiteConfigurationFile(
-    configPath: () -> String
-): SiteConfiguration = try {
-    configPath().let(::File).let(yamlMapper::readValue)
-} catch (e: Exception) {
-// Handle exception or log error
-    SiteConfiguration(
-        BakeConfiguration("", "", null), GitPushConfiguration(
-            "", "", RepositoryConfiguration(
-                "", "", RepositoryCredentials("", "")
-            ), "", ""
-        )
-    )
-}
-
-val bakeSrcPath: String get() = localConf.bake.srcPath
-
-val bakeDestDirPath: String get() = localConf.bake.destDirPath
-
-fun createCnameFile() {
+fun Project.createCnameFile() {
     when {
         localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() -> "${project.layout.buildDirectory.get().asFile.absolutePath}${
             getDefault().separator
@@ -371,5 +349,3 @@ tasks.register("createPatronFormation") {
         )
     }
 }
-
-

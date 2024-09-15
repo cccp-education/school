@@ -1,6 +1,7 @@
 package workspace.slides
 
 import org.gradle.api.Project
+import workspace.WorkspaceManager.localConf
 import java.io.File
 import java.util.*
 
@@ -14,4 +15,9 @@ object SlideManager{
                 .use(::load)
         }[key].toString())
     }
+    val Project.slideSrcPath: String get() = "${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/"
+    val Project.slideDestDirPath: String get() = localConf.bake.destDirPath
+
+
+
 }
