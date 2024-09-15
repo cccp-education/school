@@ -236,6 +236,25 @@ object WorkspaceManager {
             }
         }
     }
-
+    fun createRepoDir(path: String): File = path
+        .let(::File)
+        .apply {
+            when {
+                exists() && !isDirectory -> when {
+                    !delete() -> throw Exception("Cant delete file named like repo dir")
+                }
+            }
+            when {
+                exists() -> when {
+                    !deleteRecursively() -> throw Exception("Cant delete current repo dir")
+                }
+            }
+            when {
+                exists() -> throw Exception("Repo dir should not already exists")
+                !exists() -> when {
+                    !mkdir() -> throw Exception("Cant create repo dir")
+                }
+            }
+        }
 }
 

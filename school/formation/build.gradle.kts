@@ -3,18 +3,12 @@
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
-import org.eclipse.jgit.api.Git.init
-import org.eclipse.jgit.revwalk.RevCommit
-import org.eclipse.jgit.transport.URIish
-import workspace.FileOperationResult
-import workspace.RepositoryConfiguration.Companion.ORIGIN
-import workspace.SiteConfiguration
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.bakeSrcPath
 import workspace.WorkspaceManager.createCnameFile
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.printConf
-import workspace.WorkspaceManager.push
+import workspace.WorkspaceManager.pushPages
 import workspace.WorkspaceUtils.yamlMapper
 import workspace.courses.Courses.JSON_FILE
 import workspace.courses.Courses.ROOT_NODE
@@ -30,12 +24,14 @@ plugins {
     id("org.asciidoctor.jvm.revealjs")
 }
 
+apply<workspace.slides.SlidePlugin>()
+
 repositories { ruby { gems() } }
 
 tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
     group = "slider"
     description = "Slider settings"
-    dependsOn("cleanBuild")
+    dependsOn("cleanSlidesBuild")
     revealjs {
         version = "3.1.0"
         templateGitHub {
@@ -80,25 +76,23 @@ tasks.register<AsciidoctorTask>("asciidoctor") {
     dependsOn(tasks.asciidoctorRevealJs)
 }
 
-tasks.register<DefaultTask>("cleanBuild") {
-    group = "slider"
-    description = "Delete generated presentation in build directory."
-    doFirst {
-        "${layout.buildDirectory}/docs/asciidocRevealJs".run {
-            "$this/images"
-                .let(::File)
-                .deleteRecursively()
-            let(::File)
-                .listFiles()
-                ?.filter { it.isFile && it.name.endsWith(".html") }
-                ?.forEach { it.delete() }
-        }
-    }
-}
+//tasks.register<DefaultTask>("cleanBuild") {
+//    group = "slider"
+//    description = "Delete generated presentation in build directory."
+//    doFirst {
+//        "${layout.buildDirectory}/docs/asciidocRevealJs".run {
+//            "$this/images"
+//                .let(::File)
+//                .deleteRecursively()
+//            let(::File)
+//                .listFiles()
+//                ?.filter { it.isFile && it.name.endsWith(".html") }
+//                ?.forEach { it.delete() }
+//        }
+//    }
+//}
 
-//TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
-
-tasks.register("deploySlides") {
+tasks.register<DefaultTask>("deploySlides") {
     group = "slider"
     description = "Deploy sliders to remote repository"
     dependsOn("asciidoctor")
@@ -115,43 +109,6 @@ tasks.register("deploySlides") {
         printConf()
 
     }
-}
-
-fun pushSlides(
-    destPath: () -> String,
-    pathTo: () -> String
-) = pathTo()
-    .run(::createRepoDir)
-    .let { it: File ->
-        copySlideFilesToRepo(destPath(), it)
-            .takeIf { it is FileOperationResult.Success }
-            ?.run {
-                initAddCommit(it, localConf)
-                push(it, localConf)
-                it.deleteRecursively()
-                destPath()
-                    .let(::File)
-                    .deleteRecursively()
-            }
-    }
-
-fun copySlideFilesToRepo(
-    slidesDirPath: String,
-    repoDir: File
-): FileOperationResult = try {
-    slidesDirPath
-        .let(::File)
-        .apply {
-            when {
-                !copyRecursively(
-                    repoDir,
-                    true
-                ) -> throw Exception("Unable to copy slides directory to build directory")
-            }
-        }.deleteRecursively()
-    FileOperationResult.Success
-} catch (e: Exception) {
-    FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
 }
 
 tasks.register<Exec>("openFirefox") {
@@ -177,7 +134,7 @@ tasks.register<Exec>("asciidocCapsule") {
     workingDir = layout.projectDirectory.asFile
 }
 
-tasks.register("publishSite") {
+tasks.register<DefaultTask>("publishSite") {
     group = "site"
     description = "Publish site online."
     dependsOn("bake")
@@ -192,76 +149,7 @@ tasks.register("publishSite") {
     }
 }
 
-
-fun createRepoDir(path: String): File = path.let(::File).apply {
-    when {
-        exists() && !isDirectory -> when {
-            !delete() -> throw Exception("Cant delete file named like repo dir")
-        }
-    }
-    when {
-        exists() -> when {
-            !deleteRecursively() -> throw Exception("Cant delete current repo dir")
-        }
-    }
-    when {
-        exists() -> throw Exception("Repo dir should not already exists")
-        !exists() -> when {
-            !mkdir() -> throw Exception("Cant create repo dir")
-        }
-    }
-}
-
-fun copyBakedFilesToRepo(
-    bakeDirPath: String, repoDir: File
-): FileOperationResult = try {
-    bakeDirPath.let(::File).apply {
-        when {
-            !copyRecursively(repoDir, true) -> throw Exception("Unable to copy baked directory to build directory")
-        }
-    }.deleteRecursively()
-    FileOperationResult.Success
-} catch (e: Exception) {
-    FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
-}
-
-fun initAddCommit(
-    repoDir: File,
-    conf: SiteConfiguration,
-): RevCommit {
-    init()
-        .setDirectory(repoDir)
-        .call()
-        .run {
-            when {
-                repository.isBare -> throw Exception("Repository should not be bare")
-                !repository.directory.isDirectory -> throw Exception("Repository should be a directory")
-                else -> {
-                    remoteAdd().apply {
-                        setName(ORIGIN)
-                        setUri(URIish(conf.pushPage.repo.repository))
-                    }.call()
-                    add().addFilepattern(".").call()
-                    return commit().setMessage(conf.pushPage.message).call()
-                }
-            }
-        }
-}
-
-fun pushPages(
-    destPath: () -> String,
-    pathTo: () -> String
-) = pathTo()
-    .run(::createRepoDir).let { it: File ->
-        copyBakedFilesToRepo(destPath(), it).takeIf { it is FileOperationResult.Success }?.run {
-            initAddCommit(it, localConf)
-            push(it, localConf)
-            it.deleteRecursively()
-            destPath().let(::File).deleteRecursively()
-        }
-    }
-
-tasks.register("schoolProcess") {
+tasks.register<DefaultTask>("schoolProcess") {
     group = "school"
     description = "Processes used in school."
     val text = """
@@ -284,7 +172,7 @@ En résumé, cette formation offre une préparation complète pour ceux qui aspi
     doFirst { "word count : ${text.wordCount()}".let(::println) }
 }
 
-tasks.register("createPatronFormation") {
+tasks.register<DefaultTask>("createPatronFormation") {
     group = "school"
     description = "Create patron formation in build folder."
     doLast {
