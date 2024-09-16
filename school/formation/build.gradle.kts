@@ -6,6 +6,7 @@ import workspace.WorkspaceManager.bakeSrcPath
 import workspace.WorkspaceManager.createCnameFile
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.pushPages
+import workspace.slides.SlidesPlugin.Companion.TASK_CLEAN_SLIDES_BUILD
 import java.nio.file.FileSystems.getDefault
 
 plugins {
@@ -17,7 +18,10 @@ apply<workspace.courses.CoursesPlugin>()
 
 repositories { ruby { gems() } }
 
-tasks.getByName<AsciidoctorJRevealJSTask>("asciidoctorRevealJs") {
+
+
+
+tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
     group = "slider"
     description = "Slider settings"
     dependsOn("cleanSlidesBuild")

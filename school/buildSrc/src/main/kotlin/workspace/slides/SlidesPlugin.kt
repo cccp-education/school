@@ -14,6 +14,10 @@ import java.io.File
 
 @Suppress("unused")
 class SlidesPlugin : Plugin<Project> {
+    companion object {
+        const val TASK_CLEAN_SLIDES_BUILD = "asciidoctorRevealJs"
+    }
+
     override fun apply(project: Project) {
         project.repositories {
             mavenCentral()
