@@ -31,6 +31,9 @@ object WorkspaceManager {
     const val CVS_REMOTE: String = "remote"
     const val DNS_CNAME = "CNAME"
     const val WORKSPACE_PATH_KEY = "workspace_path"
+    const val TASK_PUBLISH_SITE = "publishSite"
+    const val TASK_BAKE_SITE = "bake"
+    const val GROUP_TASK_SITE="site"
 
     val Project.bakeSrcPath: String get() = localConf.bake.srcPath
 
@@ -104,7 +107,7 @@ object WorkspaceManager {
         }
     }
 
-//    @Throws(IOException::class)
+    @Throws(IOException::class)
     fun Project.push(
         repoDir: File,
         conf: SiteConfiguration,
@@ -236,6 +239,7 @@ object WorkspaceManager {
             }
         }
     }
+
     fun createRepoDir(path: String): File = path
         .let(::File)
         .apply {

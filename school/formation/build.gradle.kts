@@ -1,11 +1,15 @@
 @file:Suppress("ImplicitThis")
 
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
+import workspace.WorkspaceManager.GROUP_TASK_SITE
+import workspace.WorkspaceManager.TASK_BAKE_SITE
+import workspace.WorkspaceManager.TASK_PUBLISH_SITE
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.bakeSrcPath
 import workspace.WorkspaceManager.createCnameFile
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.pushPages
+import workspace.slides.SlidesPlugin.Companion.GROUP_TASK_SLIDER
 import workspace.slides.SlidesPlugin.Companion.TASK_CLEAN_SLIDES_BUILD
 import java.nio.file.FileSystems.getDefault
 
@@ -22,7 +26,7 @@ repositories { ruby { gems() } }
 
 
 tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
-    group = "slider"
+    group = GROUP_TASK_SLIDER
     description = "Slider settings"
     dependsOn("cleanSlidesBuild")
     revealjs {
@@ -66,10 +70,10 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
 
 
 
-tasks.register<DefaultTask>("publishSite") {
-    group = "site"
+tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
+    group = GROUP_TASK_SITE
     description = "Publish site online."
-    dependsOn("bake")
+    dependsOn(TASK_BAKE_SITE)
     doFirst { createCnameFile() }
     jbake {
         srcDirName = bakeSrcPath

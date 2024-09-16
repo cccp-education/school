@@ -3,6 +3,7 @@ package workspace.school
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
+import workspace.WorkspaceManager.TASK_PUBLISH_SITE
 import workspace.WorkspaceManager.initWorkspace
 import workspace.WorkspaceManager.initialConf
 import workspace.WorkspaceManager.printConf
@@ -222,7 +223,6 @@ class SchoolPlugin : Plugin<Project> {
         const val TASK_SCHOOL_FRONTEND_TEST = "Test"
         const val TASK_SCHOOL_FRONTEND_BUILD = "Build"
         const val TASK_SCHOOL_FRONTEND_PUBLISH = "Publish"
-        const val TASK_PUBLISH_SITE = "publishSite"
 
         const val TASK_SCHOOL_MOODLE_STOP_DEV = "StopDev"
         const val TASK_SCHOOL_MOODLE_LAUNCH_DEV = "LaunchDev"

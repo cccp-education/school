@@ -16,6 +16,7 @@ import java.io.File
 class SlidesPlugin : Plugin<Project> {
     companion object {
         const val TASK_CLEAN_SLIDES_BUILD = "asciidoctorRevealJs"
+        const val GROUP_TASK_SLIDER="slider"
     }
 
     override fun apply(project: Project) {
