@@ -8,12 +8,12 @@ import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.repositories
 import workspace.WorkspaceManager.printConf
-import workspace.slides.SlideManager.deckFile
-import workspace.slides.SlideManager.slideSrcPath
+import workspace.slides.SlidesManager.deckFile
+import workspace.slides.SlidesManager.slideSrcPath
 import java.io.File
 
 @Suppress("unused")
-class SlidePlugin : Plugin<Project> {
+class SlidesPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.repositories {
             mavenCentral()

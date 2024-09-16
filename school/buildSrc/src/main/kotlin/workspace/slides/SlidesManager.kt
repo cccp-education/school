@@ -11,7 +11,7 @@ import java.util.*
 
 //TODO: deploy slides to a repo per whole training program https://github.com/talaria-formation/prepro-cda.git
 
-object SlideManager {
+object SlidesManager {
 
     val Project.slideSrcPath: String get() = "${layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/"
     val Project.slideDestDirPath: String get() = localConf.bake.destDirPath

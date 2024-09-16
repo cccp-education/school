@@ -15,7 +15,7 @@ plugins {
     id("org.asciidoctor.jvm.revealjs")
 }
 
-apply<workspace.slides.SlidePlugin>()
+apply<workspace.slides.SlidesPlugin>()
 apply<workspace.courses.CoursesPlugin>()
 
 
