@@ -20,7 +20,6 @@ object WorkspaceUtils {
         it: Map<Pair<String, String>, String>
     ) = "${it.values.first()}${it.keys.first().first}"
 
-
     val sep: String get() = FileSystems.getDefault().separator
 
     val Project.yamlMapper: ObjectMapper

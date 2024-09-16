@@ -1,5 +1,3 @@
-//@file:Suppress("ImplicitThis")
-
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
 import workspace.WorkspaceManager.GROUP_TASK_SITE
 import workspace.WorkspaceManager.TASK_BAKE_SITE
@@ -9,9 +7,10 @@ import workspace.WorkspaceManager.bakeSrcPath
 import workspace.WorkspaceManager.createCnameFile
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceManager.pushPages
+import workspace.WorkspaceUtils.sep
 import workspace.slides.SlidesPlugin.Companion.GROUP_TASK_SLIDER
+import workspace.slides.SlidesPlugin.Companion.TASK_ASCIIDOCTOR_REVEALJS
 import workspace.slides.SlidesPlugin.Companion.TASK_CLEAN_SLIDES_BUILD
-import java.nio.file.FileSystems.getDefault
 
 plugins {
     id("org.jbake.site")
@@ -22,10 +21,10 @@ apply<workspace.courses.CoursesPlugin>()
 
 repositories { ruby { gems() } }
 
-tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
+tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
     group = GROUP_TASK_SLIDER
     description = "Slider settings"
-    dependsOn("cleanSlidesBuild")
+    dependsOn(TASK_CLEAN_SLIDES_BUILD)
     revealjs {
         version = "3.1.0"
         templateGitHub {
@@ -35,21 +34,23 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
         }
     }
     revealjsOptions {
-        setSourceDir(File("../../../bibliotheque/slides"))
+        setSourceDir("..$sep..$sep..${sep}bibliotheque${sep}slides".let(::File))
         baseDirFollowsSourceFile()
         resources {
-            from("$sourceDir/images") {
+            from("$sourceDir${sep}images") {
                 include("**")
                 into("images")
             }
         }
         attributes(
             mapOf(
-                "build-gradle" to layout.projectDirectory.let { "$it/build.gradle.kts" }.let(::File),
+                "build-gradle" to layout.projectDirectory.let {
+                    "$it${sep}build.gradle.kts"
+                }.let(::File),
                 "endpoint-url" to "https://talaria-formation.github.io/",
                 "source-highlighter" to "coderay",
                 "coderay-css" to "style",
-                "imagesdir" to "./images",
+                "imagesdir" to ".${sep}images",
                 "toc" to "left",
                 "icons" to "font",
                 "setanchors" to "",
@@ -75,7 +76,7 @@ tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
         destDirName = bakeDestDirPath
     }
     doLast {
-        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}$bakeDestDirPath" },
-            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}$sep$bakeDestDirPath" },
+            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.pushPage.to}" })
     }
 }

@@ -23,7 +23,6 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.FileSystems.getDefault
 
-
 @Suppress("MemberVisibilityCanBePrivate")
 object WorkspaceManager {
 
@@ -33,7 +32,7 @@ object WorkspaceManager {
     const val WORKSPACE_PATH_KEY = "workspace_path"
     const val TASK_PUBLISH_SITE = "publishSite"
     const val TASK_BAKE_SITE = "bake"
-    const val GROUP_TASK_SITE="site"
+    const val GROUP_TASK_SITE = "site"
 
     val Project.bakeSrcPath: String get() = localConf.bake.srcPath
 
@@ -45,9 +44,9 @@ object WorkspaceManager {
         get() = readSiteConfigurationFile { "$rootDir$sep${properties["managed_config_path"]}" }
 
     val Map<*, *>.isCnameExists: Boolean
-        get() = contains("cname") &&
-                this["cname"] is String &&
-                this["cname"] as String != ""
+        get() = DNS_CNAME.lowercase().let {
+            contains(it) && this[it] is String && this[it] as String != ""
+        }
 
     val Project.workspaceEither: Either<WorkspaceError, Bureau>
         get() = try {

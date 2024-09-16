@@ -15,8 +15,9 @@ import java.io.File
 @Suppress("unused")
 class SlidesPlugin : Plugin<Project> {
     companion object {
-        const val TASK_CLEAN_SLIDES_BUILD = "asciidoctorRevealJs"
-        const val GROUP_TASK_SLIDER="slider"
+        const val GROUP_TASK_SLIDER = "slider"
+        const val TASK_ASCIIDOCTOR_REVEALJS = "asciidoctorRevealJs"
+        const val TASK_CLEAN_SLIDES_BUILD = "cleanSlidesBuild"
     }
 
     override fun apply(project: Project) {
