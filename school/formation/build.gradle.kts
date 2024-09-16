@@ -1,4 +1,4 @@
-@file:Suppress("ImplicitThis")
+//@file:Suppress("ImplicitThis")
 
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
 import workspace.WorkspaceManager.GROUP_TASK_SITE
@@ -21,9 +21,6 @@ apply<workspace.slides.SlidesPlugin>()
 apply<workspace.courses.CoursesPlugin>()
 
 repositories { ruby { gems() } }
-
-
-
 
 tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
     group = GROUP_TASK_SLIDER
@@ -67,8 +64,6 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_CLEAN_SLIDES_BUILD) {
         )
     }
 }
-
-
 
 tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
     group = GROUP_TASK_SITE
