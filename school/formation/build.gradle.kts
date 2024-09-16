@@ -9,15 +9,11 @@ import workspace.WorkspaceManager.pushPages
 import java.nio.file.FileSystems.getDefault
 
 plugins {
-    idea
     id("org.jbake.site")
-    id("org.asciidoctor.jvm.gems")
     id("org.asciidoctor.jvm.revealjs")
 }
-
 apply<workspace.slides.SlidesPlugin>()
 apply<workspace.courses.CoursesPlugin>()
-
 
 repositories { ruby { gems() } }
 
@@ -80,5 +76,3 @@ tasks.register<DefaultTask>("publishSite") {
             pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
     }
 }
-
-

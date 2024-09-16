@@ -1,12 +1,7 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import workspace.WorkspaceUtils.purchaseArtifact
 
-plugins {
-    idea
-    id("com.github.node-gradle.node")
-//    id("org.asciidoctor.jvm.convert")
-}
-
+plugins { idea }
 apply<workspace.school.SchoolPlugin>()
 apply<workspace.forms.FormPlugin>()
 apply<workspace.jamstack.JBakeGhPagesPlugin>()
