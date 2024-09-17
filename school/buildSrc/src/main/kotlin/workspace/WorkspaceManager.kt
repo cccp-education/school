@@ -22,8 +22,8 @@ import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
 
+@Suppress("MemberVisibilityCanBePrivate")
 object WorkspaceManager {
-
     const val CVS_ORIGIN: String = "origin"
     const val CVS_REMOTE: String = "remote"
     const val DNS_CNAME = "CNAME"
@@ -31,16 +31,13 @@ object WorkspaceManager {
     const val TASK_PUBLISH_SITE = "publishSite"
     const val TASK_BAKE_SITE = "bake"
     const val GROUP_TASK_SITE = "site"
+    const val CONFIG_PATH_KEY = "managed_config_path"
 
     val Project.bakeSrcPath: String get() = localConf.bake.srcPath
-
     val Project.bakeDestDirPath: String get() = localConf.bake.destDirPath
-
     val Project.workspacePath get() = "$projectDir$sep${properties[WORKSPACE_PATH_KEY]}"
-
     val Project.localConf: SiteConfiguration
-        get() = readSiteConfigurationFile { "$rootDir$sep${properties["managed_config_path"]}" }
-
+        get() = readSiteConfigurationFile { "$rootDir$sep${properties[CONFIG_PATH_KEY]}" }
     val Map<*, *>.isCnameExists: Boolean
         get() = DNS_CNAME.lowercase().let {
             contains(it) && this[it] is String && this[it] as String != ""
@@ -67,8 +64,6 @@ object WorkspaceManager {
         })
     }
 
-
-    @Suppress("MemberVisibilityCanBePrivate")
     fun Project.readSiteConfigurationFile(
         configPath: () -> String
     ): SiteConfiguration = try {
@@ -237,7 +232,7 @@ object WorkspaceManager {
         }
     }
 
-    @Suppress("MemberVisibilityCanBePrivate")
+
     fun Project.cnamePath() =
         "${project.layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.bake.destDirPath}$sep$CNAME"
 

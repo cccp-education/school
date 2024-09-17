@@ -1,11 +1,11 @@
-= Bureau
+= Atelier
 
 image::rsrc/img/lang-en-blue.svg[link=README.adoc]
 
 == But
-Le projet bureau vise à organiser et structurer mon activité de formateur et développeur.
+Le projet Atelier vise à organiser et structurer mon activité de formateur et développeur.
 
-Le projet bureau est basé sur le logiciel link:https://gradle.org/[gradle] comme automate de taches.
+Le projet Atelier est basé sur le logiciel link:https://gradle.org/[gradle] comme automate de taches.
 
 == Comment ?
 .Les taches prévues sont :

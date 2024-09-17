@@ -1,5 +1,9 @@
 package workspace.school
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
@@ -139,6 +143,27 @@ class SchoolPlugin : Plugin<Project> {
             group = GROUP_WORKSPACE_UTILS
             description = "Task tool to dev"
             doFirst { println(":$TASK_INITIAL_CONF_TO_YAML") }
+//            doLast {
+////                val jsonInput = """{"nom":"John","age":30,"ville":"Paris"}"""  // JSON non formaté
+////                val objectMapper = ObjectMapper().apply {
+////                    enable(SerializationFeature.INDENT_OUTPUT)  // Active l'indentation
+////                }
+////                val jsonNode: JsonNode = objectMapper.readTree(jsonInput)
+//                //                println(project.initialConf)
+//
+//                // not formated JSON
+//                val jsonInput = project.initialConf.toString()
+//                val objectMapper = ObjectMapper().apply {
+//                    // Activate indentation
+//                    enable(INDENT_OUTPUT)
+//                }
+//                // Read raw JSON as JsonNode
+//                val jsonNode: JsonNode = objectMapper.readTree(jsonInput)
+//                // Convert to formatted JSON
+//                val formattedJson = objectMapper.writeValueAsString(jsonNode)
+//                // Displaying formatted JSON
+//                println(formattedJson)
+//            }
             doLast { println(project.initialConf) }
         }
 

@@ -1,11 +1,11 @@
-= Bureau
+= Atelier
 
 image::rsrc/img/lang-fr-red.svg[link=README.fr.adoc]
 
 == Goal
-The Bureau project aims to organize and structure my activity as a trainer and developer.
+The Atelier project aims to organize and structure my activity as a trainer and developer.
 
-The Bureau project is based on the link:https://gradle.org/[Gradle] software as a task automation tool.
+The Atelier project is based on the link:https://gradle.org/[Gradle] software as a task automation tool.
 
 == How ?
 .The planned tasks are:
