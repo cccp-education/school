@@ -1,11 +1,11 @@
-= Atelier
+= School
 
 image::rsrc/img/lang-fr-red.svg[link=README.fr.adoc]
 
 == Goal
-The Atelier project aims to organize and structure my activity as a trainer and developer.
+The School project aims to organize and structure my activity as a trainer and developer.
 
-The Atelier project is based on the link:https://gradle.org/[Gradle] software as a task automation tool.
+The School project is based on the link:https://gradle.org/[Gradle] software as a task automation tool.
 
 == How ?
 .The planned tasks are:
