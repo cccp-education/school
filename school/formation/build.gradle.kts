@@ -5,8 +5,9 @@ import workspace.WorkspaceManager.TASK_PUBLISH_SITE
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.bakeSrcPath
 import workspace.WorkspaceManager.createCnameFile
-import workspace.WorkspaceManager.localConf
+import workspace.WorkspaceManager.pushDestPath
 import workspace.WorkspaceManager.pushPages
+import workspace.WorkspaceManager.pushPathTo
 import workspace.WorkspaceUtils.sep
 import workspace.slides.SlidesPlugin.Companion.GROUP_TASK_SLIDER
 import workspace.slides.SlidesPlugin.Companion.TASK_ASCIIDOCTOR_REVEALJS
@@ -75,8 +76,6 @@ tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
         srcDirName = bakeSrcPath
         destDirName = bakeDestDirPath
     }
-    doLast {
-        pushPages(destPath = { "${layout.buildDirectory.get().asFile.absolutePath}$sep$bakeDestDirPath" },
-            pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.pushPage.to}" })
-    }
+    doLast { pushPages(pushDestPath(), pushPathTo()) }
 }
+

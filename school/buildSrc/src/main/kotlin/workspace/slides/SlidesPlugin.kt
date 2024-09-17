@@ -24,7 +24,6 @@ class SlidesPlugin : Plugin<Project> {
         project.repositories {
             mavenCentral()
             gradlePluginPortal()
-
         }
 
         project.tasks.register<DefaultTask>("cleanSlidesBuild") {

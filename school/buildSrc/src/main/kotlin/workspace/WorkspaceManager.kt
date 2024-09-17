@@ -21,9 +21,7 @@ import workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
-import java.nio.file.FileSystems.getDefault
 
-@Suppress("MemberVisibilityCanBePrivate")
 object WorkspaceManager {
 
     const val CVS_ORIGIN: String = "origin"
@@ -70,6 +68,7 @@ object WorkspaceManager {
     }
 
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun Project.readSiteConfigurationFile(
         configPath: () -> String
     ): SiteConfiguration = try {
@@ -218,26 +217,29 @@ object WorkspaceManager {
 
     fun Project.createCnameFile() {
         when {
-            localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() -> "${project.layout.buildDirectory.get().asFile.absolutePath}${
-                getDefault().separator
-            }${
-                localConf.bake.destDirPath
-            }${getDefault().separator}$CNAME".let(::File).run {
-                when {
-                    exists() && isDirectory -> deleteRecursively()
-                    exists() -> delete()
-                }
-                when {
-                    exists() -> throw Exception("Destination path should exists : $this")
-                    !createNewFile() -> throw Exception("Can't create path : $this")
-                    else -> {
-                        appendText(localConf.bake.cname ?: "", UTF_8)
-                        if ((exists() && !isDirectory).not()) throw Exception("Destination created but not a directory : $this")
+            localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() ->
+                cnamePath()
+                    .let(::File)
+                    .run {
+                        when {
+                            exists() && isDirectory -> deleteRecursively()
+                            exists() -> delete()
+                        }
+                        when {
+                            exists() -> throw Exception("Destination path should exists : $this")
+                            !createNewFile() -> throw Exception("Can't create path : $this")
+                            else -> {
+                                appendText(localConf.bake.cname ?: "", UTF_8)
+                                if ((exists() && !isDirectory).not()) throw Exception("Destination created but not a directory : $this")
+                            }
+                        }
                     }
-                }
-            }
         }
     }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    fun Project.cnamePath() =
+        "${project.layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.bake.destDirPath}$sep$CNAME"
 
     fun createRepoDir(path: String): File = path
         .let(::File)
@@ -259,5 +261,11 @@ object WorkspaceManager {
                 }
             }
         }
+
+    fun Project.pushDestPath(): () -> String =
+        { "${layout.buildDirectory.get().asFile.absolutePath}$sep$bakeDestDirPath" }
+
+    fun Project.pushPathTo(): () -> String =
+        { "${layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.pushPage.to}" }
 }
 

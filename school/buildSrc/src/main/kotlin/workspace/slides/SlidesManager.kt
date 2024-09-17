@@ -26,6 +26,7 @@ object SlidesManager {
         }[key].toString())
     }
 
+    @Suppress("unused")
     fun Project.pushSlides(
         destPath: () -> String,
         pathTo: () -> String
@@ -44,6 +45,7 @@ object SlidesManager {
                 }
         }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun copySlideFilesToRepo(
         slidesDirPath: String,
         repoDir: File
