@@ -1,6 +1,7 @@
 .env
 *.hprof
 managed-jbake-context.yml
+slides-context.yml
 gradle-home.properties
 build
 .gradle

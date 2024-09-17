@@ -18,7 +18,7 @@ Le projet School est basé sur le logiciel link:https://gradle.org/[gradle] comm
 
 .Pré-requis système
 - Java 17
-- Docker Desktop
+- Docker
 
 .Comment lancer une tache dans le terminal
 

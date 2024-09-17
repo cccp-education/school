@@ -18,7 +18,7 @@ The School project is based on the link:https://gradle.org/[Gradle] software as 
 
 .System prerequisites
 - Java 17
-- Docker Desktop
+- Docker
 
 .How to launch a task in the terminal
 
