@@ -78,4 +78,3 @@ tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
     }
     doLast { pushPages(pushDestPath(), pushPathTo()) }
 }
-
