@@ -5,7 +5,8 @@ import org.eclipse.jgit.transport.PushResult
 
 sealed class GitOperationResult {
     data class Success(
-        val commit: RevCommit, val pushResults: MutableIterable<PushResult>?
+        val commit: RevCommit,
+        val pushResults: MutableIterable<PushResult>?
     ) : GitOperationResult()
 
     data class Failure(val error: String) : GitOperationResult()
