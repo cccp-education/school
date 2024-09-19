@@ -263,4 +263,3 @@ object WorkspaceManager {
     fun Project.pushPathTo(): () -> String =
         { "${layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.pushPage.to}" }
 }
-
