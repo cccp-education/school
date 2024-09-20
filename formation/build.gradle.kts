@@ -35,7 +35,7 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
         }
     }
     revealjsOptions {
-        setSourceDir("..$sep..$sep..${sep}bibliotheque${sep}slides".let(::File))
+        setSourceDir("..$sep..${sep}bibliotheque${sep}slides".let(::File))
         baseDirFollowsSourceFile()
         resources {
             from("$sourceDir${sep}images") {
