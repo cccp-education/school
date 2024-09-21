@@ -14,10 +14,10 @@ import org.gradle.api.Project
 import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.WorkspaceError.FileNotFound
 import workspace.WorkspaceError.ParsingError
-import workspace.WorkspaceUtils.copyFilesTo
 import workspace.WorkspaceUtils.createDirectory
 import workspace.WorkspaceUtils.sep
 import workspace.WorkspaceUtils.yamlMapper
+import workspace.jbake.JBakeGhPagesManager.copyFilesTo
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8

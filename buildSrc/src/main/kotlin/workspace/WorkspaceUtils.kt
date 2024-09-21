@@ -29,18 +29,18 @@ object WorkspaceUtils {
             .registerKotlinModule()
             .registerArrowModule()
 
-    fun Project.copyFilesTo(
-        bakeDirPath: String, repoDir: File
-    ): FileOperationResult = try {
-        bakeDirPath.also { "bakeDirPath : $it".let(::println) }.let(::File).apply {
-            copyRecursively(repoDir, true)
-            deleteRecursively()
-        }.let { "Est-ce que $it existe après copy & delete? ${it.exists()}" }
-            .let(::println)
-        FileOperationResult.Success
-    } catch (e: Exception) {
-        FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
-    }
+//    fun Project.copyFilesTo(
+//        bakeDirPath: String, repoDir: File
+//    ): FileOperationResult = try {
+//        bakeDirPath.also { "bakeDirPath : $it".let(::println) }.let(::File).apply {
+//            copyRecursively(repoDir, true)
+//            deleteRecursively()
+//        }.let { "Est-ce que $it existe après copy & delete? ${it.exists()}" }
+//            .let(::println)
+//        FileOperationResult.Success
+//    } catch (e: Exception) {
+//        FileOperationResult.Failure(e.message ?: "An error occurred during file copy.")
+//    }
 
     fun Project.createDirectory(
         path: String

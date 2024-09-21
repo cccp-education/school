@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import workspace.forms.FormPlugin
-import workspace.jamstack.JBakeGhPagesPlugin
+import workspace.jbake.JBakeGhPagesPlugin
 import workspace.school.SchoolPlugin
 import workspace.school.SchoolPlugin.Companion.TASK_HELLO
 import java.io.ByteArrayOutputStream
