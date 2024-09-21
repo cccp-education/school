@@ -4,11 +4,11 @@ import workspace.WorkspaceManager.TASK_BAKE_SITE
 import workspace.WorkspaceManager.TASK_PUBLISH_SITE
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.bakeSrcPath
-import workspace.WorkspaceManager.createCnameFile
-import workspace.WorkspaceManager.pushDestPath
-import workspace.WorkspaceManager.pushPages
-import workspace.WorkspaceManager.pushPathTo
+import workspace.WorkspaceManager.pushSiteToGhPages
 import workspace.WorkspaceUtils.sep
+import workspace.jbake.JBakeGhPagesManager.createCnameFile
+import workspace.jbake.JBakeGhPagesManager.sitePushDestPath
+import workspace.jbake.JBakeGhPagesManager.sitePushPathTo
 import workspace.slides.SlidesPlugin.Companion.GROUP_TASK_SLIDER
 import workspace.slides.SlidesPlugin.Companion.TASK_ASCIIDOCTOR_REVEALJS
 import workspace.slides.SlidesPlugin.Companion.TASK_CLEAN_SLIDES_BUILD
@@ -76,5 +76,5 @@ tasks.register<DefaultTask>(TASK_PUBLISH_SITE) {
         srcDirName = bakeSrcPath
         destDirName = bakeDestDirPath
     }
-    doLast { pushPages(pushDestPath(), pushPathTo()) }
+    doLast { pushSiteToGhPages(sitePushDestPath(), sitePushPathTo()) }
 }

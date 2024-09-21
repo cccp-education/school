@@ -7,7 +7,7 @@ import workspace.Bureau
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.isCnameExists
 import workspace.WorkspaceManager.localConf
-import workspace.WorkspaceManager.pushPages
+import workspace.WorkspaceManager.pushSiteToGhPages
 import workspace.WorkspaceManager.workspaceEither
 import workspace.WorkspaceUtils
 import java.io.File
@@ -59,7 +59,7 @@ object SchoolOpsManager {
     ) { createSchoolCnameFile(it) }
 
 
-    fun Project.pushSchoolFrontendPages() = pushPages(
+    fun Project.pushSchoolFrontendPages() = pushSiteToGhPages(
         schoolFrontendBakeDestDirPath(),
         schoolFrontendPathTo()
     )

@@ -11,7 +11,6 @@ import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.Project
-import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.WorkspaceError.FileNotFound
 import workspace.WorkspaceError.ParsingError
 import workspace.WorkspaceUtils.createDirectory
@@ -79,7 +78,7 @@ object WorkspaceManager {
         )
     }
 
-    fun Project.initAddCommit(
+    fun Project.initAddCommitToSite(
         repoDir: File,
         conf: SiteConfiguration,
     ): RevCommit {
@@ -101,7 +100,7 @@ object WorkspaceManager {
     }
 
     @Throws(IOException::class)
-    fun Project.push(
+    fun Project.pushSite(
         repoDir: File,
         conf: SiteConfiguration,
     ): MutableIterable<PushResult>? = FileRepositoryBuilder()
@@ -138,15 +137,15 @@ object WorkspaceManager {
 
     //    "deploy": "gh-pages -d dist -b 'master' history false message 'https://cheroliv.github.io/talaria' repo 'https://github.com/cheroliv/talaria.git https://git:${GITHUB_TOKEN}@github.com/cheroliv/talaria.git' dest '.' ",
     // passer par un workspaceEither pour récupérer le workspace
-    fun Project.pushPages(
+    fun Project.pushSiteToGhPages(
         destPath: () -> String,
         pathTo: () -> String
     ) = createDirectory(pathTo()).let { it: File ->
         copyFilesTo(destPath(), it)
             .takeIf { it is FileOperationResult.Success }
             ?.run {
-                initAddCommit(it, localConf)
-                push(it, localConf)
+                initAddCommitToSite(it, localConf)
+                pushSite(it, localConf)
                 it.deleteRecursively()
                 destPath()
                     .let(::File)
@@ -209,33 +208,6 @@ object WorkspaceManager {
             )
         )
 
-
-    fun Project.createCnameFile() {
-        when {
-            localConf.bake.cname != null && localConf.bake.cname!!.isNotBlank() ->
-                cnamePath()
-                    .let(::File)
-                    .run {
-                        when {
-                            exists() && isDirectory -> deleteRecursively()
-                            exists() -> delete()
-                        }
-                        when {
-                            exists() -> throw Exception("Destination path should exists : $this")
-                            !createNewFile() -> throw Exception("Can't create path : $this")
-                            else -> {
-                                appendText(localConf.bake.cname ?: "", UTF_8)
-                                if ((exists() && !isDirectory).not()) throw Exception("Destination created but not a directory : $this")
-                            }
-                        }
-                    }
-        }
-    }
-
-
-    fun Project.cnamePath() =
-        "${project.layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.bake.destDirPath}$sep$CNAME"
-
     fun createRepoDir(path: String): File = path
         .let(::File)
         .apply {
@@ -256,10 +228,4 @@ object WorkspaceManager {
                 }
             }
         }
-
-    fun Project.pushDestPath(): () -> String =
-        { "${layout.buildDirectory.get().asFile.absolutePath}$sep$bakeDestDirPath" }
-
-    fun Project.pushPathTo(): () -> String =
-        { "${layout.buildDirectory.get().asFile.absolutePath}$sep${localConf.pushPage.to}" }
 }

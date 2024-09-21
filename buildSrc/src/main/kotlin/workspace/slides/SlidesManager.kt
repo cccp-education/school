@@ -3,9 +3,9 @@ package workspace.slides
 import org.gradle.api.Project
 import workspace.FileOperationResult
 import workspace.WorkspaceManager
-import workspace.WorkspaceManager.initAddCommit
+import workspace.WorkspaceManager.initAddCommitToSite
 import workspace.WorkspaceManager.localConf
-import workspace.WorkspaceManager.push
+import workspace.WorkspaceManager.pushSite
 import java.io.File
 import java.util.*
 
@@ -36,8 +36,8 @@ object SlidesManager {
             copySlideFilesToRepo(destPath(), it)
                 .takeIf { it is FileOperationResult.Success }
                 ?.run {
-                    initAddCommit(it, localConf)
-                    push(it, localConf)
+                    initAddCommitToSite(it, localConf)
+                    pushSite(it, localConf)
                     it.deleteRecursively()
                     destPath()
                         .let(::File)
