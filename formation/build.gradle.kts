@@ -9,9 +9,24 @@ import workspace.WorkspaceUtils.sep
 import workspace.jbake.JBakeGhPagesManager.createCnameFile
 import workspace.jbake.JBakeGhPagesManager.sitePushDestPath
 import workspace.jbake.JBakeGhPagesManager.sitePushPathTo
-import workspace.slides.SlidesPlugin.Companion.GROUP_TASK_SLIDER
-import workspace.slides.SlidesPlugin.Companion.TASK_ASCIIDOCTOR_REVEALJS
-import workspace.slides.SlidesPlugin.Companion.TASK_CLEAN_SLIDES_BUILD
+import workspace.slides.SlidesPlugin.RevealJsSlides.BUILD_GRADLE_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.CODERAY_CSS_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.DOCINFO_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.ENDPOINT_URL_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.GROUP_TASK_SLIDER
+import workspace.slides.SlidesPlugin.RevealJsSlides.ICONS_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.IDPREFIX_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.IDSEPARATOR_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.IMAGEDIR_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_HISTORY_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_SLIDENUMBER_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_THEME_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_TRANSITION_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.SETANCHORS_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.SOURCE_HIGHLIGHTER_KEY
+import workspace.slides.SlidesPlugin.RevealJsSlides.TASK_ASCIIDOCTOR_REVEALJS
+import workspace.slides.SlidesPlugin.RevealJsSlides.TASK_CLEAN_SLIDES_BUILD
+import workspace.slides.SlidesPlugin.RevealJsSlides.TOC_KEY
 
 plugins {
     id("org.jbake.site")
@@ -45,23 +60,24 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
         }
         attributes(
             mapOf(
-                "build-gradle" to layout.projectDirectory.let {
-                    "$it${sep}build.gradle.kts"
-                }.let(::File),
-                "endpoint-url" to "https://talaria-formation.github.io/",
-                "source-highlighter" to "coderay",
-                "coderay-css" to "style",
-                "imagesdir" to ".${sep}images",
-                "toc" to "left",
-                "icons" to "font",
-                "setanchors" to "",
-                "idprefix" to "slide-",
-                "idseparator" to "-",
-                "docinfo" to "shared",
-                "revealjs_theme" to "black",
-                "revealjs_transition" to "linear",
-                "revealjs_history" to "true",
-                "revealjs_slideNumber" to "true"
+                BUILD_GRADLE_KEY to layout
+                    .projectDirectory
+                    .let { "$it${sep}build.gradle.kts" }
+                    .let(::File),
+                ENDPOINT_URL_KEY to "https://talaria-formation.github.io/",
+                SOURCE_HIGHLIGHTER_KEY to "coderay",
+                CODERAY_CSS_KEY to "style",
+                IMAGEDIR_KEY to ".${sep}images",
+                TOC_KEY to "left",
+                ICONS_KEY to "font",
+                SETANCHORS_KEY to "",
+                IDPREFIX_KEY to "slide-",
+                IDSEPARATOR_KEY to "-",
+                DOCINFO_KEY to "shared",
+                REVEALJS_THEME_KEY to "black",
+                REVEALJS_TRANSITION_KEY to "linear",
+                REVEALJS_HISTORY_KEY to "true",
+                REVEALJS_SLIDENUMBER_KEY to "true"
             )
         )
     }
