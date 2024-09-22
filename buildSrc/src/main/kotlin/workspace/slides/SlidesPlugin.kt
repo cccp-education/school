@@ -12,7 +12,6 @@ import workspace.slides.SlidesManager.deckFile
 import workspace.slides.SlidesManager.slideSrcPath
 import java.io.File
 
-//@Suppress("unused")
 class SlidesPlugin : Plugin<Project> {
     object RevealJsSlides {
         const val GROUP_TASK_SLIDER = "slider"
