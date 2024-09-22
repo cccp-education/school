@@ -64,7 +64,6 @@ object SchoolOpsManager {
         schoolFrontendPathTo()
     )
 
-
     fun Project.loadSchoolFrontend() = extensions
         .getByType<NodeExtension>()
         .let { project.nodeDirSchoolFrontend(it) }
