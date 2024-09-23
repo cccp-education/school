@@ -1,7 +1,7 @@
 package workspace.slides
 
 import org.gradle.api.Project
-import workspace.FileOperationResult
+import workspace.git.FileOperationResult
 import workspace.WorkspaceManager
 import workspace.WorkspaceManager.initAddCommitToSite
 import workspace.WorkspaceManager.localConf

@@ -1,9 +1,9 @@
 package workspace.jbake
 
 import org.gradle.api.Project
-import workspace.FileOperationResult
-import workspace.FileOperationResult.Failure
-import workspace.FileOperationResult.Success
+import workspace.git.FileOperationResult
+import workspace.git.FileOperationResult.Failure
+import workspace.git.FileOperationResult.Success
 import workspace.RepositoryConfiguration.Companion.CNAME
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.localConf

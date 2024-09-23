@@ -1,4 +1,4 @@
-package workspace
+package workspace.git
 
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.PushResult

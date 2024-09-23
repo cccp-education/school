@@ -11,11 +11,13 @@ import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.Project
-import workspace.WorkspaceError.FileNotFound
-import workspace.WorkspaceError.ParsingError
+import workspace.git.WorkspaceError.FileNotFound
+import workspace.git.WorkspaceError.ParsingError
 import workspace.WorkspaceUtils.createDirectory
 import workspace.WorkspaceUtils.sep
 import workspace.WorkspaceUtils.yamlMapper
+import workspace.git.FileOperationResult
+import workspace.git.WorkspaceError
 import workspace.jbake.JBakeGhPagesManager.copyFilesTo
 import java.io.File
 import java.io.IOException
