@@ -7,7 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.repositories
-import school.WorkspaceManager.printConf
+import school.workspace.WorkspaceManager.printConf
 import school.slides.SlidesManager.deckFile
 import school.slides.SlidesManager.slideSrcPath
 import java.io.File

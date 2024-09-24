@@ -1,7 +1,7 @@
-package school.school
+package school.content
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument
-import school.WorkspaceUtils
+import school.workspace.WorkspaceUtils
 import java.io.File
 import java.io.FileInputStream
 

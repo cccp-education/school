@@ -5,7 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.register
-import school.WorkspaceUtils.yamlMapper
+import school.workspace.WorkspaceUtils.yamlMapper
 import school.courses.Courses.JSON_FILE
 import school.courses.Courses.ROOT_NODE
 import java.io.File

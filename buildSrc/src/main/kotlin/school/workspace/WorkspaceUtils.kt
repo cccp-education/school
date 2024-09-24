@@ -1,4 +1,4 @@
-package school
+package school.workspace
 
 import arrow.integrations.jackson.module.registerArrowModule
 import com.fasterxml.jackson.databind.ObjectMapper

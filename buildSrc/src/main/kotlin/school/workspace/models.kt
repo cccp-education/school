@@ -1,4 +1,4 @@
-package school
+package school.workspace
 
 /**
 - Ajouter une paire clé/map au bout du chemin de clé dans un list

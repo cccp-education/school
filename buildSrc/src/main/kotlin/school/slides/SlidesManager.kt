@@ -2,10 +2,10 @@ package school.slides
 
 import org.gradle.api.Project
 import school.git.FileOperationResult
-import school.WorkspaceManager
-import school.WorkspaceManager.initAddCommitToSite
-import school.WorkspaceManager.localConf
-import school.WorkspaceManager.pushSite
+import school.workspace.WorkspaceManager
+import school.workspace.WorkspaceManager.initAddCommitToSite
+import school.workspace.WorkspaceManager.localConf
+import school.workspace.WorkspaceManager.pushSite
 import java.io.File
 import java.util.*
 

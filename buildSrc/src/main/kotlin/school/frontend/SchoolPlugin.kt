@@ -1,19 +1,21 @@
-package school.school
+package school.frontend
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
-import school.WorkspaceManager.TASK_PUBLISH_SITE
-import school.WorkspaceManager.initWorkspace
-import school.WorkspaceManager.initialConf
-import school.WorkspaceManager.printConf
-import school.WorkspaceUtils
-import school.WorkspaceUtils.lsWorkingDir
-import school.WorkspaceUtils.yamlMapper
-import school.school.SchoolOpsManager.fixEncodage
-import school.school.SchoolOpsManager.loadSchoolFrontend
-import school.school.SchoolOpsManager.processSchoolFrontendCnameFile
-import school.school.SchoolOpsManager.pushSchoolFrontendPages
+import school.workspace.WorkspaceManager.TASK_PUBLISH_SITE
+import school.workspace.WorkspaceManager.initWorkspace
+import school.workspace.WorkspaceManager.initialConf
+import school.workspace.WorkspaceManager.printConf
+import school.workspace.WorkspaceUtils
+import school.workspace.WorkspaceUtils.lsWorkingDir
+import school.workspace.WorkspaceUtils.yamlMapper
+import school.content.SPG
+import school.content.SchoolContentManager
+import school.frontend.SchoolOpsManager.fixEncodage
+import school.frontend.SchoolOpsManager.loadSchoolFrontend
+import school.frontend.SchoolOpsManager.processSchoolFrontendCnameFile
+import school.frontend.SchoolOpsManager.pushSchoolFrontendPages
 import java.lang.System.getenv
 import java.nio.charset.StandardCharsets.UTF_8
 

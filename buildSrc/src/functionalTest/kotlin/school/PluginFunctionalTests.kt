@@ -1,6 +1,6 @@
 @file:Suppress("FunctionName")
 
-package workspace
+package school
 
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir

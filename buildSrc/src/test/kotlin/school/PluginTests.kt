@@ -1,14 +1,14 @@
-package workspace
+package school
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
-import school.Office
-import school.OfficeEntry
 import school.forms.FormPlugin
 import school.jbake.JBakeGhPagesPlugin
-import school.school.SchoolPlugin
-import school.school.SchoolPlugin.Companion.TASK_HELLO
+import school.frontend.SchoolPlugin
+import school.frontend.SchoolPlugin.Companion.TASK_HELLO
+import school.workspace.Office
+import school.workspace.OfficeEntry
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.lang.System.out

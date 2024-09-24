@@ -1,8 +1,8 @@
 package school.forms
 
 import org.gradle.api.Project
-import school.Office
-import school.WorkspaceManager.workspaceEither
+import school.workspace.Office
+import school.workspace.WorkspaceManager.workspaceEither
 import java.io.IOException
 import java.util.*
 

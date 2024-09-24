@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package school.school
+package school.content
 
 data class Formation(
     val nom: String,

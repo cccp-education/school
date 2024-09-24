@@ -1,4 +1,4 @@
-package school
+package school.workspace
 
 import arrow.core.Either
 import arrow.core.left
@@ -11,9 +11,9 @@ import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.Project
-import school.WorkspaceUtils.createDirectory
-import school.WorkspaceUtils.sep
-import school.WorkspaceUtils.yamlMapper
+import school.workspace.WorkspaceUtils.createDirectory
+import school.workspace.WorkspaceUtils.sep
+import school.workspace.WorkspaceUtils.yamlMapper
 import school.git.*
 import school.git.WorkspaceError.FileNotFound
 import school.git.WorkspaceError.ParsingError

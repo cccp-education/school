@@ -5,9 +5,9 @@ import school.git.FileOperationResult
 import school.git.FileOperationResult.Failure
 import school.git.FileOperationResult.Success
 import school.git.RepositoryInfo.CNAME
-import school.WorkspaceManager.bakeDestDirPath
-import school.WorkspaceManager.localConf
-import school.WorkspaceUtils.sep
+import school.workspace.WorkspaceManager.bakeDestDirPath
+import school.workspace.WorkspaceManager.localConf
+import school.workspace.WorkspaceUtils.sep
 import java.io.File
 import java.nio.charset.StandardCharsets.UTF_8
 

@@ -1,16 +1,16 @@
-package school.school
+package school.frontend
 
 import com.github.gradle.node.NodeExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
-import school.Office
-import school.WorkspaceManager.DNS_CNAME
-import school.WorkspaceManager.bakeDestDirPath
-import school.WorkspaceManager.isCnameExists
-import school.WorkspaceManager.localConf
-import school.WorkspaceManager.pushSiteToGhPages
-import school.WorkspaceManager.workspaceEither
-import school.WorkspaceUtils.sep
+import school.workspace.Office
+import school.workspace.WorkspaceManager.DNS_CNAME
+import school.workspace.WorkspaceManager.bakeDestDirPath
+import school.workspace.WorkspaceManager.isCnameExists
+import school.workspace.WorkspaceManager.localConf
+import school.workspace.WorkspaceManager.pushSiteToGhPages
+import school.workspace.WorkspaceManager.workspaceEither
+import school.workspace.WorkspaceUtils.sep
 import java.io.File
 import java.nio.charset.StandardCharsets.UTF_8
 
