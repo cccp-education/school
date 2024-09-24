@@ -1,0 +1,3 @@
+package school.training
+
+object EvaluationManager

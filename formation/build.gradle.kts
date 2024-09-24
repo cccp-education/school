@@ -1,39 +1,39 @@
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
-import workspace.WorkspaceManager.GROUP_TASK_SITE
-import workspace.WorkspaceManager.TASK_BAKE_SITE
-import workspace.WorkspaceManager.TASK_PUBLISH_SITE
-import workspace.WorkspaceManager.bakeDestDirPath
-import workspace.WorkspaceManager.bakeSrcPath
-import workspace.WorkspaceManager.pushSiteToGhPages
-import workspace.WorkspaceUtils.sep
-import workspace.jbake.JBakeGhPagesManager.createCnameFile
-import workspace.jbake.JBakeGhPagesManager.sitePushDestPath
-import workspace.jbake.JBakeGhPagesManager.sitePushPathTo
-import workspace.slides.SlidesPlugin.RevealJsSlides.BUILD_GRADLE_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.CODERAY_CSS_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.DOCINFO_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.ENDPOINT_URL_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.GROUP_TASK_SLIDER
-import workspace.slides.SlidesPlugin.RevealJsSlides.ICONS_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.IDPREFIX_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.IDSEPARATOR_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.IMAGEDIR_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_HISTORY_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_SLIDENUMBER_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_THEME_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.REVEALJS_TRANSITION_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.SETANCHORS_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.SOURCE_HIGHLIGHTER_KEY
-import workspace.slides.SlidesPlugin.RevealJsSlides.TASK_ASCIIDOCTOR_REVEALJS
-import workspace.slides.SlidesPlugin.RevealJsSlides.TASK_CLEAN_SLIDES_BUILD
-import workspace.slides.SlidesPlugin.RevealJsSlides.TOC_KEY
+import school.WorkspaceManager.GROUP_TASK_SITE
+import school.WorkspaceManager.TASK_BAKE_SITE
+import school.WorkspaceManager.TASK_PUBLISH_SITE
+import school.WorkspaceManager.bakeDestDirPath
+import school.WorkspaceManager.bakeSrcPath
+import school.WorkspaceManager.pushSiteToGhPages
+import school.WorkspaceUtils.sep
+import school.jbake.JBakeGhPagesManager.createCnameFile
+import school.jbake.JBakeGhPagesManager.sitePushDestPath
+import school.jbake.JBakeGhPagesManager.sitePushPathTo
+import school.slides.SlidesPlugin.RevealJsSlides.BUILD_GRADLE_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.CODERAY_CSS_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.DOCINFO_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.ENDPOINT_URL_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.GROUP_TASK_SLIDER
+import school.slides.SlidesPlugin.RevealJsSlides.ICONS_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.IDPREFIX_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.IDSEPARATOR_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.IMAGEDIR_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.REVEALJS_HISTORY_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.REVEALJS_SLIDENUMBER_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.REVEALJS_THEME_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.REVEALJS_TRANSITION_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.SETANCHORS_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.SOURCE_HIGHLIGHTER_KEY
+import school.slides.SlidesPlugin.RevealJsSlides.TASK_ASCIIDOCTOR_REVEALJS
+import school.slides.SlidesPlugin.RevealJsSlides.TASK_CLEAN_SLIDES_BUILD
+import school.slides.SlidesPlugin.RevealJsSlides.TOC_KEY
 
 plugins {
     id("org.jbake.site")
     id("org.asciidoctor.jvm.revealjs")
 }
-apply<workspace.slides.SlidesPlugin>()
-apply<workspace.courses.CoursesPlugin>()
+apply<school.slides.SlidesPlugin>()
+apply<school.courses.CoursesPlugin>()
 
 repositories { ruby { gems() } }
 
