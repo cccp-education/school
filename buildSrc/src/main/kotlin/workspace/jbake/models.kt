@@ -2,6 +2,8 @@ package workspace.jbake
 
 import workspace.git.GitPushConfiguration
 
+//object SiteInfo{}
+
 data class SiteConfiguration(
     val bake: BakeConfiguration,
     val pushPage: GitPushConfiguration,

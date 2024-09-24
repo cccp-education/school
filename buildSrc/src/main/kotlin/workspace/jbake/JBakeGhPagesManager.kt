@@ -4,7 +4,7 @@ import org.gradle.api.Project
 import workspace.git.FileOperationResult
 import workspace.git.FileOperationResult.Failure
 import workspace.git.FileOperationResult.Success
-import workspace.git.RepositoryConfiguration.Companion.CNAME
+import workspace.git.RepositoryInfo.CNAME
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.localConf
 import workspace.WorkspaceUtils.sep
