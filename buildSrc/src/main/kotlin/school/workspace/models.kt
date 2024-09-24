@@ -10,6 +10,8 @@ package school.workspace
 
 //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
 //Office-
+typealias Office = MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>
+typealias OfficeEntry = Pair<List<String>, Any>
 
 data class SchoolOffice(
     val bibliotheque: Bibliotheque? = null,
@@ -39,5 +41,3 @@ data class SchoolOffice(
     data class HumanResources(val cv: String)
 }
 
-typealias Office = MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>
-typealias OfficeEntry = Pair<List<String>, Any>

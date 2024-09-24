@@ -7,10 +7,12 @@ import java.io.IOException
 import java.util.*
 
 object FormManager {
-    const val KRSONE_QUOTE = """You know, you don't see with your eyes
-You see with your brain
-And the more words your brain has
-The more things you can see"""
+    const val KRS_ONE_QUOTE = """
+        You know, you don't see with your eyes
+        You see with your brain
+        And the more words your brain has
+        The more things you can see
+"""
 
     @get:Throws(IOException::class)
     val Project.formAccessToken: String?
