@@ -43,40 +43,40 @@ typealias Bureau = MutableMap<String, MutableMap<String, MutableMap<String, Muta
 typealias BureauEntry = Pair<List<String>, Any>
 
 
-data class BakeConfiguration(
-    val srcPath: String,
-    val destDirPath: String,
-    val cname: String?,
-)
+//data class BakeConfiguration(
+//    val srcPath: String,
+//    val destDirPath: String,
+//    val cname: String?,
+//)
 
-data class GitPushConfiguration(
-    val from: String,
-    val to: String,
-    val repo: RepositoryConfiguration,
-    val branch: String,
-    val message: String,
-)
+//data class GitPushConfiguration(
+//    val from: String,
+//    val to: String,
+//    val repo: RepositoryConfiguration,
+//    val branch: String,
+//    val message: String,
+//)
 
 
-data class RepositoryConfiguration(
-    val name: String,
-    val repository: String,
-    val credentials: RepositoryCredentials,
-) {
-    companion object {
-        const val ORIGIN = "origin"
-        const val CNAME = "CNAME"
-        const val REMOTE = "remote"
-    }
-}
+//data class RepositoryConfiguration(
+//    val name: String,
+//    val repository: String,
+//    val credentials: RepositoryCredentials,
+//) {
+//    companion object {
+//        const val ORIGIN = "origin"
+//        const val CNAME = "CNAME"
+//        const val REMOTE = "remote"
+//    }
+//}
 
-data class RepositoryCredentials(
-    val username: String, val password: String
-)
+//data class RepositoryCredentials(
+//    val username: String, val password: String
+//)
 
-data class SiteConfiguration(
-    val bake: BakeConfiguration,
-    val pushPage: GitPushConfiguration,
-    val pushSource: GitPushConfiguration? = null,
-    val pushTemplate: GitPushConfiguration? = null,
-)
+//data class SiteConfiguration(
+//    val bake: BakeConfiguration,
+//    val pushPage: GitPushConfiguration,
+//    val pushSource: GitPushConfiguration? = null,
+//    val pushTemplate: GitPushConfiguration? = null,
+//)

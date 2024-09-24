@@ -1,6 +1,6 @@
 package workspace.slides
 
-import workspace.GitPushConfiguration
+import workspace.git.GitPushConfiguration
 
 @Suppress("unused")
 data class SlidesConfiguration(

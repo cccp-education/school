@@ -16,9 +16,10 @@ import workspace.git.WorkspaceError.ParsingError
 import workspace.WorkspaceUtils.createDirectory
 import workspace.WorkspaceUtils.sep
 import workspace.WorkspaceUtils.yamlMapper
-import workspace.git.FileOperationResult
-import workspace.git.WorkspaceError
+import workspace.git.*
+import workspace.jbake.BakeConfiguration
 import workspace.jbake.JBakeGhPagesManager.copyFilesTo
+import workspace.jbake.SiteConfiguration
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
