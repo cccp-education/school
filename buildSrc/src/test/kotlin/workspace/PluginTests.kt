@@ -52,7 +52,7 @@ class PluginTests {
 
     @Test
     fun checkWorkspaceStruture() {
-//        val office: Office = Office(
+//        val office: SchoolOffice = SchoolOffice(
 //            workspace = Workspace(
 ////                mutableMapOf<String, Workspace.Project>("portfolio" to mutableMapOf<String, Workspace.Project>("",Project()))
 //            )
@@ -72,7 +72,7 @@ class PluginTests {
 
     @Test
     fun checkInitWorkspace() = initWorkspace
-        .run(Bureau::isEmpty)
+        .run(Office::isEmpty)
         .run(::assertTrue)
 
     /**
@@ -87,7 +87,7 @@ class PluginTests {
      */
     @Test
     fun checkAddEntryToWorkspace() {
-        val ws: Bureau = initWorkspace
+        val ws: Office = initWorkspace
         ws.addEntry(
             listOf(
                 "workspace",
@@ -102,7 +102,7 @@ class PluginTests {
 
     val initWorkspace get() = mutableMapOf<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>()
 
-    fun Bureau.addEntry(entry: BureauEntry) {
+    fun Office.addEntry(entry: OfficeEntry) {
 //        put(entry.first.last(),entry.second)
     }
 

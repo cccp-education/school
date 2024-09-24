@@ -45,11 +45,11 @@ object WorkspaceManager {
             contains(it) && this[it] is String && this[it] as String != ""
         }
 
-    val Project.workspaceEither: Either<WorkspaceError, Bureau>
+    val Project.workspaceEither: Either<WorkspaceError, Office>
         get() = try {
             workspacePath.let(::File).run {
                 when {
-                    exists() -> yamlMapper.readValue<Bureau>(readText(UTF_8)).right()
+                    exists() -> yamlMapper.readValue<Office>(readText(UTF_8)).right()
 
                     else -> FileNotFound.left()
                 }

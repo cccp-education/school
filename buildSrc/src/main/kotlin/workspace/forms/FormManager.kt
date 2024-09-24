@@ -1,7 +1,7 @@
 package workspace.forms
 
 import org.gradle.api.Project
-import workspace.Bureau
+import workspace.Office
 import workspace.WorkspaceManager.workspaceEither
 import java.io.IOException
 import java.util.*
@@ -33,7 +33,7 @@ The more things you can see"""
         }
 
         @Suppress("MemberVisibilityCanBePrivate")
-    val Bureau.formCred: String
+    val Office.formCred: String
         get() = this["workspace"]
             ?.get("portfolio")
             ?.get("projects")

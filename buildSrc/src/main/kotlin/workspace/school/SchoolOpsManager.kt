@@ -3,7 +3,7 @@ package workspace.school
 import com.github.gradle.node.NodeExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getByType
-import workspace.Bureau
+import workspace.Office
 import workspace.WorkspaceManager.bakeDestDirPath
 import workspace.WorkspaceManager.isCnameExists
 import workspace.WorkspaceManager.localConf
@@ -23,7 +23,7 @@ object SchoolOpsManager {
 
     val String.fixEncodage: String get() = UTF_8.decode(UTF_8.encode(this)).toString()
 
-    fun Project.createSchoolCnameFile(workspace: Bureau) {
+    fun Project.createSchoolCnameFile(workspace: Office) {
         when {
             isSchoolFrontendCnameExists(workspace) ->
                 workspace.schoolFrontendCnamePath
@@ -40,12 +40,12 @@ object SchoolOpsManager {
         }
     }
 
-    fun schoolFrontendPath(workspace: Bureau): String =
+    fun schoolFrontendPath(workspace: Office): String =
         workspace["workspace"]!!["portfolio"]!!["projects"]!!["school"]!!["builds"]!!["frontend"]!!["path"]!!.toString()
 
 
     fun NodeExtension.schoolFrontendDir(
-        workspace: Bureau
+        workspace: Office
     ): Unit = workspace.let(::schoolFrontendPath)
         .let(::File)
         .let(nodeProjectDir::set)
@@ -75,7 +75,7 @@ object SchoolOpsManager {
         { "${buildDir.absolutePath}${WorkspaceUtils.sep}${localConf.pushPage.to}" }
 
     fun Project.isSchoolFrontendCnameExists(
-        workspace: Bureau
+        workspace: Office
     ): Boolean = workspace["school"]
         ?.get("portfolio")
         ?.get("projects")
@@ -87,7 +87,7 @@ object SchoolOpsManager {
         ?.isCnameExists
         ?: false
 
-    val Bureau.schoolFrontendCnamePath: String?
+    val Office.schoolFrontendCnamePath: String?
         get() {
             val path =
                 this["school"]
@@ -109,10 +109,10 @@ object SchoolOpsManager {
         }
 
     @Suppress("unused", "RedundantNullableReturnType")
-    val Bureau.schoolFrontendFromPath: String?
+    val Office.schoolFrontendFromPath: String?
         get() = ""
 
-    val Bureau.schoolFrontendFrom: String?
+    val Office.schoolFrontendFrom: String?
         get() = this["school"]
             ?.get("portfolio")
             ?.get("projects")
@@ -122,7 +122,7 @@ object SchoolOpsManager {
             ?.get("from")
             ?.let { it as String? }
 
-    val Bureau.schoolFrontendTo: String?
+    val Office.schoolFrontendTo: String?
         get() = this["school"]
             ?.get("portfolio")
             ?.get("projects")
@@ -132,7 +132,7 @@ object SchoolOpsManager {
             ?.get("to")
             ?.let { it as String? }
 
-    val Bureau.schoolFrontendCname: String?
+    val Office.schoolFrontendCname: String?
         get() = with(
             this["school"]
                 ?.get("portfolio")
