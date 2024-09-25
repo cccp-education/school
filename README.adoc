@@ -20,64 +20,79 @@ The School project is based on the link:https://gradle.org/[Gradle] software as 
 - Java 17
 - Docker
 
-.How to launch a task in the terminal
+// .How to launch a task in the terminal
+//
+// _Windows_
+// [source,bash]
+// ----
+// .\gradlew.bat :hello
+// ----
+//
+// _Linux & Mac_
+// [source,bash]
+// ----
+// ./gradlew :hello
+// ----
+//
+// _Output_
+// ----
+// > Task :hello
+// Hello from the SchoolPlugin
+// ----
+
+== Available tasks
+
+.List available tasks
 
 _Windows_
 [source,bash]
 ----
-.\gradlew.bat :hello
+.\gradlew.bat -q :tasks
 ----
 
 _Linux & Mac_
 [source,bash]
 ----
-./gradlew :hello
+./gradlew -q :tasks
 ----
 
-_Output_
-----
-> Task :hello
-Hello from the SchoolPlugin
-----
-
-== Available tasks
-
-.School
-- `:initWorkspace` - Initialize workspace configuration.
-- `:printDossierProfessionnelle` - Displays the internal structure of the professional dossier document in the terminal.
-
-.School Frontend
-- `:schoolFrontendServe` - Run the school site locally.
-- `:schoolFrontendDesign` - Design the school site in Storybook.
-- `:schoolFrontendTests` - Test the school site.
-- `:schoolFrontendPublish` - Publish the school site to CDN.
-
-.School Backoffice
-- `:schoolBackofficeTests` - Test the school backoffice.
-- `:schoolBackofficePush` - Pushes the school backoffice script to the Google Workspace.
-
-.School Moodle
-- `:projects:school:school-gradle-plugin:initMoodle` - Initializes the Moodle docker image in localhost.
-- `:projects:school:school-gradle-plugin:launchMoodleDev` - Launches the Moodle docker image in localhost.
-- `:projects:school:school-gradle-plugin:stopMoodleDev` - Stops the Moodle docker image in localhost.
-
-.Utilities
-- `:hello` - Greetings output
-- `:lsWorkingDir` - Executes the `ls` command on the current module directory.
-- `:confToYaml` - Utility task for development: displays configuration in yaml.
-- `:printEnvVars` - Retrieves environment variables.
-
-
-== Databases
-
-.postgresql
-[bash,source]
-----
-sudo docker compose -f ~/workspace/atelier/school/database/postgresql/postgresql.yml up -d
-----
-
-.mongodb
-[bash,source]
-----
-sudo docker compose -f ~/workspace/atelier/school/database/mongodb/mongodb.yml up -d
-----
+//
+// .School
+// - `:initWorkspace` - Initialize workspace configuration.
+// - `:printDossierProfessionnelle` - Displays the internal structure of the professional dossier document in the terminal.
+//
+// .School Frontend
+// - `:schoolFrontendServe` - Run the school site locally.
+// - `:schoolFrontendDesign` - Design the school site in Storybook.
+// - `:schoolFrontendTests` - Test the school site.
+// - `:schoolFrontendPublish` - Publish the school site to CDN.
+//
+// .School Backoffice
+// - `:schoolBackofficeTests` - Test the school backoffice.
+// - `:schoolBackofficePush` - Pushes the school backoffice script to the Google Workspace.
+//
+// .School Moodle
+// - `:projects:school:school-gradle-plugin:initMoodle` - Initializes the Moodle docker image in localhost.
+// - `:projects:school:school-gradle-plugin:launchMoodleDev` - Launches the Moodle docker image in localhost.
+// - `:projects:school:school-gradle-plugin:stopMoodleDev` - Stops the Moodle docker image in localhost.
+//
+// .Utilities
+// - `:hello` - Greetings output
+// - `:lsWorkingDir` - Executes the `ls` command on the current module directory.
+// - `:confToYaml` - Utility task for development: displays configuration in yaml.
+// - `:printEnvVars` - Retrieves environment variables.
+//
+//
+// == Databases
+//
+// .postgresql
+// [bash,source]
+// ----
+// sudo docker compose -f ~/workspace/atelier/school/database/postgresql/postgresql.yml up -d
+// ----
+//
+// .mongodb
+// [bash,source]
+// ----
+// sudo docker compose -f ~/workspace/atelier/school/database/mongodb/mongodb.yml up -d
+// ----

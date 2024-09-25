@@ -20,50 +20,65 @@ Le projet School est basé sur le logiciel link:https://gradle.org/[gradle] comm
 - Java 17
 - Docker
 
-.Comment lancer une tache dans le terminal
+// .Comment lancer une tache dans le terminal
+//
+// _Windows_
+// [source,bash]
+// ----
+// .\gradlew.bat :hello
+// ----
+//
+// _Linux & Mac_
+// [source,bash]
+// ----
+// ./gradlew :hello
+// ----
+//
+// _Sortie_
+// ----
+// > Task :hello
+// Hello from the SchoolPlugin
+// ----
+
+
+== Taches disponibles
+
+.Lister les taches disponible.
 
 _Windows_
 [source,bash]
 ----
-.\gradlew.bat :hello
+.\gradlew.bat :tasks
 ----
 
 _Linux & Mac_
 [source,bash]
 ----
-./gradlew :hello
-----
-
-_Sortie_
-----
-> Task :hello
-Hello from the SchoolPlugin
+./gradlew :tasks
 ----
 
 
-== Taches disponibles
-
-.École
-- `:initWorkspace` - Initialise la workspace configuration.
-- `:printDossierProfessionnelle` - Affiche dans le terminal la structure interne du document de dossier professionnel.
-
-.École Frontend
-- `:schoolFrontendServe` - Execute du site de l'école en localhost.
-- `:schoolFrontendDesign` - Design le site de l'école dans Storybook.
-- `:schoolFrontendTest` - Test le site de l'école.
-- `:schoolFrontendPublish` - Publie le site de l'école vers un CDN.
-
-.École Backoffice
-- `:schoolBackofficeTests` - Tester le backoffice de l'école.
-- `:schoolBackofficePush` - Poussez le script backoffice de l'école vers l'espace de travail Google.
-
-.École Moodle
-- `:projects:school:school-gradle-plugin:initMoodle` - Initialise l'image docker de Moodle dans localhost.
-- `:projects:school:school-gradle-plugin:launchMoodleDev` - Lance l'image docker de Moodle dans le localhost.
-- `:projects:school:school-gradle-plugin:stopMoodleDev` - Arrête l'image docker de Moodle dans le localhost.
-
-.Utilitaires
-- `:hello` - Salution d'usage.
-- `:lsWorkingDir` - Exécute la commande `ls` sur repertoire du module en execution.
-- `:confToYaml` - Tâche utilitaire pour le développement : affiche la configuration en yaml.
-- `:printEnvVars` - Récupère les variables d'environnement.
+// .École
+// - `:initWorkspace` - Initialise la workspace configuration.
+// - `:printDossierProfessionnelle` - Affiche dans le terminal la structure interne du document de dossier professionnel.
+//
+// .École Frontend
+// - `:schoolFrontendServe` - Execute du site de l'école en localhost.
+// - `:schoolFrontendDesign` - Design le site de l'école dans Storybook.
+// - `:schoolFrontendTest` - Test le site de l'école.
+// - `:schoolFrontendPublish` - Publie le site de l'école vers un CDN.
+//
+// .École Backoffice
+// - `:schoolBackofficeTests` - Tester le backoffice de l'école.
+// - `:schoolBackofficePush` - Poussez le script backoffice de l'école vers l'espace de travail Google.
+//
+// .École Moodle
+// - `:projects:school:school-gradle-plugin:initMoodle` - Initialise l'image docker de Moodle dans localhost.
+// - `:projects:school:school-gradle-plugin:launchMoodleDev` - Lance l'image docker de Moodle dans le localhost.
+// - `:projects:school:school-gradle-plugin:stopMoodleDev` - Arrête l'image docker de Moodle dans le localhost.
+//
+// .Utilitaires
+// - `:hello` - Salution d'usage.
+// - `:lsWorkingDir` - Exécute la commande `ls` sur repertoire du module en execution.
+// - `:confToYaml` - Tâche utilitaire pour le développement : affiche la configuration en yaml.
+// - `:printEnvVars` - Récupère les variables d'environnement.
