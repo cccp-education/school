@@ -1,11 +1,4 @@
 import org.asciidoctor.gradle.jvm.slides.AsciidoctorJRevealJSTask
-import school.workspace.WorkspaceManager.GROUP_TASK_SITE
-import school.workspace.WorkspaceManager.TASK_BAKE_SITE
-import school.workspace.WorkspaceManager.TASK_PUBLISH_SITE
-import school.workspace.WorkspaceManager.bakeDestDirPath
-import school.workspace.WorkspaceManager.bakeSrcPath
-import school.workspace.WorkspaceManager.pushSiteToGhPages
-import school.workspace.WorkspaceUtils.sep
 import school.jbake.JBakeGhPagesManager.createCnameFile
 import school.jbake.JBakeGhPagesManager.sitePushDestPath
 import school.jbake.JBakeGhPagesManager.sitePushPathTo
@@ -27,6 +20,13 @@ import school.slides.SlidesPlugin.RevealJsSlides.SOURCE_HIGHLIGHTER_KEY
 import school.slides.SlidesPlugin.RevealJsSlides.TASK_ASCIIDOCTOR_REVEALJS
 import school.slides.SlidesPlugin.RevealJsSlides.TASK_CLEAN_SLIDES_BUILD
 import school.slides.SlidesPlugin.RevealJsSlides.TOC_KEY
+import school.workspace.WorkspaceManager.GROUP_TASK_SITE
+import school.workspace.WorkspaceManager.TASK_BAKE_SITE
+import school.workspace.WorkspaceManager.TASK_PUBLISH_SITE
+import school.workspace.WorkspaceManager.bakeDestDirPath
+import school.workspace.WorkspaceManager.bakeSrcPath
+import school.workspace.WorkspaceManager.pushSiteToGhPages
+import school.workspace.WorkspaceUtils.sep
 
 plugins {
     id("org.jbake.site")
@@ -50,7 +50,9 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
         }
     }
     revealjsOptions {
-        setSourceDir("..$sep..${sep}bibliotheque${sep}slides".let(::File))
+        "..$sep..${sep}bibliotheque${sep}slides"
+            .let(::File)
+            .let(::setSourceDir)
         baseDirFollowsSourceFile()
         resources {
             from("$sourceDir${sep}images") {
@@ -58,28 +60,26 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
                 into("images")
             }
         }
-        attributes(
-            mapOf(
-                BUILD_GRADLE_KEY to layout
-                    .projectDirectory
-                    .let { "$it${sep}build.gradle.kts" }
-                    .let(::File),
-                ENDPOINT_URL_KEY to "https://talaria-formation.github.io/",
-                SOURCE_HIGHLIGHTER_KEY to "coderay",
-                CODERAY_CSS_KEY to "style",
-                IMAGEDIR_KEY to ".${sep}images",
-                TOC_KEY to "left",
-                ICONS_KEY to "font",
-                SETANCHORS_KEY to "",
-                IDPREFIX_KEY to "slide-",
-                IDSEPARATOR_KEY to "-",
-                DOCINFO_KEY to "shared",
-                REVEALJS_THEME_KEY to "black",
-                REVEALJS_TRANSITION_KEY to "linear",
-                REVEALJS_HISTORY_KEY to "true",
-                REVEALJS_SLIDENUMBER_KEY to "true"
-            )
-        )
+        mapOf(
+            BUILD_GRADLE_KEY to layout
+                .projectDirectory
+                .let { "$it${sep}build.gradle.kts" }
+                .let(::File),
+            ENDPOINT_URL_KEY to "https://talaria-formation.github.io/",
+            SOURCE_HIGHLIGHTER_KEY to "coderay",
+            CODERAY_CSS_KEY to "style",
+            IMAGEDIR_KEY to ".${sep}images",
+            TOC_KEY to "left",
+            ICONS_KEY to "font",
+            SETANCHORS_KEY to "",
+            IDPREFIX_KEY to "slide-",
+            IDSEPARATOR_KEY to "-",
+            DOCINFO_KEY to "shared",
+            REVEALJS_THEME_KEY to "black",
+            REVEALJS_TRANSITION_KEY to "linear",
+            REVEALJS_HISTORY_KEY to "true",
+            REVEALJS_SLIDENUMBER_KEY to "true"
+        ).let(::attributes)
     }
 }
 
