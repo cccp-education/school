@@ -10,6 +10,7 @@ import school.ai.AssistantManager.apiKey
 import school.ai.AssistantManager.createOllamaChatModel
 import school.ai.AssistantManager.createOllamaStreamingChatModel
 import school.ai.AssistantManager.generateStreamingResponse
+import school.ai.AssistantManager.localModels
 import school.ai.AssistantManager.userMessage
 
 class AssistantPlugin : Plugin<Project> {
@@ -74,12 +75,7 @@ class AssistantPlugin : Plugin<Project> {
             }
 
             // Creating tasks for each model
-            mapOf(
-                "llama3.1:latest" to "Llama3",
-                "mistral" to "Mistral",
-                "phi3.5:latest" to "Phi",
-                "smollm:135m" to "SmollM",
-            ).forEach { model ->
+            localModels.forEach { model ->
                 createChatTask("helloOllama${model.value}", model.key)
                 createStreamingChatTask("helloOllamaStream${model.value}", model.key)
             }

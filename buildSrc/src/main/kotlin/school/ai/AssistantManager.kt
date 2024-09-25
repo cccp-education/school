@@ -20,8 +20,20 @@ import org.slf4j.LoggerFactory
 
 
 object AssistantManager {
+
     val logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
 
+    @JvmStatic
+    val Project.localModels
+        get() = mapOf(
+            "llama3.2:3b" to "LlamaTiny",
+            "llama3.1:8b" to "LlamaSmall",
+            "mistral:7b" to "Mistral",
+            "phi3.5:3.8b" to "Phi",
+            "smollm:135m" to "SmollM",
+        )
+
+    @JvmStatic
     val Project.apiKey: String
         get() = Properties().apply {
             "$projectDir/private.properties"
