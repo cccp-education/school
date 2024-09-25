@@ -6,38 +6,31 @@ compose-samples
 *.ipr
 *.iws
 *.iml
-# *.odt
 
-# Ignore Gradle project-specific cache directory
 .gradle
 
-# Ignore Gradle build output directory
 build
 
-# android props
 local.properties
 
-# Visual studio code
 .vs
 
-# binaries
 bin
 
-# maven destination
 target
 
-# build destination
 output
 
-# extra private
+
+desktop.ini
+.next
+
+*.hprof
+
+
+.gitignore
 workspace.yml
 e3p0.yaml
 managed-jbake-context.yml
 private.properties
-
-# windows personalisation
-desktop.ini
 training-institut-2598582b592a.json
-.next
-
-*.hprof

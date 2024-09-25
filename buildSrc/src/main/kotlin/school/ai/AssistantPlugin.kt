@@ -50,7 +50,7 @@ class AssistantPlugin : Plugin<Project> {
                 group = "school-ai"
                 description = "Display the ollama phi3.5 chatgpt prompt request."
                 doFirst {
-                    createOllamaChatModel(model = "phi3.5")
+                    createOllamaChatModel(model = "phi3.5:latest")
                         .run { generate(userMessage).let(::println) }
                 }
             }
@@ -60,7 +60,7 @@ class AssistantPlugin : Plugin<Project> {
                 description = "Display the ollama phi3.5 chatgpt stream prompt request."
                 doFirst {
                     runBlocking {
-                        createOllamaStreamingChatModel("phi3.5").run {
+                        createOllamaStreamingChatModel("phi3.5:latest").run {
                             when (val answer = generateStreamingResponse(this, userMessage)) {
                                 is Right ->
                                     "Complete response received: \n${answer.value.content().text()}".run(::println)

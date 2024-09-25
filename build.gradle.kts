@@ -1,12 +1,15 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
+import school.ai.AssistantPlugin
+import school.forms.FormPlugin
+import school.frontend.SchoolPlugin
 import school.workspace.WorkspaceUtils.purchaseArtifact
 import school.jbake.JBakeGhPagesPlugin
 
 plugins { idea }
-apply<school.frontend.SchoolPlugin>()
-apply<school.forms.FormPlugin>()
+apply<SchoolPlugin>()
+apply<FormPlugin>()
 apply<JBakeGhPagesPlugin>()
-apply<school.ai.AssistantPlugin>()
+apply<AssistantPlugin>()
 
 purchaseArtifact()
 
