@@ -30,35 +30,31 @@ object AssistantManager {
                             | La spécialisation de ${System.getProperty("user.name")} est dans l'ingenieurie de pédagogie pour adulte,
                             | et le software craftmanship avec les méthodes agiles.
                             | $assistantName ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
-                            | Réponds moi à ce premier échange uniquement en maximum 200 mots"""
-        .trimMargin()
+                            | Réponds moi à ce premier échange uniquement en maximum 120 mots""".trimMargin()
 
-    fun Project.createOllamaChatModel(): OllamaChatModel =
+    fun Project.createOllamaChatModel(model: String = "smollm:135m"): OllamaChatModel =
         OllamaChatModel.builder().apply {
-                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                logRequests(true)
-                logResponses(true)
-            }.build()
+            baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+            modelName(project.findProperty("ollama.modelName") as? String ?: model)
+            temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
+            timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+            logRequests(true)
+            logResponses(true)
+        }.build()
 
-    fun Project.createOllamaStreamingChatModel(): OllamaStreamingChatModel =
-        OllamaStreamingChatModel
-            .builder()
-            .apply {
-                baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-                modelName(project.findProperty("ollama.modelName") as? String ?: "phi3.5")
-                temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-                timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
-                logRequests(true)
-                logResponses(true)
-            }.build()
+    fun Project.createOllamaStreamingChatModel(model: String = "smollm:135m"): OllamaStreamingChatModel =
+        OllamaStreamingChatModel.builder().apply {
+            baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+            modelName(project.findProperty("ollama.modelName") as? String ?: model)
+            temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
+            timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+            logRequests(true)
+            logResponses(true)
+        }.build()
 
 
     suspend fun generateStreamingResponse(
-        model: StreamingChatLanguageModel,
-        promptMessage: String
+        model: StreamingChatLanguageModel, promptMessage: String
     ): Either<Throwable, Response<AiMessage>> = catch {
         suspendCancellableCoroutine { continuation ->
             model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
@@ -79,9 +75,6 @@ object AssistantManager {
 
     val Project.apiKey: String
         get() = Properties().apply {
-            "$projectDir/private.properties"
-                .let(::File)
-                .inputStream()
-                .use(::load)
+            "$projectDir/private.properties".let(::File).inputStream().use(::load)
         }["OPENAI_API_KEY"] as String
 }

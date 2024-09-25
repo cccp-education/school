@@ -16,15 +16,75 @@ class AssistantPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.run {
-            task("helloOllama") {
+            task("helloOllamaMistral") {
                 group = "school-ai"
-                description = "Display the ollama chatgpt prompt request."
-                doFirst { createOllamaChatModel().run { generate(userMessage).let(::println) } }
+                description = "Display the ollama mistral chatgpt prompt request."
+                doFirst {
+                    createOllamaChatModel(model = "mistral")
+                        .run { generate(userMessage).let(::println) }
+                }
             }
 
-            task("helloOllamaStream") {
+            task("helloOllamaStreamMistral") {
                 group = "school-ai"
-                description = "Display the ollama chatgpt stream prompt request."
+                description = "Display the ollama mistral chatgpt stream prompt request."
+                doFirst {
+                    runBlocking {
+                        createOllamaStreamingChatModel("mistral").run {
+                            when (val answer = generateStreamingResponse(this, userMessage)) {
+                                is Right ->
+                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
+
+                                is Left ->
+                                    "Error during response generation: \n${answer.value}".run(::println)
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+
+            task("helloOllamaPhi") {
+                group = "school-ai"
+                description = "Display the ollama phi3.5 chatgpt prompt request."
+                doFirst {
+                    createOllamaChatModel(model = "phi3.5")
+                        .run { generate(userMessage).let(::println) }
+                }
+            }
+
+            task("helloOllamaStreamPhi") {
+                group = "school-ai"
+                description = "Display the ollama phi3.5 chatgpt stream prompt request."
+                doFirst {
+                    runBlocking {
+                        createOllamaStreamingChatModel("phi3.5").run {
+                            when (val answer = generateStreamingResponse(this, userMessage)) {
+                                is Right ->
+                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
+
+                                is Left ->
+                                    "Error during response generation: \n${answer.value}".run(::println)
+                            }
+                        }
+                    }
+                }
+            }
+
+            task("helloOllamaSmollM") {
+                group = "school-ai"
+                description = "Display the ollama mistral chatgpt prompt request."
+                doFirst {
+                    createOllamaChatModel()
+                        .run { generate(userMessage).let(::println) }
+                }
+            }
+
+            task("helloOllamaStreamSmollM") {
+                group = "school-ai"
+                description = "Display the ollama mistral chatgpt stream prompt request."
                 doFirst {
                     runBlocking {
                         createOllamaStreamingChatModel().run {
@@ -39,6 +99,7 @@ class AssistantPlugin : Plugin<Project> {
                     }
                 }
             }
+
 
             task("displayAIPrompt") {
                 group = "school-ai"
