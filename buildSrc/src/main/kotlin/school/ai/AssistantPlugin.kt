@@ -1,21 +1,18 @@
 package school.ai
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
 import dev.langchain4j.model.openai.OpenAiChatModel
-import kotlinx.coroutines.runBlocking
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import school.ai.AssistantManager.apiKey
-import school.ai.AssistantManager.createOllamaChatModel
-import school.ai.AssistantManager.createOllamaStreamingChatModel
-import school.ai.AssistantManager.generateStreamingResponse
 import school.ai.AssistantManager.localModels
+import school.ai.AssistantManager.runChat
+import school.ai.AssistantManager.runStreamChat
 import school.ai.AssistantManager.userMessage
 
 class AssistantPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
+
         project.run {
             task("displayAIPrompt") {
                 group = "school-ai"
@@ -46,10 +43,7 @@ class AssistantPlugin : Plugin<Project> {
                 task(taskName) {
                     group = "school-ai"
                     description = "Display the Ollama $model chatgpt prompt request."
-                    doFirst {
-                        createOllamaChatModel(model = model)
-                            .run { generate(userMessage).let(::println) }
-                    }
+                    doFirst { runChat(model) }
                 }
             }
 
@@ -58,19 +52,7 @@ class AssistantPlugin : Plugin<Project> {
                 task(taskName) {
                     group = "school-ai"
                     description = "Display the Ollama $model chatgpt stream prompt request."
-                    doFirst {
-                        runBlocking {
-                            createOllamaStreamingChatModel(model).run {
-                                when (val answer = generateStreamingResponse(this, userMessage)) {
-                                    is Right -> "Complete response received:\n${
-                                        answer.value.content().text()
-                                    }".run(::println)
-
-                                    is Left -> "Error during response generation:\n${answer.value}".run(::println)
-                                }
-                            }
-                        }
-                    }
+                    doFirst { runStreamChat(model) }
                 }
             }
 

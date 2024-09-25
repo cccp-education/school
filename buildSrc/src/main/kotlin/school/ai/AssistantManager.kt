@@ -3,6 +3,7 @@ package school.ai
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.getOrElse
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.model.StreamingResponseHandler
@@ -10,6 +11,7 @@ import dev.langchain4j.model.chat.StreamingChatLanguageModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import dev.langchain4j.model.output.Response
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Project
 import java.io.File
@@ -93,6 +95,25 @@ object AssistantManager {
                     continuation.resume(Left(error).getOrElse { throw it })
                 }
             })
+        }
+    }
+
+    fun Project.runChat(model: String) {
+        createOllamaChatModel(model = model)
+            .run { generate(userMessage).let(::println) }
+    }
+
+    fun Project.runStreamChat(model: String) {
+        runBlocking {
+            createOllamaStreamingChatModel(model).run {
+                when (val answer = generateStreamingResponse(this, userMessage)) {
+                    is Right -> "Complete response received:\n${
+                        answer.value.content().text()
+                    }".run(::println)
+
+                    is Left -> "Error during response generation:\n${answer.value}".run(::println)
+                }
+            }
         }
     }
 }
