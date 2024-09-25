@@ -37,7 +37,6 @@ class AssistantPlugin : Plugin<Project> {
                 }
             }
 
-
             // Generic function for chat model tasks
             fun createChatTask(taskName: String, model: String) {
                 task(taskName) {

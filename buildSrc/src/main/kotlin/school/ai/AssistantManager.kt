@@ -14,16 +14,18 @@ import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
-import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.util.*
 import kotlin.coroutines.resume
-import org.slf4j.LoggerFactory
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 object AssistantManager {
 
-    val logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
+    val logger: Logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
 
     @JvmStatic
     val Project.localModels
@@ -59,20 +61,20 @@ object AssistantManager {
 
     fun Project.createOllamaChatModel(model: String = "smollm:135m"): OllamaChatModel =
         OllamaChatModel.builder().apply {
-            baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-            modelName(project.findProperty("ollama.modelName") as? String ?: model)
-            temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-            timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+            baseUrl(findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+            modelName(findProperty("ollama.modelName") as? String ?: model)
+            temperature(findProperty("ollama.temperature") as? Double ?: 0.8)
+            timeout(ofSeconds(findProperty("ollama.timeout") as? Long ?: 6_000))
             logRequests(true)
             logResponses(true)
         }.build()
 
     fun Project.createOllamaStreamingChatModel(model: String = "smollm:135m"): OllamaStreamingChatModel =
         OllamaStreamingChatModel.builder().apply {
-            baseUrl(project.findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
-            modelName(project.findProperty("ollama.modelName") as? String ?: model)
-            temperature(project.findProperty("ollama.temperature") as? Double ?: 0.8)
-            timeout(Duration.ofSeconds(project.findProperty("ollama.timeout") as? Long ?: 6_000))
+            baseUrl(findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
+            modelName(findProperty("ollama.modelName") as? String ?: model)
+            temperature(findProperty("ollama.temperature") as? Double ?: 0.8)
+            timeout(ofSeconds(findProperty("ollama.timeout") as? Long ?: 6_000))
             logRequests(true)
             logResponses(true)
         }.build()
