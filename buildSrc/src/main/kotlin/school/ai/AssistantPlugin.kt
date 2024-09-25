@@ -16,91 +16,6 @@ class AssistantPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.run {
-            task("helloOllamaMistral") {
-                group = "school-ai"
-                description = "Display the ollama mistral chatgpt prompt request."
-                doFirst {
-                    createOllamaChatModel(model = "mistral")
-                        .run { generate(userMessage).let(::println) }
-                }
-            }
-
-            task("helloOllamaStreamMistral") {
-                group = "school-ai"
-                description = "Display the ollama mistral chatgpt stream prompt request."
-                doFirst {
-                    runBlocking {
-                        createOllamaStreamingChatModel("mistral").run {
-                            when (val answer = generateStreamingResponse(this, userMessage)) {
-                                is Right ->
-                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
-
-                                is Left ->
-                                    "Error during response generation: \n${answer.value}".run(::println)
-                            }
-                        }
-                    }
-                }
-            }
-
-
-
-
-            task("helloOllamaPhi") {
-                group = "school-ai"
-                description = "Display the ollama phi3.5 chatgpt prompt request."
-                doFirst {
-                    createOllamaChatModel(model = "phi3.5:latest")
-                        .run { generate(userMessage).let(::println) }
-                }
-            }
-
-            task("helloOllamaStreamPhi") {
-                group = "school-ai"
-                description = "Display the ollama phi3.5 chatgpt stream prompt request."
-                doFirst {
-                    runBlocking {
-                        createOllamaStreamingChatModel("phi3.5:latest").run {
-                            when (val answer = generateStreamingResponse(this, userMessage)) {
-                                is Right ->
-                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
-
-                                is Left ->
-                                    "Error during response generation: \n${answer.value}".run(::println)
-                            }
-                        }
-                    }
-                }
-            }
-
-            task("helloOllamaSmollM") {
-                group = "school-ai"
-                description = "Display the ollama mistral chatgpt prompt request."
-                doFirst {
-                    createOllamaChatModel()
-                        .run { generate(userMessage).let(::println) }
-                }
-            }
-
-            task("helloOllamaStreamSmollM") {
-                group = "school-ai"
-                description = "Display the ollama mistral chatgpt stream prompt request."
-                doFirst {
-                    runBlocking {
-                        createOllamaStreamingChatModel().run {
-                            when (val answer = generateStreamingResponse(this, userMessage)) {
-                                is Right ->
-                                    "Complete response received: \n${answer.value.content().text()}".run(::println)
-
-                                is Left ->
-                                    "Error during response generation: \n${answer.value}".run(::println)
-                            }
-                        }
-                    }
-                }
-            }
-
-
             task("displayAIPrompt") {
                 group = "school-ai"
                 description = "Dislpay on console AI prompt assistant"
@@ -122,6 +37,51 @@ class AssistantPlugin : Plugin<Project> {
                         .generate("Say 'Hello World'")
                         .run(::println)
                 }
+            }
+
+
+            // Generic function for chat model tasks
+            fun createChatTask(taskName: String, model: String) {
+                task(taskName) {
+                    group = "school-ai"
+                    description = "Display the Ollama $model chatgpt prompt request."
+                    doFirst {
+                        createOllamaChatModel(model = model)
+                            .run { generate(userMessage).let(::println) }
+                    }
+                }
+            }
+
+            // Generic function for streaming chat model tasks
+            fun createStreamingChatTask(taskName: String, model: String) {
+                task(taskName) {
+                    group = "school-ai"
+                    description = "Display the Ollama $model chatgpt stream prompt request."
+                    doFirst {
+                        runBlocking {
+                            createOllamaStreamingChatModel(model).run {
+                                when (val answer = generateStreamingResponse(this, userMessage)) {
+                                    is Right -> "Complete response received:\n${
+                                        answer.value.content().text()
+                                    }".run(::println)
+
+                                    is Left -> "Error during response generation:\n${answer.value}".run(::println)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Creating tasks for each model
+            mapOf(
+                "llama3.1:latest" to "Llama3",
+                "mistral" to "Mistral",
+                "phi3.5:latest" to "Phi",
+                "smollm:135m" to "SmollM",
+            ).forEach { model ->
+                createChatTask("helloOllama${model.value}", model.key)
+                createStreamingChatTask("helloOllamaStream${model.value}", model.key)
             }
         }
     }

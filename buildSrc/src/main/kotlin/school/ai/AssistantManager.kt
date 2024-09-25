@@ -16,8 +16,19 @@ import java.io.File
 import java.time.Duration
 import java.util.*
 import kotlin.coroutines.resume
+import org.slf4j.LoggerFactory
+
 
 object AssistantManager {
+    val logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
+
+    val Project.apiKey: String
+        get() = Properties().apply {
+            "$projectDir/private.properties"
+                .let(::File)
+                .inputStream()
+                .use(::load)
+        }["OPENAI_API_KEY"] as String
 
     val userName = System.getProperty("user.name")
     val assistantName = "E-3PO"
@@ -72,9 +83,4 @@ object AssistantManager {
             })
         }
     }
-
-    val Project.apiKey: String
-        get() = Properties().apply {
-            "$projectDir/private.properties".let(::File).inputStream().use(::load)
-        }["OPENAI_API_KEY"] as String
 }
