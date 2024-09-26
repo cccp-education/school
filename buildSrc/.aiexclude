@@ -1,0 +1,8 @@
+.gradle
+.kotlin
+build
+.gitignore
+school.buildSrc.functionalTest.iml
+school.buildSrc.iml
+school.buildSrc.main.iml
+school.buildSrc.test.iml

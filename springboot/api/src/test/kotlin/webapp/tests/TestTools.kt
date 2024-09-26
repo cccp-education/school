@@ -32,6 +32,7 @@ import kotlin.reflect.full.createInstance
 
 
 object TestTools {
+
 //@Suppress("MemberVisibilityCanBePrivate")
 //object DataTests {
 //    val adminAccount by lazy { accountCredentialsFactory(ADMIN) }
@@ -60,8 +61,7 @@ object TestTools {
 
 
     fun launcher(
-        vararg profiles: String,
-        userAuths: Set<Pair<String, String>> = emptySet()
+        vararg profiles: String, userAuths: Set<Pair<String, String>> = emptySet()
     ): ConfigurableApplicationContext = runApplication<Application> {
         /**
          * before launching: configuration
@@ -79,17 +79,13 @@ object TestTools {
          * after launching: verification & post construct
          */
         (when {
-            environment.defaultProfiles.isNotEmpty() -> environment
-                .defaultProfiles
-                .reduce { acc, s -> "$acc, $s" }
+            environment.defaultProfiles.isNotEmpty() -> environment.defaultProfiles.reduce { acc, s -> "$acc, $s" }
 
             else -> ""
         }).let { "defaultProfiles : $it" }.let(::i)
 
         (when {
-            environment.activeProfiles.isNotEmpty() -> environment
-                .activeProfiles
-                .reduce { acc, s -> "$acc, $s" }
+            environment.activeProfiles.isNotEmpty() -> environment.activeProfiles.reduce { acc, s -> "$acc, $s" }
 
             else -> ""
         }).let { "activeProfiles : $it" }.let(::i)
@@ -211,26 +207,19 @@ object TestTools {
     }.reduce { acc: String, s: String -> acc + s }
 
     fun ByteArray.logBody(): ByteArray = apply {
-        if (isNotEmpty()) map { it.toInt().toChar().toString() }
-            .reduce { request, s ->
+        if (isNotEmpty()) map { it.toInt().toChar().toString() }.reduce { request, s ->
                 request + buildString {
                     append(s)
-                    if (s == VIRGULE && request.last().isDigit())
-                        append("\n\t")
+                    if (s == VIRGULE && request.last().isDigit()) append("\n\t")
                 }
-            }.replace("{\"", "\n{\n\t\"")
-            .replace("\"}", "\"\n}")
-            .replace("\",\"", "\",\n\t\"")
+            }.replace("{\"", "\n{\n\t\"").replace("\"}", "\"\n}").replace("\",\"", "\",\n\t\"")
             .run { i("\nbody:$this") }
     }
 
     fun ByteArray.logBodyRaw(): ByteArray = apply {
         if (isNotEmpty()) map {
-            it.toInt()
-                .toChar()
-                .toString()
-        }.reduce { request, s -> request + s }
-            .run { i(this) }
+            it.toInt().toChar().toString()
+        }.reduce { request, s -> request + s }.run { i(this) }
     }
 
 //fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTemplate) {
@@ -361,12 +350,11 @@ object TestTools {
 //fun findAllAccountAuthority(dao: R2dbcEntityTemplate): Set<AccountAuthorityEntity> =
 //    dao.select(AccountAuthorityEntity::class.java).all().toIterable().toHashSet()
 
-    private fun createObjectMapper() =
-        ObjectMapper().apply {
-            configure(WRITE_DURATIONS_AS_TIMESTAMPS, false)
-            setSerializationInclusion(NON_EMPTY)
-            registerModule(JavaTimeModule())
-        }
+    private fun createObjectMapper() = ObjectMapper().apply {
+        configure(WRITE_DURATIONS_AS_TIMESTAMPS, false)
+        setSerializationInclusion(NON_EMPTY)
+        registerModule(JavaTimeModule())
+    }
 
     /**
      * Convert an object to JSON byte array.
@@ -400,16 +388,14 @@ object TestTools {
                 }
                 return true
             } catch (e: DateTimeParseException) {
-                mismatchDescription.appendText("was ")
-                    .appendValue(item)
+                mismatchDescription.appendText("was ").appendValue(item)
                     .appendText(", which could not be parsed as a ZonedDateTime")
                 return false
             }
         }
 
         override fun describeTo(description: Description) {
-            description.appendText("a String representing the same Instant as ")
-                .appendValue(date)
+            description.appendText("a String representing the same Instant as ").appendValue(date)
         }
     }
 

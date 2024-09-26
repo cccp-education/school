@@ -1,6 +1,29 @@
-//@file:Suppress("NonAsciiCharacters")
-//
+@file:Suppress("NonAsciiCharacters")
+
 package webapp.signup
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.validation.Validator
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.getBean
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.ApplicationContext
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
+import org.springframework.test.web.reactive.server.returnResult
+import webapp.core.utils.i
+import webapp.tests.TestTools.logBody
+import webapp.tests.TestTools.requestToString
+import webapp.tests.TestUtils.Data.DEFAULT_USER_JSON
+import webapp.tests.TestUtils.Data.user
+import webapp.tests.TestUtils.Data.users
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+
 //
 //import com.fasterxml.jackson.databind.ObjectMapper
 //import jakarta.validation.Validation.byProvider
@@ -15,7 +38,9 @@ package webapp.signup
 //import org.springframework.context.ConfigurableApplicationContext
 //import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 //import org.springframework.http.HttpHeaders.ACCEPT_LANGUAGE
-//import org.springframework.http.MediaType.APPLICATION_JSON
+//import webapp.users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD
+//import webapp.users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD
+
 //import org.springframework.http.ProblemDetail
 //import org.springframework.http.ResponseEntity
 //import org.springframework.test.web.reactive.server.WebTestClient
@@ -33,54 +58,60 @@ package webapp.signup
 //import kotlin.test.*
 //
 //
-//class IntegrationTests {
-//    private lateinit var context: ConfigurableApplicationContext
-//    private val dao: R2dbcEntityTemplate by lazy { context.getBean<R2dbcEntityTemplate>() }
-//    private val validator: Validator by lazy { context.getBean<Validator>() }
-//    private val client: WebTestClient by lazy { bindToServer().baseUrl(BASE_URL_DEV).build() }
-//
-//    @BeforeAll
-//    fun `lance le server en profile test`() = launcher().let { context = it }
-//
-//    @AfterAll
-//    fun `arrête le serveur`() = context.close()
-//
+@SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
+@ActiveProfiles("test")
+class IntegrationTests {
+
+    @Autowired
+    lateinit var context: ApplicationContext
+    lateinit var client: WebTestClient
+    val mapper: ObjectMapper by lazy { context.getBean() }
+    val validator: Validator by lazy { context.getBean() }
+    val dao: R2dbcEntityTemplate by lazy { context.getBean() }
+
+    @BeforeTest
+    fun setUp() {
+        client = context.let(::bindToApplicationContext).build()
+    }
+
 //    @AfterEach
 //    fun tearDown() = deleteAllAccounts(dao)
-//
-//    @Test
-//    fun `DataTestsChecks - affiche moi du json`() = run {
-//        context.getBean<ObjectMapper>().writeValueAsString(accounts).run(::i)
-//        context.getBean<ObjectMapper>().writeValueAsString(defaultAccount).run(::i)
-//        DEFAULT_ACCOUNT_JSON.run(::i)
-//    }
-//
-//    @Test
-//    fun `SignupController - vérifie que la requête contient bien des données cohérentes`() {
-//        client
-//            .post()
-//            .uri("")
-//            .contentType(APPLICATION_JSON)
-//            .bodyValue(defaultAccount)
-//            .exchange()
-//            .returnResult<Unit>()
-//            .requestBodyContent!!
-//            .logBody()
-//            .requestToString()
-//            .run {
-//                defaultAccount.run {
+
+    @Test
+    fun `DataTestsChecks - affiche moi du json`() = run {
+        assertDoesNotThrow {
+            mapper.writeValueAsString(users).run(::i)
+            mapper.writeValueAsString(user).run(::i)
+            DEFAULT_USER_JSON.run(::i)
+        }
+    }
+
+    @Test
+    fun `SignupController - vérifie que la requête contient bien des données cohérentes`() {
+        client
+            .post()
+            .uri("")
+            .contentType(APPLICATION_JSON)
+            .bodyValue(user)
+            .exchange()
+            .returnResult<Unit>()
+            .requestBodyContent!!
+            .logBody()
+            .requestToString()
+            .run {
+//                user.run {
 //                    setOf(
 //                        "\"$LOGIN_FIELD\":\"${login}\"",
 //                        "\"$PASSWORD_FIELD\":\"${password}\"",
-//                        "\"$FIRST_NAME_FIELD\":\"${firstName}\"",
-//                        "\"$LAST_NAME_FIELD\":\"${lastName}\"",
+////                        "\"$FIRST_NAME_FIELD\":\"${firstName}\"",
+////                        "\"$LAST_NAME_FIELD\":\"${lastName}\"",
 //                        "\"$EMAIL_FIELD\":\"${email}\"",
 //                    ).map { assertTrue(contains(it)) }
 //                }
-//            }
-//    }
-//
-//
+            }
+    }
+
+
 //    @Test //TODO: mock sendmail
 //    fun `SignupController - test signup avec un account valide`() {
 //        val countUserBefore = countAccount(dao)
@@ -535,4 +566,4 @@ package webapp.signup
 ////                .let { assertEquals(URI("$ACTIVATE_API_PATH$this"), it) }
 //        }
 //    }
-//}
+}

@@ -27,7 +27,7 @@ object TestUtils {
         val admin: User by lazy { userFactory(ADMIN) }
         val user: User by lazy { userFactory(USER) }
         val users: Set<User> = setOf(admin, user)
-        const val DEFAULT_ACCOUNT_JSON = """{
+        const val DEFAULT_USER_JSON = """{
     "login": "$USER",
     "email": "$USER@$DOMAIN_DEV_URL",
     "password": "$USER"}"""

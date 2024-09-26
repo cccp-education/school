@@ -19,6 +19,7 @@ buildscript {
   dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20-Beta2") }
 }
 
+
 plugins {
   java
   idea
