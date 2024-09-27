@@ -239,12 +239,12 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
     dependsOn("check")
     commandLine(
         "firefox",
+        "--new-tab",
         layout
             .projectDirectory
             .asFile
             .toPath()
             .resolve("build/reports/tests/test/index.html")
             .toAbsolutePath()
-        ,"&"
     )
 }

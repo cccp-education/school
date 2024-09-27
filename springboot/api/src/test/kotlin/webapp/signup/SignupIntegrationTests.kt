@@ -21,8 +21,12 @@ import webapp.tests.TestTools.requestToString
 import webapp.tests.TestUtils.Data.DEFAULT_USER_JSON
 import webapp.tests.TestUtils.Data.user
 import webapp.tests.TestUtils.Data.users
+import webapp.users.User.UserDao.Fields.EMAIL_FIELD
+import webapp.users.User.UserDao.Fields.LOGIN_FIELD
+import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 //
 //import com.fasterxml.jackson.databind.ObjectMapper
@@ -98,17 +102,18 @@ class SignupIntegrationTests {
             .requestBodyContent!!
             .logBody()
             .requestToString()
-            .run {
+//            .run {
 //                user.run {
 //                    setOf(
 //                        "\"$LOGIN_FIELD\":\"${login}\"",
 //                        "\"$PASSWORD_FIELD\":\"${password}\"",
-////                        "\"$FIRST_NAME_FIELD\":\"${firstName}\"",
-////                        "\"$LAST_NAME_FIELD\":\"${lastName}\"",
+//////                        "\"$FIRST_NAME_FIELD\":\"${firstName}\"",
+//////                        "\"$LAST_NAME_FIELD\":\"${lastName}\"",
 //                        "\"$EMAIL_FIELD\":\"${email}\"",
 //                    ).map { assertTrue(contains(it)) }
+//                    let(::println)
 //                }
-            }
+//            }
     }
 
 
