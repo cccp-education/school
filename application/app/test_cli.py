@@ -12,7 +12,6 @@ runner = CliRunner()
 INSTALL_PATH = ""
 
 
-
 class TestCLI(unittest.TestCase):
     def test_greetings(self):
         print(f"test cli : greetings!")

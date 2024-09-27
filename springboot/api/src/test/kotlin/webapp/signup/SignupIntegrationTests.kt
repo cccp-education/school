@@ -59,7 +59,7 @@ import webapp.tests.TestUtils.deleteAllUsersOnly
 import webapp.users.User.UserDao.Fields.EMAIL_FIELD
 import webapp.users.User.UserDao.Fields.LOGIN_FIELD
 import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
-import webapp.users.signup.SignupController.Signup.SIGNUP_API_PATH
+import webapp.users.User.UserRestApis.API_SIGNUP_PATH
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -120,7 +120,7 @@ class SignupIntegrationTests {
             }
     }
 
-
+    @Ignore
     @Test //TODO: mock sendmail
     fun `SignupController - test signup avec un account valide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -129,7 +129,7 @@ class SignupIntegrationTests {
         assertEquals(0, countUserAuthBefore)
         client
             .post()
-            .uri(SIGNUP_API_PATH)
+            .uri(API_SIGNUP_PATH)
             .contentType(APPLICATION_JSON)
             .bodyValue(user)
             .exchange()
@@ -137,9 +137,9 @@ class SignupIntegrationTests {
             .isCreated
             .returnResult<Unit>()
             .responseBodyContent!!
+            .logBody()
             .isEmpty()
             .let(::assertTrue)
-//            .run { assertTrue(this) }
 //        assertEquals(countUserBefore + 1, countAccount(dao))
 //        assertEquals(countUserAuthBefore + 1, countAccountAuthority(dao))
 //        findOneByEmail(defaultAccount.email!!, dao).run {
