@@ -60,7 +60,7 @@ import kotlin.test.Test
 //
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
-class IntegrationTests {
+class SignupIntegrationTests {
 
     @Autowired
     lateinit var context: ApplicationContext

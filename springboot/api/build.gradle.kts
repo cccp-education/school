@@ -245,5 +245,6 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
             .toPath()
             .resolve("build/reports/tests/test/index.html")
             .toAbsolutePath()
+        ,"&"
     )
 }
