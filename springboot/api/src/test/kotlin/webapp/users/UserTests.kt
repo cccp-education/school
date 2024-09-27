@@ -1,6 +1,6 @@
 @file:Suppress("JUnitMalformedDeclaration")
 
-package webapp
+package webapp.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
