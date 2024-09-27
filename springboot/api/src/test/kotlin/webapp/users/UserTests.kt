@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -19,7 +20,6 @@ import webapp.tests.TestUtils.defaultRoles
 import webapp.tests.TestUtils.deleteAllUsersOnly
 import webapp.users.User.UserDao.Dao.save
 import webapp.users.User.UserDao.Dao.toJson
-import javax.inject.Inject
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,57 +29,57 @@ import kotlin.test.assertEquals
 @ActiveProfiles("test")
 class UserTests {
 
-  @Inject
-  lateinit var context: ApplicationContext
-  val mapper: ObjectMapper by lazy { context.getBean() }
-  val validator: Validator by lazy { context.getBean() }
+    @Autowired
+    lateinit var context: ApplicationContext
+    val mapper: ObjectMapper by lazy { context.getBean() }
+    val validator: Validator by lazy { context.getBean() }
 
-  @AfterTest
-  fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
+    @AfterTest
+    fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
 
-  @Test
-  fun `save default user should work in this context `() = runBlocking {
-    val count = context.countUsers()
-    (user to context).save()
-    assertEquals(expected = count + 1, context.countUsers())
-  }
-
-  @Test
-  fun `count users, expected 0`() =
-    runBlocking {
-      assertEquals(
-        0,
-        context.countUsers(),
-        "because init sql script does not inserts default users."
-      )
+    @Test
+    fun `save default user should work in this context `() = runBlocking {
+        val count = context.countUsers()
+        (user to context).save()
+        assertEquals(expected = count + 1, context.countUsers())
     }
 
-  @Test
-  fun `count roles, expected 3`() = runBlocking {
-    context.run {
-      assertEquals(
-        defaultRoles.size,
-        countRoles(),
-        "Because init sql script does insert default roles."
-      )
+    @Test
+    fun `count users, expected 0`() =
+        runBlocking {
+            assertEquals(
+                0,
+                context.countUsers(),
+                "because init sql script does not inserts default users."
+            )
+        }
+
+    @Test
+    fun `count roles, expected 3`() = runBlocking {
+        context.run {
+            assertEquals(
+                defaultRoles.size,
+                countRoles(),
+                "Because init sql script does insert default roles."
+            )
+        }
     }
-  }
 
-  @Test
-  fun `display user formatted in JSON`() = assertDoesNotThrow {
-    (user to context).toJson.let(::i)
-  }
-
-  @Test
-  fun `check toJson build a valid json format`() {
-    assertDoesNotThrow {
-      (user to context).toJson.let(mapper::readTree)
+    @Test
+    fun `display user formatted in JSON`() = assertDoesNotThrow {
+        (user to context).toJson.let(::i)
     }
-  }
 
-  @Test
-  fun `test cleanField extension function`() {
-    assertEquals("`login`".cleanField(), "login","Backtick should be removed")
-  }
+    @Test
+    fun `check toJson build a valid json format`() {
+        assertDoesNotThrow {
+            (user to context).toJson.let(mapper::readTree)
+        }
+    }
+
+    @Test
+    fun `test cleanField extension function`() {
+        assertEquals("`login`".cleanField(), "login", "Backtick should be removed")
+    }
 }

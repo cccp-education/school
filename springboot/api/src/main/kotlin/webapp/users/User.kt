@@ -1,6 +1,6 @@
 @file:Suppress(
   "RemoveRedundantQualifierName",
-  "MemberVisibilityCanBePrivate"
+  "MemberVisibilityCanBePrivate", "SqlNoDataSourceInspection"
 )
 
 package webapp.users

@@ -4,7 +4,9 @@ import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 
 @Service
-class SignupService(private val context: ApplicationContext)
+class SignupService(private val context: ApplicationContext){
+
+}
 
 /*
 package webapp.accounts.signup
