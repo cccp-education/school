@@ -1,0 +1,13 @@
+= Streamlit webapp
+
+== Run streamlit app
+
+[source,bash]
+----
+streamlit run webapp.py
+----
+or
+[source,bash]
+----
+python -m streamlit run webapp.py
+----
