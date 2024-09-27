@@ -59,6 +59,7 @@ import webapp.tests.TestUtils.deleteAllUsersOnly
 import webapp.users.User.UserDao.Fields.EMAIL_FIELD
 import webapp.users.User.UserDao.Fields.LOGIN_FIELD
 import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
+import webapp.users.signup.SignupController.Signup.SIGNUP_API_PATH
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -121,22 +122,23 @@ class SignupIntegrationTests {
 
 
     @Test //TODO: mock sendmail
-    fun `SignupController - test signup avec un account valide`() = runBlocking {
+    fun `SignupController - test signup avec un account valide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserBefore)
         assertEquals(0, countUserAuthBefore)
-//        client
-//            .post()
-//            .uri(SIGNUP_API_PATH)
-//            .contentType(APPLICATION_JSON)
-//            .bodyValue(user)
-//            .exchange()
-//            .expectStatus()
-//            .isCreated
-//            .returnResult<Unit>()
-//            .responseBodyContent!!
-//            .isEmpty()
+        client
+            .post()
+            .uri(SIGNUP_API_PATH)
+            .contentType(APPLICATION_JSON)
+            .bodyValue(user)
+            .exchange()
+            .expectStatus()
+            .isCreated
+            .returnResult<Unit>()
+            .responseBodyContent!!
+            .isEmpty()
+            .let(::assertTrue)
 //            .run { assertTrue(this) }
 //        assertEquals(countUserBefore + 1, countAccount(dao))
 //        assertEquals(countUserAuthBefore + 1, countAccountAuthority(dao))
