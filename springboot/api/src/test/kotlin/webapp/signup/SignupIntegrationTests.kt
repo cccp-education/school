@@ -2,32 +2,6 @@
 
 package webapp.signup
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.getBean
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.ApplicationContext
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
-import org.springframework.test.web.reactive.server.returnResult
-import webapp.core.utils.i
-import webapp.tests.TestTools.logBody
-import webapp.tests.TestTools.requestToString
-import webapp.tests.TestUtils.Data.DEFAULT_USER_JSON
-import webapp.tests.TestUtils.Data.user
-import webapp.tests.TestUtils.Data.users
-import webapp.users.User.UserDao.Fields.EMAIL_FIELD
-import webapp.users.User.UserDao.Fields.LOGIN_FIELD
-import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertTrue
-
 //
 //import com.fasterxml.jackson.databind.ObjectMapper
 //import jakarta.validation.Validation.byProvider
@@ -59,9 +33,34 @@ import kotlin.test.assertTrue
 //import webapp.core.property.*
 //import java.net.URI
 //import java.util.Locale.*
-//import kotlin.test.*
-//
-//
+import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.validation.Validator
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.getBean
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.ApplicationContext
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
+import org.springframework.test.web.reactive.server.returnResult
+import webapp.core.utils.i
+import webapp.tests.TestTools.logBody
+import webapp.tests.TestTools.requestToString
+import webapp.tests.TestUtils.Data.DEFAULT_USER_JSON
+import webapp.tests.TestUtils.Data.user
+import webapp.tests.TestUtils.Data.users
+import webapp.tests.TestUtils.countUserAuthority
+import webapp.tests.TestUtils.countUsers
+import webapp.tests.TestUtils.deleteAllUsersOnly
+import webapp.users.User.UserDao.Fields.EMAIL_FIELD
+import webapp.users.User.UserDao.Fields.LOGIN_FIELD
+import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
+import kotlin.test.*
+
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
 class SignupIntegrationTests {
@@ -78,8 +77,8 @@ class SignupIntegrationTests {
         client = context.let(::bindToApplicationContext).build()
     }
 
-//    @AfterEach
-//    fun tearDown() = deleteAllAccounts(dao)
+    @AfterTest
+    fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
     fun `DataTestsChecks - affiche moi du json`() = run {
@@ -102,32 +101,36 @@ class SignupIntegrationTests {
             .requestBodyContent!!
             .logBody()
             .requestToString()
-//            .run {
-//                user.run {
-//                    setOf(
-//                        "\"$LOGIN_FIELD\":\"${login}\"",
-//                        "\"$PASSWORD_FIELD\":\"${password}\"",
-//////                        "\"$FIRST_NAME_FIELD\":\"${firstName}\"",
-//////                        "\"$LAST_NAME_FIELD\":\"${lastName}\"",
-//                        "\"$EMAIL_FIELD\":\"${email}\"",
-//                    ).map { assertTrue(contains(it)) }
-//                    let(::println)
-//                }
-//            }
+            .run {
+                user.run {
+                    mapOf(
+                        LOGIN_FIELD to login,
+                        PASSWORD_FIELD to password,
+                        EMAIL_FIELD to email,
+//                        FIRST_NAME_FIELD to firstName,
+//                        LAST_NAME_FIELD to lastName,
+                    ).map { (key, value) ->
+                        assertTrue {
+                            contains(key)
+                            contains(value)
+                        }
+                    }
+                }
+            }
     }
 
 
-//    @Test //TODO: mock sendmail
-//    fun `SignupController - test signup avec un account valide`() {
-//        val countUserBefore = countAccount(dao)
-//        val countUserAuthBefore = countAccountAuthority(dao)
-//        assertEquals(0, countUserBefore)
-//        assertEquals(0, countUserAuthBefore)
+    @Test //TODO: mock sendmail
+    fun `SignupController - test signup avec un account valide`() = runBlocking {
+        val countUserBefore = context.countUsers()
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserBefore)
+        assertEquals(0, countUserAuthBefore)
 //        client
 //            .post()
 //            .uri(SIGNUP_API_PATH)
 //            .contentType(APPLICATION_JSON)
-//            .bodyValue(defaultAccount)
+//            .bodyValue(user)
 //            .exchange()
 //            .expectStatus()
 //            .isCreated
@@ -142,8 +145,8 @@ class SignupIntegrationTests {
 //            assertFalse(activated)
 //            assertNotNull(activationKey)
 //        }
-//    }
-//
+    }
+
 //    @Test
 //    fun `SignupController - test signup account validator avec login invalid`() {
 //        validator

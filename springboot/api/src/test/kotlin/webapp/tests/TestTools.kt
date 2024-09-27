@@ -206,6 +206,7 @@ object TestTools {
         it.toInt().toChar().toString()
     }.reduce { acc: String, s: String -> acc + s }
 
+    //TODO : change that ugly json formating
     fun ByteArray.logBody(): ByteArray = apply {
         if (isNotEmpty()) map { it.toInt().toChar().toString() }.reduce { request, s ->
                 request + buildString {
