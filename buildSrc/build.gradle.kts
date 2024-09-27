@@ -78,11 +78,11 @@ tasks.named<Task>("check") { dependsOn(functionalTest) }
 tasks.named<Test>("test") { useJUnitPlatform() }
 
 tasks.withType<JavaExec> {
-    jvmArgs = listOf(
+    jvmArgs = setOf(
         "--add-modules=jdk.incubator.vector",
         "--enable-native-access=ALL-UNNAMED",
         "--enable-preview"
-    )
+    ).toList()
 }
 
 //kotlin { jvmToolchain(JavaVersion.VERSION_21.ordinal) }
