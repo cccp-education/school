@@ -1,38 +1,9 @@
 @file:Suppress("NonAsciiCharacters")
 
-package webapp.signup
+package webapp.users.signup
 
-//
-//import com.fasterxml.jackson.databind.ObjectMapper
-//import jakarta.validation.Validation.byProvider
-//import jakarta.validation.Validator
-//import jakarta.validation.constraints.Pattern
-//import jakarta.validation.constraints.Size
-//import org.hibernate.validator.HibernateValidator
-//import org.junit.jupiter.api.AfterAll
-//import org.junit.jupiter.api.AfterEach
-//import org.junit.jupiter.api.BeforeAll
-//import org.springframework.beans.factory.getBean
-//import org.springframework.context.ConfigurableApplicationContext
-//import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-//import org.springframework.http.HttpHeaders.ACCEPT_LANGUAGE
-//import webapp.users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD
-//import webapp.users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD
-
-//import org.springframework.http.ProblemDetail
-//import org.springframework.http.ResponseEntity
-//import org.springframework.test.web.reactive.server.WebTestClient
-//import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
-//import org.springframework.test.web.reactive.server.returnResult
-//import webapp.DataTests.DEFAULT_ACCOUNT_JSON
-//import webapp.DataTests.accounts
-//import webapp.DataTests.defaultAccount
-//import webapp.accounts.models.AccountCredentials
-//import webapp.accounts.models.AccountUtils.generateActivationKey
-//import webapp.core.logging.i
-//import webapp.core.property.*
-//import java.net.URI
-//import java.util.Locale.*
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
@@ -41,24 +12,23 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
 import org.springframework.test.web.reactive.server.returnResult
+import webapp.TestTools.logBody
+import webapp.TestTools.requestToString
+import webapp.TestUtils
+import webapp.TestUtils.Data.DEFAULT_USER_JSON
+import webapp.TestUtils.Data.user
+import webapp.TestUtils.countUserAuthority
+import webapp.TestUtils.countUsers
+import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.utils.i
-import webapp.tests.TestTools.logBody
-import webapp.tests.TestTools.requestToString
-import webapp.tests.TestUtils.Data.DEFAULT_USER_JSON
-import webapp.tests.TestUtils.Data.user
-import webapp.tests.TestUtils.Data.users
-import webapp.tests.TestUtils.countUserAuthority
-import webapp.tests.TestUtils.countUsers
-import webapp.tests.TestUtils.deleteAllUsersOnly
-import webapp.users.User.UserDao.Fields.EMAIL_FIELD
-import webapp.users.User.UserDao.Fields.LOGIN_FIELD
-import webapp.users.User.UserDao.Fields.PASSWORD_FIELD
+import webapp.users.User
+import webapp.users.User.UserDao.Dao.findOneByEmail
 import webapp.users.User.UserRestApis.API_SIGNUP_PATH
 import kotlin.test.*
 
@@ -74,17 +44,17 @@ class SignupIntegrationTests {
     val dao: R2dbcEntityTemplate by lazy { context.getBean() }
 
     @BeforeTest
-    fun setUp() {
-        client = context.let(::bindToApplicationContext).build()
+    fun setUp(context: ApplicationContext) {
+        client = context.run(WebTestClient::bindToApplicationContext).build()
     }
 
     @AfterTest
-    fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
+    fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
     fun `DataTestsChecks - affiche moi du json`() = run {
         assertDoesNotThrow {
-            mapper.writeValueAsString(users).run(::i)
+            mapper.writeValueAsString(TestUtils.Data.users).run(::i)
             mapper.writeValueAsString(user).run(::i)
             DEFAULT_USER_JSON.run(::i)
         }
@@ -105,11 +75,11 @@ class SignupIntegrationTests {
             .run {
                 user.run {
                     mapOf(
-                        LOGIN_FIELD to login,
-                        PASSWORD_FIELD to password,
-                        EMAIL_FIELD to email,
-//                        FIRST_NAME_FIELD to firstName,
-//                        LAST_NAME_FIELD to lastName,
+                        User.UserDao.Fields.LOGIN_FIELD to login,
+                        User.UserDao.Fields.PASSWORD_FIELD to password,
+                        User.UserDao.Fields.EMAIL_FIELD to email,
+                        //FIRST_NAME_FIELD to firstName,
+                        //LAST_NAME_FIELD to lastName,
                     ).map { (key, value) ->
                         assertTrue {
                             contains(key)
@@ -118,6 +88,38 @@ class SignupIntegrationTests {
                     }
                 }
             }
+    }
+
+    @Test
+    fun `SignupController - test signup avec une url invalide`(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+//        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserBefore)
+//        assertEquals(0, countUserAuthBefore)
+        client
+            .post()
+            .uri(API_SIGNUP_PATH)
+            .contentType(APPLICATION_JSON)
+            .bodyValue(user)
+            .exchange()
+            .expectStatus()
+            .isNotFound
+            .returnResult<Unit>()
+            .responseBodyContent!!
+            .logBody()
+            .isNotEmpty()
+            .let(::assertTrue)
+        assertEquals(countUserBefore, context.countUsers())
+//        assertEquals(countUserBefore + 1, context.countUsers())
+//        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        (user to context).findOneByEmail(user.email).run {
+            when (this) {
+                    is Left -> assertEquals(EmptyResultDataAccessException::class.java,value::class.java )
+                is Right -> {
+                    assertEquals(user, value)
+                }
+            }
+        }
     }
 
     @Ignore
@@ -140,13 +142,17 @@ class SignupIntegrationTests {
             .logBody()
             .isEmpty()
             .let(::assertTrue)
-//        assertEquals(countUserBefore + 1, countAccount(dao))
-//        assertEquals(countUserAuthBefore + 1, countAccountAuthority(dao))
-//        findOneByEmail(defaultAccount.email!!, dao).run {
-//            assertNotNull(this)
-//            assertFalse(activated)
-//            assertNotNull(activationKey)
-//        }
+        assertEquals(countUserBefore, context.countUsers())
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        (user to context).findOneByEmail(user.email).run {
+            when (this) {
+                is Left -> assertEquals(value::class.java, NullPointerException::class.java)
+                is Right -> {
+                    assertEquals(user, value)
+                }
+            }
+        }
     }
 
 //    @Test

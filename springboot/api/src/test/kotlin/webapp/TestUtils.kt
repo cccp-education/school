@@ -4,7 +4,7 @@
     "unused"
 )
 
-package webapp.tests
+package webapp
 
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
@@ -58,6 +58,9 @@ object TestUtils {
 
     val ApplicationContext.defaultRoles
         get() = setOf(ROLE_ADMIN, ROLE_USER, ROLE_ANONYMOUS)
+
+
+
 
     suspend fun ApplicationContext.countUsers(): Int =
         "select count(*) from `user`"

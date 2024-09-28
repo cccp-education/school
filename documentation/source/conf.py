@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Documentation'
-copyright = '2024, @prologeek'
-author = '@prologeek'
+copyright = '2024, @cheroliv'
+author = '@cheroliv'
 release = '0.0.1-SNAPSHOT'
 
 # -- General configuration ---------------------------------------------------

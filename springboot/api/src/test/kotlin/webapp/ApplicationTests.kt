@@ -1,19 +1,19 @@
 package webapp
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
+import webapp.TestUtils.Data.OFFICIAL_SITE
 import webapp.core.property.Config
 import webapp.core.property.DEVELOPMENT
 import webapp.core.property.PRODUCTION
 import webapp.core.property.STARTUP_LOG_MSG_KEY
 import webapp.core.utils.i
-import webapp.tests.TestUtils.Data.OFFICIAL_SITE
 import java.util.*
 import java.util.Locale.FRENCH
-import javax.inject.Inject
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -22,7 +22,7 @@ import kotlin.test.assertEquals
 @ActiveProfiles("test")
 class ApplicationTests {
 
-    @Inject
+    @Autowired
     lateinit var context: ApplicationContext
 
     @Test
@@ -64,8 +64,6 @@ class ApplicationTests {
     fun `ConfigurationsTests - test go visit message`() =
         assertEquals(
             OFFICIAL_SITE,
-            context
-                .getBean<Config>()
-                .goVisitMessage
+            context.getBean<Config>().goVisitMessage
         )
 }

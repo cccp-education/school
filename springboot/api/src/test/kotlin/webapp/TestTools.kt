@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package webapp.tests
+package webapp
 
 
 //import webapp.accounts.models.Account
@@ -18,7 +18,6 @@ import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironment
 import org.springframework.context.ConfigurableApplicationContext
-import webapp.Application
 import webapp.core.property.*
 import webapp.core.utils.i
 import java.io.IOException

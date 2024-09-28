@@ -1,4 +1,4 @@
-//@file:Suppress(
+package webapp.users//@file:Suppress(
 //    "NonAsciiCharacters",
 //    "MemberVisibilityCanBePrivate",
 //    "PropertyName"

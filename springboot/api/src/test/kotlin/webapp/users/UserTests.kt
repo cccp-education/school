@@ -2,6 +2,8 @@
 
 package webapp.users
 
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
@@ -11,18 +13,17 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
+import webapp.TestUtils.Data.user
+import webapp.TestUtils.countRoles
+import webapp.TestUtils.countUsers
+import webapp.TestUtils.defaultRoles
+import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.utils.AppUtils.cleanField
 import webapp.core.utils.i
-import webapp.tests.TestUtils.Data.user
-import webapp.tests.TestUtils.countRoles
-import webapp.tests.TestUtils.countUsers
-import webapp.tests.TestUtils.defaultRoles
-import webapp.tests.TestUtils.deleteAllUsersOnly
+import webapp.users.User.UserDao.Dao.findOneByEmail
 import webapp.users.User.UserDao.Dao.save
 import webapp.users.User.UserDao.Dao.toJson
-import kotlin.test.AfterTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -81,5 +82,31 @@ class UserTests {
     @Test
     fun `test cleanField extension function`() {
         assertEquals("`login`".cleanField(), "login", "Backtick should be removed")
+    }
+
+    @Test
+    fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+        (user to context).findOneByEmail("user@dummy.com").run {
+            when (this) {
+                is Left -> assertNotNull(value)
+
+                is Right -> assertNull(value)
+            }
+        }
+    }
+
+    @Test
+    fun `check findOneByEmail with existant email`(): Unit = runBlocking {
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+        (user to context).findOneByEmail(user.email).run {
+            when (this) {
+                is Left -> assertEquals(value::class.java, NullPointerException::class.java)
+
+                is Right -> assertEquals(user, value)
+            }
+        }
     }
 }
