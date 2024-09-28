@@ -98,7 +98,7 @@ class SignupIntegrationTests {
 //        assertEquals(0, countUserAuthBefore)
         client
             .post()
-            .uri(API_SIGNUP_PATH)
+            .uri("/api/users/foobar")
             .contentType(APPLICATION_JSON)
             .bodyValue(user)
             .exchange()
@@ -114,7 +114,7 @@ class SignupIntegrationTests {
 //        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
         (user to context).findOneByEmail(user.email).run {
             when (this) {
-                    is Left -> assertEquals(EmptyResultDataAccessException::class.java,value::class.java )
+                is Left -> assertEquals(EmptyResultDataAccessException::class.java, value::class.java)
                 is Right -> {
                     assertEquals(user, value)
                 }
