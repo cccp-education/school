@@ -20,10 +20,10 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitOne
 import org.springframework.r2dbc.core.awaitRowsUpdated
+import webapp.core.model.EntityModel
 import webapp.core.property.ANONYMOUS_USER
 import webapp.core.property.EMPTY_STRING
 import webapp.core.utils.AppUtils.cleanField
-import webapp.users.EntityModel.Companion.ID_MEMBER
 import webapp.users.User.UserDao.Attributes.EMAIL_ATTR
 import webapp.users.User.UserDao.Attributes.ID_ATTR
 import webapp.users.User.UserDao.Attributes.LANG_KEY_ATTR
@@ -208,20 +208,3 @@ data class User(
     }
 }
 
-// Abstract entity model with Generic ID, which can be of any type
-abstract class EntityModel<T>(
-    open val id: T? = null
-) {
-    companion object {
-        const val ID_MEMBER = "id"
-    }
-}
-
-// Generic extension function that allows the ID to be applied to any EntityModel type
-inline fun <reified T : EntityModel<ID>, ID> T.withId(id: ID): T {
-    // Use reflection to create a copy with the passed ID
-    return this::class.constructors.first { it.parameters.any { param -> param.name == ID_MEMBER } }
-        .call(id, *this::class.constructors.first().parameters.drop(1).map { param ->
-            this::class.members.first { member -> member.name == param.name }.call(this)
-        }.toTypedArray())
-}

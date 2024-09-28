@@ -73,19 +73,21 @@ class UserTests {
     }
 
     @Test
-    fun `check toJson build a valid json format`() {
-        assertDoesNotThrow {
-            (user to context).toJson.let(mapper::readTree)
-        }
+    fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
+        (user to context).toJson.let(mapper::readTree)
     }
 
-    @Test
-    fun `test cleanField extension function`() {
-        assertEquals("`login`".cleanField(), "login", "Backtick should be removed")
-    }
 
     @Test
-    fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
+    fun `test cleanField extension function`() = assertEquals(
+        "login",
+        "`login`".cleanField(),
+        "Backtick should be removed"
+    )
+
+
+    @Test
+    fun `check findOneByEmail with non-existent email`() = runBlocking {
         (user to context).save()
         assertEquals(1, context.countUsers())
         (user to context).findOneByEmail("user@dummy.com").run {
@@ -98,7 +100,7 @@ class UserTests {
     }
 
     @Test
-    fun `check findOneByEmail with existant email`(): Unit = runBlocking {
+    fun `check findOneByEmail with existant email`() = runBlocking {
         (user to context).save()
         assertEquals(1, context.countUsers())
         (user to context).findOneByEmail(user.email).run {
