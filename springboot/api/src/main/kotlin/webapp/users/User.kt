@@ -1,6 +1,7 @@
 @file:Suppress(
     "RemoveRedundantQualifierName",
-    "MemberVisibilityCanBePrivate", "SqlNoDataSourceInspection"
+    "MemberVisibilityCanBePrivate",
+    "SqlNoDataSourceInspection"
 )
 
 package webapp.users
@@ -22,7 +23,9 @@ import org.springframework.r2dbc.core.awaitRowsUpdated
 import webapp.core.property.ANONYMOUS_USER
 import webapp.core.property.EMPTY_STRING
 import webapp.core.utils.AppUtils.cleanField
+import webapp.users.EntityModel.Companion.ID_MEMBER
 import webapp.users.User.UserDao.Attributes.EMAIL_ATTR
+import webapp.users.User.UserDao.Attributes.ID_ATTR
 import webapp.users.User.UserDao.Attributes.LANG_KEY_ATTR
 import webapp.users.User.UserDao.Attributes.LOGIN_ATTR
 import webapp.users.User.UserDao.Attributes.PASSWORD_ATTR
@@ -41,42 +44,32 @@ import webapp.users.security.UserRole.UserRoleDao
 import java.util.*
 import jakarta.validation.constraints.Email as EmailConstraint
 
-abstract class EntityModel<T>(
-    // Generic ID, which can be of any type
-    open val id: T? = null
-)
-
-// Generic extension function that allows the ID to be applied to any EntityModel type
-inline fun <reified T : EntityModel<ID>, ID> T.withId(id: ID): T {
-    // Use reflection to create a copy with the passed ID
-    return this::class.constructors
-        .first { it.parameters.any { param -> param.name == "id"} }
-        .call(id, *this::class.constructors.first().parameters.drop(1).map { param ->
-            this::class.members.first { member -> member.name == param.name }.call(this)
-        }.toTypedArray())
-}
-
 data class User(
     override val id: UUID? = null,
+
     @field:NotNull
     @field:Pattern(regexp = LOGIN_REGEX)
     @field:Size(min = 1, max = 50)
     val login: String,
+
     @JsonIgnore
     @field:NotNull
     @field:Size(min = 60, max = 60)
     val password: String = EMPTY_STRING,
+
     @field:EmailConstraint
     @field:Size(min = 5, max = 254)
     val email: String = EMPTY_STRING,
+
     @JsonIgnore
     val roles: MutableSet<Role> = mutableSetOf(Role(ANONYMOUS_USER)),
+
     @field:Size(min = 2, max = 10)
     val langKey: String = EMPTY_STRING,
+
     @JsonIgnore
     val version: Long = -1,
 ) : EntityModel<UUID>() {
-
 
     companion object {
         @JvmStatic
@@ -91,6 +84,7 @@ data class User(
             const val PASSWORD_MIN: Int = 4
             const val PASSWORD_MAX: Int = 16
             const val IMAGE_URL_DEFAULT = "https://placehold.it/50x50"
+            const val PHONE_REGEX = "^(\\+|00)?[1-9]\\d{0,49}\$"
         }
 
         object Members {
@@ -149,9 +143,7 @@ data class User(
                     UserRoleDao.Relations.SQL_SCRIPT
                 ).joinToString("")
                     .trimMargin()
-
-
-            //TODO: signup, findByEmailOrLogin,
+            //TODO: signup, findByLogin, findByEmailOrLogin,
         }
 
         object Dao {
@@ -159,8 +151,7 @@ data class User(
                 get() = second.getBean<ObjectMapper>().writeValueAsString(first)
 
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
-                second
-                    .getBean<R2dbcEntityTemplate>()
+                second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
                     .sql(INSERT)
                     .bind(LOGIN_ATTR, first.login)
@@ -176,24 +167,24 @@ data class User(
             }
 
 
-            suspend fun Pair<User, ApplicationContext>.findOneByEmail(email: String): Either<Throwable, User> = try {
-                second
-                    .getBean<DatabaseClient>()
+            suspend fun Pair<User, ApplicationContext>.findOneByEmail(
+                email: String
+            ): Either<Throwable, User> = try {
+                second.getBean<DatabaseClient>()
                     .sql("SELECT * FROM `user` WHERE LOWER(email) = LOWER(:email)")
                     .bind("email", email)
                     .fetch()
                     .awaitOne()
                     .let { row ->
                         User(
-                            id = row[User.UserDao.Attributes.ID_ATTR] as UUID?,
-                            login = row[User.UserDao.Attributes.LOGIN_ATTR] as String,
-                            password = row[User.UserDao.Attributes.PASSWORD_ATTR] as String,
-                            email = row[User.UserDao.Attributes.EMAIL_ATTR] as String,
-                            langKey = row[User.UserDao.Attributes.LANG_KEY_ATTR] as String,
-                            version = row[User.UserDao.Attributes.VERSION_ATTR] as Long
+                            id = row[ID_ATTR] as UUID?,
+                            login = row[LOGIN_ATTR] as String,
+                            password = row[PASSWORD_ATTR] as String,
+                            email = row[EMAIL_ATTR] as String,
+                            langKey = row[LANG_KEY_ATTR] as String,
+                            version = row[VERSION_ATTR] as Long
                         )
-                    }
-                    .right()
+                    }.right()
             } catch (e: Throwable) {
                 e.left()
             }
@@ -215,4 +206,22 @@ data class User(
         const val API_CHANGE = "/change-password"
         const val API_CHANGE_PATH = "$API_USERS$API_CHANGE"
     }
+}
+
+// Abstract entity model with Generic ID, which can be of any type
+abstract class EntityModel<T>(
+    open val id: T? = null
+) {
+    companion object {
+        const val ID_MEMBER = "id"
+    }
+}
+
+// Generic extension function that allows the ID to be applied to any EntityModel type
+inline fun <reified T : EntityModel<ID>, ID> T.withId(id: ID): T {
+    // Use reflection to create a copy with the passed ID
+    return this::class.constructors.first { it.parameters.any { param -> param.name == ID_MEMBER } }
+        .call(id, *this::class.constructors.first().parameters.drop(1).map { param ->
+            this::class.members.first { member -> member.name == param.name }.call(this)
+        }.toTypedArray())
 }

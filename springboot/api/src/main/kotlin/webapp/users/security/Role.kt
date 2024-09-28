@@ -20,9 +20,7 @@ data class Role(
             const val ID_FIELD = "`role`"
         }
 
-        object Constraints {
-            const val PHONE_REGEX = "^(\\+|00)?[1-9]\\d{0,49}\$"
-        }
+        object Constraints
 
         object Relations {
             const val TABLE_NAME = "`authority`"
