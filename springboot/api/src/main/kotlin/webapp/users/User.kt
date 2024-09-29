@@ -167,7 +167,7 @@ data class User(
             }
 
 
-            suspend fun Pair<User, ApplicationContext>.findOneByEmail(
+            suspend fun Pair<User, ApplicationContext>.findOneUserByEmail(
                 email: String
             ): Either<Throwable, User> = try {
                 second.getBean<DatabaseClient>()

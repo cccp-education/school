@@ -20,7 +20,7 @@ import webapp.TestUtils.defaultRoles
 import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.utils.AppUtils.cleanField
 import webapp.core.utils.i
-import webapp.users.User.UserDao.Dao.findOneByEmail
+import webapp.users.User.UserDao.Dao.findOneUserByEmail
 import webapp.users.User.UserDao.Dao.save
 import webapp.users.User.UserDao.Dao.toJson
 import kotlin.test.*
@@ -37,7 +37,6 @@ class UserTests {
 
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
-
 
     @Test
     fun `save default user should work in this context `() = runBlocking {
@@ -90,7 +89,7 @@ class UserTests {
     fun `check findOneByEmail with non-existent email`() = runBlocking {
         (user to context).save()
         assertEquals(1, context.countUsers())
-        (user to context).findOneByEmail("user@dummy.com").run {
+        (user to context).findOneUserByEmail("user@dummy.com").run {
             when (this) {
                 is Left -> assertNotNull(value)
 
@@ -103,7 +102,7 @@ class UserTests {
     fun `check findOneByEmail with existant email`() = runBlocking {
         (user to context).save()
         assertEquals(1, context.countUsers())
-        (user to context).findOneByEmail(user.email).run {
+        (user to context).findOneUserByEmail(user.email).run {
             when (this) {
                 is Left -> assertEquals(value::class.java, NullPointerException::class.java)
 
