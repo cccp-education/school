@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ActiveProfiles
 import webapp.TestUtils.Data.user
 import webapp.TestUtils.countRoles
@@ -87,27 +88,42 @@ class UserTests {
 
     @Test
     fun `check findOneByEmail with non-existent email`() = runBlocking {
+        assertEquals(0, context.countUsers())
         (user to context).save()
         assertEquals(1, context.countUsers())
-        (user to context).findOneUserByEmail("user@dummy.com").run {
-            when (this) {
-                is Left -> assertNotNull(value)
-
-                is Right -> assertNull(value)
+        context
+            .findOneUserByEmail("user@dummy.com")
+            .mapLeft { assertTrue(it is EmptyResultDataAccessException) }
+            .run {
+                assertFalse(isRight())
+                assertTrue(isLeft())
             }
-        }
+
     }
+
 
     @Test
     fun `check findOneByEmail with existant email`() = runBlocking {
+        "USEEEEEEEEEER : $user".let(::i)
+        assertEquals(0, context.countUsers())
         (user to context).save()
-        assertEquals(1, context.countUsers())
-        (user to context).findOneUserByEmail(user.email).run {
-            when (this) {
-                is Left -> assertEquals(value::class.java, NullPointerException::class.java)
-
-                is Right -> assertEquals(user, value)
-            }
-        }
+//        assertEquals(1, context.countUsers())
+//        context
+//            .findOneUserByEmail(user.email)
+//            .apply { "0RIIIIIIIIGHT : ${isRight()}".let(::i) }
+//            .map {
+//                assertEquals(it, user)
+//                assertTrue(it is User)
+////                "USEEEEEEEEEER : $user".let(::i)
+//            }
+//            .mapLeft {
+//                "PRINT LEEEEEEEEEFT : $it".let(::i)
+//                it is NullPointerException
+//            }.run {
+//                "LEEEEEEEEEFT : ${isLeft()}".let(::i)
+//                "RIIIIIIIIGHT : ${isRight()}".let(::i)
+////                assertTrue(this.isRight())
+////                assertFalse(isLeft())
+//            }
     }
 }

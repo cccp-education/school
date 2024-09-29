@@ -167,11 +167,11 @@ data class User(
             }
 
 
-            suspend fun Pair<User, ApplicationContext>.findOneUserByEmail(
+            suspend fun ApplicationContext.findOneUserByEmail(
                 email: String
             ): Either<Throwable, User> = try {
-                second.getBean<DatabaseClient>()
-                    .sql("SELECT * FROM `user` WHERE LOWER(email) = LOWER(:email)")
+                getBean<DatabaseClient>()
+                    .sql("select * from `user` u where lower(u.email) = lower(:email)")
                     .bind("email", email)
                     .fetch()
                     .awaitOne()

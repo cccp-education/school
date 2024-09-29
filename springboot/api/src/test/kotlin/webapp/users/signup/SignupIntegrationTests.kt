@@ -112,7 +112,7 @@ class SignupIntegrationTests {
         assertEquals(countUserBefore, context.countUsers())
 //        assertEquals(countUserBefore + 1, context.countUsers())
 //        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-        (user to context).findOneUserByEmail(user.email).run {
+        context.findOneUserByEmail(user.email).run {
             when (this) {
                 is Left -> assertEquals(EmptyResultDataAccessException::class.java, value::class.java)
                 is Right -> {
@@ -145,7 +145,7 @@ class SignupIntegrationTests {
         assertEquals(countUserBefore, context.countUsers())
         assertEquals(countUserBefore + 1, context.countUsers())
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-        (user to context).findOneUserByEmail(user.email).run {
+        context.findOneUserByEmail(user.email).run {
             when (this) {
                 is Left -> assertEquals(value::class.java, NullPointerException::class.java)
                 is Right -> {
