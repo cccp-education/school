@@ -71,6 +71,9 @@ data class User(
     @JsonIgnore
     val version: Long = -1,
 ) : EntityModel<UUID>() {
+//    fun withId(id: UUID): User {
+//        TODO("Not yet implemented")
+//    }
 
     companion object {
         @JvmStatic
