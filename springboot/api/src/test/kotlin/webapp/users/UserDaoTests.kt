@@ -1,27 +1,33 @@
-@file:Suppress("JUnitMalformedDeclaration")
+@file:Suppress("JUnitMalformedDeclaration", "SqlNoDataSourceInspection")
 
 package webapp.users
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
+import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.r2dbc.core.awaitRowsUpdated
 import org.springframework.test.context.ActiveProfiles
 import tdd.TestUtils.Data.user
 import tdd.TestUtils.defaultRoles
 import webapp.core.model.EntityModel.Members.withId
-import webapp.core.utils.AppUtils.cleanField
-import webapp.core.utils.AppUtils.toJson
 import webapp.core.utils.i
+import webapp.users.UserDao.Attributes.EMAIL_ATTR
+import webapp.users.UserDao.Attributes.LANG_KEY_ATTR
+import webapp.users.UserDao.Attributes.LOGIN_ATTR
+import webapp.users.UserDao.Attributes.PASSWORD_ATTR
+import webapp.users.UserDao.Attributes.VERSION_ATTR
 import webapp.users.UserDao.Dao.countUsers
 import webapp.users.UserDao.Dao.deleteAllUsersOnly
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserDao.Dao.save
+import webapp.users.UserDao.Relations.INSERT
 import webapp.users.security.Role.RoleDao.Dao.countRoles
 import kotlin.test.*
 
@@ -97,5 +103,48 @@ class UserDaoTests {
             assertTrue(isRight())
             assertFalse(isLeft())
         }.map { assertEquals(it, user.withId(it.id!!)) }
+    }
+
+
+    @Test
+    fun `trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
+        user.run {
+            context.getBean<R2dbcEntityTemplate>()
+                .databaseClient
+                .sql(INSERT)
+                .bind(LOGIN_ATTR, login)
+                .bind(EMAIL_ATTR, email)
+                .bind(PASSWORD_ATTR, password)
+                .bind(LANG_KEY_ATTR, langKey)
+                .bind(VERSION_ATTR, version)
+                .fetch()
+                .run {
+                    i("Number of rows updated (user saved): ${awaitRowsUpdated()}")
+                    // passer par un est si rowsUpdated == 1,
+                    // alors repasser par un sql pour retrieve l'id generated par la dataBase
+                    //                    one()
+                    //                        .toString()
+                    //                        .let(::i)
+                    //                        .let {
+                    //                        if (it == null) i("It's empty")
+                    //                        else if (it.isEmpty()) i("It's empty")
+                    //                        else i(it.toString())
+                    //                    }
+                }
+
+            context.getBean<R2dbcEntityTemplate>()
+                .databaseClient
+                .sql("SELECT * FROM `user`")
+                .fetch()
+                .all()
+                .collect {
+                    it
+                        .apply {
+                            "User retrieved: " + this.entries.toString()
+                        }
+                        .toString()
+                        .let(::i)
+                }
+        }
     }
 }
