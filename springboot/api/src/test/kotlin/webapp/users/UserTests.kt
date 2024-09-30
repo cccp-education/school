@@ -23,7 +23,6 @@ import webapp.core.utils.AppUtils.toJson
 import webapp.core.utils.i
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserDao.Dao.save
-import java.util.*
 import kotlin.test.*
 
 
@@ -100,10 +99,10 @@ class UserTests {
     fun `check findOneByEmail with existant email`(): Unit = runBlocking {
         assertEquals(0, context.countUsers(), "context should not have a user recorded in database")
         (user to context).save()
-        assertEquals(1, context.countUsers(),"context should have only one user recorded in database")
+        assertEquals(1, context.countUsers(), "context should have only one user recorded in database")
         context.findOneByEmail<User>(user.email).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.map { assertEquals(it, user.withId(it.id as UUID)) }
+        }.map { assertEquals(it, user.withId(it.id!!)) }
     }
 }
