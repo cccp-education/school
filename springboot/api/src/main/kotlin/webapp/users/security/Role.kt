@@ -4,6 +4,10 @@ package webapp.users.security
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
+import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import webapp.core.property.ROLE_ADMIN
 import webapp.core.property.ROLE_ANONYMOUS
 import webapp.core.property.ROLE_USER
@@ -32,6 +36,18 @@ data class Role(
                    ('$ROLE_USER'),
                    ('$ROLE_ANONYMOUS');
 """
+        }
+
+        object Dao {
+            suspend fun ApplicationContext.countRoles(): Int =
+                "select count(*) from `authority`"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .fetch()
+                    .awaitSingle()
+                    .values
+                    .first()
+                    .toString()
+                    .toInt()
         }
     }
 }

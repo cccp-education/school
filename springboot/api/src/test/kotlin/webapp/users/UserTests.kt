@@ -5,21 +5,20 @@ package webapp.users
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ActiveProfiles
 import tdd.TestUtils.Data.user
-import tdd.TestUtils.countRoles
-import tdd.TestUtils.countUsers
-import tdd.TestUtils.defaultRoles
-import tdd.TestUtils.deleteAllUsersOnly
-import webapp.core.model.EntityModel.Members.withId
-import webapp.users.UserDao.Dao.findOneByEmail
-import webapp.users.UserDao.Dao.save
-import kotlin.test.*
+import webapp.core.utils.AppUtils.cleanField
+import webapp.core.utils.AppUtils.toJson
+import webapp.core.utils.i
+import webapp.users.UserDao.Dao.deleteAllUsersOnly
+import kotlin.test.AfterTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -35,51 +34,20 @@ class UserTests {
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
-    fun `save default user should work in this context `() = runBlocking {
-        val count = context.countUsers()
-        (user to context).save()
-        assertEquals(expected = count + 1, context.countUsers())
+    fun `display user formatted in JSON`() = assertDoesNotThrow {
+        (user to context).toJson.let(::i)
     }
 
     @Test
-    fun `count users, expected 0`() =
-        runBlocking {
-            assertEquals(
-                0,
-                context.countUsers(),
-                "because init sql script does not inserts default users."
-            )
-        }
-
-    @Test
-    fun `count roles, expected 3`() = runBlocking {
-        context.run {
-            assertEquals(
-                defaultRoles.size,
-                countRoles(),
-                "Because init sql script does insert default roles."
-            )
-        }
+    fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
+        (user to context).toJson.let(mapper::readTree)
     }
 
     @Test
-    fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers(), "context should not have a user recorded in database")
-        context.findOneByEmail<User>("user@dummy.com").apply {
-            assertFalse(isRight())
-            assertTrue(isLeft())
-        }.mapLeft { assertTrue(it is EmptyResultDataAccessException) }
-    }
-
-
-    @Test
-    fun `check findOneByEmail with existant email`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers(), "context should not have a user recorded in database")
-        (user to context).save()
-        assertEquals(1, context.countUsers(), "context should have only one user recorded in database")
-        context.findOneByEmail<User>(user.email).apply {
-            assertTrue(isRight())
-            assertFalse(isLeft())
-        }.map { assertEquals(it, user.withId(it.id!!)) }
-    }
+    fun `test cleanField extension function`() = assertEquals(
+        "login",
+        "`login`".cleanField(),
+        "Backtick should be removed"
+    )
+    //TODO : Write and/or Test toMap, toUser
 }

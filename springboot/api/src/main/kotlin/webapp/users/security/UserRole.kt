@@ -3,6 +3,11 @@
 package webapp.users.security
 
 import jakarta.validation.constraints.NotNull
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
+import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.await
+import org.springframework.r2dbc.core.awaitSingle
 import webapp.users.UserDao
 import webapp.users.security.Role.RoleDao
 import webapp.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
@@ -57,7 +62,58 @@ data class UserRole(
 //            """
         }
 
-//        object Dao {
+        object Dao {
+            suspend fun ApplicationContext.countUserAuthority(): Int =
+                "select count(*) from `user_authority`"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .fetch()
+                    .awaitSingle()
+                    .values
+                    .first()
+                    .toString()
+                    .toInt()
+
+
+            suspend fun ApplicationContext.deleteAllUserAuthorities(): Unit =
+                "DELETE FROM `user_authority`"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .await()
+
+            suspend fun ApplicationContext.deleteAllUserAuthorityByUserId(
+                id: UUID
+            ) = "delete from user_authority where user_id = :userId"
+                .let(getBean<DatabaseClient>()::sql)
+                .bind("userId", id)
+                .await()
+
+            suspend fun ApplicationContext.deleteAuthorityByRole(
+                role: String
+            ): Unit = "delete from `authority` a where lower(a.role) = lower(:role)"
+                .let(getBean<DatabaseClient>()::sql)
+                .bind("role", role)
+                .await()
+
+            suspend fun ApplicationContext.deleteUserByIdWithAuthorities_(id: UUID) = getBean<DatabaseClient>().run {
+                "delete from user_authority where user_id = :userId"
+                    .let(::sql)
+                    .bind("userId", id)
+                    .await()
+                "delete from `user` where user_id = :userId"
+                    .let(::sql)
+                    .await()
+            }
+
+            val ApplicationContext.queryDeleteAllUserAuthorityByUserLogin
+                get() =
+                    "delete from user_authority where user_id = (select u.id from `user` u where u.login=:login)"
+
+            suspend fun ApplicationContext.deleteAllUserAuthorityByUserLogin(
+                login: String
+            ): Unit = getBean<DatabaseClient>()
+                .sql(queryDeleteAllUserAuthorityByUserLogin)
+                .bind("login", login)
+                .await()
+
 //            val Pair<User, ApplicationContext>.toJson: String
 //                get() = second.getBean<ObjectMapper>().writeValueAsString(first)
 //
@@ -88,6 +144,6 @@ data class UserRole(
 //            } catch (e: Throwable) {
 //                e.left()
 //            }
-//        }
+        }
     }
 }

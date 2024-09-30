@@ -23,14 +23,14 @@ import tdd.TestTools.requestToString
 import tdd.TestUtils
 import tdd.TestUtils.Data.DEFAULT_USER_JSON
 import tdd.TestUtils.Data.user
-import tdd.TestUtils.countUserAuthority
-import tdd.TestUtils.countUsers
-import tdd.TestUtils.deleteAllUsersOnly
 import webapp.core.utils.i
 import webapp.users.User
+import webapp.users.UserDao
+import webapp.users.UserDao.Dao.countUsers
+import webapp.users.UserDao.Dao.deleteAllUsersOnly
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserRestApiRoutes.API_SIGNUP_PATH
-import webapp.users.UserDao
+import webapp.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])

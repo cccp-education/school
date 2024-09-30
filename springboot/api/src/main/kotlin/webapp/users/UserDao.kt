@@ -12,9 +12,7 @@ import arrow.core.right
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.awaitOne
-import org.springframework.r2dbc.core.awaitRowsUpdated
+import org.springframework.r2dbc.core.*
 import webapp.core.model.EntityModel
 import webapp.core.utils.AppUtils.cleanField
 import webapp.users.UserDao.Attributes.EMAIL_ATTR
@@ -108,6 +106,17 @@ object UserDao {
 
     object Dao {
 
+        suspend fun ApplicationContext.countUsers(): Int =
+            "SELECT COUNT(*) FROM `user`"
+                .let(getBean<DatabaseClient>()::sql)
+                .fetch()
+                .awaitSingle()
+                .values
+                .first()
+                .toString()
+                .toInt()
+
+
         //TODO : change the return type in  Either<Throwable, UUID>
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
             second.getBean<R2dbcEntityTemplate>()
@@ -124,6 +133,11 @@ object UserDao {
         } catch (e: Throwable) {
             e.left()
         }
+
+        suspend fun ApplicationContext.deleteAllUsersOnly(): Unit =
+            "DELETE FROM `user`"
+                .let(getBean<DatabaseClient>()::sql)
+                .await()
 
 
         suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, T> =
