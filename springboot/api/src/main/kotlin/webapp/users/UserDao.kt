@@ -9,8 +9,10 @@ package webapp.users
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
 import webapp.core.model.EntityModel
@@ -134,6 +136,30 @@ object UserDao {
             e.left()
         }
 
+        // passer par un est si rowsUpdated == 1,
+        // alors repasser par un sql pour retrieve l'id generated par la dataBase
+        //                    one()
+        //                        .toString()
+        //                        .let(::i)
+        //                        .let {
+        //                        if (it == null) i("It's empty")
+        //                        else if (it.isEmpty()) i("It's empty")
+        //                        else i(it.toString())
+        //                    }
+        suspend fun Pair<User, ApplicationContext>.saveWithId(): Either<Throwable, UUID> = try {
+            (first to second).save()
+            second.getBean<R2dbcEntityTemplate>()
+                .databaseClient.sql("SELECT * FROM `user`")
+                .fetch()
+                .all()
+                .collect { it["ID"] }
+                .toString()
+                .let(UUID::fromString)
+                .right()
+        } catch (e: Throwable) {
+            EmptyResultDataAccessException::class.left()
+            e.left()
+        }
         suspend fun ApplicationContext.deleteAllUsersOnly(): Unit =
             "DELETE FROM `user`"
                 .let(getBean<DatabaseClient>()::sql)

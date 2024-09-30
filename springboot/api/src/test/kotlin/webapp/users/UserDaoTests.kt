@@ -2,10 +2,14 @@
 
 package webapp.users
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
@@ -27,8 +31,10 @@ import webapp.users.UserDao.Dao.countUsers
 import webapp.users.UserDao.Dao.deleteAllUsersOnly
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserDao.Dao.save
+import webapp.users.UserDao.Dao.saveWithId
 import webapp.users.UserDao.Relations.INSERT
 import webapp.users.security.Role.RoleDao.Dao.countRoles
+import java.util.*
 import kotlin.test.*
 
 
@@ -109,6 +115,7 @@ class UserDaoTests {
     @Test
     fun `trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
         user.run {
+
             context.getBean<R2dbcEntityTemplate>()
                 .databaseClient
                 .sql(INSERT)
@@ -118,33 +125,33 @@ class UserDaoTests {
                 .bind(LANG_KEY_ATTR, langKey)
                 .bind(VERSION_ATTR, version)
                 .fetch()
-                .run {
-                    i("Number of rows updated (user saved): ${awaitRowsUpdated()}")
-                    // passer par un est si rowsUpdated == 1,
-                    // alors repasser par un sql pour retrieve l'id generated par la dataBase
-                    //                    one()
-                    //                        .toString()
-                    //                        .let(::i)
-                    //                        .let {
-                    //                        if (it == null) i("It's empty")
-                    //                        else if (it.isEmpty()) i("It's empty")
-                    //                        else i(it.toString())
-                    //                    }
-                }
+                .apply { i("Number of rows updated (user saved): ${awaitRowsUpdated()}") }
 
-            context.getBean<R2dbcEntityTemplate>()
-                .databaseClient
-                .sql("SELECT * FROM `user`")
-                .fetch()
-                .all()
-                .collect {
-                    it
-                        .apply {
-                            "User retrieved: " + this.entries.toString()
-                        }
-                        .toString()
-                        .let(::i)
-                }
+            assertDoesNotThrow {
+                context.getBean<R2dbcEntityTemplate>()
+                    .databaseClient
+                    .sql("SELECT * FROM `user`")
+                    .fetch()
+                    .all()
+                    .collect {
+                        it["ID"]
+                            .toString()
+                            .run(UUID::fromString)
+                            .also {
+                                i(it!!.toString())
+                                assertEquals(
+                                    it.toString().length,
+                                    "f02ca2cf-82fa-4201-a48f-56a0ea997cdf".length.apply { i(this.toString()) })
+
+                            }
+                    }
+
+            }
+            (user to context).saveWithId().onRight {
+                it.toString().apply {
+                    assertEquals(36, it.toString().length)
+                }.apply(::i)
+            }
         }
     }
 }
