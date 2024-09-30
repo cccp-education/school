@@ -28,8 +28,9 @@ import webapp.TestUtils.countUsers
 import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.utils.i
 import webapp.users.User
-import webapp.users.User.UserDao.Dao.findOneByEmail
-import webapp.users.User.UserRestApis.API_SIGNUP_PATH
+import webapp.users.UserDao.Dao.findOneByEmail
+import webapp.users.UserRestApiRoutes.API_SIGNUP_PATH
+import webapp.users.UserDao
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -75,9 +76,9 @@ class SignupIntegrationTests {
             .run {
                 user.run {
                     mapOf(
-                        User.UserDao.Fields.LOGIN_FIELD to login,
-                        User.UserDao.Fields.PASSWORD_FIELD to password,
-                        User.UserDao.Fields.EMAIL_FIELD to email,
+                        UserDao.Fields.LOGIN_FIELD to login,
+                        UserDao.Fields.PASSWORD_FIELD to password,
+                        UserDao.Fields.EMAIL_FIELD to email,
                         //FIRST_NAME_FIELD to firstName,
                         //LAST_NAME_FIELD to lastName,
                     ).map { (key, value) ->

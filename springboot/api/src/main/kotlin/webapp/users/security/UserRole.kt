@@ -3,7 +3,7 @@
 package webapp.users.security
 
 import jakarta.validation.constraints.NotNull
-import webapp.users.User.UserDao
+import webapp.users.UserDao
 import webapp.users.security.Role.RoleDao
 import webapp.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
 import webapp.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD

@@ -21,8 +21,8 @@ import webapp.core.model.EntityModel.Members.withId
 import webapp.core.utils.AppUtils.cleanField
 import webapp.core.utils.AppUtils.toJson
 import webapp.core.utils.i
-import webapp.users.User.UserDao.Dao.findOneByEmail
-import webapp.users.User.UserDao.Dao.save
+import webapp.users.UserDao.Dao.findOneByEmail
+import webapp.users.UserDao.Dao.save
 import java.util.*
 import kotlin.test.*
 

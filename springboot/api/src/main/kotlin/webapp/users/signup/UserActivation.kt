@@ -3,8 +3,8 @@
 package webapp.users.signup
 
 import jakarta.validation.constraints.Size
-import webapp.users.User.UserDao
-import webapp.users.User.UserDao.Fields.ID_FIELD
+import webapp.users.UserDao
+import webapp.users.UserDao.Fields.ID_FIELD
 import webapp.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import webapp.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import webapp.users.signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD

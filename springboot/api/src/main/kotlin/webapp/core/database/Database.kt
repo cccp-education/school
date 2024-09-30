@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
 import webapp.core.property.Config
 import webapp.core.utils.i
-import webapp.users.User.UserDao
+import webapp.users.UserDao
 import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime

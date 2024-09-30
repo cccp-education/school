@@ -1,19 +1,8 @@
 package webapp.users.signup
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ServerWebExchange
-import webapp.core.utils.i
-import webapp.users.User.UserRestApis.API_SIGNUP
-import webapp.users.User.UserRestApis.API_USERS
+import webapp.users.UserRestApiRoutes.API_USERS
 
 @RestController
 @RequestMapping(API_USERS)

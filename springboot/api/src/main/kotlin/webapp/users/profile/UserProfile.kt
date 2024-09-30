@@ -5,8 +5,8 @@ package webapp.users.profile
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import webapp.core.property.EMPTY_STRING
-import webapp.users.User.UserDao
-import webapp.users.User.UserDao.Fields.ID_FIELD
+import webapp.users.UserDao
+import webapp.users.UserDao.Fields.ID_FIELD
 import webapp.users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD
 import webapp.users.profile.UserProfile.UserProfileDao.Fields.IMAGE_URL_FIELD
 import webapp.users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD
