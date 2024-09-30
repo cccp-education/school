@@ -7,6 +7,8 @@
 package webapp.users
 
 import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -25,7 +27,6 @@ import webapp.core.property.ANONYMOUS_USER
 import webapp.core.property.EMPTY_STRING
 import webapp.core.utils.AppUtils.cleanField
 import webapp.users.User.UserDao.Attributes.EMAIL_ATTR
-import webapp.users.User.UserDao.Attributes.ID_ATTR
 import webapp.users.User.UserDao.Attributes.LANG_KEY_ATTR
 import webapp.users.User.UserDao.Attributes.LOGIN_ATTR
 import webapp.users.User.UserDao.Attributes.PASSWORD_ATTR
@@ -150,6 +151,7 @@ data class User(
             val Pair<User, ApplicationContext>.toJson: String
                 get() = second.getBean<ObjectMapper>().writeValueAsString(first)
 
+            //TODO : change the return type in  Either<Throwable, UUID>
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
                 second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
@@ -167,27 +169,32 @@ data class User(
             }
 
 
-            suspend fun ApplicationContext.findOneUserByEmail(
-                email: String
-            ): Either<Throwable, User> = try {
-                getBean<DatabaseClient>()
-                    .sql("select * from `user` u where lower(u.email) = lower(:email)")
-                    .bind("email", email)
-                    .fetch()
-                    .awaitOne()
-                    .let { row ->
-                        User(
-                            id = row[ID_ATTR] as UUID?,
-                            login = row[LOGIN_ATTR] as String,
-                            password = row[PASSWORD_ATTR] as String,
-                            email = row[EMAIL_ATTR] as String,
-                            langKey = row[LANG_KEY_ATTR] as String,
-                            version = row[VERSION_ATTR] as Long
-                        )
-                    }.right()
-            } catch (e: Throwable) {
-                e.left()
-            }
+            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, T> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            val user = getBean<DatabaseClient>()
+                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:email)")
+                                .bind("email", email)
+                                .fetch()
+                                .awaitOne()
+                                .let { row ->
+                                    User(
+                                        id = row["id"] as UUID?,
+                                        login = row["login"] as String,
+                                        password = row["password"] as String,
+                                        email = row["email"] as String,
+                                        langKey = row["lang_key"] as String,
+                                        version = row["version"] as Long
+                                    )
+                                }
+                            Right(user as T)
+                        } catch (e: Throwable) {
+                            Left(e)
+                        }
+                    }
+                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                }
         }
     }
 

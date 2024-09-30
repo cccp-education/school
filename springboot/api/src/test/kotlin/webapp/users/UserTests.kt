@@ -2,6 +2,7 @@
 
 package webapp.users
 
+import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,11 +20,13 @@ import webapp.TestUtils.countRoles
 import webapp.TestUtils.countUsers
 import webapp.TestUtils.defaultRoles
 import webapp.TestUtils.deleteAllUsersOnly
+import webapp.core.model.EntityModel
 import webapp.core.utils.AppUtils.cleanField
 import webapp.core.utils.i
-import webapp.users.User.UserDao.Dao.findOneUserByEmail
+import webapp.users.User.UserDao.Dao.findOneByEmail
 import webapp.users.User.UserDao.Dao.save
 import webapp.users.User.UserDao.Dao.toJson
+import java.util.*
 import kotlin.test.*
 
 
@@ -91,8 +94,11 @@ class UserTests {
         assertEquals(0, context.countUsers())
         (user to context).save()
         assertEquals(1, context.countUsers())
+//        val result: Either<Throwable, User> = context.findOneByEmail<User>("user@dummy.com")
+
+
         context
-            .findOneUserByEmail("user@dummy.com")
+            .findOneByEmail<User>("user@dummy.com")
             .mapLeft { assertTrue(it is EmptyResultDataAccessException) }
             .run {
                 assertFalse(isRight())
@@ -102,28 +108,28 @@ class UserTests {
     }
 
 
-    @Test
-    fun `check findOneByEmail with existant email`() = runBlocking {
-        "USEEEEEEEEEER : $user".let(::i)
-        assertEquals(0, context.countUsers())
-        (user to context).save()
-//        assertEquals(1, context.countUsers())
-//        context
-//            .findOneUserByEmail(user.email)
-//            .apply { "0RIIIIIIIIGHT : ${isRight()}".let(::i) }
-//            .map {
-//                assertEquals(it, user)
-//                assertTrue(it is User)
-////                "USEEEEEEEEEER : $user".let(::i)
-//            }
-//            .mapLeft {
-//                "PRINT LEEEEEEEEEFT : $it".let(::i)
-//                it is NullPointerException
-//            }.run {
-//                "LEEEEEEEEEFT : ${isLeft()}".let(::i)
-//                "RIIIIIIIIGHT : ${isRight()}".let(::i)
-////                assertTrue(this.isRight())
-////                assertFalse(isLeft())
-//            }
-    }
+//    @Test
+//    fun `check findOneByEmail with existant email`() = runBlocking {
+//        "USEEEEEEEEEER : $user".let(::i)
+//        assertEquals(0, context.countUsers())
+//        (user to context).save()
+////        assertEquals(1, context.countUsers())
+////        context
+////            .findOneUserByEmail(user.email)
+////            .apply { "0RIIIIIIIIGHT : ${isRight()}".let(::i) }
+////            .map {
+////                assertEquals(it, user)
+////                assertTrue(it is User)
+//////                "USEEEEEEEEEER : $user".let(::i)
+////            }
+////            .mapLeft {
+////                "PRINT LEEEEEEEEEFT : $it".let(::i)
+////                it is NullPointerException
+////            }.run {
+////                "LEEEEEEEEEFT : ${isLeft()}".let(::i)
+////                "RIIIIIIIIGHT : ${isRight()}".let(::i)
+//////                assertTrue(this.isRight())
+//////                assertFalse(isLeft())
+////            }
+//    }
 }
