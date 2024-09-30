@@ -2,9 +2,6 @@
 
 package webapp.users
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.reactive.collect
@@ -114,44 +111,34 @@ class UserDaoTests {
 
     @Test
     fun `trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
-        user.run {
+        assertEquals(0, context.countUsers())
+        (user to context).saveWithId()
+//            .onRight {
+//            it.toString().apply {
+//                assertEquals(36, it.toString().length)
+//            }.apply(::i)
+//        }
+        assertEquals(1, context.countUsers())
 
+//        user.run {
+//            context.getBean<R2dbcEntityTemplate>()
+//                .databaseClient
+//                .sql(INSERT)
+//                .bind(LOGIN_ATTR, login)
+//                .bind(EMAIL_ATTR, email)
+//                .bind(PASSWORD_ATTR, password)
+//                .bind(LANG_KEY_ATTR, langKey)
+//                .bind(VERSION_ATTR, version)
+//                .fetch()
+//                .apply { i("Number of rows updated (user saved): ${awaitRowsUpdated()}") }
+
+        assertDoesNotThrow {
             context.getBean<R2dbcEntityTemplate>()
                 .databaseClient
-                .sql(INSERT)
-                .bind(LOGIN_ATTR, login)
-                .bind(EMAIL_ATTR, email)
-                .bind(PASSWORD_ATTR, password)
-                .bind(LANG_KEY_ATTR, langKey)
-                .bind(VERSION_ATTR, version)
+                .sql("SELECT * FROM `user`")
                 .fetch()
-                .apply { i("Number of rows updated (user saved): ${awaitRowsUpdated()}") }
-
-            assertDoesNotThrow {
-                context.getBean<R2dbcEntityTemplate>()
-                    .databaseClient
-                    .sql("SELECT * FROM `user`")
-                    .fetch()
-                    .all()
-                    .collect {
-                        it["ID"]
-                            .toString()
-                            .run(UUID::fromString)
-                            .also {
-                                i(it!!.toString())
-                                assertEquals(
-                                    it.toString().length,
-                                    "f02ca2cf-82fa-4201-a48f-56a0ea997cdf".length.apply { i(this.toString()) })
-
-                            }
-                    }
-
-            }
-            (user to context).saveWithId().onRight {
-                it.toString().apply {
-                    assertEquals(36, it.toString().length)
-                }.apply(::i)
-            }
+                .all()
+                .collect { it["ID"].toString().run(UUID::fromString) }
         }
     }
 }

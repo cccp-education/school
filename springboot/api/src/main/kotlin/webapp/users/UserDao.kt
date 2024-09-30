@@ -22,6 +22,7 @@ import webapp.users.UserDao.Attributes.LANG_KEY_ATTR
 import webapp.users.UserDao.Attributes.LOGIN_ATTR
 import webapp.users.UserDao.Attributes.PASSWORD_ATTR
 import webapp.users.UserDao.Attributes.VERSION_ATTR
+import webapp.users.UserDao.Dao.save
 import webapp.users.UserDao.Fields.EMAIL_FIELD
 import webapp.users.UserDao.Fields.ID_FIELD
 import webapp.users.UserDao.Fields.LANG_KEY_FIELD
@@ -136,30 +137,7 @@ object UserDao {
             e.left()
         }
 
-        // passer par un est si rowsUpdated == 1,
-        // alors repasser par un sql pour retrieve l'id generated par la dataBase
-        //                    one()
-        //                        .toString()
-        //                        .let(::i)
-        //                        .let {
-        //                        if (it == null) i("It's empty")
-        //                        else if (it.isEmpty()) i("It's empty")
-        //                        else i(it.toString())
-        //                    }
-        suspend fun Pair<User, ApplicationContext>.saveWithId(): Either<Throwable, UUID> = try {
-            (first to second).save()
-            second.getBean<R2dbcEntityTemplate>()
-                .databaseClient.sql("SELECT * FROM `user`")
-                .fetch()
-                .all()
-                .collect { it["ID"] }
-                .toString()
-                .let(UUID::fromString)
-                .right()
-        } catch (e: Throwable) {
-            EmptyResultDataAccessException::class.left()
-            e.left()
-        }
+
         suspend fun ApplicationContext.deleteAllUsersOnly(): Unit =
             "DELETE FROM `user`"
                 .let(getBean<DatabaseClient>()::sql)
@@ -193,5 +171,32 @@ object UserDao {
 
                 else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
             }
+
+
+        // passer par un est si rowsUpdated == 1,
+        // alors repasser par un sql pour retrieve l'id generated par la dataBase
+        //                    one()
+        //                        .toString()
+        //                        .let(::i)
+        //                        .let {
+        //                        if (it == null) i("It's empty")
+        //                        else if (it.isEmpty()) i("It's empty")
+        //                        else i(it.toString())
+        //                    }
+        suspend fun Pair<User, ApplicationContext>.saveWithId(): Either<Throwable, UUID> = try {
+            (first to second).save()
+            second.getBean<R2dbcEntityTemplate>()
+                .databaseClient.sql("SELECT * FROM `user`")
+                .fetch()
+                .all()
+                .collect { it["ID"] }
+                .toString()
+                .let(UUID::fromString)
+                .right()
+        } catch (e: Throwable) {
+//            EmptyResultDataAccessException::class.left()
+            e.left()
+        }
+
     }
 }
