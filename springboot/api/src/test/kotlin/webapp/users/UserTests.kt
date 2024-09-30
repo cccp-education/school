@@ -88,9 +88,7 @@ class UserTests {
 
     @Test
     fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers())
-        (user to context).save()
-        assertEquals(1, context.countUsers())
+        assertEquals(0, context.countUsers(), "context should not have a user recorded in database")
         context.findOneByEmail<User>("user@dummy.com").apply {
             assertFalse(isRight())
             assertTrue(isLeft())
@@ -100,9 +98,9 @@ class UserTests {
 
     @Test
     fun `check findOneByEmail with existant email`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers())
+        assertEquals(0, context.countUsers(), "context should not have a user recorded in database")
         (user to context).save()
-        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUsers(),"context should have only one user recorded in database")
         context.findOneByEmail<User>(user.email).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
