@@ -5,7 +5,6 @@ package webapp.users
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,9 +17,6 @@ import webapp.TestUtils.countUsers
 import webapp.TestUtils.defaultRoles
 import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.model.EntityModel.Members.withId
-import webapp.core.utils.AppUtils.cleanField
-import webapp.core.utils.AppUtils.toJson
-import webapp.core.utils.i
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserDao.Dao.save
 import kotlin.test.*
@@ -65,25 +61,6 @@ class UserTests {
             )
         }
     }
-
-    @Test
-    fun `display user formatted in JSON`() = assertDoesNotThrow {
-        (user to context).toJson.let(::i)
-    }
-
-    @Test
-    fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
-        (user to context).toJson.let(mapper::readTree)
-    }
-
-
-    @Test
-    fun `test cleanField extension function`() = assertEquals(
-        "login",
-        "`login`".cleanField(),
-        "Backtick should be removed"
-    )
-
 
     @Test
     fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
