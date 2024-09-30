@@ -19,10 +19,10 @@ import webapp.TestUtils.defaultRoles
 import webapp.TestUtils.deleteAllUsersOnly
 import webapp.core.model.EntityModel.Members.withId
 import webapp.core.utils.AppUtils.cleanField
+import webapp.core.utils.AppUtils.toJson
 import webapp.core.utils.i
 import webapp.users.User.UserDao.Dao.findOneByEmail
 import webapp.users.User.UserDao.Dao.save
-import webapp.users.User.UserDao.Dao.toJson
 import java.util.*
 import kotlin.test.*
 

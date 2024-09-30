@@ -12,7 +12,6 @@ import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -71,9 +70,6 @@ data class User(
     @JsonIgnore
     val version: Long = -1,
 ) : EntityModel<UUID>() {
-//    fun withId(id: UUID): User {
-//        TODO("Not yet implemented")
-//    }
 
     companion object {
         @JvmStatic
@@ -151,8 +147,6 @@ data class User(
         }
 
         object Dao {
-            val Pair<User, ApplicationContext>.toJson: String
-                get() = second.getBean<ObjectMapper>().writeValueAsString(first)
 
             //TODO : change the return type in  Either<Throwable, UUID>
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
@@ -196,6 +190,7 @@ data class User(
                             Left(e)
                         }
                     }
+
                     else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
         }
