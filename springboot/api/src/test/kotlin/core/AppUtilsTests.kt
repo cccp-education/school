@@ -9,20 +9,19 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
+import tdd.TestUtils.Data.user
 import webapp.Application
-import webapp.TestUtils.Data.user
 import webapp.core.utils.AppUtils.cleanField
 import webapp.core.utils.AppUtils.toJson
 import webapp.core.utils.i
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
-@SpringBootTest(
-    properties = ["spring.main.web-application-type=reactive"],
-    classes = [Application::class]
-)
 @ActiveProfiles("test")
+@SpringBootTest(
+    classes = [Application::class],
+    properties = ["spring.main.web-application-type=reactive"]
+)
 class AppUtilsTests {
 
     @Autowired

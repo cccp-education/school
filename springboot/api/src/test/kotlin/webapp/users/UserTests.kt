@@ -11,11 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.test.context.ActiveProfiles
-import webapp.TestUtils.Data.user
-import webapp.TestUtils.countRoles
-import webapp.TestUtils.countUsers
-import webapp.TestUtils.defaultRoles
-import webapp.TestUtils.deleteAllUsersOnly
+import tdd.TestUtils.Data.user
+import tdd.TestUtils.countRoles
+import tdd.TestUtils.countUsers
+import tdd.TestUtils.defaultRoles
+import tdd.TestUtils.deleteAllUsersOnly
 import webapp.core.model.EntityModel.Members.withId
 import webapp.users.UserDao.Dao.findOneByEmail
 import webapp.users.UserDao.Dao.save

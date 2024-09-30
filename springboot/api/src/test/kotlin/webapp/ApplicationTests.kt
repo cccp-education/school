@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
-import webapp.TestUtils.Data.OFFICIAL_SITE
+import tdd.TestUtils.Data.OFFICIAL_SITE
 import webapp.core.property.Config
 import webapp.core.property.DEVELOPMENT
 import webapp.core.property.PRODUCTION

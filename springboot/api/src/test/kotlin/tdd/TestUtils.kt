@@ -4,7 +4,7 @@
     "unused"
 )
 
-package webapp
+package tdd
 
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
