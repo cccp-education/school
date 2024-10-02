@@ -40,6 +40,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "school"
+include("model")
 include("school-gradle-plugin")
 include("springboot:api")
 include("formation")
