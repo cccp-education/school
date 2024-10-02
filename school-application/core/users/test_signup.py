@@ -12,6 +12,8 @@ from pyrsistent import m
 
 from core.users.signup import Signup
 
+if __name__ == '__main__':
+    unittest.main()
 
 # Constantes pour les tests
 LOGIN_REGEX = r"^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$"
@@ -20,9 +22,12 @@ PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = 50
 LOGIN_MAX_LENGTH = 50
 
+
+
 # Stratégies Hypothesis personnalisées
 def valid_login():
     return st.from_regex(LOGIN_REGEX).filter(lambda x: 1 <= len(x) <= LOGIN_MAX_LENGTH)
+
 
 def valid_password():
     # Stratégie pour générer des mots de passe valides
@@ -41,6 +46,7 @@ def valid_password():
                   any(c.isdigit() for c in p) and
                   any(c in '!@#$%^&*(),.?":{}|<>' for c in p)
     )
+
 
 def valid_email():
     return st.emails()
@@ -140,6 +146,72 @@ class TestSignup(unittest.TestCase):
                 email=invalid_email
             ))
 
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_from_persistent_valid_input(self):
+        # Arrange
+        data = m(login="john_doe", password=12345, repassword=12345, email="johndoe@example.com")
+
+        # Act
+        signup = Signup.from_persistent(data)
+
+        # Assert
+        self.assertEqual(signup.login, "john_doe")
+        self.assertEqual(signup.password, 12345)
+        self.assertEqual(signup.repassword, 12345)
+        self.assertEqual(signup.email, "johndoe@example.com")
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_from_persistent_invalid_input(self):
+        # Arrange
+        data = m(login="john_doe", password=12345, repassword=12345, email="invalid_email")  # invalid email
+
+        # Act and Assert
+        with self.assertRaises(ValueError):
+            Signup.from_persistent(data)
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_to_persistent_valid_input(self):
+        # Arrange
+        signup = Signup(login="jane_doe", password=67890, repassword=67890, email="janedoe@example.com")
+
+        # Act
+        data = signup.to_persistent()
+
+        # Assert
+        self.assertEqual(data['login'], "jane_doe")
+        self.assertEqual(data['password'], 67890)
+        self.assertEqual(data['repassword'], 67890)
+        self.assertEqual(data['email'], "janedoe@example.com")
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_to_persistent_invalid_input(self):
+        # Arrange
+        signup = Signup(login="john_doe", password=12345, repassword=12345, email="johndoe@example.com")
+        signup.login = None  # Set login to None
+
+        # Act and Assert
+        with self.assertRaises(TypeError):
+            signup.to_persistent()
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_from_persistent_non_pmap_input(self):
+        # Arrange
+        data = {"login": "john_doe", "password": 12345, "repassword": 12345, "email": "johndoe@example.com"}
+
+        # Act and Assert
+        with self.assertRaises(ValueError):
+            Signup.from_persistent(data)
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_from_persistent_empty_input(self):
+        # Arrange
+        data = m()
+
+        # Act and Assert
+        with self.assertRaises(ValueError):
+            Signup.from_persistent(data)
+
+
 class TestGreetings(unittest.TestCase):
     def setUp(self):
         self.held_output = io.StringIO()
@@ -154,7 +226,4 @@ class TestGreetings(unittest.TestCase):
         assert_that(output).is_equal_to("Greeting world!")
 
 
-
-if __name__ == '__main__':
-    unittest.main()
 

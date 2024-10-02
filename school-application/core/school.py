@@ -26,4 +26,15 @@ if __name__ == "__main__":
     persistent_data = new_signup.to_persistent()
     print("Données Pyrsistent:", persistent_data)
 
-    #TODO: to_json, to_xml, json_schema, yml_schema, xml_dtd
+    print(f"to_json : {new_signup.to_json()}")
+
+    print(f"to_xml : {new_signup.to_xml()}")
+
+    print(f"to_schema json : {new_signup.to_schema()}")
+
+    print(f"to_schema yaml : {new_signup.to_schema("yaml")}")
+
+    print(f"to_dtd : {new_signup.to_dtd()}")
+
+    # TODO: to_xsd
+    # print(f"to_xsd : {new_signup.to_xsd()}")
