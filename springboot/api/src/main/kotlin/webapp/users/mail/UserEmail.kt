@@ -1,4 +1,4 @@
-package webapp.users.profile
+package webapp.users.mail
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
