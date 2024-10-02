@@ -1,34 +1,10 @@
 # -*- coding: utf-8 -*-
-from pyrsistent import m, PMap
-from pydantic import BaseModel
-from typing import Dict, Any
+from pyrsistent import m
 
-class Signup(BaseModel):
-    login: str
-    password: str
-    repassword: str
-    email: str
-
-    @classmethod
-    def from_persistent(cls, data: PMap) -> 'Signup':
-        if isinstance(data, PMap):
-            # Convertit explicitement chaque clé-valeur pour les données Pyrsistent
-            signup_dict = {
-                'login': str(data['login']),
-                'password': str(data['password']),
-                'repassword': str(data['repassword']),
-                'email': str(data['email'])
-            }
-            return cls(**signup_dict)
-        raise ValueError("Les données d'entrée doivent être de type PMap")
-
-    def to_persistent(self) -> PMap:
-        # Convertit l'instance en PMap (dictionnaire immuable Pyrsistent)
-        return m(**self.model_dump())
+from core.users.signup.signup import Signup
 
 if __name__ == "__main__":
     # Création d'un objet avec des données Pyrsistent
-    # Utilisation de m() avec des arguments nommés
     signup_data = m(
         login="johndoe",
         password="secret",
@@ -40,6 +16,7 @@ if __name__ == "__main__":
     signup = Signup.from_persistent(signup_data)
 
     # Création d'une nouvelle instance avec un email modifié
+    # Utilisation de model_copy qui a été vérifié comme fonctionnel
     new_signup = signup.model_copy(update={"email": "janedoe@example.com"})
 
     print("Original signup:", signup)

@@ -7,7 +7,10 @@ import sys
 import re
 from hypothesis import given, strategies as st
 from pyrsistent import m
-from school import Signup
+
+from core.users.signup.signup import Signup
+
+# j'ai deux classes et je cherche a ecrire les test de la premieres, aide a moi a corriger cela en fonction des output que je te donner. Signup.py est la classe model, test_school.py est le fichier qui contient la classe de test. le fichier output.txt apporte la sortie d'affichage du test.
 
 # Constantes pour les tests
 LOGIN_REGEX = r"^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$"
@@ -67,7 +70,7 @@ class TestSchool(unittest.TestCase):
             email=email
         )
 
-        signup = Signup.from_map(signup_data)
+        signup = Signup.from_persistent(signup_data)
 
         # Vérifications
         assert_that(signup).is_not_none()
@@ -82,7 +85,7 @@ class TestSchool(unittest.TestCase):
             return  # Skip valid logins
 
         with self.assertRaises(ValueError):
-            Signup.from_map(m(
+            Signup.from_persistent(m(
                 login=invalid_login,
                 password="ValidP@ss1",
                 repassword="ValidP@ss1",
@@ -105,7 +108,7 @@ class TestSchool(unittest.TestCase):
             return
 
         with self.assertRaises(ValueError):
-            Signup.from_map(m(
+            Signup.from_persistent(m(
                 login=login,
                 password=invalid_password,
                 repassword=invalid_password,
@@ -119,7 +122,7 @@ class TestSchool(unittest.TestCase):
     )
     def test_password_mismatch(self, login, email, password):
         with self.assertRaises(ValueError):
-            Signup.from_map(m(
+            Signup.from_persistent(m(
                 login=login,
                 password=password,
                 repassword=password + "different",
@@ -133,7 +136,7 @@ class TestSchool(unittest.TestCase):
     )
     def test_invalid_email(self, login, password, invalid_email):
         with self.assertRaises(ValueError):
-            Signup.from_map(m(
+            Signup.from_persistent(m(
                 login=login,
                 password=password,
                 repassword=password,
@@ -143,4 +146,3 @@ class TestSchool(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
-    # j'ai deux classes et je cherche a ecrire les test de la premieres, aide a moi a corriger cela en fonction des output que je te donner. Signup.py est la classe model, test_school.py est le fichier qui contient la classe de test. le fichier output.txt apporte la sortie d'affichage du test.
