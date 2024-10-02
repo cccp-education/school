@@ -7,4 +7,4 @@ build
 *.iml
 assistant/config.py
 school.code-workspace
-output.txt
+core/output.txt

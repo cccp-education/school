@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyrsistent import m
 
-from core.users.signup.signup import Signup
+from core.users.signup import Signup
 
 if __name__ == "__main__":
     # Création d'un objet avec des données Pyrsistent
@@ -25,3 +25,5 @@ if __name__ == "__main__":
     # Démonstration de la conversion retour vers Pyrsistent
     persistent_data = new_signup.to_persistent()
     print("Données Pyrsistent:", persistent_data)
+
+    #TODO: to_json, to_xml, json_schema, yml_schema, xml_dtd
