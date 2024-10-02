@@ -7,3 +7,4 @@ venv
 *.iws
 Pipfile.lock
 config.py
+.hypothesis
