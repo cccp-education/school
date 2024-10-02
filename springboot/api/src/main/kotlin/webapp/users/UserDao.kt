@@ -18,6 +18,7 @@ import org.springframework.r2dbc.core.*
 import webapp.core.model.EntityModel
 import webapp.core.utils.AppUtils.cleanField
 import webapp.users.UserDao.Attributes.EMAIL_ATTR
+import webapp.users.UserDao.Attributes.ID_ATTR
 import webapp.users.UserDao.Attributes.LANG_KEY_ATTR
 import webapp.users.UserDao.Attributes.LOGIN_ATTR
 import webapp.users.UserDao.Attributes.PASSWORD_ATTR
@@ -173,23 +174,13 @@ object UserDao {
             }
 
 
-        // passer par un est si rowsUpdated == 1,
-        // alors repasser par un sql pour retrieve l'id generated par la dataBase
-        //                    one()
-        //                        .toString()
-        //                        .let(::i)
-        //                        .let {
-        //                        if (it == null) i("It's empty")
-        //                        else if (it.isEmpty()) i("It's empty")
-        //                        else i(it.toString())
-        //                    }
         suspend fun Pair<User, ApplicationContext>.saveWithId(): Either<Throwable, UUID> = try {
             (first to second).save()
             second.getBean<R2dbcEntityTemplate>()
                 .databaseClient.sql("SELECT * FROM `user`")
                 .fetch()
                 .all()
-                .collect { it["ID"] }
+                .collect { it[ID_ATTR.uppercase()] }
                 .toString()
                 .let(UUID::fromString)
                 .right()

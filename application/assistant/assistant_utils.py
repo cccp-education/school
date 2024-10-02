@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 from config import OPENAI_API_KEY, LANGCHAIN_TRACING_V2, LANGCHAIN_API_KEY

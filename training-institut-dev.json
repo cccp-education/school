@@ -1,0 +1,11 @@
+{
+  "type": "service_account",
+  "project_id": "training-institut",
+  "client_email": "training-institut@training-institut.iam.gserviceaccount.com",
+  "client_id": "102304215556092800777",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/training-institut%40training-institut.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,0 +1,7 @@
+typer==0.12.5
+fabric==3.2.2
+pytest==8.3.3
+unittest2==1.1.0
+pydantic==2.9.2
+pyrsistent==0.20.0
+hypothesis==6.112.2

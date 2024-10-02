@@ -6,3 +6,4 @@ build
 
 *.iml
 assistant/config.py
+school.code-workspace

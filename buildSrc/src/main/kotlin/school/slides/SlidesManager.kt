@@ -2,6 +2,7 @@ package school.slides
 
 import org.gradle.api.Project
 import school.git.FileOperationResult
+import school.slides.SlidesManager.pushSlides
 import school.workspace.WorkspaceManager
 import school.workspace.WorkspaceManager.initAddCommitToSite
 import school.workspace.WorkspaceManager.localConf

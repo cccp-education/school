@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 
 from assertpy import assert_that
@@ -7,12 +8,11 @@ from typer.testing import CliRunner
 from cli import cli, status
 
 runner = CliRunner()
-
-
 INSTALL_PATH = ""
 
 
 class TestCLI(unittest.TestCase):
+
     def test_greetings(self):
         print(f"test cli : greetings!")
         result = runner.invoke(cli)

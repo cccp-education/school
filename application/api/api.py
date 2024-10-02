@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 School FastAPI application.
 """
@@ -21,4 +22,8 @@ async def read_item(item_id: int, q: Union[str, None] = None):
 
 
 if __name__ == "__main__":
-    uvicorn.run('api:api', reload=True,port=8888)
+    uvicorn.run(
+        'api:api',
+        reload=True,
+        port=8888
+    )

@@ -1,0 +1,42 @@
+workspace:
+  portfolio:
+    projects:
+      form:
+        cred: "~/workspace/bureau/training-institut-2598582b592a.json"
+      school:
+        builds:
+          frontend:
+            path: "~/workspace/school/frontend"
+            repository:
+              from: "dist"
+              to: "cvs"
+              url: "https://github.com/cheroliv/talaria.git"
+              credentials:
+                username: "dev"
+                token: "gho_rPyJL2bFS9WabFRVZTNo8OygCyJ8tX24Gv9lz"
+              branch: "master"
+              message: "https://cheroliv.github.io/talaria"
+          backoffice:
+            path: "~/workspace/bureau/projects/school/backoffice"
+      jbake-ghpages:
+        builds:
+          frontend:
+            path: "~/workspace/bureau/project/jbake-ghpages/site"
+          jbake:
+            path: "~/workspace/bureau/project/jbake-ghpages"
+    training-catalogue:
+  human-resources:
+  # noinspection SpellCheckingInspection
+  bibliotheque:
+    books-collection:
+    data:
+    formations:
+    metiers:
+    notebooks:
+    pilotage:
+    schemas:
+    slides:
+    sites:
+    school:
+  configuration:
+

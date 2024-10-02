@@ -20,6 +20,7 @@ import school.git.WorkspaceError.ParsingError
 import school.jbake.BakeConfiguration
 import school.jbake.JBakeGhPagesManager.copyFilesTo
 import school.jbake.SiteConfiguration
+import school.slides.SlidesConfiguration
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
@@ -59,11 +60,14 @@ object WorkspaceManager {
         }
 
     fun Project.printConf() {
-        workspaceEither.fold({ "Error: $it".run(::println) }, {
-            it.also(::println)
-                .let(yamlMapper::writeValueAsString)
-                .let(::println)
-        })
+        workspaceEither.fold(
+            { "Error: $it".run(::println) },
+            {
+                it.also(::println)
+                    .let(yamlMapper::writeValueAsString)
+                    .let(::println)
+            }
+        )
     }
 
     fun Project.readSiteConfigurationFile(
@@ -81,6 +85,25 @@ object WorkspaceManager {
         )
     }
 
+    fun Project.readSlideConfigurationFile(
+        configPath: () -> String
+    ): SlidesConfiguration = try {
+        configPath()
+            .run(::File)
+            .run(yamlMapper::readValue)
+    } catch (e: Exception) {
+        // Handle exception or log error
+        SlidesConfiguration(
+            srcPath = "",
+            pushPage = GitPushConfiguration(
+                "",
+                "",
+                RepositoryConfiguration("","",RepositoryCredentials("","")),
+ "",  ""
+            )
+        )
+
+    }
     fun Project.initAddCommitToSite(
         repoDir: File,
         conf: SiteConfiguration,

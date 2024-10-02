@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # noinspection PyUnresolvedReferences
 import unittest
 from assertpy import assert_that

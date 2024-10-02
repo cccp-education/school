@@ -7,9 +7,13 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.repositories
-import school.workspace.WorkspaceManager.printConf
 import school.slides.SlidesManager.deckFile
 import school.slides.SlidesManager.slideSrcPath
+import school.workspace.Office
+import school.workspace.WorkspaceManager.localConf
+import school.workspace.WorkspaceManager.printConf
+import school.workspace.WorkspaceManager.workspaceEither
+import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 
 class SlidesPlugin : Plugin<Project> {
@@ -79,15 +83,28 @@ class SlidesPlugin : Plugin<Project> {
             dependsOn("asciidoctor")
             doFirst { println("Task description :\n\t$description") }
             doLast {
-                println("path :\n\t${project.layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/")
-                project.slideSrcPath
-                    .let(::File)
-                    .listFiles()!!
-//            .forEach { it.name.let(::println) }
-//            pushSlides(destPath = { slideDestDirPath },
-//                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
-                println("Affiche la config slide")
-                project.printConf()
+                project.localConf
+                    .let(project.yamlMapper::writeValueAsString)
+                    .let(::println)
+
+//                project.workspaceEither.fold(
+//                    { "Error: $it".run(::println) },
+//                    { it: Office ->
+//
+//                        it.also(::println)
+//                            .let(project.yamlMapper::writeValueAsString)
+//                            .let(::println)
+//                    }
+//                )
+//                println("path :\n\t${project.layout.buildDirectory.get().asFile.absolutePath}/docs/asciidocRevealJs/")
+//                project.slideSrcPath
+//                    .let(::File)
+//                    .listFiles()!!
+////            .forEach { it.name.let(::println) }
+////            pushSlides(destPath = { slideDestDirPath },
+////                pathTo = { "${layout.buildDirectory.get().asFile.absolutePath}${getDefault().separator}${localConf.pushPage.to}" })
+//                println("Affiche la config slide")
+//                project.printConf()
             }
         }
 
