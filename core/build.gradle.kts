@@ -3,6 +3,7 @@ plugins {
     `java-library`
 }
 
+group = "workspace"
 version = "0.0.1"
 
 repositories {
