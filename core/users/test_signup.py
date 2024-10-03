@@ -8,7 +8,9 @@ from assertpy import assert_that
 from hypothesis import given, strategies as st
 from pyrsistent import m
 
-from core.users.signup import Signup
+from users.signup import Signup
+
+# from core.users.signup import Signup
 
 if __name__ == '__main__':
     unittest.main()

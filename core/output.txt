@@ -1,0 +1,8 @@
+self = <test_signup.TestSignup testMethod=test_invalid_login_format>
+
+    def test_invalid_login_format(self):
+        """Test le rejet des logins invalides"""
+        invalid_data = self.valid_data.set("login", "invalid@login@example.com")
+
+>       with self.assertRaises(ValueError) as context:
+E       AssertionError: ValueError not raised
