@@ -56,6 +56,7 @@ class TestSignup(unittest.TestCase):
             email="john.doe@example.com"
         )
 
+    # @pytest.mark.skip(reason="This test is not ready yet")
     def test_to_json(self):
         """Test la sérialisation en JSON"""
         signup = Signup.from_persistent(self.valid_data)
@@ -64,6 +65,7 @@ class TestSignup(unittest.TestCase):
         assert_that(json_data).contains("john_doe")
         assert_that(json_data).contains("john.doe@example.com")
 
+    # @pytest.mark.skip(reason="This test is not ready yet")
     def test_to_xml(self):
         """Test la sérialisation en XML"""
         signup = Signup.from_persistent(self.valid_data)
@@ -73,6 +75,7 @@ class TestSignup(unittest.TestCase):
         assert_that(xml_data).contains("<login>john_doe</login>")
         assert_that(xml_data).contains("</signup>")
 
+    # @pytest.mark.skip(reason="This test is not ready yet")
     def test_to_schema(self):
         """Test la génération de schéma JSON"""
         signup = Signup.from_persistent(self.valid_data)
@@ -82,6 +85,7 @@ class TestSignup(unittest.TestCase):
         assert_that(schema["properties"]).contains_key("login")
         assert_that(schema["properties"]).contains_key("email")
 
+    # @pytest.mark.skip(reason="This test is not ready yet")
     def test_invalid_login_format(self):
         """Test le rejet des logins invalides"""
         invalid_data = self.valid_data.set("login", "invalid@login@example.com")
@@ -91,6 +95,7 @@ class TestSignup(unittest.TestCase):
 
         assert_that(str(context.exception)).contains("login")
 
+    # @pytest.mark.skip(reason="This test is not ready yet")
     def test_invalid_login_format_variant(self):
         """Test le rejet des logins invalides"""
         invalid_logins = [

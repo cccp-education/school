@@ -139,29 +139,3 @@ class Signup(BaseModel):
         if v.count('@') > 1:  # Vérifie spécifiquement le cas du double @
             raise ValueError("Le login ne peut pas contenir plus d'un @")
         return v
-
-# if __name__ == "__main__":
-#     # Création d'un objet avec des données Pyrsistent
-#     signup_data = m(
-#         login="johndoe",
-#         password="secret",
-#         repassword="secret",
-#         email="johndoe@example.com"
-#     )
-#
-#     # Création d'une instance de Signup à partir des données Pyrsistent
-#     signup = Signup.from_persistent(signup_data)
-#
-#     print("signup:", signup)
-#
-#     print(f"to_json : {signup.to_json()}")
-#
-#     print(f"to_xml : {signup.to_xml()}")
-#
-#     print(f"to_schema json : {signup.to_schema()}")
-#
-#     print(f"to_schema yaml : {signup.to_schema("yaml")}")
-#
-#     print(f"to_dtd : {signup.to_dtd()}")
-#
-#     print(f"to_xsd : {signup.to_xsd()}")
