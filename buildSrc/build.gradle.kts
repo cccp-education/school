@@ -12,21 +12,6 @@ repositories {
 
 
 dependencies {
-    rootDir.parentFile
-        .listFiles()!!.find { it.name == "core" }!!
-        .listFiles()!!.find { it.name == "build" }!!
-        .listFiles()!!.find { it.name == "libs" }!!
-        .listFiles()!!.first { it.name == "core-0.0.1.jar" }!!
-        .let(::fileTree)
-        .let(::implementation)
-    rootDir.parentFile
-        .listFiles()!!.find { it.name == "model" }!!
-        .listFiles()!!.find { it.name == "build" }!!
-        .listFiles()!!.find { it.name == "libs" }!!
-        .listFiles()!!.first { it.name == "model.jar" }!!
-        .let(::fileTree)
-        .let(::implementation)
-
     val langchain4jVersion = "0.35.0"
     val testcontainersVersion = "1.20.1"
     val asciidoctorGradleVersion = "4.0.0-alpha.1"
@@ -34,6 +19,21 @@ dependencies {
     val jacksonVersion = "2.17.2"
     val arrowKtVersion = "1.2.4"
     val jgitVersion = "6.10.0.202406032230-r"
+    val schoolVersion = "0.0.1"
+    rootDir.parentFile
+        .listFiles()!!.find { it.name == "core" }!!
+        .listFiles()!!.find { it.name == "build" }!!
+        .listFiles()!!.find { it.name == "libs" }!!
+        .listFiles()!!.first { it.name == "core-$schoolVersion.jar" }!!
+        .let(::fileTree)
+        .let(::implementation)
+    rootDir.parentFile
+        .listFiles()!!.find { it.name == "model" }!!
+        .listFiles()!!.find { it.name == "build" }!!
+        .listFiles()!!.find { it.name == "libs" }!!
+        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
+        .let(::fileTree)
+        .let(::implementation)
 
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",

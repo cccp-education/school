@@ -4,7 +4,8 @@ plugins {
 }
 
 group = "workspace"
-version = "0.0.1"
+//group = properties["artifact.group"].toString()
+version = properties["artifact.version"].toString()
 
 repositories {
     mavenCentral()
