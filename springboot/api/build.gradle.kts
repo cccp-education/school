@@ -59,6 +59,7 @@ repositories {
 }
 
 dependencies {
+//    implementation(project(":model"))
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

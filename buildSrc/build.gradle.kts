@@ -12,6 +12,7 @@ repositories {
 
 
 dependencies {
+//    implementation(project(":model"))
     val langchain4jVersion = "0.35.0"
     val testcontainersVersion="1.20.1"
     val asciidoctorGradleVersion = "4.0.0-alpha.1"

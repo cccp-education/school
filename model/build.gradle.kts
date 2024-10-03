@@ -1,15 +1,14 @@
 plugins {
     kotlin("jvm") version "2.0.20"
+    `java-library`
 }
-
-group = "school"
-version = "0.0.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+//    implementation(project(":core"))
     testImplementation(kotlin("test"))
 }
 

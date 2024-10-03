@@ -45,3 +45,11 @@ include("model")
 include("springboot:api")
 include("formation")
 include("school-gradle-plugin")
+
+// Inclure le projet model comme un build composite
+//includeBuild("core") {
+//    dependencySubstitution {
+//        substitute(module("school:core")).using(project(":core"))
+//        substitute(module("school:model")).using(project(":model"))
+//    }
+//}
