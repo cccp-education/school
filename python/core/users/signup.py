@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
 import json
-from typing import Dict
+from typing import Dict, ClassVar
+import re
 
 import pandas as pd  # pip install pandas
 import xmlschema  # pip install xmlschema
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from pyrsistent import m, PMap
-
 
 class Signup(BaseModel):
     login: str
     password: str
     repassword: str
     email: str
+
+    # Constantes pour la validation
+    LOGIN_REGEX: ClassVar[str] = r"^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$"
+    LOGIN_MAX_LENGTH: ClassVar[int] = 50
+
+    PASSWORD_REGEX: ClassVar[str] = r"!@#$%^&*(),.?\":{}|<>"
+    PASSWORD_MIN_LENGTH: ClassVar[int] = 8
+    PASSWORD_MAX_LENGTH: ClassVar[int] = 50
 
     @classmethod
     def from_persistent(cls, data: PMap) -> 'Signup':
@@ -119,6 +127,18 @@ class Signup(BaseModel):
             raise ValueError(f"Le schéma XSD généré n'est pas valide : {str(e)}")
 
         return xsd_schema
+
+    @field_validator('login')
+    def validate_login(cls, v):
+        if not v:
+            raise ValueError("Le login ne peut pas être vide")
+        if len(v) > cls.LOGIN_MAX_LENGTH:
+            raise ValueError(f"Le login ne peut pas dépasser {cls.LOGIN_MAX_LENGTH} caractères")
+        if not re.match(cls.LOGIN_REGEX, v):
+            raise ValueError("Format de login invalide")
+        if v.count('@') > 1:  # Vérifie spécifiquement le cas du double @
+            raise ValueError("Le login ne peut pas contenir plus d'un @")
+        return v
 
 # if __name__ == "__main__":
 #     # Création d'un objet avec des données Pyrsistent

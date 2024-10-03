@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
+import io
+import sys
 import unittest
 
 import pytest
 from assertpy import assert_that
-from rich import print
-import io
-import sys
-import re
 from hypothesis import given, strategies as st
 from pyrsistent import m
 
@@ -15,53 +13,111 @@ from core.users.signup import Signup
 if __name__ == '__main__':
     unittest.main()
 
-# Constantes pour les tests
-LOGIN_REGEX = r"^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$"
-PASSWORD_REGEX = r"!@#$%^&*(),.?\":{}|<>"
-PASSWORD_MIN_LENGTH = 8
-PASSWORD_MAX_LENGTH = 50
-LOGIN_MAX_LENGTH = 50
+# Stratégies Hypothesis améliorées
+@st.composite
+def valid_login_strategy(draw):
+    """Génère des logins valides selon les critères définis"""
+    return draw(st.from_regex(Signup.LOGIN_REGEX)
+                .filter(lambda x: 1 <= len(x) <= Signup.LOGIN_MAX_LENGTH))
 
 
-
-# Stratégies Hypothesis personnalisées
-def valid_login():
-    return st.from_regex(LOGIN_REGEX).filter(lambda x: 1 <= len(x) <= LOGIN_MAX_LENGTH)
-
-
-def valid_password():
-    # Stratégie pour générer des mots de passe valides
-    return st.lists(
-        st.one_of(
-            st.characters(whitelist_categories=('Lu',)),  # Au moins une majuscule
-            st.characters(whitelist_categories=('Ll',)),  # Au moins une minuscule
-            st.characters(whitelist_categories=('Nd',)),  # Au moins un chiffre
-            st.characters(whitelist_characters='!@#$%^&*(),.?":{}|<>')  # Caractère spécial
-        ),
-        min_size=PASSWORD_MIN_LENGTH,
-        max_size=PASSWORD_MAX_LENGTH
-    ).map(lambda x: ''.join(x)).filter(
-        lambda p: any(c.isupper() for c in p) and
-                  any(c.islower() for c in p) and
-                  any(c.isdigit() for c in p) and
-                  any(c in '!@#$%^&*(),.?":{}|<>' for c in p)
+@st.composite
+def valid_password_strategy(draw):
+    """Génère des mots de passe valides selon les critères de sécurité"""
+    chars = (
+        st.characters(whitelist_categories=('Lu',)),  # Majuscules
+        st.characters(whitelist_categories=('Ll',)),  # Minuscules
+        st.characters(whitelist_categories=('Nd',)),  # Chiffres
+        st.characters(whitelist_characters=Signup.PASSWORD_REGEX)  # Caractères spéciaux
     )
 
+    # Assure au moins un caractère de chaque type
+    password = [draw(char) for char in chars]
 
-def valid_email():
-    return st.emails()
+    # Complète jusqu'à la longueur minimale
+    remaining_length = draw(st.integers(min_value=max(0, Signup.PASSWORD_MIN_LENGTH - len(password)),
+                                        max_value=Signup.PASSWORD_MAX_LENGTH - len(password)))
+    password.extend(draw(st.lists(st.one_of(*chars),
+                                  min_size=remaining_length,
+                                  max_size=remaining_length)))
+
+    return ''.join(password)
 
 
 class TestSignup(unittest.TestCase):
 
+    def setUp(self):
+        """Initialisation avant chaque test"""
+        self.valid_data = m(
+            login="john_doe",
+            password="ValidP@ss1",
+            repassword="ValidP@ss1",
+            email="john.doe@example.com"
+        )
+
+    def test_to_json(self):
+        """Test la sérialisation en JSON"""
+        signup = Signup.from_persistent(self.valid_data)
+        json_data = signup.to_json()
+
+        assert_that(json_data).contains("john_doe")
+        assert_that(json_data).contains("john.doe@example.com")
+
+    def test_to_xml(self):
+        """Test la sérialisation en XML"""
+        signup = Signup.from_persistent(self.valid_data)
+        xml_data = signup.to_xml()
+
+        assert_that(xml_data).contains("<signup>")
+        assert_that(xml_data).contains("<login>john_doe</login>")
+        assert_that(xml_data).contains("</signup>")
+
+    def test_to_schema(self):
+        """Test la génération de schéma JSON"""
+        signup = Signup.from_persistent(self.valid_data)
+        schema = signup.to_schema()
+
+        assert_that(schema).contains_key("properties")
+        assert_that(schema["properties"]).contains_key("login")
+        assert_that(schema["properties"]).contains_key("email")
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_invalid_login_format(self):
+        """Test le rejet des logins invalides"""
+        invalid_logins = [
+            "invalid@login@example.com",  # Double @
+            "user name",                  # Espace non autorisé
+            "a" * 51,                     # Trop long
+            "",                           # Vide
+            "@invalid",                   # @ au début
+            "invalid@"                    # @ à la fin
+        ]
+
+        for invalid_login in invalid_logins:
+            invalid_data = self.valid_data.set("login", invalid_login)
+            with self.assertRaises(ValueError) as context:
+                Signup.from_persistent(invalid_data)
+            assert_that(str(context.exception)).contains("login")
+
+    @pytest.mark.skip(reason="This test is not ready yet")
+    def test_invalid_login_format(self):
+        """Test le rejet des logins invalides"""
+        invalid_data = self.valid_data.set("login", "invalid@login@example.com")
+
+        with self.assertRaises(ValueError) as context:
+            Signup.from_persistent(invalid_data)
+
+        assert_that(str(context.exception)).contains("login")
+
+
     @pytest.mark.skip(reason="This test is not ready yet")
     @given(
-        login=valid_login(),
-        email=valid_email(),
-        password=valid_password()
+        login=valid_login_strategy(),
+        email=st.emails(),
+        password=valid_password_strategy()
     )
     def test_valid_signup(self, login, email, password):
-        # Création d'un objet Signup valide
+        """Test la création d'un signup valide"""
         signup_data = m(
             login=login,
             password=password,
@@ -71,145 +127,45 @@ class TestSignup(unittest.TestCase):
 
         signup = Signup.from_persistent(signup_data)
 
-        # Vérifications
-        assert_that(signup).is_not_none()
         assert_that(signup.login).is_equal_to(login)
         assert_that(signup.password).is_equal_to(password)
         assert_that(signup.email).is_equal_to(email)
-        assert_that(signup.repassword).is_equal_to(signup.password)
+        assert_that(signup.repassword).is_equal_to(password)
+
+
 
     @pytest.mark.skip(reason="This test is not ready yet")
-    @given(st.text(min_size=1))
-    def test_invalid_login(self, invalid_login):
-        if re.match(LOGIN_REGEX, invalid_login) and len(invalid_login) <= LOGIN_MAX_LENGTH:
-            return  # Skip valid logins
+    def test_password_complexity(self):
+        """Test les règles de complexité des mots de passe"""
+        simple_password = "simple123"
+        invalid_data = self.valid_data.set("password", simple_password) \
+            .set("repassword", simple_password)
 
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(m(
-                login=invalid_login,
-                password="ValidP@ss1",
-                repassword="ValidP@ss1",
-                email="test@example.com"
-            ))
+        with self.assertRaises(ValueError) as context:
+            Signup.from_persistent(invalid_data)
+
+        assert_that(str(context.exception)).contains("password")
 
     @pytest.mark.skip(reason="This test is not ready yet")
-    @given(
-        login=valid_login(),
-        email=valid_email(),
-        invalid_password=st.text(min_size=1, max_size=PASSWORD_MAX_LENGTH)
-    )
-    def test_invalid_password(self, login, email, invalid_password):
-        # Si le mot de passe généré est valide par hasard, on skip le test
-        if (len(invalid_password) >= PASSWORD_MIN_LENGTH and
-                any(c.isupper() for c in invalid_password) and
-                any(c.islower() for c in invalid_password) and
-                any(c.isdigit() for c in invalid_password) and
-                any(c in PASSWORD_REGEX for c in invalid_password) and
-                login not in invalid_password):
-            return
+    def test_password_mismatch(self):
+        """Test la correspondance des mots de passe"""
+        mismatched_data = self.valid_data.set("repassword", "DifferentP@ss1")
 
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(m(
-                login=login,
-                password=invalid_password,
-                repassword=invalid_password,
-                email=email
-            ))
+        with self.assertRaises(ValueError) as context:
+            Signup.from_persistent(mismatched_data)
+
+        assert_that(str(context.exception)).contains("password")
 
     @pytest.mark.skip(reason="This test is not ready yet")
-    @given(
-        login=valid_login(),
-        email=valid_email(),
-        password=valid_password()
-    )
-    def test_password_mismatch(self, login, email, password):
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(m(
-                login=login,
-                password=password,
-                repassword=password + "different",
-                email=email
-            ))
+    def test_invalid_email(self):
+        """Test le format d'email"""
+        invalid_data = self.valid_data.set("email", "invalid-email")
 
-    @pytest.mark.skip(reason="This test is not ready yet")
-    @given(
-        login=valid_login(),
-        password=valid_password(),
-        invalid_email=st.text().filter(lambda x: '@' not in x or '.' not in x)
-    )
-    def test_invalid_email(self, login, password, invalid_email):
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(m(
-                login=login,
-                password=password,
-                repassword=password,
-                email=invalid_email
-            ))
+        with self.assertRaises(ValueError) as context:
+            Signup.from_persistent(invalid_data)
 
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_from_persistent_valid_input(self):
-        # Arrange
-        data = m(login="john_doe", password=12345, repassword=12345, email="johndoe@example.com")
+        assert_that(str(context.exception)).contains("email")
 
-        # Act
-        signup = Signup.from_persistent(data)
-
-        # Assert
-        self.assertEqual(signup.login, "john_doe")
-        self.assertEqual(signup.password, 12345)
-        self.assertEqual(signup.repassword, 12345)
-        self.assertEqual(signup.email, "johndoe@example.com")
-
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_from_persistent_invalid_input(self):
-        # Arrange
-        data = m(login="john_doe", password=12345, repassword=12345, email="invalid_email")  # invalid email
-
-        # Act and Assert
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(data)
-
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_to_persistent_valid_input(self):
-        # Arrange
-        signup = Signup(login="jane_doe", password=67890, repassword=67890, email="janedoe@example.com")
-
-        # Act
-        data = signup.to_persistent()
-
-        # Assert
-        self.assertEqual(data['login'], "jane_doe")
-        self.assertEqual(data['password'], 67890)
-        self.assertEqual(data['repassword'], 67890)
-        self.assertEqual(data['email'], "janedoe@example.com")
-
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_to_persistent_invalid_input(self):
-        # Arrange
-        signup = Signup(login="john_doe", password=12345, repassword=12345, email="johndoe@example.com")
-        signup.login = None  # Set login to None
-
-        # Act and Assert
-        with self.assertRaises(TypeError):
-            signup.to_persistent()
-
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_from_persistent_non_pmap_input(self):
-        # Arrange
-        data = {"login": "john_doe", "password": 12345, "repassword": 12345, "email": "johndoe@example.com"}
-
-        # Act and Assert
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(data)
-
-    @pytest.mark.skip(reason="This test is not ready yet")
-    def test_from_persistent_empty_input(self):
-        # Arrange
-        data = m()
-
-        # Act and Assert
-        with self.assertRaises(ValueError):
-            Signup.from_persistent(data)
 
 
 class TestGreetings(unittest.TestCase):
@@ -224,6 +180,3 @@ class TestGreetings(unittest.TestCase):
         print("Greeting world!")
         output = self.held_output.getvalue().strip()
         assert_that(output).is_equal_to("Greeting world!")
-
-
-
