@@ -64,3 +64,84 @@ class Signup(BaseModel):
         for key, value in data.items():
             dtd_elements.append(f"<!ELEMENT {key} (#PCDATA)>")
         return f"<!ELEMENT {root_element} ({' , '.join(dtd_elements)})>"
+
+    def to_xsd(self, root_element: str = "signup") -> str:
+        """Generate an XML Schema (XSD) string from the model.
+
+        Args:
+            root_element (str): The name of the root element in the schema
+
+        Returns:
+            str: The generated XSD schema as a string
+        """
+        # Convertir le modèle en DataFrame pandas pour faciliter la manipulation
+        data = dict(**self.model_dump())
+        df = pd.DataFrame([data])
+
+        # Mapper les types Python vers les types XSD
+        xsd_type_mapping = {
+            'str': 'xs:string',
+            'int': 'xs:integer',
+            'float': 'xs:decimal',
+            'bool': 'xs:boolean',
+            'datetime': 'xs:dateTime'
+        }
+
+        # Générer les éléments du schéma
+        elements = []
+        for column in df.columns:
+            python_type = type(data[column]).__name__
+            xsd_type = xsd_type_mapping.get(python_type, 'xs:string')
+            element = f"""
+                <xs:element name="{column}" type="{xsd_type}">
+                    <xs:annotation>
+                        <xs:documentation>Field: {column}</xs:documentation>
+                    </xs:annotation>
+                </xs:element>"""
+            elements.append(element)
+
+        # Construire le schéma XSD complet
+        xsd_schema = f"""<?xml version="1.0" encoding="UTF-8"?>
+    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:element name="{root_element}">
+            <xs:complexType>
+                <xs:sequence>
+                    {''.join(elements)}
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+    </xs:schema>"""
+
+        # Valider le schéma généré avec xmlschema
+        try:
+            xmlschema.XMLSchema(xsd_schema)
+        except Exception as e:
+            raise ValueError(f"Le schéma XSD généré n'est pas valide : {str(e)}")
+
+        return xsd_schema
+
+# if __name__ == "__main__":
+#     # Création d'un objet avec des données Pyrsistent
+#     signup_data = m(
+#         login="johndoe",
+#         password="secret",
+#         repassword="secret",
+#         email="johndoe@example.com"
+#     )
+#
+#     # Création d'une instance de Signup à partir des données Pyrsistent
+#     signup = Signup.from_persistent(signup_data)
+#
+#     print("signup:", signup)
+#
+#     print(f"to_json : {signup.to_json()}")
+#
+#     print(f"to_xml : {signup.to_xml()}")
+#
+#     print(f"to_schema json : {signup.to_schema()}")
+#
+#     print(f"to_schema yaml : {signup.to_schema("yaml")}")
+#
+#     print(f"to_dtd : {signup.to_dtd()}")
+#
+#     print(f"to_xsd : {signup.to_xsd()}")

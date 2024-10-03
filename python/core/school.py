@@ -36,5 +36,4 @@ if __name__ == "__main__":
 
     print(f"to_dtd : {new_signup.to_dtd()}")
 
-    # TODO: to_xsd
-    # print(f"to_xsd : {new_signup.to_xsd()}")
+    print(f"to_xsd : {new_signup.to_xsd()}")
