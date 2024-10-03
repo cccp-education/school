@@ -12,22 +12,21 @@ repositories {
 
 
 dependencies {
-    implementation(
-        rootDir.parentFile
-            .listFiles()!!.find { it.name == "core" }!!
-            .listFiles()!!.find { it.name == "build" }!!
-            .listFiles()!!.find { it.name == "libs" }!!
-            .listFiles()!!.first { it.name == "core-0.0.1.jar" }!!
-            .let(::fileTree)
-    )
-    implementation(
-        rootDir.parentFile
-            .listFiles()!!.find { it.name == "model" }!!
-            .listFiles()!!.find { it.name == "build" }!!
-            .listFiles()!!.find { it.name == "libs" }!!
-            .listFiles()!!.first { it.name == "model.jar" }!!
-            .let(::fileTree)
-    )
+    rootDir.parentFile
+        .listFiles()!!.find { it.name == "core" }!!
+        .listFiles()!!.find { it.name == "build" }!!
+        .listFiles()!!.find { it.name == "libs" }!!
+        .listFiles()!!.first { it.name == "core-0.0.1.jar" }!!
+        .let(::fileTree)
+        .let(::implementation)
+    rootDir.parentFile
+        .listFiles()!!.find { it.name == "model" }!!
+        .listFiles()!!.find { it.name == "build" }!!
+        .listFiles()!!.find { it.name == "libs" }!!
+        .listFiles()!!.first { it.name == "model.jar" }!!
+        .let(::fileTree)
+        .let(::implementation)
+
     val langchain4jVersion = "0.35.0"
     val testcontainersVersion = "1.20.1"
     val asciidoctorGradleVersion = "4.0.0-alpha.1"
