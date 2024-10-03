@@ -3,9 +3,10 @@ plugins {
     `java-library`
 }
 
-repositories {
-    mavenCentral()
-}
+
+
+
+repositories { mavenCentral() }
 
 dependencies {
     implementation(project(":core"))

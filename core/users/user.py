@@ -56,7 +56,7 @@ import re
 import xmlschema
 from datetime import datetime
 
-from core.users.role import Role
+from users.role import Role
 
 # Constants
 ANONYMOUS_USER = "ANONYMOUS"
