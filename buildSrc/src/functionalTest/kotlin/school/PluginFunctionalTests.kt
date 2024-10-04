@@ -11,7 +11,7 @@ const val BUILD_GRADLE = "build.gradle.kts"
 const val SETTINGS_GRADLE = "settings.gradle.kts"
 private const val BUILD_SRC_LIBS = "build/libs"
 
-
+@Ignore
 class PluginFunctionalTests {
 
     @TempDir

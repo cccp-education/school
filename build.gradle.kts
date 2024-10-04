@@ -1,15 +1,12 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
-import school.ai.AssistantPlugin
-import school.forms.FormPlugin
-import school.frontend.SchoolPlugin
+
 import school.workspace.WorkspaceUtils.purchaseArtifact
-import school.jbake.JBakeGhPagesPlugin
 
 plugins { idea }
-apply<SchoolPlugin>()
-apply<FormPlugin>()
-apply<JBakeGhPagesPlugin>()
-apply<AssistantPlugin>()
+apply<school.frontend.SchoolPlugin>()
+apply<school.forms.FormPlugin>()
+apply<school.jbake.JBakeGhPagesPlugin>()
+apply<school.ai.AssistantPlugin>()
 
 purchaseArtifact()
 
@@ -24,4 +21,16 @@ tasks.withType<JavaExec> {
         "--enable-native-access=ALL-UNNAMED",
         "--enable-preview"
     )
+}
+
+gradle.settingsEvaluated {
+    if (gradle.rootProject.name == "school") {
+        logger.log(LogLevel.INFO, "gradle.settingsEvaluated: BuildSrc is being evaluated.")
+    }
+}
+
+gradle.projectsEvaluated {
+    if (gradle.rootProject.name == "school") {
+        logger.log(LogLevel.INFO, "gradle.projectsEvaluated: BuildSrc project is evaluated.")
+    }
 }

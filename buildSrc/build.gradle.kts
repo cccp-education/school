@@ -4,14 +4,15 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
+    maven("https://repo.gradle.org/gradle/libs-releases/")
     maven("https://plugins.gradle.org/m2/")
     maven("https://maven.xillio.com/artifactory/libs-release/")
     maven("https://mvnrepository.com/repos/springio-plugins-release")
     maven("https://archiva-repository.apache.org/archiva/repository/public/")
 }
 
-
 dependencies {
+    // les dependances : base, model, assistant n'existe pas alors il faut les builder
     val langchain4jVersion = "0.35.0"
     val testcontainersVersion = "1.20.1"
     val asciidoctorGradleVersion = "4.0.0-alpha.1"
@@ -20,21 +21,28 @@ dependencies {
     val arrowKtVersion = "1.2.4"
     val jgitVersion = "6.10.0.202406032230-r"
     val schoolVersion = "0.0.1"
-    rootDir.parentFile
-        .listFiles()!!.find { it.name == "core" }!!
+//    rootDir.parentFile
+//        .listFiles()!!.find { it.name == "core" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "core-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
+//    rootDir.parentFile
+//        .listFiles()!!.find { it.name == "model" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
+    rootDir
+        .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
+        .listFiles()!!.find { it.name == "base" }!!
         .listFiles()!!.find { it.name == "build" }!!
         .listFiles()!!.find { it.name == "libs" }!!
-        .listFiles()!!.first { it.name == "core-$schoolVersion.jar" }!!
+        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
         .let(::fileTree)
         .let(::implementation)
-    rootDir.parentFile
-        .listFiles()!!.find { it.name == "model" }!!
-        .listFiles()!!.find { it.name == "build" }!!
-        .listFiles()!!.find { it.name == "libs" }!!
-        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
-        .let(::fileTree)
-        .let(::implementation)
-
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
@@ -69,12 +77,62 @@ dependencies {
         "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
         "org.testcontainers:testcontainers:$testcontainersVersion",
         "org.testcontainers:ollama:$testcontainersVersion",
+        "org.gradle:gradle-tooling-api:8.6",
     ).forEach(::implementation)
 
     setOf("org.jetbrains.kotlin:kotlin-test-junit5")
         .forEach(::testImplementation)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+//tasks.named("build") {
+//    // Avant de lancer la tâche "build", assure-toi que le JAR du projet 'base' est à jour
+//    dependsOn(":buildBaseJar")
+//}
+
+//gradle.beforeProject {
+//    if (name == "buildSrc") {
+//        tasks.named("build") {
+//            logger.log(LogLevel.INFO, "gradle.beforeProject call.")
+////            dependsOn(":buildBaseJar")
+//        }
+//    }
+//}
+
+
+//tasks.register("logBuildBaseJar") {
+//    group = "build"
+//    description = "Builds the base project and generates the JAR file."
+//    doLast {
+//        exec {
+//            commandLine("gradle", "-p", "../base", "build")
+//        }
+//    }
+//}
+//tasks["build"].dependsOn(":logBuildBaseJar")
+
+
+tasks["build"].dependsOn(":buildBaseJar")
+
+tasks.register<Exec>("buildBaseJar") {
+    description = "Build the base project to generate the updated JAR."
+    // Lancer la commande gradle pour construire le projet base
+    commandLine("./gradlew", ":build")
+
+    doLast {
+        // Vérifie que le fichier JAR est bien mis à jour
+        val jarFile = file("../base/build/libs/base-0.0.1.jar")
+        if (!jarFile.exists()) {
+            val messageError = "The base JAR was not built successfully."
+            logger.log(LogLevel.ERROR, messageError)
+            throw GradleException(messageError)
+        }
+        logger.log(LogLevel.INFO, "The base JAR was built successfully.")
+    }
+    workingDir = rootDir
+        .parentFile
+        .listFiles()!!.find { it.name == "base" }!!
 }
 
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")

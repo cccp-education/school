@@ -11,9 +11,6 @@ import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.URIish
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.gradle.api.Project
-import school.workspace.WorkspaceUtils.createDirectory
-import school.workspace.WorkspaceUtils.sep
-import school.workspace.WorkspaceUtils.yamlMapper
 import school.git.*
 import school.git.WorkspaceError.FileNotFound
 import school.git.WorkspaceError.ParsingError
@@ -21,9 +18,13 @@ import school.jbake.BakeConfiguration
 import school.jbake.JBakeGhPagesManager.copyFilesTo
 import school.jbake.SiteConfiguration
 import school.slides.SlidesConfiguration
+import school.workspace.WorkspaceUtils.createDirectory
+import school.workspace.WorkspaceUtils.sep
+import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate")
 object WorkspaceManager {
@@ -45,6 +46,11 @@ object WorkspaceManager {
         get() = DNS_CNAME.lowercase().let {
             contains(it) && this[it] is String && this[it] as String != ""
         }
+
+    fun Project.gradleProperties(key: String = "artifact.version"): String =
+        "${System.getProperty("user.home")}/workspace/school/gradle.properties"
+            .let(::File)
+            .run { Properties().apply { inputStream().use(::load) }[key].toString() }
 
     val Project.workspaceEither: Either<WorkspaceError, Office>
         get() = try {
@@ -98,12 +104,13 @@ object WorkspaceManager {
             pushPage = GitPushConfiguration(
                 "",
                 "",
-                RepositoryConfiguration("","",RepositoryCredentials("","")),
- "",  ""
+                RepositoryConfiguration("", "", RepositoryCredentials("", "")),
+                "", ""
             )
         )
 
     }
+
     fun Project.initAddCommitToSite(
         repoDir: File,
         conf: SiteConfiguration,
