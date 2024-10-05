@@ -28,6 +28,7 @@ object AssistantManager {
     fun main(args: Array<String>) {
         userMessage.run(::println)
     }
+
     val logger: Logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
 
     @JvmStatic
@@ -49,6 +50,17 @@ object AssistantManager {
                 .use(::load)
         }["OPENAI_API_KEY"] as String
 
+
+    @JvmStatic
+    val Project.privateProps: Properties
+        get() = Properties().apply {
+            "$projectDir/private.properties"
+                .let(::File)
+                .inputStream()
+                .let(::load)
+        }
+
+
     val userName = System.getProperty("user.name")
     val assistantName = "E-3PO"
 
@@ -61,6 +73,7 @@ object AssistantManager {
                             | et le software craftmanship avec les méthodes agiles.
                             | $assistantName ta mission est d'aider ${System.getProperty("user.name")} dans l'activité d'écriture de formation et génération de code.
                             | Réponds moi à ce premier échange uniquement en maximum 120 mots""".trimMargin()
+
 
     fun Project.createOllamaChatModel(model: String = "smollm:135m"): OllamaChatModel =
         OllamaChatModel.builder().apply {
@@ -81,6 +94,8 @@ object AssistantManager {
             logRequests(true)
             logResponses(true)
         }.build()
+
+
 
 
     suspend fun generateStreamingResponse(
