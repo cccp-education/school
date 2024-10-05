@@ -1,5 +1,3 @@
-import Build_gradle.BaseManager.artifactVersion
-import Build_gradle.BaseManager.displayBaseProperties
 import java.util.*
 
 plugins {
@@ -9,29 +7,6 @@ plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
 }
-
-object BaseManager {
-    val Project.artifactVersion: String
-        get() = "artifact.version".run(
-            Properties().apply {
-                "artifact.version.key"
-                    .run(properties::get)
-                    .let {
-                        "user.home"
-                            .run(System::getProperty)
-                            .run { "$this$it" }
-                    }.run(::File)
-                    .inputStream()
-                    .use(::load)
-            }::get
-        ).toString()
-
-    fun Project.displayBaseProperties(): Unit = artifactVersion
-        .run { "BASE VERSION : $this" }
-        .run(::println)
-}
-
-version = project.artifactVersion
 
 repositories { mavenCentral() }
 
@@ -45,15 +20,18 @@ dependencies {
     implementation(libs.guava)
 }
 
-//java {
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(21)
-//    }
-//}
+version = "artifact.version".run(
+    Properties().apply {
+        "artifact.version.key"
+            .run(properties::get)
+            .let {
+                "user.home"
+                    .run(System::getProperty)
+                    .run { "$this$it" }
+            }.run(::File)
+            .inputStream()
+            .use(::load)
+    }::get
+).toString()
 
 tasks.named<Test>("test") { useJUnitPlatform() }
-
-
-tasks.register<DefaultTask>("displayBaseProperties") {
-    doFirst { project.displayBaseProperties() }
-}
