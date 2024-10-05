@@ -48,16 +48,16 @@ tasks.register<DefaultTask>("displayBaseProperties") {
 }
 
 val Project.artifactVersion: String
-    get() = Properties().apply {
-        "artifact.version.key"
-            .run(properties::get)
-            .let {
-                "user.home"
-                    .run(System::getProperty)
-                    .run { "$this$it" }
-            }.run(::File)
-            .inputStream()
-            .use(::load)
-    }.get("artifact.version")
-        .toString()
-
+    get() = "artifact.version".run(
+        Properties().apply {
+            "artifact.version.key"
+                .run(properties::get)
+                .let {
+                    "user.home"
+                        .run(System::getProperty)
+                        .run { "$this$it" }
+                }.run(::File)
+                .inputStream()
+                .use(::load)
+        }::get
+    ).toString()
