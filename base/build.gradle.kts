@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
@@ -5,7 +7,9 @@ plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
 }
-version = "0.0.1"
+
+version = project.artifactVersion
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -33,7 +37,23 @@ dependencies {
 //    }
 //}
 
-tasks.named<Test>("test") {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+tasks.named<Test>("test") { useJUnitPlatform() }
+
+tasks.register<DefaultTask>("displayBaseProperties") {
+    doFirst {
+        project.artifactVersion
+            .run { "BASE VERSION : $this" }
+            .run(::println)
+    }
 }
+
+val Project.artifactVersion: String
+    get() = Properties().apply {
+        "artifact.version.key"
+            .run(properties::get)
+            .run { "${"user.home".run(System::getProperty)}$this" }
+            .run(::File)
+            .inputStream()
+            .use(::load)
+    }["artifact.version"].toString()
+

@@ -162,12 +162,12 @@ configurations {
     }
 }
 
-java { sourceCompatibility = VERSION_21 }
+//java { sourceCompatibility = VERSION_21 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = VERSION_21.toString()
+//        jvmTarget = VERSION_21.toString()
     }
 }
 
