@@ -136,4 +136,22 @@ object AssistantManager {
             }
         }
     }
+    // Generic function for chat model tasks
+    fun Project.createChatTask(taskName: String, model: String) {
+        task(taskName) {
+            group = "school-ai"
+            description = "Display the Ollama $model chatgpt prompt request."
+            doFirst { project.runChat(model) }
+        }
+    }
+
+    // Generic function for streaming chat model tasks
+    fun Project.createStreamingChatTask(taskName: String, model: String) {
+        task(taskName) {
+            group = "school-ai"
+            description = "Display the Ollama $model chatgpt stream prompt request."
+            doFirst { runStreamChat(model) }
+        }
+    }
+
 }
