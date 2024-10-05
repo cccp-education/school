@@ -1,3 +1,5 @@
+import Build_gradle.BaseManager.artifactVersion
+import Build_gradle.BaseManager.displayBaseProperties
 import java.util.*
 
 plugins {
@@ -8,25 +10,37 @@ plugins {
     `java-library`
 }
 
-version = project.artifactVersion
+object BaseManager {
+    val Project.artifactVersion: String
+        get() = "artifact.version".run(
+            Properties().apply {
+                "artifact.version.key"
+                    .run(properties::get)
+                    .let {
+                        "user.home"
+                            .run(System::getProperty)
+                            .run { "$this$it" }
+                    }.run(::File)
+                    .inputStream()
+                    .use(::load)
+            }::get
+        ).toString()
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+    fun Project.displayBaseProperties(): Unit = artifactVersion
+        .run { "BASE VERSION : $this" }
+        .run(::println)
 }
 
+version = project.artifactVersion
+
+repositories { mavenCentral() }
+
 dependencies {
-    // Use the Kotlin JUnit 5 integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-
-    // Use the JUnit 5 integration.
     testImplementation(libs.junit.jupiter.engine)
-
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api(libs.commons.math3)
-
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation(libs.guava)
 }
@@ -39,25 +53,7 @@ dependencies {
 
 tasks.named<Test>("test") { useJUnitPlatform() }
 
-tasks.register<DefaultTask>("displayBaseProperties") {
-    doFirst {
-        project.artifactVersion
-            .run { "BASE VERSION : $this" }
-            .run(::println)
-    }
-}
 
-val Project.artifactVersion: String
-    get() = "artifact.version".run(
-        Properties().apply {
-            "artifact.version.key"
-                .run(properties::get)
-                .let {
-                    "user.home"
-                        .run(System::getProperty)
-                        .run { "$this$it" }
-                }.run(::File)
-                .inputStream()
-                .use(::load)
-        }::get
-    ).toString()
+tasks.register<DefaultTask>("displayBaseProperties") {
+    doFirst { project.displayBaseProperties() }
+}

@@ -47,10 +47,21 @@ object WorkspaceManager {
             contains(it) && this[it] is String && this[it] as String != ""
         }
 
+    @JvmStatic
     fun Project.gradleProperties(key: String = "artifact.version"): String =
         "${System.getProperty("user.home")}/workspace/school/gradle.properties"
             .let(::File)
             .run { Properties().apply { inputStream().use(::load) }[key].toString() }
+
+    @JvmStatic
+    val Project.privateProps: Properties
+        get() = Properties().apply {
+            "$projectDir/private.properties"
+                .let(::File)
+                .inputStream()
+                .let(::load)
+        }
+
 
     val Project.workspaceEither: Either<WorkspaceError, Office>
         get() = try {
@@ -66,14 +77,14 @@ object WorkspaceManager {
         }
 
     fun Project.printConf() {
-        workspaceEither.fold(
-            { "Error: $it".run(::println) },
-            {
+        workspaceEither
+            .mapLeft { "Error: $it".run(::println) }
+            .map {
                 it.also(::println)
                     .let(yamlMapper::writeValueAsString)
                     .let(::println)
             }
-        )
+
     }
 
     fun Project.readSiteConfigurationFile(
@@ -108,7 +119,6 @@ object WorkspaceManager {
                 "", ""
             )
         )
-
     }
 
     fun Project.initAddCommitToSite(

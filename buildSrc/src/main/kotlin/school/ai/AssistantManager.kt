@@ -16,11 +16,9 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Project
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.File
+import school.workspace.WorkspaceManager.privateProps
 import java.time.Duration.ofSeconds
-import java.util.*
 import kotlin.coroutines.resume
-
 
 @Suppress("MemberVisibilityCanBePrivate")
 object AssistantManager {
@@ -33,32 +31,26 @@ object AssistantManager {
 
     @JvmStatic
     val Project.localModels
-        get() = mapOf(
+        get() = setOf(
             "llama3.2:3b" to "LlamaTiny",
             "llama3.1:8b" to "LlamaSmall",
             "mistral:7b" to "Mistral",
             "phi3.5:3.8b" to "Phi",
             "smollm:135m" to "SmollM",
+            "aya:8b" to "Aya"
         )
 
+    // Creating tasks for each model
     @JvmStatic
-    val Project.apiKey: String
-        get() = Properties().apply {
-            "$projectDir/private.properties"
-                .let(::File)
-                .inputStream()
-                .use(::load)
-        }["OPENAI_API_KEY"] as String
+    fun Project.createChatTasks() = localModels.forEach {
+        createChatTask(it.first, "helloOllama${it.second}")
+        createStreamingChatTask(it.first, "helloOllamaStream${it.second}")
+    }
 
 
     @JvmStatic
-    val Project.privateProps: Properties
-        get() = Properties().apply {
-            "$projectDir/private.properties"
-                .let(::File)
-                .inputStream()
-                .let(::load)
-        }
+    val Project.openAIapiKey: String
+        get() = privateProps["OPENAI_API_KEY"] as String
 
 
     val userName = System.getProperty("user.name")
@@ -94,8 +86,6 @@ object AssistantManager {
             logRequests(true)
             logResponses(true)
         }.build()
-
-
 
 
     suspend fun generateStreamingResponse(
@@ -136,8 +126,9 @@ object AssistantManager {
             }
         }
     }
+
     // Generic function for chat model tasks
-    fun Project.createChatTask(taskName: String, model: String) {
+    fun Project.createChatTask(model: String, taskName: String) {
         task(taskName) {
             group = "school-ai"
             description = "Display the Ollama $model chatgpt prompt request."
@@ -146,7 +137,7 @@ object AssistantManager {
     }
 
     // Generic function for streaming chat model tasks
-    fun Project.createStreamingChatTask(taskName: String, model: String) {
+    fun Project.createStreamingChatTask(model: String, taskName: String) {
         task(taskName) {
             group = "school-ai"
             description = "Display the Ollama $model chatgpt stream prompt request."

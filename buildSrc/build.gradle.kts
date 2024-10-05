@@ -72,7 +72,7 @@ dependencies {
         "com.burgstaller:okhttp-digest:1.10",
         "org.ysb33r.gradle:grolifant:0.12.1",
         "com.avast.gradle:gradle-docker-compose-plugin:0.14.2",
-        "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
+//        "dev.langchain4j:langchain4j-open-ai:$langchain4jVersion",
         "dev.langchain4j:langchain4j:$langchain4jVersion",
         "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
         "org.testcontainers:testcontainers:$testcontainersVersion",
