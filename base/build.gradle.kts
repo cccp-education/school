@@ -51,9 +51,13 @@ val Project.artifactVersion: String
     get() = Properties().apply {
         "artifact.version.key"
             .run(properties::get)
-            .run { "${"user.home".run(System::getProperty)}$this" }
-            .run(::File)
+            .let {
+                "user.home"
+                    .run(System::getProperty)
+                    .run { "$this$it" }
+            }.run(::File)
             .inputStream()
             .use(::load)
-    }["artifact.version"].toString()
+    }.get("artifact.version")
+        .toString()
 
