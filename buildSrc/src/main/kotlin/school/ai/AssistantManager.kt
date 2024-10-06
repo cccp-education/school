@@ -25,8 +25,9 @@ import kotlin.coroutines.resume
 object AssistantManager {
     @JvmStatic
     fun main(args: Array<String>) {
-        userMessageFr.run(::println)
-        userMessageEn.run(::println)
+        userMessageFr.run{"userMessageFr : $this"}.run(::println)
+        println()
+        userMessageEn.run{"userMessageEn : $this"}.run(::println)
     }
 
     @JvmStatic
@@ -35,9 +36,9 @@ object AssistantManager {
             "llama3.2:3b" to "LlamaTiny",
             "llama3.1:8b" to "LlamaSmall",
             "mistral:7b" to "Mistral",
+            "aya:8b" to "Aya",
             "phi3.5:3.8b" to "Phi",
-            "smollm:135m" to "SmollM",
-            "aya:8b" to "Aya"
+            "smollm:135m" to "SmollM"
         )
 
     // Creating tasks for each model
