@@ -3,15 +3,13 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
-
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     alias(libs.plugins.jvm)
+    id("com.github.node-gradle.node")
+    id("com.avast.gradle.docker-compose")
 }
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 testing {
     suites {
@@ -45,7 +43,7 @@ gradlePlugin {
     // Define the plugin
     val greeting by plugins.creating {
         id = "org.example.greeting"
-        implementationClass = "org.example.SchoolFastapiPlugin"
+        implementationClass = "org.example.SchoolPlugin"
     }
 }
 

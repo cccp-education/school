@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
+# # -*- coding: utf-8 -*-
 from pyrsistent import m
-
 from users.signup import Signup
-
 if __name__ == "__main__":
     # Création d'un objet avec des données Pyrsistent
     signup_data = m(
@@ -17,7 +15,7 @@ if __name__ == "__main__":
 
     # Création d'une nouvelle instance avec un email modifié
     # Utilisation de model_copy qui a été vérifié comme fonctionnel
-    new_signup = signup.model_copy(update={"email": "janedoe@example.com"})
+    new_signup = signup.copy(update={"email": "janedoe@example.com"})
 
     print("Original signup:", signup)
     print("New signup:", new_signup)

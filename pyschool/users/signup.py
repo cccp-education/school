@@ -6,7 +6,7 @@ import re
 import pandas as pd  # pip install pandas
 import xmlschema  # pip install xmlschema
 import yaml
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, validator
 from pyrsistent import m, PMap
 
 class Signup(BaseModel):
@@ -38,16 +38,16 @@ class Signup(BaseModel):
 
     def to_persistent(self) -> PMap:
         # Utilise model_dump() pour Pydantic v2
-        return m(**self.model_dump())
+        return m(**self.dict())
 
     def to_json(self) -> str:
         """Convert a Pyrsistent Map to a JSON string."""
-        return json.dumps(dict(**self.model_dump()))
+        return json.dumps(dict(**self.dict()))
 
     def to_xml(self, root_element: str = "signup") -> str:
         """Convert a Pyrsistent Map to an XML string."""
         xml_elements = []
-        data = dict(**self.model_dump())
+        data = dict(**self.dict())
         for key, value in data.items():
             xml_elements.append(f"<{key}>{value}</{key}>")
         return f"<{root_element}>{''.join(xml_elements)}</{root_element}>"
@@ -58,7 +58,7 @@ class Signup(BaseModel):
             "type": "object",
             "properties": {}
         }
-        data = dict(**self.model_dump())
+        data = dict(**self.dict())
         for key, value in data.items():
             schema["properties"][key] = {"type": type(value).__name__}
         if schema_type == "yaml":
@@ -68,7 +68,7 @@ class Signup(BaseModel):
     def to_dtd(self, root_element: str = "signup") -> str:
         """Generate a DTD (Document Type Definition) string from the model."""
         dtd_elements = []
-        data = dict(**self.model_dump())
+        data = dict(**self.dict())
         for key, value in data.items():
             dtd_elements.append(f"<!ELEMENT {key} (#PCDATA)>")
         return f"<!ELEMENT {root_element} ({' , '.join(dtd_elements)})>"
@@ -83,7 +83,7 @@ class Signup(BaseModel):
             str: The generated XSD schema as a string
         """
         # Convertir le modèle en DataFrame pandas pour faciliter la manipulation
-        data = dict(**self.model_dump())
+        data = dict(**self.dict())
         df = pd.DataFrame([data])
 
         # Mapper les types Python vers les types XSD
@@ -128,7 +128,7 @@ class Signup(BaseModel):
 
         return xsd_schema
 
-    @field_validator('login')
+    @validator('login')
     def validate_login(cls, v):
         if not v:
             raise ValueError("Le login ne peut pas être vide")

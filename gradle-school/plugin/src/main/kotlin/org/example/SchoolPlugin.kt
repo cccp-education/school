@@ -6,7 +6,7 @@ import org.gradle.api.Project
 /**
  * A simple 'hello world' plugin.
  */
-class SchoolFastapiPlugin: Plugin<Project> {
+class SchoolPlugin: Plugin<Project> {
     override fun apply(project: Project) {
         // Register a task
         project.tasks.register("greeting") { task ->

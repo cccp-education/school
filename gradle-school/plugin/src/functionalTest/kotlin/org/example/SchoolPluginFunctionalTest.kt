@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 /**
  * A simple functional test for the 'org.example.greeting' plugin.
  */
-class SchoolFastapiPluginFunctionalTest {
+class SchoolPluginFunctionalTest {
 
     @field:TempDir
     lateinit var projectDir: File
