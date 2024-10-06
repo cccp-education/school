@@ -16,8 +16,6 @@ import dev.langchain4j.model.output.Response
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.gradle.api.Project
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import school.ai.AssistantManager.PromptManager.userMessageEn
 import school.ai.AssistantManager.PromptManager.userMessageFr
 import school.workspace.WorkspaceManager.privateProps
@@ -31,11 +29,8 @@ object AssistantManager {
         userMessageEn.run(::println)
     }
 
-
-    val logger: Logger = LoggerFactory.getLogger(AssistantPlugin::class.java)
-
     @JvmStatic
-    val Project.localModels
+    val localModels
         get() = setOf(
             "llama3.2:3b" to "LlamaTiny",
             "llama3.1:8b" to "LlamaSmall",
@@ -51,12 +46,6 @@ object AssistantManager {
         createChatTask(it.first, "helloOllama${it.second}")
         createStreamingChatTask(it.first, "helloOllamaStream${it.second}")
     }
-
-
-    @JvmStatic
-    val Project.openAIapiKey: String
-        get() = privateProps["OPENAI_API_KEY"] as String
-
 
     fun Project.createOllamaChatModel(model: String = "smollm:135m"): OllamaChatModel =
         OllamaChatModel.builder().apply {
@@ -135,6 +124,10 @@ object AssistantManager {
             doFirst { runStreamChat(model) }
         }
     }
+
+    @JvmStatic
+    val Project.openAIapiKey: String
+        get() = privateProps["OPENAI_API_KEY"] as String
 
     object PromptManager {
         const val ASSISTANT_NAME = "E-3PO"
