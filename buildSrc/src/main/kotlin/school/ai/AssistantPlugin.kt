@@ -2,8 +2,8 @@ package school.ai
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import school.ai.AssistantManager.PromptManager.userMessageFr
 import school.ai.AssistantManager.createChatTasks
-import school.ai.AssistantManager.userMessage
 
 class AssistantPlugin : Plugin<Project> {
 
@@ -11,7 +11,7 @@ class AssistantPlugin : Plugin<Project> {
         project.task("displayE3POPrompt") {
             group = "school-ai"
             description = "Dislpay on console AI prompt assistant"
-            doFirst { userMessage.let(::println) }
+            doFirst { userMessageFr.let(::println) }
         }
 
         // Creating tasks for each model

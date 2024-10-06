@@ -9,7 +9,7 @@ apply<school.jbake.JBakeGhPagesPlugin>()
 apply<school.ai.AssistantPlugin>()
 
 purchaseArtifact()
-
+//TODO: add some tasks from detached projects, and python run, tests, deployment
 tasks.wrapper {
     gradleVersion = "8.6"
     distributionType = ALL
