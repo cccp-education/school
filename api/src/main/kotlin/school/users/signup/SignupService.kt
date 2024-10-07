@@ -1,12 +1,29 @@
 package school.users.signup
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import school.base.model.EntityModel.Members.withId
+import school.users.User
+import school.users.UserDao.Dao.save
+import school.users.UserDao.Dao.saveWithId
+import java.lang.Error
 
 @Service
-class SignupService(private val context: ApplicationContext){
-
+class SignupService(private val context: ApplicationContext) {
+    @Transactional
+    suspend fun signup(signup: Signup): Either<Any, User> = signup
+        .run(context::fromSignupToUser)
+        .run {
+            (this to context).saveWithId()
+                .mapLeft { Exception("Not able to save id").left() }
+                .map { return withId(it).right() }
+        }
 }
+
 
 /*
 package school.accounts.signup
