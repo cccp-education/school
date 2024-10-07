@@ -44,9 +44,9 @@ include("formation")
 //include("school-gradle-plugin")
 
 // Inclure le projet model comme un build composite
-//includeBuild("core") {
+//includeBuild("base") {
 //    dependencySubstitution {
-//        substitute(module("school:core")).using(project(":core"))
+//        substitute(module("school:base")).using(project(":base"))
 //        substitute(module("school:model")).using(project(":model"))
 //    }
 //}

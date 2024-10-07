@@ -10,7 +10,7 @@ from pyrsistent import m
 
 from users.signup import Signup
 
-# from core.users.signup import Signup
+# from base.users.signup import Signup
 
 if __name__ == '__main__':
     unittest.main()

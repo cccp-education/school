@@ -22,10 +22,10 @@ dependencies {
     val jgitVersion = "6.10.0.202406032230-r"
     val schoolVersion = "0.0.1"
 //    rootDir.parentFile
-//        .listFiles()!!.find { it.name == "core" }!!
+//        .listFiles()!!.find { it.name == "base" }!!
 //        .listFiles()!!.find { it.name == "build" }!!
 //        .listFiles()!!.find { it.name == "libs" }!!
-//        .listFiles()!!.first { it.name == "core-$schoolVersion.jar" }!!
+//        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
 //        .let(::fileTree)
 //        .let(::implementation)
 //    rootDir.parentFile

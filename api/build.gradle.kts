@@ -50,13 +50,13 @@ val Pair<String, String>.artifactVersion: String
         }::get
     ).toString()
 
-springBoot.mainClass.set("webapp.Application")
+springBoot.mainClass.set("school.Application")
 
 tasks.register("cli") {
     //./gradlew -q cli --args='your args there'
     group = "application"
-    description = "Run webapp cli"
-    doFirst { springBoot.mainClass.set("webapp.CommandLine") }
+    description = "Run school cli"
+    doFirst { springBoot.mainClass.set("school.CommandLine") }
     finalizedBy("bootRun")
 }
 
@@ -67,6 +67,8 @@ repositories {
     maven(url = "https://maven.repository.redhat.com/ga/")
     maven(url = "https://repo.spring.io/milestone")
     maven(url = "https://repo.spring.io/snapshot")
+    maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")
+
 }
 
 dependencies {
@@ -156,6 +158,12 @@ dependencies {
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")
+
+
+    // BDD - Cucumber
+    testImplementation("io.cucumber:cucumber-java8:${properties["cucumber_java.version"]}")
+    testImplementation("io.cucumber:cucumber-java:${properties["cucumber_java.version"]}")
+
 }
 
 configurations {
@@ -204,7 +212,16 @@ tasks.register<Delete>("cleanResources") {
     })
 }
 
-tasks.jacocoTestReport { reports { xml.required.set(true) } }
+tasks.jacocoTestReport {
+    // Give jacoco the file generated with the cucumber tests for the coverage.
+    executionData(
+        files(
+            "$buildDir/jacoco/test.exec",
+//            "$buildDir/results/jacoco/cucumber.exec"
+        )
+    )
+    reports { xml.required.set(true) }
+}
 
 tasks.register<TestReport>("testReport") {
     description = "Generates an HTML test report from the results of testReport task."
@@ -218,6 +235,42 @@ tasks.register<TestReport>("testReport") {
     }))
     reportOn("test")
 }
+
+val cucumberRuntime: Configuration by configurations.creating {
+    extendsFrom(configurations["testImplementation"])
+}
+
+//tasks.register<DefaultTask>("cucumber") {
+//    group = "verification"
+//    dependsOn("assemble", "compileTestJava")
+//    doLast {
+//        javaexec {
+//            mainClass.set("io.cucumber.base.cli.Main")
+//            classpath = cucumberRuntime + sourceSets.main.get().output + sourceSets.test.get().output
+//            // Change glue for your project package where the step definitions are.
+//            // And where the feature files are.
+//            args = listOf(
+//                "--plugin",
+//                "pretty",
+//                "--glue",
+//                "features",
+//                "src/test/resources/features"
+//            )
+//            // Configure jacoco agent for the test coverage in the string interpolation.
+//            jvmArgs = listOf(
+//                "-javaagent:${
+//                    zipTree(
+//                        configurations
+//                            .jacocoAgent
+//                            .get()
+//                            .singleFile
+//                    ).filter { it.name == "jacocoagent.jar" }.singleFile
+//                }=destfile=$buildDir/results/jacoco/cucumber.exec,append=false"
+//            )
+//        }
+//    }
+//}
+
 
 data class DockerHub(
     val username: String = properties["docker_hub_login"].toString(),
