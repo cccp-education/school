@@ -35,14 +35,14 @@ dependencies {
 //        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
 //        .let(::fileTree)
 //        .let(::implementation)
-    rootDir
-        .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
-        .listFiles()!!.find { it.name == "base" }!!
-        .listFiles()!!.find { it.name == "build" }!!
-        .listFiles()!!.find { it.name == "libs" }!!
-        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
-        .let(::fileTree)
-        .let(::implementation)
+//    rootDir
+//        .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
+//        .listFiles()!!.find { it.name == "api" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",

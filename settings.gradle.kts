@@ -40,10 +40,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "school"
-//TODO: core devient base module
-//include("core")
-//include("model")
-//include("api")
 include("formation")
 //include("school-gradle-plugin")
 

@@ -9,6 +9,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.FileSystems
+import java.util.*
 
 buildscript {
     repositories {
@@ -33,8 +34,21 @@ plugins {
 }
 
 group = properties["artifact.group"].toString()
-version = properties["artifact.version"].toString()
 
+version = ("artifact.version" to "artifact.version.key").artifactVersion
+
+val Pair<String, String>.artifactVersion: String
+    get() = first.run(
+        Properties().apply {
+            second.run(properties::get).let {
+                "user.home"
+                    .run(System::getProperty)
+                    .run { "$this$it" }
+            }.run(::File)
+                .inputStream()
+                .use(::load)
+        }::get
+    ).toString()
 
 springBoot.mainClass.set("webapp.Application")
 
