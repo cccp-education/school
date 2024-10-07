@@ -8,6 +8,21 @@ plugins {
     `java-library`
 }
 
+version = ("artifact.version" to "artifact.version.key").artifactVersion
+
+val Pair<String, String>.artifactVersion: String
+    get() = first.run(
+        Properties().apply {
+            second.run(properties::get).let {
+                "user.home"
+                    .run(System::getProperty)
+                    .run { "$this$it" }
+            }.run(::File)
+                .inputStream()
+                .use(::load)
+        }::get
+    ).toString()
+
 repositories { mavenCentral() }
 
 dependencies {
@@ -19,19 +34,5 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation(libs.guava)
 }
-
-version = "artifact.version".run(
-    Properties().apply {
-        "artifact.version.key"
-            .run(properties::get)
-            .let {
-                "user.home"
-                    .run(System::getProperty)
-                    .run { "$this$it" }
-            }.run(::File)
-            .inputStream()
-            .use(::load)
-    }::get
-).toString()
 
 tasks.named<Test>("test") { useJUnitPlatform() }

@@ -1,16 +1,12 @@
 package org.example
 
 class Library {
-    fun someLibraryMethod(): Boolean {
-        return true
-    }
+    fun someLibraryMethod(): Boolean = true
 
     companion object {
         @JvmStatic
-        fun main(args: Array<String>): Unit {
-            Library()
-                .run(Library::someLibraryMethod)
-                .let(::println)
-        }
+        fun main(args: Array<String>) = Library()
+            .run(Library::someLibraryMethod)
+            .let(::println)
     }
 }

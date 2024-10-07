@@ -5,7 +5,6 @@
     "UnstableApiUsage",
 )
 
-import org.gradle.api.JavaVersion.VERSION_21
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -32,8 +31,6 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
 }
-
-
 
 group = properties["artifact.group"].toString()
 version = properties["artifact.version"].toString()
