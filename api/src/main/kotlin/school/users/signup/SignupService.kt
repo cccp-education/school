@@ -7,21 +7,32 @@ import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
+import school.base.property.ROLE_USER
 import school.users.User
-import school.users.UserDao.Dao.save
-import school.users.UserDao.Dao.saveWithId
-import java.lang.Error
+import school.users.UserDao.Dao.signup
+import school.users.security.UserRole
+import school.users.security.UserRole.UserRoleDao.Dao.signup
+
 
 @Service
 class SignupService(private val context: ApplicationContext) {
     @Transactional
-    suspend fun signup(signup: Signup): Either<Any, User> = signup
-        .run(context::fromSignupToUser)
-        .run {
-            (this to context).saveWithId()
-                .mapLeft { Exception("Not able to save id").left() }
-                .map { return withId(it).right() }
-        }
+    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+        signup
+            .run(context::fromSignupToUser)
+            .run {
+                (this to context)
+                    .signup()
+                    .mapLeft { return Exception("Not able to save user with id").left() }
+                    .map { uuid ->
+                        return (UserRole(userId = uuid, role = ROLE_USER) to context).signup()
+                            .mapLeft { return Exception("Unable to save user_role").left() }
+                            .map { return withId(uuid).right() }
+                    }
+            }
+    } catch (t: Throwable) {
+        t.left()
+    }
 }
 
 

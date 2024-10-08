@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
 import school.base.model.EntityModel
+import school.base.property.ROLE_USER
 import school.base.utils.AppUtils.cleanField
 import school.users.UserDao.Attributes.EMAIL_ATTR
 import school.users.UserDao.Attributes.ID_ATTR
@@ -22,6 +23,7 @@ import school.users.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.UserDao.Attributes.LOGIN_ATTR
 import school.users.UserDao.Attributes.PASSWORD_ATTR
 import school.users.UserDao.Attributes.VERSION_ATTR
+import school.users.UserDao.Dao.save
 import school.users.UserDao.Fields.EMAIL_FIELD
 import school.users.UserDao.Fields.ID_FIELD
 import school.users.UserDao.Fields.LANG_KEY_FIELD
@@ -31,6 +33,8 @@ import school.users.UserDao.Fields.VERSION_FIELD
 import school.users.UserDao.Relations.INSERT
 import school.users.security.Role
 import school.users.security.UserRole
+import school.users.security.UserRole.UserRoleDao.Dao.signup
+import java.lang.Exception
 import java.util.*
 
 object UserDao {
@@ -107,7 +111,6 @@ object UserDao {
     }
 
     object Dao {
-
         suspend fun ApplicationContext.countUsers(): Int =
             "SELECT COUNT(*) FROM `user`"
                 .let(getBean<DatabaseClient>()::sql)
@@ -119,8 +122,7 @@ object UserDao {
                 .toInt()
 
 
-        //TODO : change the return type in  Either<Throwable, UUID>
-        suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
+        suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
             second.getBean<R2dbcEntityTemplate>()
                 .databaseClient
                 .sql(INSERT)
@@ -130,7 +132,10 @@ object UserDao {
                 .bind(LANG_KEY_ATTR, first.langKey)
                 .bind(VERSION_ATTR, first.version)
                 .fetch()
-                .awaitRowsUpdated()
+                .awaitSingleOrNull()
+                ?.get(ID_ATTR.uppercase())
+                .toString()
+                .run(UUID::fromString)
                 .right()
         } catch (e: Throwable) {
             e.left()
@@ -171,17 +176,13 @@ object UserDao {
                 else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
             }
 
-
-        suspend fun Pair<User, ApplicationContext>.saveWithId(): Either<Throwable, UUID> = try {
+        suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
             (first to second).save()
-            second.getBean<R2dbcEntityTemplate>()
-                .databaseClient.sql("SELECT * FROM `user`")
-                .fetch()
-                .all()
-                .collect { it[ID_ATTR.uppercase()] }
-                .toString()
-                .let(UUID::fromString)
-                .right()
+                .mapLeft { return Exception("Unable to save User").left() }
+                .map {
+                    (UserRole(userId = it, role = ROLE_USER) to second).signup()
+                    return it.right()
+                }
         } catch (e: Throwable) {
 //            EmptyResultDataAccessException::class.left()
             e.left()

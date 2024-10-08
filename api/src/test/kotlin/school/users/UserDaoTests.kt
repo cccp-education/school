@@ -14,14 +14,14 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.test.context.ActiveProfiles
-import base.tdd.TestUtils.Data.user
-import base.tdd.TestUtils.defaultRoles
+import school.base.tdd.TestUtils.Data.user
+import school.base.tdd.TestUtils.defaultRoles
 import school.base.model.EntityModel.Members.withId
 import school.users.UserDao.Dao.countUsers
 import school.users.UserDao.Dao.deleteAllUsersOnly
 import school.users.UserDao.Dao.findOneByEmail
 import school.users.UserDao.Dao.save
-import school.users.UserDao.Dao.saveWithId
+import school.users.UserDao.Dao.signup
 import school.users.security.Role.RoleDao.Dao.countRoles
 import java.util.*
 import kotlin.test.*
@@ -104,7 +104,7 @@ class UserDaoTests {
     @Test
     fun `trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
-        (user to context).saveWithId()
+        (user to context).signup()
 //            .onRight {
 //            it.toString().apply {
 //                assertEquals(36, it.toString().length)

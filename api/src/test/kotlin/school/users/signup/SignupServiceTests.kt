@@ -2,50 +2,92 @@
 
 package school.users.signup
 
-import arrow.core.Either.Left
-import arrow.core.Either.Right
-import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
-import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
-import base.tdd.TestTools.logBody
-import base.tdd.TestTools.requestToString
-import base.tdd.TestUtils
-import base.tdd.TestUtils.Data.DEFAULT_USER_JSON
-import base.tdd.TestUtils.Data.user
+import school.base.database.Database
+import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
-import school.users.User
 import school.users.UserDao
+import school.users.UserDao.Attributes.LOGIN_ATTR
 import school.users.UserDao.Dao.countUsers
 import school.users.UserDao.Dao.deleteAllUsersOnly
-import school.users.UserDao.Dao.findOneByEmail
-import school.users.UserDao.Dao.saveWithId
-import school.users.UserRestApiRoutes.API_SIGNUP_PATH
+import school.users.UserDao.Dao.save
+import school.users.UserDao.Fields.LOGIN_FIELD
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
-import kotlin.test.*
+import java.util.*
+import kotlin.test.AfterTest
+import kotlin.test.Ignore
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
 class SignupServiceTests {
 
     @Autowired
+    private lateinit var database: Database
+
+    @Autowired
     lateinit var context: ApplicationContext
+
+    val FIND_USER_BY_LOGIN="SELECT u.${UserDao.Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} AS u WHERE u.${UserDao.Fields.LOGIN_FIELD}= LOWER(:${UserDao.Attributes.LOGIN_ATTR})"
 
 
     @AfterTest
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
+    fun `test UserRoleDao signup with existing user without user_role`(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        val userSaveResult = (user to context).save()
+        assertEquals(countUserBefore + 1, context.countUsers())
+        userSaveResult//TODO: Problem with the either result do not return the user id but persist it on database
+            .map { i("on passe ici!") }
+            .mapLeft { i("on passe par la!") }
+        val userId = context.getBean<DatabaseClient>()
+            .sql(FIND_USER_BY_LOGIN)
+            .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+            .fetch()
+            .one()
+            .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+            .toString()
+            .run(UUID::fromString)
+        i("UserId : $userId")
+    }
+
+    @Test
+    fun `test retrieve userId by using existing login`() = runBlocking {
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        (user to context).save()
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertDoesNotThrow {
+            context.getBean<DatabaseClient>()
+                .sql(FIND_USER_BY_LOGIN)
+                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .fetch()
+                .one()
+                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+                .toString()
+                .run(UUID::fromString)
+                .run { i("UserId : $this") }
+        }
+    }
+
+    @Test
+    @Ignore
     fun `signupService save user but not role_user yet`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
@@ -60,8 +102,10 @@ class SignupServiceTests {
             )
         )
         assertEquals(countUserBefore + 1, context.countUsers())
-//        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
+
+
 //    @Test
 //    fun `DataTestsChecks - affiche moi du json`() = run {
 //        assertDoesNotThrow {

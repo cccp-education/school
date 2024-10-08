@@ -2,13 +2,25 @@
 
 package school.users.security
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import jakarta.validation.constraints.NotNull
+import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.r2dbc.core.awaitSingle
+import school.base.utils.AppUtils.cleanField
 import school.users.UserDao
+import school.users.UserDao.Attributes.ID_ATTR
+import school.users.UserDao.Fields
+import school.users.UserDao.Fields.EMAIL_FIELD
+import school.users.UserDao.Fields.LOGIN_FIELD
+import school.users.UserDao.Fields.PASSWORD_FIELD
+import school.users.UserDao.Fields.VERSION_FIELD
 import school.users.security.Role.RoleDao
 import school.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
 import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD
@@ -17,7 +29,7 @@ import java.util.*
 
 @Suppress("unused")
 data class UserRole(
-    val id: Long,
+    val id: Long = -1,
     @field:NotNull
     val userId: UUID,
     @field:NotNull
@@ -30,7 +42,11 @@ data class UserRole(
             const val USER_ID_FIELD = "`user_id`"
             const val ROLE_FIELD = RoleDao.Fields.ID_FIELD
         }
-
+        object Attributes {
+            val ID_ATTR = ID_FIELD.cleanField()
+            val USER_ID_ATTR = USER_ID_FIELD.cleanField()
+            val ROLE_ATTR = ROLE_FIELD.cleanField()
+        }
         object Relations {
             const val TABLE_NAME = "`user_authority`"
             const val SQL_SCRIPT = """
@@ -49,9 +65,10 @@ data class UserRole(
         CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_authority`
         ON $TABLE_NAME ($ROLE_FIELD, $USER_ID_FIELD);
 """
-            const val INSERT = ""
-//                """
-//            insert into $TABLE_NAME (
+            const val INSERT = """
+            INSERT INTO $TABLE_NAME (
+                ${Fields.USER_ID_FIELD},${Fields.ROLE_FIELD}
+            ) VALUES (:userId, :role);"""
 //            ${Fields.LOGIN_FIELD}, ${Fields.EMAIL_FIELD}, ${Fields.PASSWORD_FIELD},
 //            ${Fields.FIRST_NAME_FIELD}, ${Fields.LAST_NAME_FIELD}, ${Fields.LANG_KEY_FIELD}, ${Fields.IMAGE_URL_FIELD},
 //            ${Fields.ENABLED_FIELD}, ${Fields.ACTIVATION_KEY_FIELD}, ${Fields.RESET_KEY_FIELD}, ${Fields.RESET_DATE_FIELD},
@@ -59,12 +76,29 @@ data class UserRole(
 //            values (:login, :email, :password, :firstName, :lastName,
 //            :langKey, :imageUrl, :enabled, :activationKey, :resetKey, :resetDate,
 //            :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate, :version)
-//            """
+//"""
         }
 
         object Dao {
+            suspend fun Pair<UserRole, ApplicationContext>.signup(): Either<Throwable, Long> = try {
+                second.getBean<R2dbcEntityTemplate>()
+                    .databaseClient.sql(Relations.INSERT)
+                    .fetch()
+                    .one()
+                    .collect { it[ID_FIELD.uppercase()] }
+                    .toString()
+                    .toLong()
+                    .right()
+            } catch (e: Exception) {
+                e.left()
+            }
+
+
+//            suspend fun Pair<UserRole, ApplicationContext>.save(): Either<Throwable, Long> {
+//            }
+
             suspend fun ApplicationContext.countUserAuthority(): Int =
-                "select count(*) from `user_authority`"
+                "SELECT COUNT(*) FROM `user_authority`"
                     .let(getBean<DatabaseClient>()::sql)
                     .fetch()
                     .awaitSingle()

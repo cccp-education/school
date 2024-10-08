@@ -1,6 +1,6 @@
 @file:Suppress("JUnitMalformedDeclaration")
 
-package base
+package school.base
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import base.tdd.TestUtils.Data.user
+import school.base.tdd.TestUtils.Data.user
 import school.Application
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson

@@ -4,7 +4,7 @@
     "unused", "UNUSED_VARIABLE"
 )
 
-package base.tdd
+package school.base.tdd
 
 import org.springframework.context.ApplicationContext
 import school.base.property.*

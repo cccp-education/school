@@ -18,11 +18,11 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import base.tdd.TestTools.logBody
-import base.tdd.TestTools.requestToString
-import base.tdd.TestUtils
-import base.tdd.TestUtils.Data.DEFAULT_USER_JSON
-import base.tdd.TestUtils.Data.user
+import school.base.tdd.TestTools.logBody
+import school.base.tdd.TestTools.requestToString
+import school.base.tdd.TestUtils
+import school.base.tdd.TestUtils.Data.DEFAULT_USER_JSON
+import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
 import school.users.User
 import school.users.UserDao
