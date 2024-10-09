@@ -25,11 +25,11 @@ import school.base.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
 import school.users.User
-import school.users.UserDao
-import school.users.UserDao.Dao.countUsers
-import school.users.UserDao.Dao.deleteAllUsersOnly
-import school.users.UserDao.Dao.findOneByEmail
-import school.users.UserRestApiRoutes.API_SIGNUP_PATH
+import school.users.User.UserDao
+import school.users.User.UserDao.Dao.countUsers
+import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.User.UserDao.Dao.findOneByEmail
+import school.users.User.UserRestApiRoutes.API_SIGNUP_PATH
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import kotlin.test.*
 

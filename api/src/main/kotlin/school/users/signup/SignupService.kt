@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
 import school.base.property.ROLE_USER
 import school.users.User
-import school.users.UserDao.Dao.signup
+import school.users.User.UserDao.Dao.signup
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 

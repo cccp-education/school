@@ -15,7 +15,7 @@ import school.base.tdd.TestUtils.Data.user
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
 import school.base.utils.i
-import school.users.UserDao.Dao.deleteAllUsersOnly
+import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

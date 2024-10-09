@@ -3,8 +3,8 @@
 package school.users.signup
 
 import jakarta.validation.constraints.Size
-import school.users.UserDao
-import school.users.UserDao.Fields.ID_FIELD
+import school.users.User.UserDao
+import school.users.User.UserDao.Fields.ID_FIELD
 import school.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD

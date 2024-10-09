@@ -2,7 +2,7 @@ package school.users.signup
 
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import school.users.UserRestApiRoutes.API_USERS
+import school.users.User.UserRestApiRoutes.API_USERS
 
 @RestController
 @RequestMapping(API_USERS)

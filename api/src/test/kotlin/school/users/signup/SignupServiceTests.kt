@@ -14,17 +14,14 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.database.Database
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
-import school.users.UserDao
-import school.users.UserDao.Dao.countUsers
-import school.users.UserDao.Dao.deleteAllUsersOnly
-import school.users.UserDao.Dao.save
-import school.users.UserDao.Relations.FIND_USER_BY_LOGIN
-import school.users.security.Role
+import school.users.User
+import school.users.User.UserDao.Dao.countUsers
+import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.User.UserDao.Dao.save
+import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
 import school.users.security.Role.RoleDao
-import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
-import school.users.security.UserRole.UserRoleDao.Relations.TABLE_NAME
 import java.util.*
 import kotlin.test.AfterTest
 import kotlin.test.Ignore
@@ -58,10 +55,10 @@ class SignupServiceTests {
             .map { i("on passe ici!") }
             .mapLeft { i("on passe par la!") }
         val userId = context.getBean<DatabaseClient>().sql(FIND_USER_BY_LOGIN)
-            .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+            .bind(User.UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
             .fetch()
             .one()
-            .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+            .awaitSingle()[User.UserDao.Attributes.ID_ATTR.uppercase()]
             .toString()
             .run(UUID::fromString)
         context.getBean<DatabaseClient>().sql(
@@ -90,10 +87,10 @@ class SignupServiceTests {
         assertDoesNotThrow {
             context.getBean<DatabaseClient>()
                 .sql(FIND_USER_BY_LOGIN)
-                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .bind(User.UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
                 .fetch()
                 .one()
-                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+                .awaitSingle()[User.UserDao.Attributes.ID_ATTR.uppercase()]
                 .toString()
                 .run(UUID::fromString)
                 .run { i("UserId : $this") }

@@ -14,13 +14,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.r2dbc.core.awaitSingle
 import school.base.utils.AppUtils.cleanField
-import school.users.UserDao
-import school.users.UserDao.Attributes.ID_ATTR
-import school.users.UserDao.Fields
-import school.users.UserDao.Fields.EMAIL_FIELD
-import school.users.UserDao.Fields.LOGIN_FIELD
-import school.users.UserDao.Fields.PASSWORD_FIELD
-import school.users.UserDao.Fields.VERSION_FIELD
+import school.users.User
 import school.users.security.Role.RoleDao
 import school.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
 import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD
@@ -54,7 +48,7 @@ data class UserRole(
             $ID_FIELD         IDENTITY NOT NULL PRIMARY KEY,
             $USER_ID_FIELD    UUID,
             $ROLE_FIELD       VARCHAR,
-            FOREIGN KEY ($USER_ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
+            FOREIGN KEY ($USER_ID_FIELD) REFERENCES ${User.UserDao.Relations.TABLE_NAME} (${User.UserDao.Fields.ID_FIELD})
                 ON DELETE CASCADE
                 ON UPDATE CASCADE,
             FOREIGN KEY ($ROLE_FIELD) REFERENCES ${RoleDao.Relations.TABLE_NAME} (${RoleDao.Fields.ID_FIELD})
