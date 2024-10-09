@@ -7,13 +7,14 @@ import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import school.base.model.EntityModel.Members.withId
 import school.users.User
+import school.users.User.UserDao.Dao.fromSignupToUser
 import school.users.User.UserDao.Dao.signup
 
 
 @Service
 class SignupService(private val context: ApplicationContext) {
     suspend fun signup(signup: Signup): Either<Throwable, User> = try {
-        signup.run(context::fromSignupToUser).run {
+        context.fromSignupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
                 .map { return withId(it).right() }

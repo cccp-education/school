@@ -15,17 +15,3 @@ data class Signup(
     val email: String,
 )
 
-fun ApplicationContext.fromSignupToUser(signup: Signup): User {
-    // Validation du mot de passe et de la confirmation
-    require(signup.password == signup.repassword) { "Passwords do not match!" }
-
-    // Création d'un utilisateur à partir des données de Signup
-    return User(
-        id = UUID.randomUUID(), // Génération d'un UUID
-        login = signup.login,
-        password = getBean<PasswordEncoder>().encode(signup.password), // Remplacez par une fonction de hachage réelle
-        email = signup.email,
-        roles = mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
-        langKey = "en" // Valeur par défaut, ajustez si nécessaire
-    )
-}

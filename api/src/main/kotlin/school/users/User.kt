@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import org.springframework.transaction.support.TransactionTemplate
@@ -46,6 +47,7 @@ import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Attributes.ROLE_ATTR
 import school.users.security.UserRole.UserRoleDao.Attributes.USER_ID_ATTR
 import school.users.security.UserRole.UserRoleDao.Dao.signup
+import school.users.signup.Signup
 import java.util.*
 import jakarta.validation.constraints.Email as EmailConstraint
 
@@ -252,6 +254,20 @@ data class User(
                     }
             } catch (e: Throwable) {
                 e.left()
+            }
+
+            fun ApplicationContext.fromSignupToUser(signup: Signup): User {
+                // Validation du mot de passe et de la confirmation
+                require(signup.password == signup.repassword) { "Passwords do not match!" }
+                // Création d'un utilisateur à partir des données de Signup
+                return User(
+                    id = UUID.randomUUID(), // Génération d'un UUID
+                    login = signup.login,
+                    password = getBean<PasswordEncoder>().encode(signup.password),
+                    email = signup.email,
+                    roles = mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
+                    langKey = "en" // Valeur par défaut, ajustez si nécessaire
+                )
             }
         }
     }
