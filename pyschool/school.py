@@ -1,6 +1,9 @@
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
 from pyrsistent import m
+
 from users.signup import Signup
+
 if __name__ == "__main__":
     # Création d'un objet avec des données Pyrsistent
     signup_data = m(

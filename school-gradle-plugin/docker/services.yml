@@ -3,5 +3,5 @@ name: jhlc4j
 services:
   postgresql:
     extends:
-      file: ./postgresql.yml
+      file: postgresql.yml
       service: postgresql

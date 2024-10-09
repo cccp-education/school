@@ -1,4 +1,4 @@
-package org.example
+package school
 
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
@@ -17,12 +17,13 @@ class SchoolPluginFunctionalTest {
     private val buildFile by lazy { projectDir.resolve("build.gradle") }
     private val settingsFile by lazy { projectDir.resolve("settings.gradle") }
 
-    @Test fun `can run task`() {
+    @Test
+    fun `can run task`() {
         // Set up the test build
         settingsFile.writeText("")
         buildFile.writeText("""
             plugins {
-                id('org.example.greeting')
+                id('school-gradle-plugin')
             }
         """.trimIndent())
 

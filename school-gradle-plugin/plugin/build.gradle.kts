@@ -6,7 +6,7 @@ plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     alias(libs.plugins.jvm)
     id("com.github.node-gradle.node")
-    id("com.avast.gradle.docker-compose")
+    id("org.jbake.site")
 }
 
 repositories { mavenCentral() }
@@ -42,8 +42,8 @@ testing {
 gradlePlugin {
     // Define the plugin
     val greeting by plugins.creating {
-        id = "org.example.greeting"
-        implementationClass = "org.example.SchoolPlugin"
+        id = "school.greeting"
+        implementationClass = "school.SchoolPlugin"
     }
 }
 
