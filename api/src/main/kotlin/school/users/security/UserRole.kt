@@ -36,11 +36,13 @@ data class UserRole(
             const val USER_ID_FIELD = "`user_id`"
             const val ROLE_FIELD = RoleDao.Fields.ID_FIELD
         }
+
         object Attributes {
             val ID_ATTR = ID_FIELD.cleanField()
             val USER_ID_ATTR = USER_ID_FIELD.cleanField()
             val ROLE_ATTR = ROLE_FIELD.cleanField()
         }
+
         object Relations {
             const val TABLE_NAME = "`user_authority`"
             const val SQL_SCRIPT = """

@@ -68,7 +68,10 @@ data class User(
     @JsonIgnore
     val version: Long = -1,
 ) : EntityModel<UUID>() {
-
+companion object{
+    @JvmStatic
+    fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
+}
     /** Account REST API URIs */
     object UserRestApiRoutes {
         const val API_AUTHORITY = "/api/authorities"
@@ -86,9 +89,6 @@ data class User(
     }
 
     object UserDao {
-        @JvmStatic
-        fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
-
         object Constraints {
             // Regex for acceptable logins
             const val LOGIN_REGEX =

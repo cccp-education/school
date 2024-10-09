@@ -3,6 +3,7 @@
 package school.users.signup
 
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
 import school.base.database.Database
+import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
 import school.users.User
@@ -19,12 +21,9 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
-import school.users.security.Role.RoleDao
-import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*
 import kotlin.test.AfterTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -43,7 +42,6 @@ class SignupServiceTests {
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
-    @Ignore
     fun `test UserRoleDao signup with existing user without user_role`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
@@ -61,23 +59,23 @@ class SignupServiceTests {
             .awaitSingle()[User.UserDao.Attributes.ID_ATTR.uppercase()]
             .toString()
             .run(UUID::fromString)
-        context.getBean<DatabaseClient>().sql(
-            """
-            INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (
-                ${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD}
-            ) VALUES (:userId, :role)"""
-        ).bind("userId", userId)
-            .bind("role", school.base.property.ROLE_USER)
+        context.getBean<DatabaseClient>()
+            .sql("""insert into `user_authority` (`user_id`, `role`) values ('$userId', '$ROLE_USER')""")
+//        .sql(
+//            """
+//            INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (
+//                ${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD}
+//            ) VALUES (:userId, :role)"""
+//            .bind("userId", userId)
+//            .bind("role", ROLE_USER)
             .fetch()
             .one()
-            .awaitSingle()
-//            .toString()
-//            .run { "insert result : $this" }
-//            .let(::i)
+            .awaitSingleOrNull()
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
     @Test
-    fun `test retrieve userId by existing login`() = runBlocking {
+    fun `test retrieve id from user by existing login`() = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()

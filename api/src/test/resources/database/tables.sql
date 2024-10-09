@@ -1,14 +1,18 @@
--- noinspection SqlNoDataSourceInspectionForFile
-CREATE TABLE IF NOT EXISTS `authority` (
-    `role` VARCHAR(50) PRIMARY KEY
-);
+DROP TABLE IF EXISTS `user_authority`;
 --
-MERGE INTO `authority` VALUES ('ADMIN'), ('USER'), ('ANONYMOUS');
+DROP TABLE IF EXISTS `user`;
 --
-CREATE TABLE IF NOT EXISTS `telephone` (
-    id                 UUID default random_uuid() PRIMARY KEY,
-    `value`            VARCHAR
-);
+DROP TABLE IF EXISTS `authority`;
+--
+CREATE TABLE IF NOT EXISTS `authority` ( `role` VARCHAR(50) PRIMARY KEY);
+--
+MERGE INTO `authority`(`role`) VALUES ('ADMIN'), ('USER'), ('ANONYMOUS');
+--
+-- CREATE TABLE IF NOT EXISTS `telephone` (
+--     id                 UUID default random_uuid() PRIMARY KEY,
+--     `value`            VARCHAR
+-- );
+
 --
 CREATE TABLE IF NOT EXISTS `user` (
     `id`                 UUID default random_uuid() PRIMARY KEY,
@@ -39,12 +43,13 @@ ON `user` (`email`);
 -- CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_reset_key`
 -- ON `user` (`reset_key`);
 --
+
 CREATE TABLE IF NOT EXISTS `user_authority`
 (
     `id`      IDENTITY NOT NULL PRIMARY KEY,
     `user_id` UUID,
     `role`  VARCHAR,
-    FOREIGN KEY (`user_id`) REFERENCES `user` (id)
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (`role`) REFERENCES `authority` (`role`)
@@ -53,32 +58,34 @@ CREATE TABLE IF NOT EXISTS `user_authority`
 );
 --
 CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_authority`
-ON `user_authority` (`role`, user_id);
+ON `user_authority` (`role`, `user_id`);
+
+-- insert into `user_authority` (`user_id`, `role`) values ('3c65bfc9-f933-4eea-ab80-c7bc3e713060', 'USER');
 --
-CREATE TABLE IF NOT EXISTS `user_reset` (
-    `id`                      UUID default random_uuid() PRIMARY KEY,
-    `user_id`                 UUID,
-    `reset_key`             VARCHAR(20),
-    `reset_date`            datetime,
-    FOREIGN KEY (user_id)   REFERENCES `user` (id)
-                            ON DELETE CASCADE
-                            ON UPDATE CASCADE
-);
+-- CREATE TABLE IF NOT EXISTS `user_reset` (
+--     `id`                      UUID default random_uuid() PRIMARY KEY,
+--     `user_id`                 UUID,
+--     `reset_key`             VARCHAR(20),
+--     `reset_date`            datetime,
+--     FOREIGN KEY (user_id)   REFERENCES `user` (id)
+--                             ON DELETE CASCADE
+--                             ON UPDATE CASCADE
+-- );
 --
-CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_reset_key` ON `user_reset` (`reset_key`);
+-- CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_reset_key` ON `user_reset` (`reset_key`);
 --
-CREATE TABLE IF NOT EXISTS `user_email`
-(
-    `id` UUID default random_uuid() PRIMARY KEY,
-    `user_id` UUID,
-    `email` varchar(255),
-    `date` datetime
-    FOREIGN KEY (`user_id`)   REFERENCES `user` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
+-- CREATE TABLE IF NOT EXISTS `user_email`
+-- (
+--     `id` UUID default random_uuid() PRIMARY KEY,
+--     `user_id` UUID,
+--     `email` varchar(255),
+--     `date` datetime
+--     FOREIGN KEY (`user_id`)   REFERENCES `user` (`id`)
+--     ON DELETE CASCADE
+--     ON UPDATE CASCADE
+-- );
 --
-CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_email` ON `user_email` (`email`);
+-- CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_email` ON `user_email` (`email`);
 --
 -- data class UserActivation(
 --     val id: UUID,
@@ -127,9 +134,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_email` ON `user_email` (`email`
 -- )
 
 --
-
-
-
 
 -- CREATE TABLE IF NOT EXISTS artist
 -- (
