@@ -76,7 +76,9 @@ class SignupServiceTests {
             .one()
             .awaitSingleOrNull()
         context.getBean<DatabaseClient>()
-            .sql("SELECT ua.${UserRoleDao.Fields.ID_FIELD} FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua")
+            .sql("SELECT ua.${UserRoleDao.Fields.ID_FIELD} FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua where ua.`user_id`= :userId and ua.`role` = :role")
+            .bind("userId", userId)
+            .bind("role", ROLE_USER)
             .fetch()
             .one()
             .awaitSingle()["ID"]
