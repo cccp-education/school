@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
-import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
@@ -22,7 +21,6 @@ import org.springframework.r2dbc.core.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import org.springframework.transaction.support.TransactionTemplate
 import school.base.model.EntityModel
 import school.base.property.ANONYMOUS_USER
 import school.base.property.EMPTY_STRING
@@ -44,10 +42,7 @@ import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.INSERT
 import school.users.security.Role
 import school.users.security.UserRole
-import school.users.security.UserRole.UserRoleDao.Attributes.ROLE_ATTR
-import school.users.security.UserRole.UserRoleDao.Attributes.USER_ID_ATTR
 import school.users.security.UserRole.UserRoleDao.Dao.signup
-import school.users.signup.Signup
 import java.util.*
 import jakarta.validation.constraints.Email as EmailConstraint
 
@@ -81,6 +76,13 @@ data class User(
         @JvmStatic
         fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
     }
+
+    data class Signup(
+        val login: String,
+        val password: String,
+        val repassword: String,
+        val email: String,
+    )
 
     /** Account REST API URIs */
     object UserRestApiRoutes {
@@ -173,7 +175,6 @@ data class User(
 
         object Dao {
             suspend fun ApplicationContext.countUsers(): Int =
-//                getBean<TransactionalOperator>().executeAndAwait {
                 "SELECT COUNT(*) FROM `user`"
                     .let(getBean<DatabaseClient>()::sql)
                     .fetch()
@@ -182,11 +183,8 @@ data class User(
                     .first()
                     .toString()
                     .toInt()
-//                }
-
 
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
-//                second.getBean<TransactionalOperator>().executeAndAwait {
                 second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
                     .sql(INSERT)
@@ -201,7 +199,6 @@ data class User(
                     .toString()
                     .run(UUID::fromString)
                     .right()
-//                }
             } catch (e: Throwable) {
                 e.left()
             }

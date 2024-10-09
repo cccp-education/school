@@ -23,7 +23,7 @@ val detailsKeys by lazy {
     )
 }
 
-//SignupController
+//UserController
 val ALLOWED_ORDERED_PROPERTIES by lazy {
     arrayOf(
         "id",

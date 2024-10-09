@@ -1,4 +1,4 @@
-package school.users.signup
+package school.users
 
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -6,7 +6,7 @@ import school.users.User.UserRestApiRoutes.API_USERS
 
 @RestController
 @RequestMapping(API_USERS)
-class SignupController {
+class UserController {
     internal class SignupException(message: String) : RuntimeException(message)
 
 //    /**
@@ -54,7 +54,7 @@ import school.base.property.*
 
 @RestController
 @RequestMapping(ACCOUNT_API)
-class SignupController(private val signupService: SignupService) {
+class UserController(private val signupService: UserService) {
 
     internal class SignupException(message: String) : RuntimeException(message)
 
@@ -929,7 +929,7 @@ val Account.logResetAttempt get() = d("reset attempt: $email")
 suspend fun signup(
     signup: Signup,
     exchange: ServerWebExchange,
-    service: SignupService
+    service: UserService
 ): ResponseEntity<ProblemDetail> = (signup
     .account.apply { logSignupAttempt }
     .validate(signupFields, exchange) to
@@ -950,7 +950,7 @@ suspend fun signup(
 }
 
 suspend fun Pair<Account, Boolean>.idsIsNotAvailable(
-    service: SignupService
+    service: UserService
 ): Boolean = @Suppress("KotlinConstantConditions")
 when {
     !second -> service.deleteAccount(first).run { false }
@@ -982,13 +982,13 @@ val ProblemsModel.badResponseEmailIsNotAvailable
     )
 
 suspend fun Account.emailIsNotAvailable(
-    service: SignupService
+    service: UserService
 ) = service
     .pairAccountActivatedById(email!!)
     ?.idsIsNotAvailable(service)
     ?: false
 
-suspend fun activate(key: String, service: SignupService): ResponseEntity<ProblemDetail> {
+suspend fun activate(key: String, service: UserService): ResponseEntity<ProblemDetail> {
     serverErrorProblems.copy(path = "$API_ACCOUNT$API_ACTIVATE").also {
         return when (val account = service.accountByActivationKey(key)) {
             null -> {
@@ -1009,7 +1009,7 @@ suspend fun activate(key: String, service: SignupService): ResponseEntity<Proble
 }
 
 suspend fun Account.loginIsNotAvailable(
-    service: SignupService
+    service: UserService
 ) = service
     .pairAccountActivatedById(login!!)
     ?.idsIsNotAvailable(service)

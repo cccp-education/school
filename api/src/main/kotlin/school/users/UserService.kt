@@ -1,4 +1,4 @@
-package school.users.signup
+package school.users
 
 import arrow.core.Either
 import arrow.core.left
@@ -6,13 +6,13 @@ import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import school.base.model.EntityModel.Members.withId
-import school.users.User
+import school.users.User.Signup
 import school.users.User.UserDao.Dao.fromSignupToUser
 import school.users.User.UserDao.Dao.signup
 
 
 @Service
-class SignupService(private val context: ApplicationContext) {
+class UserService(private val context: ApplicationContext) {
     suspend fun signup(signup: Signup): Either<Throwable, User> = try {
         context.fromSignupToUser(signup).run {
             (this to context).signup()
@@ -45,7 +45,7 @@ import java.time.Instant
 import java.util.*
 
 @Service
-class SignupService(
+class UserService(
     private val accountRepository: AccountRepository,
     private val mailService: MailService,
     private val passwordEncoder: PasswordEncoder
@@ -90,7 +90,7 @@ package community.accounts.signup
 
 import community.accounts.Account
 
-interface SignupService {
+interface UserService {
     suspend fun signup(signup: Signup): Signup?
     suspend fun accountByActivationKey(key: String): Account?
     suspend fun pairAccountActivatedById(emailOrLogin: String): Pair<Account, Boolean>?
@@ -120,7 +120,7 @@ class SignupServiceImpl(
     private val accountRepository: AccountRepository,
     private val mailService: MailService,
     private val passwordEncoder: PasswordEncoder
-) : SignupService {
+) : UserService {
     @Transactional
     override suspend fun signup(signup: Signup): Signup? = now().run {
         accountRepository.save(signup)?.also {

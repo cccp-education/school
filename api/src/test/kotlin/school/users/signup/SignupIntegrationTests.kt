@@ -157,7 +157,7 @@ class SignupIntegrationTests {
     }
 
 //    @Test
-//    fun `SignupController - test signup account validator avec login invalid`() {
+//    fun `UserController - test signup account validator avec login invalid`() {
 //        validator
 //            .validateProperty(AccountCredentials(login = "funky-log(n"), LOGIN_FIELD)
 //            .run viol@{
@@ -172,7 +172,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec login invalid`() {
+//    fun `UserController - test signup account avec login invalid`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -193,7 +193,7 @@ class SignupIntegrationTests {
 //
 //
 //    @Test
-//    fun `SignupController - test signup account avec un email invalid`() {
+//    fun `UserController - test signup account avec un email invalid`() {
 //        val countBefore = countAccount(dao)
 //        assertEquals(0, countBefore)
 //        client
@@ -212,7 +212,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account validator avec un password invalid`() {
+//    fun `UserController - test signup account validator avec un password invalid`() {
 //        val wrongPassword = "123"
 //        validator
 //            .validateProperty(AccountCredentials(password = wrongPassword), PASSWORD_FIELD)
@@ -228,7 +228,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec un password invalid`() {
+//    fun `UserController - test signup account avec un password invalid`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -247,7 +247,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec un password null`() {
+//    fun `UserController - test signup account avec un password null`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -265,7 +265,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account activé avec un email existant`() {
+//    fun `UserController - test signup account activé avec un email existant`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        //activation de l'account
@@ -294,7 +294,7 @@ class SignupIntegrationTests {
 //
 //
 //    @Test
-//    fun `SignupController - test signup account activé avec un login existant`() {
+//    fun `UserController - test signup account activé avec un login existant`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        //activation de l'account
@@ -322,7 +322,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test//TODO: mock sendmail
-//    fun `SignupController - test signup account avec un email dupliqué`() {
+//    fun `UserController - test signup account avec un email dupliqué`() {
 //
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
@@ -432,7 +432,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test//TODO: mock sendmail
-//    fun `SignupController - test signup account en renseignant l'autorité admin qui sera ignoré et le champ activé qui sera mis à false`() {
+//    fun `UserController - test signup account en renseignant l'autorité admin qui sera ignoré et le champ activé qui sera mis à false`() {
 //        val countUserBefore = countAccount(dao)
 //        val countUserAuthBefore = countAccountAuthority(dao)
 //        assertEquals(0, countUserBefore)
@@ -476,7 +476,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie l'internationalisation des validations par validator factory avec mauvais login en italien`() {
+//    fun `UserController - vérifie l'internationalisation des validations par validator factory avec mauvais login en italien`() {
 //        byProvider(HibernateValidator::class.java)
 //            .configure()
 //            .defaultLocale(ENGLISH)
@@ -509,7 +509,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
+//    fun `UserController - vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -532,7 +532,7 @@ class SignupIntegrationTests {
 //
 //
 //    @Test
-//    fun `SignupController - test activate avec une mauvaise clé`() {
+//    fun `UserController - test activate avec une mauvaise clé`() {
 //        client
 //            .get()
 //            .uri("$ACTIVATE_API_PATH$ACTIVATE_API_PARAM", "wrongActivationKey")
@@ -543,7 +543,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test activate avec une clé valide`() {
+//    fun `UserController - test activate avec une clé valide`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        createDataAccounts(setOf(defaultAccount), dao)
@@ -570,7 +570,7 @@ class SignupIntegrationTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie que la requête avec mauvaise URI renvoi la bonne URL erreur`() {
+//    fun `UserController - vérifie que la requête avec mauvaise URI renvoi la bonne URL erreur`() {
 //        generateActivationKey.run {
 //            client
 //                .get()

@@ -32,7 +32,7 @@
 //    )
 //
 //
-//suspend fun AccountCredentials.loginIsNotAvailable(signupService: SignupService) =
+//suspend fun AccountCredentials.loginIsNotAvailable(signupService: UserService) =
 //    signupService.accountById(login!!).run {
 //        if (this == null) return@run false
 //        return when {
@@ -45,7 +45,7 @@
 //        }
 //    }
 //
-//suspend fun AccountCredentials.emailIsNotAvailable(signupService: SignupService) =
+//suspend fun AccountCredentials.emailIsNotAvailable(signupService: UserService) =
 //    signupService.accountById(email!!).run {
 //        if (this == null) return@run false
 //        return when {

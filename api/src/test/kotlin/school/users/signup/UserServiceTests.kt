@@ -17,12 +17,11 @@ import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
-import school.base.database.Database
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
-import school.users.User
-import school.users.User.UserDao
+import school.users.UserService
+import school.users.User.*
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
@@ -39,7 +38,7 @@ import kotlin.test.assertEquals
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
-class SignupServiceTests {
+class UserServiceTests {
 
     @Autowired
     lateinit var context: ApplicationContext
@@ -127,7 +126,7 @@ class SignupServiceTests {
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-        context.getBean<SignupService>().signup(
+        context.getBean<UserService>().signup(
             Signup(
                 login = "jdoe",
                 email = "jdoe@acme.com",
@@ -150,7 +149,7 @@ class SignupServiceTests {
 //    }
 
 //    @Test
-//    fun `SignupController - vérifie que la requête contient bien des données cohérentes`() {
+//    fun `UserController - vérifie que la requête contient bien des données cohérentes`() {
 //        client
 //            .post()
 //            .uri("")
@@ -180,7 +179,7 @@ class SignupServiceTests {
 //    }
 
 //    @Test
-//    fun `SignupController - test signup avec une url invalide`(): Unit = runBlocking {
+//    fun `UserController - test signup avec une url invalide`(): Unit = runBlocking {
 //        val countUserBefore = context.countUsers()
 ////        val countUserAuthBefore = context.countUserAuthority()
 //        assertEquals(0, countUserBefore)
@@ -213,7 +212,7 @@ class SignupServiceTests {
 
 //    @Ignore
 //    @Test //TODO: mock sendmail
-//    fun `SignupController - test signup avec un account valide`(): Unit = runBlocking {
+//    fun `UserController - test signup avec un account valide`(): Unit = runBlocking {
 //        val countUserBefore = context.countUsers()
 //        val countUserAuthBefore = context.countUserAuthority()
 //        assertEquals(0, countUserBefore)
@@ -245,7 +244,7 @@ class SignupServiceTests {
 //    }
 
 //    @Test
-//    fun `SignupController - test signup account validator avec login invalid`() {
+//    fun `UserController - test signup account validator avec login invalid`() {
 //        validator
 //            .validateProperty(AccountCredentials(login = "funky-log(n"), LOGIN_FIELD)
 //            .run viol@{
@@ -260,7 +259,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec login invalid`() {
+//    fun `UserController - test signup account avec login invalid`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -281,7 +280,7 @@ class SignupServiceTests {
 //
 //
 //    @Test
-//    fun `SignupController - test signup account avec un email invalid`() {
+//    fun `UserController - test signup account avec un email invalid`() {
 //        val countBefore = countAccount(dao)
 //        assertEquals(0, countBefore)
 //        client
@@ -300,7 +299,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account validator avec un password invalid`() {
+//    fun `UserController - test signup account validator avec un password invalid`() {
 //        val wrongPassword = "123"
 //        validator
 //            .validateProperty(AccountCredentials(password = wrongPassword), PASSWORD_FIELD)
@@ -316,7 +315,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec un password invalid`() {
+//    fun `UserController - test signup account avec un password invalid`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -335,7 +334,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account avec un password null`() {
+//    fun `UserController - test signup account avec un password null`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -353,7 +352,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test signup account activé avec un email existant`() {
+//    fun `UserController - test signup account activé avec un email existant`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        //activation de l'account
@@ -382,7 +381,7 @@ class SignupServiceTests {
 //
 //
 //    @Test
-//    fun `SignupController - test signup account activé avec un login existant`() {
+//    fun `UserController - test signup account activé avec un login existant`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        //activation de l'account
@@ -410,7 +409,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test//TODO: mock sendmail
-//    fun `SignupController - test signup account avec un email dupliqué`() {
+//    fun `UserController - test signup account avec un email dupliqué`() {
 //
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
@@ -520,7 +519,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test//TODO: mock sendmail
-//    fun `SignupController - test signup account en renseignant l'autorité admin qui sera ignoré et le champ activé qui sera mis à false`() {
+//    fun `UserController - test signup account en renseignant l'autorité admin qui sera ignoré et le champ activé qui sera mis à false`() {
 //        val countUserBefore = countAccount(dao)
 //        val countUserAuthBefore = countAccountAuthority(dao)
 //        assertEquals(0, countUserBefore)
@@ -564,7 +563,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie l'internationalisation des validations par validator factory avec mauvais login en italien`() {
+//    fun `UserController - vérifie l'internationalisation des validations par validator factory avec mauvais login en italien`() {
 //        byProvider(HibernateValidator::class.java)
 //            .configure()
 //            .defaultLocale(ENGLISH)
@@ -597,7 +596,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
+//    fun `UserController - vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
 //        assertEquals(0, countAccount(dao))
 //        client
 //            .post()
@@ -620,7 +619,7 @@ class SignupServiceTests {
 //
 //
 //    @Test
-//    fun `SignupController - test activate avec une mauvaise clé`() {
+//    fun `UserController - test activate avec une mauvaise clé`() {
 //        client
 //            .get()
 //            .uri("$ACTIVATE_API_PATH$ACTIVATE_API_PARAM", "wrongActivationKey")
@@ -631,7 +630,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - test activate avec une clé valide`() {
+//    fun `UserController - test activate avec une clé valide`() {
 //        assertEquals(0, countAccount(dao))
 //        assertEquals(0, countAccountAuthority(dao))
 //        createDataAccounts(setOf(defaultAccount), dao)
@@ -658,7 +657,7 @@ class SignupServiceTests {
 //    }
 //
 //    @Test
-//    fun `SignupController - vérifie que la requête avec mauvaise URI renvoi la bonne URL erreur`() {
+//    fun `UserController - vérifie que la requête avec mauvaise URI renvoi la bonne URL erreur`() {
 //        generateActivationKey.run {
 //            client
 //                .get()
