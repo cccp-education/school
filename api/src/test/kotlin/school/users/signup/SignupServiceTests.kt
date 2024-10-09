@@ -143,7 +143,7 @@ class SignupServiceTests {
         //TODO: fix Pair<UserRole, ApplicationContext>.signup() to get user_role persisted
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
-
+//TODO test phase book Spath P., Cosmina I., Harrop R., Schaefer C. - Pro Spring 6 with Kotlin - 2023.pdf p 456
 
 //    @Test
 //    fun `DataTestsChecks - affiche moi du json`() = run {
