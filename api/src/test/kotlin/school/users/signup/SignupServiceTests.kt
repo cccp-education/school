@@ -22,6 +22,7 @@ import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
 import school.users.User
+import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
@@ -62,10 +63,10 @@ class SignupServiceTests {
             .map { i("on passe ici!") }
             .mapLeft { i("on passe par la!") }
         val userId = context.getBean<DatabaseClient>().sql(FIND_USER_BY_LOGIN)
-            .bind(User.UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+            .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
             .fetch()
             .one()
-            .awaitSingle()[User.UserDao.Attributes.ID_ATTR.uppercase()]
+            .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
             .toString()
             .run(UUID::fromString)
         context.getBean<DatabaseClient>()
@@ -113,10 +114,10 @@ class SignupServiceTests {
         assertDoesNotThrow {
             context.getBean<DatabaseClient>()
                 .sql(FIND_USER_BY_LOGIN)
-                .bind(User.UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
                 .fetch()
                 .one()
-                .awaitSingle()[User.UserDao.Attributes.ID_ATTR.uppercase()]
+                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
                 .toString()
                 .run(UUID::fromString)
                 .run { i("UserId : $this") }
