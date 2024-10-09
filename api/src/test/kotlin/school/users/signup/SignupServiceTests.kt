@@ -2,6 +2,10 @@
 
 package school.users.signup
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
@@ -10,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
 import school.base.database.Database
@@ -21,8 +26,11 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
+import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import school.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
+import school.users.security.UserRole.UserRoleDao.Relations
 import java.util.*
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -67,7 +75,29 @@ class SignupServiceTests {
             .fetch()
             .one()
             .awaitSingleOrNull()
+        context.getBean<DatabaseClient>()
+            .sql("SELECT ua.${UserRoleDao.Fields.ID_FIELD} FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua")
+            .fetch()
+            .one()
+            .awaitSingle()["ID"]
+            .toString()
+            .let { "user_role_id : $it" }
+            .run(::i)
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+    }
+
+    suspend fun Pair<UserRole, ApplicationContext>.signup(): Either<Throwable, Long> = try {
+        second.getBean<R2dbcEntityTemplate>()
+            .databaseClient.sql(Relations.INSERT)
+            .bind(UserRoleDao.Attributes.USER_ID_ATTR, first.userId)
+            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER).fetch()
+            .one()
+            .collect { it[ID_FIELD.uppercase()] }
+            .toString()
+            .toLong()
+            .right()
+    } catch (e: Exception) {
+        e.left()
     }
 
     @Test
