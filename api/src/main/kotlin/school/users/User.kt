@@ -229,12 +229,17 @@ data class User(
                     else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
+
             @Throws(EmptyResultDataAccessException::class)
             suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
+                //TODO: hadle programmatic transaction management : https://docs.spring.io/spring-framework/reference/data-access/transaction/programmatic.html
                 (first to second).save()
-                val userId = second.findOneByEmail<User>(first.email).getOrNull()?.id!!
-                (UserRole(userId = userId, role = ROLE_USER) to second).signup()
-                userId.right()
+                second.findOneByEmail<User>(first.email)
+                    .mapLeft { return Exception("Unable to find user by email").left() }
+                    .map {
+                        (UserRole(userId = it.id!!, role = ROLE_USER) to second).signup()
+                        return it.id.right()
+                    }
             } catch (e: Throwable) {
                 e.left()
             }

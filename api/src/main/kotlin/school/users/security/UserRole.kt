@@ -1,4 +1,7 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress(
+    "MemberVisibilityCanBePrivate",
+    "RemoveRedundantQualifierName"
+)
 
 package school.users.security
 
@@ -78,7 +81,9 @@ data class UserRole(
         object Dao {
             suspend fun Pair<UserRole, ApplicationContext>.signup(): Either<Throwable, Long> = try {
                 second.getBean<R2dbcEntityTemplate>()
-                    .databaseClient.sql(Relations.INSERT)
+                    .databaseClient.sql(UserRoleDao.Relations.INSERT)
+                    .bind(UserRoleDao.Attributes.USER_ID_ATTR, first.userId)
+                    .bind(UserRoleDao.Attributes.ROLE_ATTR, first.role)
                     .fetch()
                     .one()
                     .collect { it[ID_FIELD.uppercase()] }

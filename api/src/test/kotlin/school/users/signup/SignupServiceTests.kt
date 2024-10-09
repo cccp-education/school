@@ -141,7 +141,7 @@ class SignupServiceTests {
         )
         assertEquals(countUserBefore + 1, context.countUsers())
         //TODO: fix Pair<UserRole, ApplicationContext>.signup() to get user_role persisted
-//        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
 
