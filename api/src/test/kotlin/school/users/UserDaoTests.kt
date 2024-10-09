@@ -25,7 +25,8 @@ import school.users.User.UserDao.Dao.signup
 import school.users.security.Role.RoleDao.Dao.countRoles
 import java.util.*
 import kotlin.test.*
-
+//import school.users.User.UserDao.Dao.signup
+//import school.users.security.UserRole.UserRoleDao.Dao.signup
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
@@ -33,8 +34,6 @@ class UserDaoTests {
 
     @Autowired
     lateinit var context: ApplicationContext
-    val mapper: ObjectMapper by lazy { context.getBean() }
-    val validator: Validator by lazy { context.getBean() }
 
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }

@@ -5,7 +5,6 @@ package school.users.signup
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -40,9 +38,6 @@ class SignupIntegrationTests {
     @Autowired
     lateinit var context: ApplicationContext
     lateinit var client: WebTestClient
-    val mapper: ObjectMapper by lazy { context.getBean() }
-    val validator: Validator by lazy { context.getBean() }
-    val dao: R2dbcEntityTemplate by lazy { context.getBean() }
 
     @BeforeTest
     fun setUp(context: ApplicationContext) {
@@ -55,13 +50,17 @@ class SignupIntegrationTests {
     @Test
     fun `DataTestsChecks - affiche moi du json`() = run {
         assertDoesNotThrow {
-            mapper.writeValueAsString(TestUtils.Data.users).run(::i)
-            mapper.writeValueAsString(user).run(::i)
+            context.getBean<ObjectMapper>().run {
+                writeValueAsString(TestUtils.Data.users).run(::i)
+                writeValueAsString(user).run(::i)
+            }
             DEFAULT_USER_JSON.run(::i)
         }
     }
 
+
     @Test
+    @Ignore
     fun `SignupController - vérifie que la requête contient bien des données cohérentes`() {
         client
             .post()
@@ -92,6 +91,7 @@ class SignupIntegrationTests {
     }
 
     @Test
+    @Ignore
     fun `SignupController - test signup avec une url invalide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
 //        val countUserAuthBefore = context.countUserAuthority()

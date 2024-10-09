@@ -65,17 +65,9 @@ data class UserRole(
         ON $TABLE_NAME ($ROLE_FIELD, $USER_ID_FIELD);
 """
             val INSERT = """
-                INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD}) 
+                INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD})
                 VALUES (:${UserRoleDao.Attributes.USER_ID_ATTR}, :${UserRoleDao.Attributes.ROLE_ATTR})
                 """.trimIndent()
-//            ${Fields.LOGIN_FIELD}, ${Fields.EMAIL_FIELD}, ${Fields.PASSWORD_FIELD},
-//            ${Fields.FIRST_NAME_FIELD}, ${Fields.LAST_NAME_FIELD}, ${Fields.LANG_KEY_FIELD}, ${Fields.IMAGE_URL_FIELD},
-//            ${Fields.ENABLED_FIELD}, ${Fields.ACTIVATION_KEY_FIELD}, ${Fields.RESET_KEY_FIELD}, ${Fields.RESET_DATE_FIELD},
-//            ${Fields.CREATED_BY_FIELD}, ${Fields.CREATED_DATE_FIELD}, ${Fields.LAST_MODIFIED_BY_FIELD}, ${Fields.LAST_MODIFIED_DATE_FIELD}, ${Fields.VERSION_FIELD})
-//            values (:login, :email, :password, :firstName, :lastName,
-//            :langKey, :imageUrl, :enabled, :activationKey, :resetKey, :resetDate,
-//            :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate, :version)
-//"""
         }
 
         object Dao {
@@ -95,9 +87,6 @@ data class UserRole(
             }
 
 
-//            suspend fun Pair<UserRole, ApplicationContext>.save(): Either<Throwable, Long> {
-//            }
-
             suspend fun ApplicationContext.countUserAuthority(): Int =
                 "SELECT COUNT(*) FROM `user_authority`"
                     .let(getBean<DatabaseClient>()::sql)
@@ -107,7 +96,6 @@ data class UserRole(
                     .first()
                     .toString()
                     .toInt()
-
 
             suspend fun ApplicationContext.deleteAllUserAuthorities(): Unit =
                 "DELETE FROM `user_authority`"
@@ -123,20 +111,22 @@ data class UserRole(
 
             suspend fun ApplicationContext.deleteAuthorityByRole(
                 role: String
-            ): Unit = "delete from `authority` a where lower(a.role) = lower(:role)"
-                .let(getBean<DatabaseClient>()::sql)
-                .bind("role", role)
-                .await()
+            ): Unit =
+                "delete from `authority` a where lower(a.role) = lower(:role)"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .bind("role", role)
+                    .await()
 
-            suspend fun ApplicationContext.deleteUserByIdWithAuthorities_(id: UUID) = getBean<DatabaseClient>().run {
-                "delete from user_authority where user_id = :userId"
-                    .let(::sql)
-                    .bind("userId", id)
-                    .await()
-                "delete from `user` where user_id = :userId"
-                    .let(::sql)
-                    .await()
-            }
+            suspend fun ApplicationContext.deleteUserByIdWithAuthorities_(id: UUID) =
+                getBean<DatabaseClient>().run {
+                    "delete from user_authority where user_id = :userId"
+                        .let(::sql)
+                        .bind("userId", id)
+                        .await()
+                    "delete from `user` where user_id = :userId"
+                        .let(::sql)
+                        .await()
+                }
 
             val ApplicationContext.queryDeleteAllUserAuthorityByUserLogin
                 get() =
@@ -144,10 +134,12 @@ data class UserRole(
 
             suspend fun ApplicationContext.deleteAllUserAuthorityByUserLogin(
                 login: String
-            ): Unit = getBean<DatabaseClient>()
-                .sql(queryDeleteAllUserAuthorityByUserLogin)
-                .bind("login", login)
-                .await()
+            ): Unit =
+                getBean<DatabaseClient>()
+                    .sql(queryDeleteAllUserAuthorityByUserLogin)
+                    .bind("login", login)
+                    .await()
+
 
 //            val Pair<User, ApplicationContext>.toJson: String
 //                get() = second.getBean<ObjectMapper>().writeValueAsString(first)

@@ -1,7 +1,7 @@
 package school.users.security
 //
-//import org.springframework.context.annotation.Bean
-//import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 //import org.springframework.http.HttpMethod.*
 //import org.springframework.security.authentication.ReactiveAuthenticationManager
 //import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
@@ -10,8 +10,8 @@ package school.users.security
 //import org.springframework.security.config.web.server.SecurityWebFiltersOrder.HTTP_BASIC
 //import org.springframework.security.config.web.server.ServerHttpSecurity
 //import org.springframework.security.base.userdetails.ReactiveUserDetailsService
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-//import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 //import org.springframework.security.web.server.SecurityWebFilterChain
 //import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
 //import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher
@@ -27,14 +27,16 @@ package school.users.security
 //import school.base.property.Properties
 //import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager as RepositoryAuthentication
 //
-//@Configuration
+@Configuration
 //@EnableWebFluxSecurity
 //@EnableReactiveMethodSecurity
-//class SecurityConfiguration(
+class SecurityConfiguration(
 //    private val properties: Properties,
 //    private val security: Security,
 //    private val userDetailsService: ReactiveUserDetailsService,
-//) {
+) {
+    @Bean("passwordEncoder")
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 //    @Suppress("removal")
 //    @Bean
 //    fun springSecurityFilterChain(
@@ -115,8 +117,6 @@ package school.users.security
 //    })
 //
 //
-//    @Bean("passwordEncoder")
-//    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 //
 //    @Bean
 //    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager =
@@ -125,4 +125,4 @@ package school.users.security
 //        }
 //
 //
-//}
+}

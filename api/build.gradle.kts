@@ -19,7 +19,6 @@ buildscript {
     dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20-Beta2") }
 }
 
-
 plugins {
     java
     idea
@@ -68,11 +67,9 @@ repositories {
     maven(url = "https://repo.spring.io/milestone")
     maven(url = "https://repo.spring.io/snapshot")
     maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")
-
 }
 
 dependencies {
-//    implementation(project(":model"))
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -96,7 +93,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 //    implementation("org.springframework.security:spring-security-data")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 
@@ -105,15 +102,12 @@ dependencies {
         exclude(module = "mockito-core")
     }
 
-
     // JWT
     implementation("io.jsonwebtoken:jjwt-impl:${properties["jsonwebtoken.version"]}")
     implementation("io.jsonwebtoken:jjwt-jackson:${properties["jsonwebtoken.version"]}")
 
-
     // SSL
     implementation("io.netty:netty-tcnative-boringssl-static:${properties["boring_ssl.version"]}")
-
 
     // Database
     runtimeOnly("com.h2database:h2")
@@ -158,12 +152,6 @@ dependencies {
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")
-
-
-    // BDD - Cucumber
-    testImplementation("io.cucumber:cucumber-java8:${properties["cucumber_java.version"]}")
-    testImplementation("io.cucumber:cucumber-java:${properties["cucumber_java.version"]}")
-
 }
 
 configurations {
@@ -217,7 +205,6 @@ tasks.jacocoTestReport {
     executionData(
         files(
             "$buildDir/jacoco/test.exec",
-//            "$buildDir/results/jacoco/cucumber.exec"
         )
     )
     reports { xml.required.set(true) }
@@ -239,38 +226,6 @@ tasks.register<TestReport>("testReport") {
 val cucumberRuntime: Configuration by configurations.creating {
     extendsFrom(configurations["testImplementation"])
 }
-
-//tasks.register<DefaultTask>("cucumber") {
-//    group = "verification"
-//    dependsOn("assemble", "compileTestJava")
-//    doLast {
-//        javaexec {
-//            mainClass.set("io.cucumber.base.cli.Main")
-//            classpath = cucumberRuntime + sourceSets.main.get().output + sourceSets.test.get().output
-//            // Change glue for your project package where the step definitions are.
-//            // And where the feature files are.
-//            args = listOf(
-//                "--plugin",
-//                "pretty",
-//                "--glue",
-//                "features",
-//                "src/test/resources/features"
-//            )
-//            // Configure jacoco agent for the test coverage in the string interpolation.
-//            jvmArgs = listOf(
-//                "-javaagent:${
-//                    zipTree(
-//                        configurations
-//                            .jacocoAgent
-//                            .get()
-//                            .singleFile
-//                    ).filter { it.name == "jacocoagent.jar" }.singleFile
-//                }=destfile=$buildDir/results/jacoco/cucumber.exec,append=false"
-//            )
-//        }
-//    }
-//}
-
 
 data class DockerHub(
     val username: String = properties["docker_hub_login"].toString(),

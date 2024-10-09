@@ -42,11 +42,7 @@ import kotlin.test.assertEquals
 class SignupServiceTests {
 
     @Autowired
-    private lateinit var database: Database
-
-    @Autowired
     lateinit var context: ApplicationContext
-
 
     @AfterTest
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
@@ -126,7 +122,7 @@ class SignupServiceTests {
     }
 
     @Test
-    fun `signupService save user but not role_user yet`(): Unit = runBlocking {
+    fun `signupService save user and role_user`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -140,7 +136,6 @@ class SignupServiceTests {
             )
         )
         assertEquals(countUserBefore + 1, context.countUsers())
-        //TODO: fix Pair<UserRole, ApplicationContext>.signup() to get user_role persisted
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 //TODO test phase book Spath P., Cosmina I., Harrop R., Schaefer C. - Pro Spring 6 with Kotlin - 2023.pdf p 456

@@ -13,11 +13,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
+import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.executeAndAwait
+import org.springframework.transaction.support.TransactionTemplate
 import school.base.model.EntityModel
 import school.base.property.ANONYMOUS_USER
 import school.base.property.EMPTY_STRING
@@ -39,6 +43,8 @@ import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.INSERT
 import school.users.security.Role
 import school.users.security.UserRole
+import school.users.security.UserRole.UserRoleDao.Attributes.ROLE_ATTR
+import school.users.security.UserRole.UserRoleDao.Attributes.USER_ID_ATTR
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.util.*
 import jakarta.validation.constraints.Email as EmailConstraint
@@ -165,6 +171,7 @@ data class User(
 
         object Dao {
             suspend fun ApplicationContext.countUsers(): Int =
+//                getBean<TransactionalOperator>().executeAndAwait {
                 "SELECT COUNT(*) FROM `user`"
                     .let(getBean<DatabaseClient>()::sql)
                     .fetch()
@@ -173,9 +180,11 @@ data class User(
                     .first()
                     .toString()
                     .toInt()
+//                }
 
 
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
+//                second.getBean<TransactionalOperator>().executeAndAwait {
                 second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
                     .sql(INSERT)
@@ -190,6 +199,7 @@ data class User(
                     .toString()
                     .run(UUID::fromString)
                     .right()
+//                }
             } catch (e: Throwable) {
                 e.left()
             }
@@ -229,11 +239,11 @@ data class User(
                     else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
-
             @Throws(EmptyResultDataAccessException::class)
             suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
-                //TODO: hadle programmatic transaction management : https://docs.spring.io/spring-framework/reference/data-access/transaction/programmatic.html
-                (first to second).save()
+                second.getBean<TransactionalOperator>().executeAndAwait {
+                    (first to second).save()
+                }
                 second.findOneByEmail<User>(first.email)
                     .mapLeft { return Exception("Unable to find user by email").left() }
                     .map {
