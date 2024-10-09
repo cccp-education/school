@@ -21,6 +21,7 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
+import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*
 import kotlin.test.AfterTest
@@ -60,14 +61,9 @@ class SignupServiceTests {
             .toString()
             .run(UUID::fromString)
         context.getBean<DatabaseClient>()
-            .sql("""insert into `user_authority` (`user_id`, `role`) values ('$userId', '$ROLE_USER')""")
-//        .sql(
-//            """
-//            INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (
-//                ${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD}
-//            ) VALUES (:userId, :role)"""
-//            .bind("userId", userId)
-//            .bind("role", ROLE_USER)
+            .sql(UserRoleDao.Relations.INSERT)
+            .bind(UserRoleDao.Attributes.USER_ID_ATTR, userId)
+            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER)
             .fetch()
             .one()
             .awaitSingleOrNull()

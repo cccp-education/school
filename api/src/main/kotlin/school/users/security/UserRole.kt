@@ -39,7 +39,7 @@ data class UserRole(
 
         object Attributes {
             val ID_ATTR = ID_FIELD.cleanField()
-            val USER_ID_ATTR = USER_ID_FIELD.cleanField()
+            const val USER_ID_ATTR = "userId"
             val ROLE_ATTR = ROLE_FIELD.cleanField()
         }
 
@@ -61,10 +61,10 @@ data class UserRole(
         CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_authority`
         ON $TABLE_NAME ($ROLE_FIELD, $USER_ID_FIELD);
 """
-            const val INSERT = """
-            INSERT INTO $TABLE_NAME (
-                ${Fields.USER_ID_FIELD},${Fields.ROLE_FIELD}
-            ) VALUES (:userId, :role);"""
+            val INSERT = """
+                INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD}) 
+                VALUES (:${UserRoleDao.Attributes.USER_ID_ATTR}, :${UserRoleDao.Attributes.ROLE_ATTR})
+                """.trimIndent()
 //            ${Fields.LOGIN_FIELD}, ${Fields.EMAIL_FIELD}, ${Fields.PASSWORD_FIELD},
 //            ${Fields.FIRST_NAME_FIELD}, ${Fields.LAST_NAME_FIELD}, ${Fields.LANG_KEY_FIELD}, ${Fields.IMAGE_URL_FIELD},
 //            ${Fields.ENABLED_FIELD}, ${Fields.ACTIVATION_KEY_FIELD}, ${Fields.RESET_KEY_FIELD}, ${Fields.RESET_DATE_FIELD},
