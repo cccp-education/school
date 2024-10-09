@@ -49,7 +49,7 @@ class Database(private val config: Config) {
             setDatabasePopulator(
                 ResourceDatabasePopulator(
                     File.createTempFile("prefix", "suffix")
-                        .apply { writeText(UserDao.Relations.sqlScript, UTF_8) }
+                        .apply { writeText(UserDao.Relations.CREATE_TABLES, UTF_8) }
                         .let(::FileSystemResource)
                 )
             )

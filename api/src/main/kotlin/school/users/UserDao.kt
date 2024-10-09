@@ -9,7 +9,6 @@ package school.users
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
@@ -23,7 +22,6 @@ import school.users.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.UserDao.Attributes.LOGIN_ATTR
 import school.users.UserDao.Attributes.PASSWORD_ATTR
 import school.users.UserDao.Attributes.VERSION_ATTR
-import school.users.UserDao.Dao.save
 import school.users.UserDao.Fields.EMAIL_FIELD
 import school.users.UserDao.Fields.ID_FIELD
 import school.users.UserDao.Fields.LANG_KEY_FIELD
@@ -39,7 +37,7 @@ import java.util.*
 
 object UserDao {
     @JvmStatic
-    fun main(args: Array<String>) = println(UserDao.Relations.sqlScript)
+    fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
 
     object Constraints {
         // Regex for acceptable logins
@@ -99,15 +97,18 @@ object UserDao {
             $VERSION_FIELD
         ) values ( :login, :email, :password, :langKey, :version)"""
 
+        //TODO: signup, findByEmailOrLogin,
+        val FIND_USER_BY_LOGIN =
+            "SELECT u.${UserDao.Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} AS u WHERE u.${UserDao.Fields.LOGIN_FIELD}= LOWER(:${UserDao.Attributes.LOGIN_ATTR})"
+
         @JvmStatic
-        val sqlScript: String
+        val CREATE_TABLES: String
             get() = setOf(
                 UserDao.Relations.SQL_SCRIPT,
                 Role.RoleDao.Relations.SQL_SCRIPT,
                 UserRole.UserRoleDao.Relations.SQL_SCRIPT
             ).joinToString("")
                 .trimMargin()
-        //TODO: signup, findByLogin, findByEmailOrLogin,
     }
 
     object Dao {
