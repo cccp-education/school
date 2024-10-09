@@ -1,6 +1,6 @@
-//@file:Suppress("unused")
-//
-//package school.users.signup
+@file:Suppress("unused")
+
+package school.users.signup
 //
 //import jakarta.validation.constraints.*
 //import school.base.property.IMAGE_URL_DEFAULT

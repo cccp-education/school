@@ -24,11 +24,12 @@ class SignupService(private val context: ApplicationContext) {
                 (this to context)
                     .signup()
                     .mapLeft { return Exception("Not able to save user with id").left() }
-                    .map { uuid ->
-                        return (UserRole(userId = uuid, role = ROLE_USER) to context).signup()
-                            .mapLeft { return Exception("Unable to save user_role").left() }
-                            .map { return withId(uuid).right() }
-                    }
+//                    .map { uuid ->
+//                        return (UserRole(userId = uuid, role = ROLE_USER) to context).signup()
+//                            .mapLeft { return Exception("Unable to save user_role").left() }
+//                            .map { return withId(uuid).right() }
+//                    }
+                return this.right()
             }
     } catch (t: Throwable) {
         t.left()

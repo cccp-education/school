@@ -1,4 +1,4 @@
-//package school.users.signup
+package school.users.signup
 //
 //import org.apache.commons.lang3.RandomStringUtils
 //import java.security.SecureRandom

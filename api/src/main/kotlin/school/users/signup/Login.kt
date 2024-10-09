@@ -1,4 +1,4 @@
-//package school.users.signup
+package school.users.signup
 //
 //import jakarta.validation.constraints.NotNull
 //import jakarta.validation.constraints.Size

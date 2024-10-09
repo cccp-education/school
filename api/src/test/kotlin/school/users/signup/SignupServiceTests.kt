@@ -93,7 +93,8 @@ class SignupServiceTests {
         second.getBean<R2dbcEntityTemplate>()
             .databaseClient.sql(Relations.INSERT)
             .bind(UserRoleDao.Attributes.USER_ID_ATTR, first.userId)
-            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER).fetch()
+            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER)
+            .fetch()
             .one()
             .collect { it[ID_FIELD.uppercase()] }
             .toString()

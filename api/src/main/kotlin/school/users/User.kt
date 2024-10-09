@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
 import school.base.model.EntityModel
@@ -68,10 +69,11 @@ data class User(
     @JsonIgnore
     val version: Long = -1,
 ) : EntityModel<UUID>() {
-companion object{
-    @JvmStatic
-    fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
-}
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
+    }
+
     /** Account REST API URIs */
     object UserRestApiRoutes {
         const val API_AUTHORITY = "/api/authorities"
@@ -227,15 +229,13 @@ companion object{
                     else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
+            @Throws(EmptyResultDataAccessException::class)
             suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
                 (first to second).save()
-                    .mapLeft { return Exception("Unable to save User").left() }
-                    .map {
-                        (UserRole(userId = it, role = ROLE_USER) to second).signup()
-                        return it.right()
-                    }
+                val userId = second.findOneByEmail<User>(first.email).getOrNull()?.id!!
+                (UserRole(userId = userId, role = ROLE_USER) to second).signup()
+                userId.right()
             } catch (e: Throwable) {
-//            EmptyResultDataAccessException::class.left()
                 e.left()
             }
         }

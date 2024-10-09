@@ -1,4 +1,4 @@
-//package school.users.signup
+package school.users.signup
 //
 //data class AccountFull(
 //    val account: Account,
