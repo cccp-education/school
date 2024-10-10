@@ -17,6 +17,8 @@ import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.executeAndAwait
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i

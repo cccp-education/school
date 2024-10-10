@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
 import school.users.User.Signup
 import school.users.User.UserDao.Dao.fromSignupToUser
