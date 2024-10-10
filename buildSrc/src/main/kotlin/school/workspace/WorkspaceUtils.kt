@@ -10,24 +10,18 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.FileSystems
 
+val project = """
+Creator of Commun Content for Pedagogy dot Education https://cccp.education/
+"""
+
 object WorkspaceUtils {
     @JvmStatic
-    val String.uppercaseFirstChar
-        get() = run {
-            replaceFirst(
-                first(),
-                first().uppercaseChar()
-            )
-        }
+    val String.uppercaseFirstChar: String
+        get() = replaceFirst(first(), first().uppercaseChar())
 
     @JvmStatic
-    val String.lowercaseFirstChar
-        get() = run {
-            replaceFirst(
-                first(),
-                first().lowercaseChar()
-            )
-        }
+    val String.lowercaseFirstChar: String
+        get() = replaceFirst(first(), first().lowercaseChar())
 
     fun Project.purchaseArtifact() = ("artifact.group" to "artifact.version").run {
         group = properties[first].toString()

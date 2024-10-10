@@ -74,17 +74,11 @@ object AssistantManager {
     ): Either<Throwable, Response<AiMessage>> = catch {
         suspendCancellableCoroutine { continuation ->
             model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
-                override fun onNext(token: String) {
-                    print(token)
-                }
+                override fun onNext(token: String) = print(token)
 
-                override fun onComplete(response: Response<AiMessage>) {
-                    continuation.resume(response)
-                }
+                override fun onComplete(response: Response<AiMessage>) = continuation.resume(response)
 
-                override fun onError(error: Throwable) {
-                    continuation.resume(Left(error).getOrElse { throw it })
-                }
+                override fun onError(error: Throwable) = continuation.resume(Left(error).getOrElse { throw it })
             })
         }
     }
