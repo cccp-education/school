@@ -11,11 +11,12 @@ import school.ai.AssistantManager.createOllamaStreamingChatModel
 import school.ai.AssistantManager.generateStreamingResponse
 import school.translate.TranslatorManager.PromptManager.translateMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
-import school.translate.TranslatorManager.translatorSupportedLanguages
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
 import java.util.*
 
 object TranslatorManager {
+    const val MODEL = "aya:8b"
+
     @JvmStatic
     fun main(args: Array<String>) {
         translatorSupportedLanguages
@@ -70,9 +71,8 @@ object TranslatorManager {
     fun Project.createTranslationTasks() = translatorSupportedLanguages
         .translationTasks()
         .forEach {
-            val model = "aya:8b"
-            createTranslationChatTask(model, "translate${it}")
-            createStreamingTranslationChatTask(model, "translateStream${it}")
+            createTranslationChatTask(MODEL, "translate${it}")
+            createStreamingTranslationChatTask(MODEL, "translateStream${it}")
         }
 
     // Generic function for chat model tasks
@@ -120,5 +120,4 @@ object TranslatorManager {
             }
         }
     }
-
 }
