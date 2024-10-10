@@ -1,6 +1,6 @@
 @file:Suppress("NonAsciiCharacters")
 
-package school.users.signup
+package school.users
 
 import arrow.core.Either.Left
 import arrow.core.Either.Right
@@ -22,7 +22,6 @@ import school.base.tdd.TestUtils
 import school.base.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
-import school.users.User
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
@@ -33,7 +32,7 @@ import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
-class SignupIntegrationTests {
+class UserIntegrationTests {
 
     @Autowired
     lateinit var context: ApplicationContext

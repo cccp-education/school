@@ -1,6 +1,6 @@
 @file:Suppress("NonAsciiCharacters")
 
-package school.users.signup
+package school.users
 
 import arrow.core.Either
 import arrow.core.left
@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.utils.i
-import school.users.UserService
 import school.users.User.*
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly

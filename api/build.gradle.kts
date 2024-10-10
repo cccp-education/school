@@ -94,7 +94,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
-//    implementation("org.springframework.security:spring-security-data")
+    implementation("org.springframework.security:spring-security-data")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 
     // Spring tests
@@ -123,12 +123,12 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito_kotlin_version"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${properties["mockito_jupiter.version"]}")
 
-//    testImplementation("io.mockk:mockk:${properties["mockk.version"]}")
-//    testImplementation("org.wiremock:wiremock:${properties["wiremock.version"]}") {
-//        exclude(module = "commons-fileupload")
-//    }
-//    testImplementation("commons-fileupload:commons-fileupload:1.5.0.redhat-00001")
-//    testImplementation("com.ninja-squad:springmockk:${properties["springmockk.version"]}")
+    testImplementation("io.mockk:mockk:${properties["mockk.version"]}")
+    testImplementation("org.wiremock:wiremock:${properties["wiremock.version"]}") {
+        exclude(module = "commons-fileupload")
+    }
+    testImplementation("commons-fileupload:commons-fileupload:1.5.0.redhat-00001")
+    testImplementation("com.ninja-squad:springmockk:${properties["springmockk.version"]}")
 
 
     testImplementation("org.testcontainers:junit-jupiter")

@@ -1,4 +1,4 @@
-package school.users.password//@file:Suppress(
+package school.users//@file:Suppress(
 //    "NonAsciiCharacters",
 //    "unused"
 //)
