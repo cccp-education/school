@@ -7,12 +7,14 @@
 package school.users
 
 import arrow.core.Either
+import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
@@ -230,7 +232,7 @@ data class User(
                                         version = row["version"] as Long
                                     )
                                 }
-                            Either.Right(user as T)
+                            Right(user as T)
                         } catch (e: Throwable) {
                             Either.Left(e)
                         }
@@ -239,26 +241,40 @@ data class User(
                     else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
+
             suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
                 when (T::class) {
                     User::class -> {
                         try {
-                            val user = getBean<DatabaseClient>()
+                            Right(getBean<DatabaseClient>()
                                 .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
                                 .bind("email", emailOrLogin)
                                 .bind("login", emailOrLogin)
                                 .fetch()
-                                .awaitOne().let { row ->
+                                .awaitOne().let { rows ->
                                     User(
-                                        id = row["id"] as UUID?,
-                                        login = row["login"] as String,
-                                        password = row["password"] as String,
-                                        email = row["email"] as String,
-                                        langKey = row["lang_key"] as String,
-                                        version = row["version"] as Long
+                                        id = rows["id"] as UUID?,
+                                        login = rows["login"] as String,
+                                        password = rows["password"] as String,
+                                        email = rows["email"] as String,
+                                        langKey = rows["lang_key"] as String,
+                                        version = rows["version"] as Long
                                     )
                                 }
-                            Either.Right(user as T)
+//                                .run {
+//                                    val roles = getBean<DatabaseClient>()
+//                                        .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
+//                                        .bind("userId", id)
+//                                        .fetch()
+//                                        .all()
+//                                        .collect {
+//                                            it["role"].toString()
+//                                        }
+//
+//                                    copy(roles = roles.toSet())
+//
+//                                }
+                                    as T)
                         } catch (e: Throwable) {
                             Either.Left(e)
                         }
@@ -287,7 +303,7 @@ data class User(
                                         version = row["version"] as Long
                                     )
                                 }
-                            Either.Right(user as T)
+                            Right(user as T)
                         } catch (e: Throwable) {
                             Either.Left(e)
                         }
@@ -316,7 +332,7 @@ data class User(
                                         version = row["version"] as Long
                                     )
                                 }
-                            Either.Right(user as T)
+                            Right(user as T)
                         } catch (e: Throwable) {
                             Either.Left(e)
                         }

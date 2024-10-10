@@ -22,15 +22,3 @@ tasks.withType<JavaExec> {
         "--enable-preview"
     )
 }
-
-gradle.settingsEvaluated {
-    if (gradle.rootProject.name == "school") {
-        logger.log(LogLevel.INFO, "gradle.settingsEvaluated: BuildSrc is being evaluated.")
-    }
-}
-
-gradle.projectsEvaluated {
-    if (gradle.rootProject.name == "school") {
-        logger.log(LogLevel.INFO, "gradle.projectsEvaluated: BuildSrc project is evaluated.")
-    }
-}
