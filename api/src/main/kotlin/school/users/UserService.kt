@@ -5,17 +5,16 @@ import arrow.core.left
 import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
 import school.users.User.Signup
-import school.users.User.UserDao.Dao.fromSignupToUser
+import school.users.User.UserDao.Dao.signupToUser
 import school.users.User.UserDao.Dao.signup
 
 
 @Service
 class UserService(private val context: ApplicationContext) {
     suspend fun signup(signup: Signup): Either<Throwable, User> = try {
-        context.fromSignupToUser(signup).run {
+        context.signupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
                 .map { return withId(it).right() }

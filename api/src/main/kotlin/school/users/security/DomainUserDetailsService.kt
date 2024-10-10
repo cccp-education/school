@@ -1,21 +1,16 @@
 package school.users.security
-//
+
 //import jakarta.validation.Validator
 //import kotlinx.coroutines.reactor.mono
-//import org.springframework.security.base.authority.SimpleGrantedAuthority
-//import org.springframework.security.base.userdetails.ReactiveUserDetailsService
-//import org.springframework.security.base.userdetails.User
-//import org.springframework.security.base.userdetails.UserDetails
-//import org.springframework.security.base.userdetails.UsernameNotFoundException
+//import org.springframework.security.core.authority.SimpleGrantedAuthority
+//import org.springframework.security.core.userdetails.ReactiveUserDetailsService
+//import org.springframework.security.core.userdetails.User
+//import org.springframework.security.core.userdetails.UserDetails
+//import org.springframework.security.core.userdetails.UsernameNotFoundException
 //import org.springframework.stereotype.Component
 //import org.springframework.transaction.annotation.Transactional
-//import reactor.base.publisher.Mono
-//import school.base.property.EMAIL_FIELD
-//import school.accounts.exceptions.UserNotActivatedException
-//import school.accounts.models.AccountCredentials
-//import school.accounts.repository.AccountRepository
-//import school.base.logging.d
-//import kotlin.jvm.Throws
+//import reactor.core.publisher.Mono
+//import school.base.utils.d
 //
 //@Suppress("unused")
 //@Component("userDetailsService")
@@ -62,8 +57,8 @@ package school.users.security
 //        )
 //    }
 //}
-//
-//
+
+
 ///*
 //package community.accounts.security
 //

@@ -11,6 +11,24 @@ import java.io.File
 import java.nio.file.FileSystems
 
 object WorkspaceUtils {
+    @JvmStatic
+    val String.uppercaseFirstChar
+        get() = run {
+            replaceFirst(
+                first(),
+                first().uppercaseChar()
+            )
+        }
+
+    @JvmStatic
+    val String.lowercaseFirstChar
+        get() = run {
+            replaceFirst(
+                first(),
+                first().lowercaseChar()
+            )
+        }
+
     fun Project.purchaseArtifact() = ("artifact.group" to "artifact.version").run {
         group = properties[first].toString()
         version = properties[second].toString()

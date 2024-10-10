@@ -17,14 +17,17 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.tdd.TestUtils.Data.user
 import school.base.tdd.TestUtils.defaultRoles
+import school.base.utils.i
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.security.Role.RoleDao.Dao.countRoles
 import java.util.*
 import kotlin.test.*
+
 //import school.users.User.UserDao.Dao.signup
 //import school.users.security.UserRole.UserRoleDao.Dao.signup
 
@@ -34,6 +37,8 @@ class UserDaoTests {
 
     @Autowired
     lateinit var context: ApplicationContext
+    val mapper: ObjectMapper by lazy { context.getBean() }
+    val validator: Validator by lazy { context.getBean() }
 
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
@@ -99,30 +104,14 @@ class UserDaoTests {
         }.map { assertEquals(it, user.withId(it.id!!)) }
     }
 
-
     @Test
-    fun `trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
+    fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
-        (user to context).signup()
-//            .onRight {
-//            it.toString().apply {
-//                assertEquals(36, it.toString().length)
-//            }.apply(::i)
-//        }
+        (user to context).signup().onRight {
+            //36 is the to string length of a UUID
+            it.toString().apply { assertEquals(36, it.toString().length) }.apply(::i)
+        }
         assertEquals(1, context.countUsers())
-
-//        user.run {
-//            context.getBean<R2dbcEntityTemplate>()
-//                .databaseClient
-//                .sql(INSERT)
-//                .bind(LOGIN_ATTR, login)
-//                .bind(EMAIL_ATTR, email)
-//                .bind(PASSWORD_ATTR, password)
-//                .bind(LANG_KEY_ATTR, langKey)
-//                .bind(VERSION_ATTR, version)
-//                .fetch()
-//                .apply { i("Number of rows updated (user saved): ${awaitRowsUpdated()}") }
-
         assertDoesNotThrow {
             context.getBean<R2dbcEntityTemplate>()
                 .databaseClient
@@ -130,6 +119,36 @@ class UserDaoTests {
                 .fetch()
                 .all()
                 .collect { it["ID"].toString().run(UUID::fromString) }
+        }
+    }
+
+    @Test
+    fun `test findOne`() = runBlocking {
+        assertEquals(0, context.countUsers())
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+
+        context.findOne<User>(user.email).apply {
+            assertTrue(isRight())
+            assertFalse(isLeft())
+        }.map { assertEquals(it, user.withId(it.id!!)) }
+
+        context.findOne<User>(user.login).apply {
+            assertTrue(isRight())
+            assertFalse(isLeft())
+        }.map { assertEquals(it, user.withId(it.id!!)) }
+    }
+
+    @Test
+    fun `test findOne with not existing email or login`() = runBlocking {
+        assertEquals(0, context.countUsers())
+        context.findOne<User>(user.email).apply {
+            assertFalse(isRight())
+            assertTrue(isLeft())
+        }
+        context.findOne<User>(user.login).apply {
+            assertFalse(isRight())
+            assertTrue(isLeft())
         }
     }
 }

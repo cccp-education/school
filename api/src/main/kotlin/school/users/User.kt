@@ -71,6 +71,8 @@ data class User(
 
     @JsonIgnore
     val version: Long = -1,
+
+    val authorities: Set<String> = emptySet()
 ) : EntityModel<UUID>() {
     companion object {
         @JvmStatic
@@ -184,6 +186,7 @@ data class User(
                     .toString()
                     .toInt()
 
+            @Throws(EmptyResultDataAccessException::class)
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
                 second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
@@ -194,8 +197,7 @@ data class User(
                     .bind(LANG_KEY_ATTR, first.langKey)
                     .bind(VERSION_ATTR, first.version)
                     .fetch()
-                    .awaitSingleOrNull()
-                    ?.get(ID_ATTR.uppercase())
+                    .awaitOne()[ID_ATTR.uppercase()]
                     .toString()
                     .run(UUID::fromString)
                     .right()
@@ -208,6 +210,91 @@ data class User(
                 "DELETE FROM `user`"
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
+
+            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, T> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            val user = getBean<DatabaseClient>()
+                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
+                                .bind("email", emailOrLogin)
+                                .bind("login", emailOrLogin)
+                                .fetch()
+                                .awaitOne().let { row ->
+                                    User(
+                                        id = row["id"] as UUID?,
+                                        login = row["login"] as String,
+                                        password = row["password"] as String,
+                                        email = row["email"] as String,
+                                        langKey = row["lang_key"] as String,
+                                        version = row["version"] as Long
+                                    )
+                                }
+                            Either.Right(user as T)
+                        } catch (e: Throwable) {
+                            Either.Left(e)
+                        }
+                    }
+
+                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                }
+
+            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            val user = getBean<DatabaseClient>()
+                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
+                                .bind("email", emailOrLogin)
+                                .bind("login", emailOrLogin)
+                                .fetch()
+                                .awaitOne().let { row ->
+                                    User(
+                                        id = row["id"] as UUID?,
+                                        login = row["login"] as String,
+                                        password = row["password"] as String,
+                                        email = row["email"] as String,
+                                        langKey = row["lang_key"] as String,
+                                        version = row["version"] as Long
+                                    )
+                                }
+                            Either.Right(user as T)
+                        } catch (e: Throwable) {
+                            Either.Left(e)
+                        }
+                    }
+
+                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                }
+
+
+            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, T> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            val user = getBean<DatabaseClient>()
+                                .sql("SELECT * FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
+                                .bind("login", login)
+                                .fetch()
+                                .awaitOne()
+                                .let { row ->
+                                    User(
+                                        id = row["id"] as UUID?,
+                                        login = row["login"] as String,
+                                        password = row["password"] as String,
+                                        email = row["email"] as String,
+                                        langKey = row["lang_key"] as String,
+                                        version = row["version"] as Long
+                                    )
+                                }
+                            Either.Right(user as T)
+                        } catch (e: Throwable) {
+                            Either.Left(e)
+                        }
+                    }
+
+                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                }
 
 
             suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, T> =
@@ -253,7 +340,7 @@ data class User(
                 e.left()
             }
 
-            fun ApplicationContext.fromSignupToUser(signup: Signup): User {
+            fun ApplicationContext.signupToUser(signup: Signup): User {
                 // Validation du mot de passe et de la confirmation
                 require(signup.password == signup.repassword) { "Passwords do not match!" }
                 // Création d'un utilisateur à partir des données de Signup

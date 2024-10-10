@@ -25,4 +25,23 @@ object AppUtils {
     .deleteCharAt(0)
     .deleteCharAt(length - 2)
     .toString()
+  @JvmStatic
+  val String.upperFirstLetter
+    get() = run {
+      replaceFirst(
+        first(),
+        first().uppercaseChar()
+      )
+    }
+
+  @JvmStatic
+  val String.lowerFirstLetter
+    get() = run {
+      replaceFirst(
+        first(),
+        first().lowercaseChar()
+      )
+    }
+
+
 }
