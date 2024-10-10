@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package school.workspace
 
 import arrow.integrations.jackson.module.registerArrowModule
@@ -9,10 +11,6 @@ import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.FileSystems
-
-val project = """
-Creator of Commun Content for Pedagogy dot Education https://cccp.education/
-"""
 
 object WorkspaceUtils {
     @JvmStatic

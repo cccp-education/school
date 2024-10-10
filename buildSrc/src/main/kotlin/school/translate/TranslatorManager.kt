@@ -1,4 +1,7 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress(
+    "MemberVisibilityCanBePrivate",
+    "MayBeConstant"
+)
 
 package school.translate
 
@@ -13,13 +16,14 @@ import school.translate.TranslatorManager.PromptManager.translateMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
 import java.util.*
+import java.util.Locale.*
 
 object TranslatorManager {
     const val MODEL = "aya:8b"
 
     @JvmStatic
     fun main(args: Array<String>) {
-        translatorSupportedLanguages
+        supportedLanguages
             .translationTasks()
             .forEach(::println)
             .run {
@@ -29,46 +33,49 @@ object TranslatorManager {
                 val currentLocale = Locale.getDefault()
                 currentLocale.run { "currentLocale : $this" }.run(::println)
                 // Force English language for display
-                Locale.setDefault(Locale.ENGLISH)
+                Locale.setDefault(ENGLISH)
                 // Get the display name of the English locale
-                val englishDisplayName = Locale.ENGLISH.getDisplayLanguage(Locale.ENGLISH)
+                val englishDisplayName = ENGLISH.getDisplayLanguage(ENGLISH)
                 println("English display name: $englishDisplayName")
             }
     }
 
-
     @JvmStatic
-    val translatorSupportedLanguages: Set<String> = setOf(
-        Locale.FRENCH,
-        Locale.ENGLISH,
-        Locale.GERMAN,
-        Locale.forLanguageTag("es")
+    val supportedLanguages: Set<String> = setOf(
+        FRENCH, ENGLISH, GERMAN,
+        forLanguageTag("ru"),
+        forLanguageTag("es"),
     ).map { it.language }.toSet()
 
     @JvmStatic
     fun Set<String>.translationTasks(): Set<String> = mutableSetOf<String>().apply {
-        val uppercaseFirstCharLangs = this@translationTasks.map { it.uppercaseFirstChar }
-        uppercaseFirstCharLangs.run {
-            forEach { from ->
-                "translate${from}To".run {
-                    uppercaseFirstCharLangs.filter { to -> to != from }
-                        .forEach { add("$this${it}") }
+        this@translationTasks
+            .map { it.uppercaseFirstChar }
+            .run langNames@{
+                forEach { from: String ->
+                    "translate${from}To".run {
+                        this@langNames.filter {
+                            it != from
+                        }.forEach { add("$this$it") }
+                    }
                 }
             }
-        }
     }
 
 
     object PromptManager {
         val userLanguage = System.getProperty("user.language")!!
-        val translateMessage = """Translate this sentence from $userLanguage to english : 
-            | """.trimMargin()
+        val fromLanguage = System.getProperty("user.language")!!
+        val toLanguage: String = ENGLISH.toLanguageTag()
+        val text = ""
+        val translateMessage = """Translate this sentence from $fromLanguage to $toLanguage : 
+            $text""".trimMargin()
     }
 
 
     //translatorSupportedLanguages
     // Creating tasks for each model
-    fun Project.createTranslationTasks() = translatorSupportedLanguages
+    fun Project.createTranslationTasks() = supportedLanguages
         .translationTasks()
         .forEach {
             createTranslationChatTask(MODEL, "translate${it}")

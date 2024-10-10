@@ -26,10 +26,5 @@ async def read_item(signup_id: int, q: Union[str, None] = None):
     return {"signup_id": signup_id, "q": q}
 
 
-
 if __name__ == "__main__":
-    uvicorn.run(
-        'api:api',
-        reload=True,
-        port=8888
-    )
+    uvicorn.run('api:api', reload=True, port=8888)
