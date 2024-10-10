@@ -36,11 +36,11 @@ object TranslatorManager {
 
     @JvmStatic
     fun Set<String>.translationTasks(): Set<String> = mutableSetOf<String>().apply {
-        val map = this@translationTasks.map { it.uppercaseFirstChar }
-        map.run {
+        val uppercaseFirstCharLangs = this@translationTasks.map { it.uppercaseFirstChar }
+        uppercaseFirstCharLangs.run {
             forEach { from ->
                 "translate${from}To".run {
-                    map.filter { to -> to != from }
+                    uppercaseFirstCharLangs.filter { to -> to != from }
                         .forEach { add("$this${it}") }
                 }
             }
