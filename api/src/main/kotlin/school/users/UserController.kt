@@ -8,7 +8,6 @@ import school.users.User.UserRestApiRoutes.API_USERS
 @RequestMapping(API_USERS)
 class UserController {
     internal class SignupException(message: String) : RuntimeException(message)
-
 //    /**
 //     * {@code POST  /signup} : register the user.
 //     *

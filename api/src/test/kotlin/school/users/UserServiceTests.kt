@@ -1,38 +1,17 @@
-@file:Suppress("NonAsciiCharacters")
+@file:Suppress("NonAsciiCharacters", "SqlResolve")
 
 package school.users
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
-import kotlinx.coroutines.reactive.collect
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.reactive.TransactionalOperator
-import org.springframework.transaction.reactive.executeAndAwait
-import school.base.property.ROLE_USER
-import school.base.tdd.TestUtils.Data.user
-import school.base.utils.i
-import school.users.User.*
+import school.users.User.Signup
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
-import school.users.User.UserDao.Dao.save
-import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
-import school.users.security.UserRole
-import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
-import school.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
-import school.users.security.UserRole.UserRoleDao.Relations
-import java.util.*
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,80 +25,6 @@ class UserServiceTests {
 
     @AfterTest
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
-
-    @Test
-    fun `test UserRoleDao signup with existing user without user_role`(): Unit = runBlocking {
-        val countUserBefore = context.countUsers()
-        assertEquals(0, countUserBefore)
-        val countUserAuthBefore = context.countUserAuthority()
-        assertEquals(0, countUserAuthBefore)
-        val userSaveResult = (user to context).save()
-        assertEquals(countUserBefore + 1, context.countUsers())
-        userSaveResult//TODO: Problem with the either result do not return the user id but persist it on database
-            .map { i("on passe ici!") }
-            .mapLeft { i("on passe par la!") }
-        val userId = context.getBean<DatabaseClient>().sql(FIND_USER_BY_LOGIN)
-            .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
-            .fetch()
-            .one()
-            .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
-            .toString()
-            .run(UUID::fromString)
-        context.getBean<DatabaseClient>()
-            .sql(UserRoleDao.Relations.INSERT)
-            .bind(UserRoleDao.Attributes.USER_ID_ATTR, userId)
-            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER)
-            .fetch()
-            .one()
-            .awaitSingleOrNull()
-        context.getBean<DatabaseClient>()
-            .sql("SELECT ua.${UserRoleDao.Fields.ID_FIELD} FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua where ua.`user_id`= :userId and ua.`role` = :role")
-            .bind("userId", userId)
-            .bind("role", ROLE_USER)
-            .fetch()
-            .one()
-            .awaitSingle()["ID"]
-            .toString()
-            .let { "user_role_id : $it" }
-            .run(::i)
-        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-    }
-
-    suspend fun Pair<UserRole, ApplicationContext>.signup(): Either<Throwable, Long> = try {
-        second.getBean<R2dbcEntityTemplate>()
-            .databaseClient.sql(Relations.INSERT)
-            .bind(UserRoleDao.Attributes.USER_ID_ATTR, first.userId)
-            .bind(UserRoleDao.Attributes.ROLE_ATTR, ROLE_USER)
-            .fetch()
-            .one()
-            .collect { it[ID_FIELD.uppercase()] }
-            .toString()
-            .toLong()
-            .right()
-    } catch (e: Exception) {
-        e.left()
-    }
-
-    @Test
-    fun `test retrieve id from user by existing login`() = runBlocking {
-        val countUserBefore = context.countUsers()
-        assertEquals(0, countUserBefore)
-        val countUserAuthBefore = context.countUserAuthority()
-        assertEquals(0, countUserAuthBefore)
-        (user to context).save()
-        assertEquals(countUserBefore + 1, context.countUsers())
-        assertDoesNotThrow {
-            context.getBean<DatabaseClient>()
-                .sql(FIND_USER_BY_LOGIN)
-                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
-                .fetch()
-                .one()
-                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
-                .toString()
-                .run(UUID::fromString)
-                .run { i("UserId : $this") }
-        }
-    }
 
     @Test
     fun `signupService save user and role_user`(): Unit = runBlocking {

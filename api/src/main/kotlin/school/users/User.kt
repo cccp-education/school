@@ -242,39 +242,23 @@ data class User(
                 }
 
 
-            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
+            suspend inline fun <reified T : User> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
                 when (T::class) {
                     User::class -> {
                         try {
-                            Right(getBean<DatabaseClient>()
-                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
-                                .bind("email", emailOrLogin)
-                                .bind("login", emailOrLogin)
-                                .fetch()
-                                .awaitOne().let { rows ->
-                                    User(
-                                        id = rows["id"] as UUID?,
-                                        login = rows["login"] as String,
-                                        password = rows["password"] as String,
-                                        email = rows["email"] as String,
-                                        langKey = rows["lang_key"] as String,
-                                        version = rows["version"] as Long
-                                    )
+                            findOne<T>(emailOrLogin).onRight { user ->
+                                val roles = mutableSetOf<Role>()
+                                val userId = user.id
+                                getBean<TransactionalOperator>().executeAndAwait {
+                                    getBean<DatabaseClient>()
+                                        .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
+                                        .bind("userId", userId)
+                                        .fetch()
+                                        .all()
+                                        .collect { row -> roles.add(Role(id = row["role"].toString())) }
                                 }
-//                                .run {
-//                                    val roles = getBean<DatabaseClient>()
-//                                        .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
-//                                        .bind("userId", id)
-//                                        .fetch()
-//                                        .all()
-//                                        .collect {
-//                                            it["role"].toString()
-//                                        }
-//
-//                                    copy(roles = roles.toSet())
-//
-//                                }
-                                    as T)
+                                user.copy(roles = roles).right()
+                            }
                         } catch (e: Throwable) {
                             Either.Left(e)
                         }
