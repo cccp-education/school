@@ -9,7 +9,6 @@ compose-samples
 *.iws
 *.iml
 # *.odt
-pyschool/config.py
 
 # Ignore Gradle project-specific cache directory
 .gradle

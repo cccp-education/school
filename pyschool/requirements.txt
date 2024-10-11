@@ -20,7 +20,7 @@ idna
 iniconfig
 itsdangerous
 Jinja2
-langchain
+langchain==0.3
 langchain-openai
 langchain-ollama
 langchainhub
