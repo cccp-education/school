@@ -8,17 +8,18 @@ package school.translate
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import kotlinx.coroutines.runBlocking
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.options.Option
+import org.gradle.kotlin.dsl.task
 import school.ai.AssistantManager.createOllamaChatModel
 import school.ai.AssistantManager.createOllamaStreamingChatModel
 import school.ai.AssistantManager.generateStreamingResponse
 import school.translate.TranslatorManager.PromptManager.getTranslatePromptMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
-import java.util.*
 import java.util.Locale.*
-
-typealias TranslationTasks = Set<Pair<String/*taskName*/, Pair<String/*from*/, String/*to*/>>>
 
 object TranslatorManager {
     const val MODEL = "aya:8b"
@@ -45,60 +46,68 @@ object TranslatorManager {
 
     @JvmStatic
     fun Set<String>.translationTasks()
-            : TranslationTasks = mutableSetOf<Pair<String, Pair<String, String>>>().apply {
-        this@translationTasks
-            .map { it.uppercaseFirstChar }
-            .run langNames@{
-                forEach { from: String ->
-                    "${from}To".run task@{
-                        this@langNames
-                            .filter { it != from }
-                            .forEach { add("${this@task}$it" to (from to it)) }
+            : Set<Pair<String/*taskName*/, Pair<String/*from*/, String/*to*/>>> =
+        mutableSetOf<Pair<String, Pair<String, String>>>().apply {
+            this@translationTasks
+                .map { it.uppercaseFirstChar }
+                .run langNames@{
+                    forEach { from: String ->
+                        "${from}To".run task@{
+                            this@langNames
+                                .filter { it != from }
+                                .forEach { add("${this@task}$it" to (from to it)) }
+                        }
                     }
                 }
-            }
-    }
+        }
 
     object PromptManager {
+        @JvmStatic
         val userLanguage = System.getProperty("user.language")!!
+
+        @JvmStatic
         val fromLanguage = System.getProperty("user.language")!!
+
+        @JvmStatic
         fun Pair<String, String>.getTranslatePromptMessage(text: String): String =
             """Translate this sentence from ${forLanguageTag(first).getDisplayLanguage(ENGLISH).lowercase()} to ${
                 forLanguageTag(second).getDisplayLanguage(
                     ENGLISH
                 ).lowercase()
-            } : 
+            } :
 $text""".trimMargin()
     }
 
 
-    //translatorSupportedLanguages
     // Creating tasks for each model
     fun Project.createTranslationTasks() = run {
         supportedLanguages
             .translationTasks()
-            .forEach {
-                createTranslationChatTask(MODEL, (it.first to it.second))
-                createStreamingTranslationChatTask(MODEL, (it.first to it.second))
+            .forEach<Pair<String, Pair<String, String>>> {
+                createTranslationChatTask(MODEL, it)
+                createStreamingTranslationChatTask(MODEL, it)
             }
     }
 
-    // Generic function for chat model tasks
-    fun Project.createTranslationChatTask(model: String, taskComponent: Pair<String, Pair<String, String>>) {
-        class MyPluginExtension {
-            var input: String? = null
-        }
+    open class InputTranslationTextTask : DefaultTask() {
+        @Suppress("UnstableApiUsage")
+        @set:Option(option = "text", description = "The text to translate")
+        @get:Input
+        lateinit var text: String
+    }
 
-        task("translate${taskComponent.first}") {
+    // Generic function for chat model tasks
+    fun Project.createTranslationChatTask(
+        model: String,
+        taskComponent: Pair<String, Pair<String, String>>
+    ) {
+        task<InputTranslationTextTask>("translate${taskComponent.first}") {
             group = "translator"
             description = "Translate using the Ollama $model chatgpt prompt request."
-            val text = this.project.objects.property(String::class.java)
-//            val extension = project.extensions.create("myPlugin", MyPluginExtension::class.java)
-
             doLast {
                 project.runTranslationChat(
                     model,
-                    taskComponent.second.getTranslatePromptMessage(text.getOrElse(""))
+                    taskComponent.second.getTranslatePromptMessage(text)
                 )
             }
         }
@@ -109,14 +118,13 @@ $text""".trimMargin()
         model: String,
         taskComponent: Pair<String, Pair<String, String>>
     ) {
-        task("translateStream${taskComponent.first}") {
+        task<InputTranslationTextTask>("translateStream${taskComponent.first}") {
             group = "translator"
             description = "Translate the Ollama $model chatgpt stream prompt request."
-            val text = project.objects.property(String::class.java)
-            doFirst {
+            doLast {
                 project.runStreamTranslationChat(
                     model,
-                    taskComponent.second.getTranslatePromptMessage(text.getOrElse(""))
+                    taskComponent.second.getTranslatePromptMessage(text)
                 )
             }
         }
