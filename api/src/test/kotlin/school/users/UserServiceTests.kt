@@ -16,8 +16,8 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
+@SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 class UserServiceTests {
 
     @Autowired
