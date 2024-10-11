@@ -7,6 +7,8 @@ apply<school.frontend.SchoolPlugin>()
 apply<school.forms.FormPlugin>()
 apply<school.jbake.JBakeGhPagesPlugin>()
 apply<school.ai.AssistantPlugin>()
+apply<school.translate.TranslatorPlugin>()
+
 
 purchaseArtifact()
 //TODO: add some tasks from detached projects, and python run, tests, deployment

@@ -27,22 +27,13 @@ object TranslatorManager {
     fun main(args: Array<String>) {
         supportedLanguages
             .translationTasks()
-//            .apply { forEach(::println) }
+            .apply { forEach(::println) }
             .let {
-//                userLanguage.run { "userLanguage : $this" }.run(::println)
+                userLanguage.run { "userLanguage : $this" }.run(::println)
                 "Gradle task name : ${it.first().first}".run(::println)
                 it.first().second.getTranslatePromptMessage("SALUT LES AMIS COMMENT CA VA ?")
                     .run { "translateMessage : $this" }.run(::println)
             }
-//            .run {
-//                val currentLocale = Locale.getDefault()
-//                currentLocale.run { "currentLocale : $this" }.run(::println)
-                // Force English language for display
-//                Locale.setDefault(ENGLISH)
-                // Get the display name of the English locale
-//                val englishDisplayName = ENGLISH.getDisplayLanguage(ENGLISH)
-//                println("English display name: $englishDisplayName")
-//            }
     }
 
     @JvmStatic
@@ -83,23 +74,31 @@ $text""".trimMargin()
 
     //translatorSupportedLanguages
     // Creating tasks for each model
-    fun Project.createTranslationTasks() = supportedLanguages
-        .translationTasks()
-        .forEach {
-            val text = """ICI LE TEXT A TRADUIRE!"""
-            createTranslationChatTask(MODEL, Triple(it.first, it.second, text))
-            createStreamingTranslationChatTask(MODEL, Triple(it.first, it.second, text))
-        }
+    fun Project.createTranslationTasks() = run {
+        supportedLanguages
+            .translationTasks()
+            .forEach {
+                createTranslationChatTask(MODEL, (it.first to it.second))
+                createStreamingTranslationChatTask(MODEL, (it.first to it.second))
+            }
+    }
 
     // Generic function for chat model tasks
-    fun Project.createTranslationChatTask(model: String, taskComponent: Triple<String, Pair<String, String>, String>) {
-        task(taskComponent.first) {
+    fun Project.createTranslationChatTask(model: String, taskComponent: Pair<String, Pair<String, String>>) {
+        class MyPluginExtension {
+            var input: String? = null
+        }
+
+        task("translate${taskComponent.first}") {
             group = "translator"
             description = "Translate using the Ollama $model chatgpt prompt request."
-            doFirst {
+            val text = this.project.objects.property(String::class.java)
+//            val extension = project.extensions.create("myPlugin", MyPluginExtension::class.java)
+
+            doLast {
                 project.runTranslationChat(
                     model,
-                    taskComponent.second.getTranslatePromptMessage(taskComponent.third)
+                    taskComponent.second.getTranslatePromptMessage(text.getOrElse(""))
                 )
             }
         }
@@ -108,17 +107,17 @@ $text""".trimMargin()
     // Generic function for streaming chat model tasks
     fun Project.createStreamingTranslationChatTask(
         model: String,
-        taskComponent: Triple<String, Pair<String, String>, String>
+        taskComponent: Pair<String, Pair<String, String>>
     ) {
-        task(taskComponent.first) {
+        task("translateStream${taskComponent.first}") {
             group = "translator"
             description = "Translate the Ollama $model chatgpt stream prompt request."
+            val text = project.objects.property(String::class.java)
             doFirst {
                 project.runStreamTranslationChat(
                     model,
-                    taskComponent.second.getTranslatePromptMessage(taskComponent.third)
+                    taskComponent.second.getTranslatePromptMessage(text.getOrElse(""))
                 )
-
             }
         }
     }
