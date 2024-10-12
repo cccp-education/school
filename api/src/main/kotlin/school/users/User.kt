@@ -255,7 +255,7 @@ data class User(
                                         .bind("userId", userId)
                                         .fetch()
                                         .all()
-                                        .collect { row -> roles.add(Role(id = row["role"].toString())) }
+                                        .collect { row -> roles.add(Role(id = row["ROLE"].toString())) }
                                 }
                                 user.copy(roles = roles).right()
                             }

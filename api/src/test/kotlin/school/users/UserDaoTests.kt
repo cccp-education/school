@@ -27,9 +27,11 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
+import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
+import school.users.security.Role
 import school.users.security.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
@@ -43,24 +45,6 @@ import kotlin.test.*
 @ActiveProfiles("test")
 class UserDaoTests {
 
-    @Autowired
-    lateinit var context: ApplicationContext
-
-    @AfterTest
-    fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
-
-    @Test
-    fun `count users, expected 0`() = runBlocking {
-        assertEquals(
-            0,
-            context.countUsers(),
-            "because init sql script does not inserts default users."
-        )
-    }
-    @Test
-    fun `test findOneWithAuths with existing email login and roles`(){
-
-    }
     //TODO: move this test RoleDaoTests
     @Test
     fun `count roles, expected 3`() = runBlocking {
@@ -73,30 +57,59 @@ class UserDaoTests {
         }
     }
 
+    @Autowired
+    lateinit var context: ApplicationContext
+
+    @AfterTest
+    fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
+
     @Test
-    fun `save default user should work in this context `() = runBlocking {
-        val count = context.countUsers()
-        (user to context).save()
-        assertEquals(expected = count + 1, context.countUsers())
-    }
-    @Test
-    fun `test retrieve id from user by existing login`() = runBlocking {
+    fun `test findOneWithAuths with existing email login and roles`() = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-        (user to context).save()
-        assertEquals(countUserBefore + 1, context.countUsers())
-        assertDoesNotThrow {
+        (user to context).signup().apply {
+            assertTrue(isRight())
+            assertFalse(isLeft())
+        }.onRight {
+            val res = context.findOneWithAuths<User>(user.email)
+//            assertTrue(res.isRight())
+//            assertFalse(res.isLeft())
+            res.isRight().apply { "context.findOneWithAuths<User>(user.email).isRight() : $this" }.run(::println)
+            res.isLeft().apply { "context.findOneWithAuths<User>(user.email).isLeft() : $this" }.run(::println)
+            val roles = mutableSetOf<Role>()
             context.getBean<DatabaseClient>()
-                .sql(FIND_USER_BY_LOGIN)
-                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
+                .bind("userId", it)
                 .fetch()
-                .one()
-                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
-                .toString()
-                .run(UUID::fromString)
-                .run { i("UserId : $this") }
+                .all()
+                .collect {
+                    assertEquals(it["ROLE"], ROLE_USER)
+                    roles.add(Role(id = it["ROLE"].toString()))
+                }
+            user.withId(it).copy(roles = roles).toString().run(::i)
+        }
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+    }
+
+
+    @Test
+    fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
+        assertEquals(0, context.countUsers())
+        (user to context).signup().onRight {
+            //36 is the to string length of a UUID
+            it.toString().apply { assertEquals(36, it.toString().length) }.apply(::i)
+        }
+        assertEquals(1, context.countUsers())
+        assertDoesNotThrow {
+            context.getBean<R2dbcEntityTemplate>()
+                .databaseClient
+                .sql("SELECT * FROM `user`")
+                .fetch()
+                .all()
+                .collect { it["ID"].toString().run(UUID::fromString) }
         }
     }
 
@@ -139,7 +152,6 @@ class UserDaoTests {
     }
 
 
-
     @Test
     fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
         assertEquals(
@@ -174,20 +186,15 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
+    fun `test findOne with not existing email or login`() = runBlocking {
         assertEquals(0, context.countUsers())
-        (user to context).signup().onRight {
-            //36 is the to string length of a UUID
-            it.toString().apply { assertEquals(36, it.toString().length) }.apply(::i)
+        context.findOne<User>(user.email).apply {
+            assertFalse(isRight())
+            assertTrue(isLeft())
         }
-        assertEquals(1, context.countUsers())
-        assertDoesNotThrow {
-            context.getBean<R2dbcEntityTemplate>()
-                .databaseClient
-                .sql("SELECT * FROM `user`")
-                .fetch()
-                .all()
-                .collect { it["ID"].toString().run(UUID::fromString) }
+        context.findOne<User>(user.login).apply {
+            assertFalse(isRight())
+            assertTrue(isLeft())
         }
     }
 
@@ -208,19 +215,42 @@ class UserDaoTests {
         }.map { assertEquals(it, user.withId(it.id!!)) }
     }
 
+
     @Test
-    fun `test findOne with not existing email or login`() = runBlocking {
-        assertEquals(0, context.countUsers())
-        context.findOne<User>(user.email).apply {
-            assertFalse(isRight())
-            assertTrue(isLeft())
-        }
-        context.findOne<User>(user.login).apply {
-            assertFalse(isRight())
-            assertTrue(isLeft())
+    fun `save default user should work in this context `() = runBlocking {
+        val count = context.countUsers()
+        (user to context).save()
+        assertEquals(expected = count + 1, context.countUsers())
+    }
+
+    @Test
+    fun `test retrieve id from user by existing login`() = runBlocking {
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        (user to context).save()
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertDoesNotThrow {
+            context.getBean<DatabaseClient>()
+                .sql(FIND_USER_BY_LOGIN)
+                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .fetch()
+                .one()
+                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+                .toString()
+                .run(UUID::fromString)
+                .run { i("UserId : $this") }
         }
     }
 
-
+    @Test
+    fun `count users, expected 0`() = runBlocking {
+        assertEquals(
+            0,
+            context.countUsers(),
+            "because init sql script does not inserts default users."
+        )
+    }
 
 }
