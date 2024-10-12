@@ -27,7 +27,6 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
-import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
@@ -64,32 +63,37 @@ class UserDaoTests {
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
-    fun `test findOneWithAuths with existing email login and roles`() = runBlocking {
+    fun `try implementation of findOneWithAuths with existing email login and roles`() = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
+        val resultRoles = mutableSetOf<Role>()
+        lateinit var resultUserId: UUID
         (user to context).signup().apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.onRight {
-            val res = context.findOneWithAuths<User>(user.email)
-//            assertTrue(res.isRight())
-//            assertFalse(res.isLeft())
-            res.isRight().apply { "context.findOneWithAuths<User>(user.email).isRight() : $this" }.run(::println)
-            res.isLeft().apply { "context.findOneWithAuths<User>(user.email).isLeft() : $this" }.run(::println)
-            val roles = mutableSetOf<Role>()
+        }.onRight { uuid ->
             context.getBean<DatabaseClient>()
                 .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
-                .bind("userId", it)
+                .bind("userId", uuid)
                 .fetch()
                 .all()
-                .collect {
-                    assertEquals(it["ROLE"], ROLE_USER)
-                    roles.add(Role(id = it["ROLE"].toString()))
+                .collect { rows ->
+                    assertEquals(rows["ROLE"], ROLE_USER)
+                    resultRoles.add(Role(id = rows["ROLE"].toString()))
                 }
-            user.withId(it).copy(roles = roles).toString().run(::i)
+            assertEquals(
+                ROLE_USER,
+                user.withId(uuid).copy(authorities = resultRoles.map { it.id }.toSet()).authorities.first()
+            )
+            resultUserId = uuid
         }
+        assertEquals(
+            resultUserId.toString().length,
+            "85b34d71-ef1d-41e0-acc1-00ab4ee1f932".length
+        )//TODO : assertnotthrow with fromStringToUuid
+        assertEquals(ROLE_USER, resultRoles.first().id)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
     }
