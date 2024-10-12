@@ -2,8 +2,7 @@
 
 package school.users
 
-//import com.fasterxml.jackson.databind.ObjectMapper
-//import jakarta.validation.Validator
+import arrow.core.getOrElse
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -17,6 +16,8 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel.Members.withId
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
@@ -25,6 +26,7 @@ import school.base.utils.i
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.User.UserDao.Dao.findAuthsByEmail
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserDao.Dao.save
@@ -36,9 +38,6 @@ import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*
 import kotlin.test.*
-
-//import school.users.User.UserDao.Dao.signup
-//import school.users.security.UserRole.UserRoleDao.Dao.signup
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
@@ -62,13 +61,80 @@ class UserDaoTests {
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
+
     @Test
-    fun `try implementation of findOneWithAuths with existing email login and roles`() = runBlocking {
+    fun `test findOneWithAuths`()= runBlocking{
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        val resultRoles = mutableSetOf<String>()
+        (user to context).signup()
+        context.getBean<TransactionalOperator>().executeAndAwait {
+//            context.findOneWithAuths<User>(user.email).map {
+//                resultRoles.addAll(it.authorities)
+//            }
+        }
+//        assertEquals(ROLE_USER, resultRoles.first())
+//        assertEquals(ROLE_USER, resultRoles.first())
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+        println("resultRoles : $resultRoles")
+        println("findAuthsByEmail : ${context.findAuthsByEmail(user.email)}")
+    }
+
+
+    @Test
+    fun `test findOneWithAuths with existing email login and roles`() = runBlocking {
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        val resultRoles = mutableSetOf<String>()
+        (user to context).signup()
+        context.findAuthsByEmail(user.email).run {
+            resultRoles.addAll(map { it }.getOrElse { emptySet() })
+        }
+        assertEquals(ROLE_USER, resultRoles.first())
+        assertEquals(ROLE_USER, resultRoles.first())
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+    }
+
+
+    @Test
+    fun `try to do implementation of findOneWithAuths with existing email login and roles using composed query`() =
+        runBlocking {
+            val countUserBefore = context.countUsers()
+            assertEquals(0, countUserBefore)
+            val countUserAuthBefore = context.countUserAuthority()
+            assertEquals(0, countUserAuthBefore)
+            val resultRoles = mutableSetOf<String>()
+//            val findAuthsAnswer: Any?//= Either<Throwable,Set<String>>()
+            (user to context).signup()
+            context.getBean<DatabaseClient>()
+                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                .bind("email", user.email)
+                .fetch()
+                .all()
+                .collect { rows ->
+                    assertEquals(rows["ROLE"], ROLE_USER)
+                    resultRoles.add(rows["ROLE"].toString())
+                }
+            assertEquals(ROLE_USER, resultRoles.first())
+            assertEquals(ROLE_USER, resultRoles.first())
+            assertEquals(1, context.countUsers())
+            assertEquals(1, context.countUserAuthority())
+        }
+
+    @Test
+    fun `try to do implementation of findOneWithAuths with existing email login and roles`() = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
         val resultRoles = mutableSetOf<Role>()
+        val findAuthsAnswer: Any?//= Either<Throwable,Set<String>>()
         lateinit var resultUserId: UUID
         (user to context).signup().apply {
             assertTrue(isRight())
@@ -97,7 +163,6 @@ class UserDaoTests {
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
     }
-
 
     @Test
     fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {

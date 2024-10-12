@@ -7,6 +7,7 @@
 package school.users
 
 import arrow.core.Either
+import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
@@ -234,37 +235,47 @@ data class User(
                                 }
                             Right(user as T)
                         } catch (e: Throwable) {
-                            Either.Left(e)
+                            Left(e)
                         }
                     }
 
-                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
+            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<String>> = try {
+                mutableSetOf<String>().apply {
+                    getBean<DatabaseClient>()
+                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                        .bind("email", email)
+                        .fetch()
+                        .all()
+                        .collect { add(it["ROLE"].toString()) }
+                }.toSet().right()
+            } catch (e: Throwable) {
+                e.left()
+            }
 
-            suspend inline fun <reified T : User> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
-                when (T::class) {
-                    User::class -> {
-                        try {
-                            findOne<T>(emailOrLogin).onRight { user ->
-                                val roles = mutableSetOf<Role>()
-                                getBean<TransactionalOperator>().executeAndAwait {
-                                    getBean<DatabaseClient>()
-                                        .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
-                                        .bind("userId", user.id)
-                                        .fetch()
-                                        .all()
-                                        .collect { row -> roles.add(Role(id = row["ROLE"].toString())) }
-                                }
-                                user.copy(roles = roles).right()
-                            }
-                        } catch (e: Throwable) {
-                            Either.Left(e)
-                        }
-                    }
 
-                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
-                }
+//            suspend inline fun <reified T : User> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
+//                when (T::class) {
+//                    User::class -> {
+//                        try {
+//                            val result: Either<Throwable, User> = findOne<User>(emailOrLogin)
+//                            result.run {
+//                                val roles = mutableSetOf<String>()
+//                                findAuthsByEmail(emailOrLogin).map { it: Set<String> ->
+//                                    it.copy(authorities = roles).right()
+//                                }.mapLeft {
+//                                    .right()
+//                                }
+//                            }
+//                        } catch (e: Throwable) {
+//                            e.left()
+//                        }
+//                    }
+//
+//                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+//                }
 
 
             suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, T> =
@@ -288,11 +299,11 @@ data class User(
                                 }
                             Right(user as T)
                         } catch (e: Throwable) {
-                            Either.Left(e)
+                            Left(e)
                         }
                     }
 
-                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
 
@@ -317,11 +328,11 @@ data class User(
                                 }
                             Right(user as T)
                         } catch (e: Throwable) {
-                            Either.Left(e)
+                            Left(e)
                         }
                     }
 
-                    else -> Either.Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
             @Throws(EmptyResultDataAccessException::class)
