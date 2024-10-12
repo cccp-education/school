@@ -248,11 +248,10 @@ data class User(
                         try {
                             findOne<T>(emailOrLogin).onRight { user ->
                                 val roles = mutableSetOf<Role>()
-                                val userId = user.id
                                 getBean<TransactionalOperator>().executeAndAwait {
                                     getBean<DatabaseClient>()
                                         .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
-                                        .bind("userId", userId)
+                                        .bind("userId", user.id)
                                         .fetch()
                                         .all()
                                         .collect { row -> roles.add(Role(id = row["ROLE"].toString())) }
