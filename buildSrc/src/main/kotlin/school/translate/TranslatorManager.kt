@@ -42,6 +42,7 @@ object TranslatorManager {
         FRENCH, ENGLISH, GERMAN,
         forLanguageTag("ru"),
         forLanguageTag("es"),
+        forLanguageTag("pt")
     ).map { it.language }.toSet()
 
     @JvmStatic
@@ -76,6 +77,17 @@ object TranslatorManager {
                 ).lowercase()
             } :
 $text""".trimMargin()
+    }
+
+
+    fun Project.createDisplaySupportedLanguagesTask() = task<DefaultTask>("displaySupportedLanguages") {
+        group = "translator"
+        description = "Dislpay supported languages"
+        doFirst {
+            supportedLanguages.map { "$it " }
+                .run { "supportedLanguages : $this" }
+                .run(::println)
+        }
     }
 
 
