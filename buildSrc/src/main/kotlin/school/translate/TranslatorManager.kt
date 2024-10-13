@@ -19,6 +19,7 @@ import school.ai.AssistantManager.generateStreamingResponse
 import school.translate.TranslatorManager.PromptManager.getTranslatePromptMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
+import java.util.*
 import java.util.Locale.*
 
 object TranslatorManager {
@@ -40,9 +41,10 @@ object TranslatorManager {
     @JvmStatic
     val supportedLanguages: Set<String> = setOf(
         FRENCH, ENGLISH, GERMAN,
+        ITALIAN, SIMPLIFIED_CHINESE,
         forLanguageTag("ru"),
         forLanguageTag("es"),
-        forLanguageTag("pt")
+        forLanguageTag("pt"),
     ).map { it.language }.toSet()
 
     @JvmStatic
@@ -84,7 +86,7 @@ $text""".trimMargin()
         group = "translator"
         description = "Dislpay supported languages"
         doFirst {
-            supportedLanguages.map { "$it " }
+            supportedLanguages.map { "${forLanguageTag(it).displayLanguage}($it) " }
                 .run { "supportedLanguages : $this" }
                 .run(::println)
         }

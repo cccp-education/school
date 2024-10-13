@@ -70,7 +70,9 @@ class PluginTests {
 //        projectInstance.run {
 //            yamlMapper.writeValueAsString(office).let(::println)
 //        }
+
     }
+//    data class Workspace(entry: WorspaceEntry)
 
     @Test
     fun checkInitWorkspace() = initWorkspace
