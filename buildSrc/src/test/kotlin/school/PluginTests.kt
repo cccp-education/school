@@ -1,9 +1,6 @@
 package school
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.core.JsonFactory
 import org.gradle.api.Project
-import org.gradle.internal.impldep.com.fasterxml.jackson.annotation.JsonRootName
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.assertDoesNotThrow
