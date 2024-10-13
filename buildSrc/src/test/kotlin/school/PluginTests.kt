@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
+import school.PluginTests.Forge.Workspace
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -36,28 +37,36 @@ val PrintStream.releaseOutput
 
 
 class PluginTests {
-    val yamlConf = """
-        workspace:
-          portfolio:
-            projects:
-              school:
-                builds:
-                  frontend:
-                    path: "/home/cheroliv/workspace/atelier/school/frontend"
-                    repository:
-                      from: "dist"
-                      to: "cvs"
-                      url: "https://github.com/cheroliv/talaria.git"
-                      credentials:
-                        username: "cheroliv"
-                        token: "token-value"
-                      branch: "master"
-                      message: "https://cheroliv.github.io/talaria"
-    """.trimIndent()
+//Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
+//data class SchoolOffice(
+//    val bibliotheque: Bibliotheque? = null,
+//    val workspace: Workspace,
+//    val humanResources: HumanResources? = null
+//) {
+//    data class Bibliotheque(
+//        val courses: MutableMap<String, Course>?,
+//        val catalogue: MutableMap<String, Training>?,
+//        val projectDocs: MutableMap<String, ProjectDocumentation>,
+//    ) {
+//        data class Course(val name: String)
+//        data class Training(val name: String)
+//        data class ProjectDocumentation(val name: String)
+//    }
+//
+//    data class Workspace(val portfolio: MutableMap<String, Project>) {
+//        data class Project(
+//            val name: String,
+//            val cred: String,
+//            val builds: MutableMap<String, ProjectBuild>
+//        ) {
+//            data class ProjectBuild(val name: String)
+//        }
+//    }
+//
+//    data class HumanResources(val cv: String)
+//}
 
-    @Test
-    fun checkWorkspaceStruture() {
-        println("workspace trace")
+    data class Forge(val workspace: Workspace){
         data class Workspace(
             val bibliotheque: String,
             val coreBusiness: String,
@@ -68,9 +77,10 @@ class PluginTests {
             val collaboration: String,
             val dashboard: String,
         )
+    }
 
-        data class Forge(val workspace: Workspace)
-
+    @Test
+    fun checkWorkspaceStruture() {
         val workspace = Workspace(
             "bibliotheque",
             "coreBusiness",
@@ -91,7 +101,7 @@ class PluginTests {
               organisation: "organisation"
               collaboration: "collaboration"
               dashboard: "dashboard"
-                """.trimMargin()
+                """.trimIndent()
         projectInstance.run {
             yamlMapper.run {
                 readValue<Forge>(hardCodedYamlConf).run {
@@ -189,4 +199,22 @@ class PluginTests {
         val projectInstance: Project
             get() = ProjectBuilder.builder().build()
     }
+    val yamlConf = """
+        workspace:
+          portfolio:
+            projects:
+              school:
+                builds:
+                  frontend:
+                    path: "/home/cheroliv/workspace/atelier/school/frontend"
+                    repository:
+                      from: "dist"
+                      to: "cvs"
+                      url: "https://github.com/cheroliv/talaria.git"
+                      credentials:
+                        username: "cheroliv"
+                        token: "token-value"
+                      branch: "master"
+                      message: "https://cheroliv.github.io/talaria"
+    """.trimIndent()
 }
