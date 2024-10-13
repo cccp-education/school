@@ -67,15 +67,13 @@ data class User(
     val email: String = EMPTY_STRING,
 
     @JsonIgnore
-    val roles: MutableSet<Role> = mutableSetOf(Role(ANONYMOUS_USER)),
+    val roles: Set<Role> = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)),
 
     @field:Size(min = 2, max = 10)
     val langKey: String = EMPTY_STRING,
 
     @JsonIgnore
     val version: Long = -1,
-
-    val authorities: Set<String> = emptySet()
 ) : EntityModel<UUID>() {
     companion object {
         @JvmStatic
@@ -242,14 +240,14 @@ data class User(
                     else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
-            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<String>> = try {
-                mutableSetOf<String>().apply {
+            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+                mutableSetOf<Role>().apply {
                     getBean<DatabaseClient>()
                         .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
                         .bind("email", email)
                         .fetch()
                         .all()
-                        .collect { add(it["ROLE"].toString()) }
+                        .collect { add(Role(it["ROLE"].toString())) }
                 }.toSet().right()
             } catch (e: Throwable) {
                 e.left()

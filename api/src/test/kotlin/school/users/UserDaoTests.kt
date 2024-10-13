@@ -2,6 +2,7 @@
 
 package school.users
 
+import arrow.core.Either
 import arrow.core.getOrElse
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
@@ -16,8 +17,6 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.reactive.TransactionalOperator
-import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel.Members.withId
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
@@ -63,21 +62,30 @@ class UserDaoTests {
 
 
     @Test
-    fun `test findOneWithAuths`()= runBlocking{
+    fun `test findOneWithAuths`() = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-        val resultRoles = mutableSetOf<String>()
-        (user to context).signup()
-        context.getBean<TransactionalOperator>().executeAndAwait {
-//            context.findOneWithAuths<User>(user.email).map {
-//                resultRoles.addAll(it.authorities)
-//            }
+        val resultRoles = mutableSetOf<Role>()
+        lateinit var userWithAuths: User
+        val result: Either<Throwable, UUID> = (user to context).signup()
+        result.isRight().run(::assertTrue)
+        result.isLeft().run(::assertFalse)
+        result.map { uuid ->
+            userWithAuths = user.withId(uuid)
+            userWithAuths.roles.isEmpty().run(::assertTrue)
+            userWithAuths.run { "userWithAuths : $this" }.run(::println)
+            context.findAuthsByEmail(user.email).map { roles ->
+                assertEquals(ROLE_USER, roles.first().id)
+                resultRoles.addAll(roles)
+            }
+            userWithAuths = userWithAuths.copy(roles = resultRoles)
         }
-//        resultRoles.isEmpty().run(::assertFalse)
-//        assertEquals(ROLE_USER, resultRoles.first())
-//        assertEquals(ROLE_USER, resultRoles.first())
+        resultRoles.isEmpty().run(::assertFalse)
+        userWithAuths.roles.isEmpty().run(::assertFalse)
+        (userWithAuths.roles.size == 1).run(::assertTrue)
+        (userWithAuths.roles.first().id == ROLE_USER).run(::assertTrue)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
         println("resultRoles : $resultRoles")
@@ -91,13 +99,13 @@ class UserDaoTests {
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-        val resultRoles = mutableSetOf<String>()
         (user to context).signup()
+        val resultRoles = mutableSetOf<Role>()
         context.findAuthsByEmail(user.email).run {
             resultRoles.addAll(map { it }.getOrElse { emptySet() })
         }
-        assertEquals(ROLE_USER, resultRoles.first())
-        assertEquals(ROLE_USER, resultRoles.first())
+        assertEquals(ROLE_USER, resultRoles.first().id)
+        assertEquals(ROLE_USER, resultRoles.first().id)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
     }
@@ -152,7 +160,11 @@ class UserDaoTests {
                 }
             assertEquals(
                 ROLE_USER,
-                user.withId(uuid).copy(authorities = resultRoles.map { it.id }.toSet()).authorities.first()
+                user.withId(uuid).copy(roles =
+                resultRoles
+                    .map { Role(it.id) }
+                    .toMutableSet())
+                    .roles.first().id
             )
             resultUserId = uuid
         }
