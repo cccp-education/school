@@ -102,13 +102,14 @@ class PluginTests {
     @Test
     fun checkWorkspaceStruture() {
         assertDoesNotThrow {
-            Workspace(
-                workspace = WorkspaceEntry(
-                    name = "fonderie", core = mapOf(
-                        "school" to Education("talaria"),
-                        "core" to mapOf("school" to Education("talaria"))
-                    )
-                ),
+            projectInstance.run {
+                Workspace(
+                    workspace = WorkspaceEntry(
+                        name = "fonderie", core = mapOf(
+                            "school" to Education("talaria"),
+                            "core" to mapOf("school" to Education("talaria"))
+                        )
+                    ),
 //                "bibliotheque",
 //                "job",
 //                "configuration",
@@ -116,26 +117,26 @@ class PluginTests {
 //                "organisation",
 //                "collaboration",
 //                "dashboard",
-            ).run workspace@{
-                projectInstance
-                    .yamlMapper
-                    .writeValueAsString(this@workspace)
-                    .apply { println(this) }
-                val om: ObjectMapper = ObjectMapper()
-                om.writeValueAsString(this).run(::println)
-                om.writeValueAsString(
-                    Workspace.Office(
-                        "bibliotheque",
-                        "job",
-                        "configuration",
-                        "communication",
-                        "organisation",
-                        "collaboration",
-                        "dashboard",
-                        "slides",
-                        "sites"
-                    )
-                ).run(::println)
+                ).run workspace@{
+                    yamlMapper
+                        .writeValueAsString(this@workspace)
+                        .apply { println(this) }
+                    val om: ObjectMapper = ObjectMapper()
+                    om.writeValueAsString(this).run(::println)
+                    om.writeValueAsString(
+                        Workspace.Office(
+                            "bibliotheque",
+                            "job",
+                            "configuration",
+                            "communication",
+                            "organisation",
+                            "collaboration",
+                            "dashboard",
+                            "slides",
+                            "sites"
+                        )
+                    ).run(::println)
+                }
             }
         }
     }
