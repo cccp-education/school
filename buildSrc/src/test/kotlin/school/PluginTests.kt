@@ -1,19 +1,22 @@
 package school
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import school.forms.FormPlugin
-import school.jbake.JBakeGhPagesPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
+import school.jbake.JBakeGhPagesPlugin
 import school.workspace.Office
 import school.workspace.OfficeEntry
+import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.lang.System.out
 import java.lang.System.setOut
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -54,23 +57,49 @@ class PluginTests {
 
     @Test
     fun checkWorkspaceStruture() {
-//        val office: SchoolOffice = SchoolOffice(
-//            workspace = Workspace(
-////                mutableMapOf<String, Workspace.Project>("portfolio" to mutableMapOf<String, Workspace.Project>("",Project()))
-//            )
-//        )
+        println("workspace trace")
+        data class Workspace(
+            val bibliotheque: String,
+            val coreBusiness: String,
+            val job: String,
+            val configuration: String,
+            val communication: String,
+            val organisation: String,
+            val collaboration: String,
+            val dashboard: String,
+        )
 
-////        val w: Workspace = Workspace(
-////            portfolio = mutableMapOf("projects" to mutableMapOf("school" to Project))
-////        )
-//        office
-//            .workspace
-//            .toString()
-//            .let(::println)
-//        projectInstance.run {
-//            yamlMapper.writeValueAsString(office).let(::println)
-//        }
+        data class Forge(val workspace: Workspace)
 
+        val workspace = Workspace(
+            "bibliotheque",
+            "coreBusiness",
+            "job",
+            "configuration",
+            "communication",
+            "organisation",
+            "collaboration",
+            "dashboard",
+        )
+        val hardCodedYamlConf = """
+            workspace:
+              bibliotheque: "bibliotheque"
+              coreBusiness: "coreBusiness"
+              job: "job"
+              configuration: "configuration"
+              communication: "communication"
+              organisation: "organisation"
+              collaboration: "collaboration"
+              dashboard: "dashboard"
+                """.trimMargin()
+        projectInstance.run {
+            yamlMapper.run {
+                readValue<Forge>(hardCodedYamlConf).run {
+                    assertEquals(workspace, workspace)
+                    assertEquals(workspace, readValue<Forge>(writeValueAsString(Forge(workspace))).workspace)
+                }
+            }
+        }
     }
 //    data class Workspace(entry: WorspaceEntry)
 
