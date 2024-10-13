@@ -237,7 +237,6 @@ object WorkspaceManager {
                                     "path" to "${projectDir}/projects/school/backoffice"
                                 ),
                             )
-
                         ), "jbake-ghpages" to mapOf(
                             "builds" to mapOf(
                                 "frontend" to mapOf(

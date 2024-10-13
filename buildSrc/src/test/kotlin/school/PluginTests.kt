@@ -3,8 +3,9 @@ package school
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
-import school.PluginTests.Forge.Workspace
-import school.PluginTests.Forge.Workspace.Education
+import org.junit.jupiter.api.assertDoesNotThrow
+import school.PluginTests.Workspace.Education
+import school.PluginTests.Workspace.WorkspaceEntry
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -36,6 +37,10 @@ val PrintStream.releaseOutput
 
 
 class PluginTests {
+    companion object {
+        @JvmStatic
+        val projectInstance: Project get() = ProjectBuilder.builder().build()
+    }
 //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
 //data class SchoolOffice(
 //    val bibliotheque: Bibliotheque? = null,
@@ -65,53 +70,58 @@ class PluginTests {
 //    data class HumanResources(val cv: String)
 //}
 
-    data class Forge(val workspace: Workspace) {
-        data class Workspace(
-            val office: String,
-            val core: Education,
-            val job: String,
-            val configuration: String,
-            val communication: String,
-            val organisation: String,
-            val collaboration: String,
-            val dashboard: String,
-        ) {
-            data class Office(
-                val books: String,
-                val datas: String,
-                val formations: String,
-                val bizness: String,
-                val notebooks: String,
-                val pilotage: String,
-                val schemas: String,
-                val slides: String,
-                val sites: String
-            )
+    data class Workspace(
+//        val name:String,//Bad behavior
+        val workspace: WorkspaceEntry,
+//        val core: Map<String, CoreEntry>,
+//        val office: String,
+//        val job: String,
+//        val configuration: String,
+//        val communication: String,
+//        val organisation: String,
+//        val collaboration: String,
+//        val dashboard: String,
+    ) {
+        interface CoreEntry
+        data class WorkspaceEntry(val name: String, val core: Any)
 
-            data class Education(val name: String)
-        }
+        data class Office(
+            val books: String,
+            val datas: String,
+            val formations: String,
+            val bizness: String,
+            val notebooks: String,
+            val pilotage: String,
+            val schemas: String,
+            val slides: String,
+            val sites: String
+        )
+
+        data class Education(val name: String) : CoreEntry
     }
 
     @Test
     fun checkWorkspaceStruture() {
-        val workspace = Workspace(
-            "office",
-            Education("school"),
-            "job",
-            "configuration",
-            "communication",
-            "organisation",
-            "collaboration",
-            "dashboard",
-        )
-
-        projectInstance
-            .yamlMapper
-            .writeValueAsString(Forge(workspace))
-            .apply { println(this) }
-
+        assertDoesNotThrow {
+            Workspace(
+//                name= "cheroliworkspace",
+                workspace = WorkspaceEntry(name = "forge", core = mapOf("school" to Education("talaria"))),
+//                "bibliotheque",
+//                mapOf("school" to Education("talaria")),
+//                "job",
+//                "configuration",
+//                "communication",
+//                "organisation",
+//                "collaboration",
+//                "dashboard",
+            ).run workspace@{
+                projectInstance
+                    .yamlMapper
+                    .writeValueAsString(this@workspace)
+                    .apply { println(this) }
+            }
+        }
     }
-//    data class Workspace(entry: WorspaceEntry)
 
     @Test
     fun checkInitWorkspace() = initWorkspace
@@ -193,29 +203,4 @@ class PluginTests {
             assertNotNull("helloJBakeGhPages".let(tasks::findByName))
         }
     }
-
-    companion object {
-        @JvmStatic
-        val projectInstance: Project
-            get() = ProjectBuilder.builder().build()
-    }
-
-    val yamlConf = """
-        workspace:
-          portfolio:
-            projects:
-              school:
-                builds:
-                  frontend:
-                    path: "/home/cheroliv/workspace/atelier/school/frontend"
-                    repository:
-                      from: "dist"
-                      to: "cvs"
-                      url: "https://github.com/cheroliv/talaria.git"
-                      credentials:
-                        username: "cheroliv"
-                        token: "token-value"
-                      branch: "master"
-                      message: "https://cheroliv.github.io/talaria"
-    """.trimIndent()
 }
