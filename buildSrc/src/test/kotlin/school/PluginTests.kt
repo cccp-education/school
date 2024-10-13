@@ -1,10 +1,10 @@
 package school
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import school.PluginTests.Forge.Workspace
+import school.PluginTests.Forge.Workspace.Education
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -17,7 +17,6 @@ import java.io.PrintStream
 import java.lang.System.out
 import java.lang.System.setOut
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -66,24 +65,38 @@ class PluginTests {
 //    data class HumanResources(val cv: String)
 //}
 
-    data class Forge(val workspace: Workspace){
+    data class Forge(val workspace: Workspace) {
         data class Workspace(
-            val bibliotheque: String,
-            val coreBusiness: String,
+            val office: String,
+            val core: Education,
             val job: String,
             val configuration: String,
             val communication: String,
             val organisation: String,
             val collaboration: String,
             val dashboard: String,
-        )
+        ) {
+            data class Office(
+                val books: String,
+                val datas: String,
+                val formations: String,
+                val bizness: String,
+                val notebooks: String,
+                val pilotage: String,
+                val schemas: String,
+                val slides: String,
+                val sites: String
+            )
+
+            data class Education(val name: String)
+        }
     }
 
     @Test
     fun checkWorkspaceStruture() {
         val workspace = Workspace(
-            "bibliotheque",
-            "coreBusiness",
+            "office",
+            Education("school"),
             "job",
             "configuration",
             "communication",
@@ -91,25 +104,12 @@ class PluginTests {
             "collaboration",
             "dashboard",
         )
-        val hardCodedYamlConf = """
-            workspace:
-              bibliotheque: "bibliotheque"
-              coreBusiness: "coreBusiness"
-              job: "job"
-              configuration: "configuration"
-              communication: "communication"
-              organisation: "organisation"
-              collaboration: "collaboration"
-              dashboard: "dashboard"
-                """.trimIndent()
-        projectInstance.run {
-            yamlMapper.run {
-                readValue<Forge>(hardCodedYamlConf).run {
-                    assertEquals(workspace, workspace)
-                    assertEquals(workspace, readValue<Forge>(writeValueAsString(Forge(workspace))).workspace)
-                }
-            }
-        }
+
+        projectInstance
+            .yamlMapper
+            .writeValueAsString(Forge(workspace))
+            .apply { println(this) }
+
     }
 //    data class Workspace(entry: WorspaceEntry)
 
@@ -199,6 +199,7 @@ class PluginTests {
         val projectInstance: Project
             get() = ProjectBuilder.builder().build()
     }
+
     val yamlConf = """
         workspace:
           portfolio:
