@@ -23,6 +23,7 @@ Jinja2
 langchain==0.3
 langchain-openai
 langchain-ollama
+langchain-community
 langchainhub
 langgraph
 langserve[all]

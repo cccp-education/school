@@ -1,41 +1,81 @@
 # -*- coding: utf-8 -*-
 
-import json
+import asyncio
+# import os
 
-from datasets import load_dataset
+from langchain.callbacks.manager import AsyncCallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+# from langchain_community.llms import HuggingFaceHub
+from langchain_community.llms import Ollama
 
 from data_test import display_placeholders
 
-dataset = load_dataset("imdb")
+
+async def ollama():
+    # Initialiser Ollama
+    llm = Ollama(
+        base_url="http://localhost:11434",  # Assurez-vous que cette URL correspond à votre configuration Ollama
+        model="llama3.2:3b",  # Ou un autre modèle que vous avez installé
+        callback_manager=AsyncCallbackManager([StreamingStdOutCallbackHandler()]),
+    )
+
+    # Créer un template de prompt
+    prompt = PromptTemplate(
+        input_variables=["question"],
+        template="Répondez à la question suivante : {question}"
+    )
+
+    # Créer une chaîne LLM
+    chain = LLMChain(llm=llm, prompt=prompt)
+
+    # Boucle principale du chatbot
+    while True:
+        user_input = input("Vous: ")
+        if user_input.lower() in ['quit', 'exit', 'bye']:
+            print("Chatbot: Au revoir !")
+            break
+
+        # Appel asynchrone à la chaîne
+        response = await chain.arun(question=user_input)
+        print(f"Chatbot: {response.strip()}")
 
 
-def format_dataset_to_json(dataset, index, keys=None):
-    """
-    Formats a specific element from a Hugging Face dataset to JSON.
+# Assurez-vous d'avoir défini votre token Hugging Face comme variable d'environnement
+# os.environ["HUGGINGFACEHUB_API_TOKEN"] = "votre_token_ici"
 
-    Args:
-        dataset: The Hugging Face dataset.
-        index: The index of the element to format.
-        keys: A list of keys to include in the JSON output. If None, all keys will be included.
-
-    Returns:
-        A JSON string representing the formatted element.
-    """
-    data = dataset["train"][index]  # Assuming it's a dictionary
-    # Create a new dictionary with specified or all keys
-    if keys:
-        dataset_dict = {key: data.get(key) for key in keys}
-    else:
-        dataset_dict = {key: value for key, value in data.items()}
-    # Convert the dictionary to JSON
-    json_data: str = json.dumps(dataset_dict)
-    return json_data
+# async def huggingface_chat():
+#     # Initialiser le modèle Hugging Face
+#     llm = HuggingFaceHub(
+#         repo_id="google/flan-t5-xxl",  # Vous pouvez changer le modèle selon vos besoins
+#         model_kwargs={"temperature": 0.5, "max_length": 512},
+#         huggingfacehub_api_token=os.environ["HUGGINGFACEHUB_API_TOKEN"],
+#         callback_manager=AsyncCallbackManager([StreamingStdOutCallbackHandler()]),
+#     )
+#
+#     # Créer un template de prompt
+#     prompt = PromptTemplate(
+#         input_variables=["question"],
+#         template="Répondez à la question suivante : {question}"
+#     )
+#
+#     # Créer une chaîne LLM
+#     chain = LLMChain(llm=llm, prompt=prompt)
+#
+#     # Boucle principale du chatbot
+#     while True:
+#         user_input = input("Vous: ")
+#         if user_input.lower() in ['quit', 'exit', 'bye']:
+#             print("Chatbot: Au revoir !")
+#             break
+#
+#         # Appel asynchrone à la chaîne
+#         response = await chain.arun(question=user_input)
+#         print(f"Chatbot: {response.strip()}")
 
 
 if __name__ == '__main__':
     display_placeholders()
-    json_string = format_dataset_to_json(
-        dataset, 100,
-        keys=["text", "label"]
-    )
-    print(json_string)
+    asyncio.run(ollama())
+    # asyncio.run(huggingface_chat())
