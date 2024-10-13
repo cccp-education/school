@@ -212,6 +212,7 @@ data class User(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
+            //TODO: change signature to return UUID
             suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, T> =
                 when (T::class) {
                     User::class -> {
@@ -240,6 +241,10 @@ data class User(
                     else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
+
+            //TODO: change sinature to return UUID
+//            fun findAuthsByUserId(userId: UUID): Either<Throwable, Set<Role>>{}
+
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {
                     getBean<DatabaseClient>()
@@ -258,14 +263,8 @@ data class User(
 //                when (T::class) {
 //                    User::class -> {
 //                        try {
-//                            val result: Either<Throwable, User> = findOne<User>(emailOrLogin)
-//                            result.run {
-//                                val roles = mutableSetOf<String>()
-//                                findAuthsByEmail(emailOrLogin).map { it: Set<String> ->
-//                                    it.copy(authorities = roles).right()
-//                                }.mapLeft {
-//                                    .right()
-//                                }
+//                            findOne<T>(emailOrLogin).map {
+//
 //                            }
 //                        } catch (e: Throwable) {
 //                            e.left()

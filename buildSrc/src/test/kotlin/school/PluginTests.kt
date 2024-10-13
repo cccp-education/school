@@ -1,9 +1,13 @@
 package school
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.core.JsonFactory
 import org.gradle.api.Project
+import org.gradle.internal.impldep.com.fasterxml.jackson.annotation.JsonRootName
 import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 import school.PluginTests.Workspace.Education
 import school.PluginTests.Workspace.WorkspaceEntry
 import school.forms.FormPlugin
@@ -41,7 +45,8 @@ class PluginTests {
         @JvmStatic
         val projectInstance: Project get() = ProjectBuilder.builder().build()
     }
-//Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
+
+    //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
 //data class SchoolOffice(
 //    val bibliotheque: Bibliotheque? = null,
 //    val workspace: Workspace,
@@ -69,11 +74,9 @@ class PluginTests {
 //
 //    data class HumanResources(val cv: String)
 //}
-
     data class Workspace(
-//        val name:String,//Bad behavior
         val workspace: WorkspaceEntry,
-//        val core: Map<String, CoreEntry>,
+//        val core: WorkspaceEntry,
 //        val office: String,
 //        val job: String,
 //        val configuration: String,
@@ -84,6 +87,7 @@ class PluginTests {
     ) {
         interface CoreEntry
         data class WorkspaceEntry(val name: String, val core: Any)
+        data class Education(val name: String) : CoreEntry
 
         data class Office(
             val books: String,
@@ -96,18 +100,19 @@ class PluginTests {
             val slides: String,
             val sites: String
         )
-
-        data class Education(val name: String) : CoreEntry
     }
 
     @Test
     fun checkWorkspaceStruture() {
         assertDoesNotThrow {
             Workspace(
-//                name= "cheroliworkspace",
-                workspace = WorkspaceEntry(name = "forge", core = mapOf("school" to Education("talaria"))),
+                workspace = WorkspaceEntry(
+                    name = "fonderie", core = mapOf(
+                        "school" to Education("talaria"),
+                        "core" to mapOf("school" to Education("talaria"))
+                    )
+                ),
 //                "bibliotheque",
-//                mapOf("school" to Education("talaria")),
 //                "job",
 //                "configuration",
 //                "communication",
@@ -119,6 +124,21 @@ class PluginTests {
                     .yamlMapper
                     .writeValueAsString(this@workspace)
                     .apply { println(this) }
+                val om: ObjectMapper = ObjectMapper()
+                om.writeValueAsString(this).run(::println)
+                om.writeValueAsString(
+                    Workspace.Office(
+                        "bibliotheque",
+                        "job",
+                        "configuration",
+                        "communication",
+                        "organisation",
+                        "collaboration",
+                        "dashboard",
+                        "slides",
+                        "sites"
+                    )
+                ).run(::println)
             }
         }
     }

@@ -69,10 +69,10 @@ class UserDaoTests {
         assertEquals(0, countUserAuthBefore)
         val resultRoles = mutableSetOf<Role>()
         lateinit var userWithAuths: User
-        val result: Either<Throwable, UUID> = (user to context).signup()
-        result.isRight().run(::assertTrue)
-        result.isLeft().run(::assertFalse)
-        result.map { uuid ->
+        (user to context).signup().apply{
+            isRight().run(::assertTrue)
+            isLeft().run(::assertFalse)
+        }.map { uuid ->
             userWithAuths = user.withId(uuid)
             userWithAuths.roles.isEmpty().run(::assertTrue)
             userWithAuths.run { "userWithAuths : $this" }.run(::println)
@@ -90,6 +90,7 @@ class UserDaoTests {
         assertEquals(1, context.countUserAuthority())
         println("resultRoles : $resultRoles")
         println("findAuthsByEmail : ${context.findAuthsByEmail(user.email)}")
+//        println("userWithAuths : ${context.find}")
     }
 
 
