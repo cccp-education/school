@@ -27,15 +27,11 @@ object TestUtils {
     "email": "$USER@$DOMAIN_DEV_URL",
     "password": "$USER"}"""
 
-        fun userFactory(login: String): User {
-            val now = now()
-            val uuid = randomUUID()
-            return User(
-                password = login,
-                login = login,
-                email = "$login@$DOMAIN_DEV_URL",
-            )
-        }
+        fun userFactory(login: String): User = User(
+            password = login,
+            login = login,
+            email = "$login@$DOMAIN_DEV_URL",
+        )
     }
 
     val ApplicationContext.PATTERN_LOCALE_2: Pattern

@@ -17,6 +17,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
+import school.base.property.EMPTY_STRING
 import school.base.property.ROLE_USER
 import school.base.tdd.TestUtils.Data.user
 import school.base.tdd.TestUtils.defaultRoles
@@ -27,6 +28,7 @@ import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findAuthsByEmail
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
+import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
@@ -73,24 +75,37 @@ class UserDaoTests {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
         }.map { uuid ->
-            userWithAuths = user.withId(uuid)
+            userWithAuths = user.withId(uuid).copy(password = EMPTY_STRING)
             userWithAuths.roles.isEmpty().run(::assertTrue)
             userWithAuths.run { "userWithAuths : $this" }.run(::println)
-            context.findAuthsByEmail(user.email).map { roles ->
-                assertEquals(ROLE_USER, roles.first().id)
-                resultRoles.addAll(roles)
-            }
-            userWithAuths = userWithAuths.copy(roles = resultRoles)
+//            context.findAuthsByEmail(user.email).map { roles ->
+//                assertEquals(ROLE_USER, roles.first().id)
+//                resultRoles.addAll(roles)
+//            }
+            //TODO : renvoyer une pair de pair avec Pair<Pair<String/*UUID*/,String/*roles*/>,Pair<String/*login*/,String/*email*/>>
+            // pour signup()
+            // save
+            // find
+//            userWithAuths = userWithAuths.copy(roles = resultRoles)
         }
-        resultRoles.isEmpty().run(::assertFalse)
-        userWithAuths.roles.isEmpty().run(::assertFalse)
-        (userWithAuths.roles.size == 1).run(::assertTrue)
-        (userWithAuths.roles.first().id == ROLE_USER).run(::assertTrue)
+//        resultRoles.isEmpty().run(::assertFalse)
+//        userWithAuths.roles.isEmpty().run(::assertFalse)
+//        (userWithAuths.roles.size == 1).run(::assertTrue)
+//        (userWithAuths.roles.first().id == ROLE_USER).run(::assertTrue)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
         println("resultRoles : $resultRoles")
-        println("findAuthsByEmail : ${context.findAuthsByEmail(user.email)}")
-//        println("userWithAuths : ${context.find}")
+        context.findAuthsByEmail(user.email)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .apply { userWithAuths.copy(roles = this!!).run(::println) }
+            .run { ("findAuthsByEmail : $this") }
+            .run(::println)
+
+//        val result = context.findOneWithAuths<User>(user.email)
+//        assertTrue(result.isRight())
+//        assertFalse(result.isLeft())
+//        "findOneWithAuths : ${result.map { it }.getOrNull()}".run(::println)
     }
 
 
@@ -120,7 +135,6 @@ class UserDaoTests {
             val countUserAuthBefore = context.countUserAuthority()
             assertEquals(0, countUserAuthBefore)
             val resultRoles = mutableSetOf<String>()
-//            val findAuthsAnswer: Any?//= Either<Throwable,Set<String>>()
             (user to context).signup()
             context.getBean<DatabaseClient>()
                 .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")

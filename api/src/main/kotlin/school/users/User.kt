@@ -8,7 +8,6 @@ package school.users
 
 import arrow.core.Either
 import arrow.core.Either.Left
-import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -25,7 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
-import school.base.property.ANONYMOUS_USER
+import school.base.model.EntityModel.Members.withId
 import school.base.property.EMPTY_STRING
 import school.base.property.ROLE_USER
 import school.base.utils.AppUtils.cleanField
@@ -207,13 +206,11 @@ data class User(
                 e.left()
             }
 
-
             suspend fun ApplicationContext.deleteAllUsersOnly(): Unit =
                 "DELETE FROM `user`"
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
-            //TODO: change signature to return UUID
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, UUID> =
                 when (T::class) {
                     User::class -> {
@@ -226,15 +223,12 @@ data class User(
                                 .awaitOne()
                                 .let { it["`id`"] } as UUID).right()
                         } catch (e: Throwable) {
-                            Left(e)
+                            e.left()
                         }
                     }
 
                     else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
-
-
-//            fun findAuthsByUserId(userId: UUID): Either<Throwable, Set<Role>>{}
 
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {
@@ -250,20 +244,35 @@ data class User(
             }
 
 
-//            suspend inline fun <reified T : User> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, T> =
-//                when (T::class) {
-//                    User::class -> {
-//                        try {
-//                            findOne<T>(emailOrLogin).map {
-//
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            var u = User(email = emailOrLogin, login = emailOrLogin)
+//                            getBean<TransactionalOperator>().executeAndAwait {
+                            findOne<T>(emailOrLogin).getOrNull()?.run {
+                                u = u.withId(this)
+                                findAuthsByEmail(emailOrLogin).getOrNull()?.run {
+                                    u = u.copy(roles = this)
+                                    return u.right()
+                                }
+                            }
 //                            }
-//                        } catch (e: Throwable) {
-//                            e.left()
-//                        }
-//                    }
-//
-//                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
-//                }
+                            Throwable("not expected to be there").left()
+                        } catch (e: Throwable) {
+                            e.left()
+                        }
+                    }
+
+                    else -> Left(
+                        IllegalArgumentException(
+                            "Unsupported type: ${
+                                T::
+                                class.simpleName
+                            }"
+                        )
+                    )
+                }
 
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
@@ -290,7 +299,7 @@ data class User(
                     User::class -> {
                         try {
                             getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.email) = LOWER(:email)")
+                                .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:email)")
                                 .bind("email", email)
                                 .fetch()
                                 .awaitOne()
