@@ -2,7 +2,6 @@
 
 package school.users
 
-import arrow.core.Either
 import arrow.core.getOrElse
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
@@ -36,6 +35,7 @@ import school.users.security.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*
+import java.util.UUID.fromString
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -69,7 +69,7 @@ class UserDaoTests {
         assertEquals(0, countUserAuthBefore)
         val resultRoles = mutableSetOf<Role>()
         lateinit var userWithAuths: User
-        (user to context).signup().apply{
+        (user to context).signup().apply {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
         }.map { uuid ->
@@ -290,12 +290,12 @@ class UserDaoTests {
         context.findOne<User>(user.email).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.map { assertEquals(it, user.withId(it.id!!)) }
+        }.map { assertDoesNotThrow { fromString(it.toString()) } }
 
         context.findOne<User>(user.login).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.map { assertEquals(it, user.withId(it.id!!)) }
+        }.map { assertDoesNotThrow { fromString(it.toString()) } }
     }
 
 

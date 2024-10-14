@@ -213,26 +213,17 @@ data class User(
                     .await()
 
             //TODO: change signature to return UUID
-            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, T> =
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, UUID> =
                 when (T::class) {
                     User::class -> {
                         try {
-                            val user = getBean<DatabaseClient>()
+                            (getBean<DatabaseClient>()
                                 .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
                                 .bind("email", emailOrLogin)
                                 .bind("login", emailOrLogin)
                                 .fetch()
-                                .awaitOne().let { row ->
-                                    User(
-                                        id = row["id"] as UUID?,
-                                        login = row["login"] as String,
-                                        password = row["password"] as String,
-                                        email = row["email"] as String,
-                                        langKey = row["lang_key"] as String,
-                                        version = row["version"] as Long
-                                    )
-                                }
-                            Right(user as T)
+                                .awaitOne()
+                                .let { it["`id`"] } as UUID).right()
                         } catch (e: Throwable) {
                             Left(e)
                         }
