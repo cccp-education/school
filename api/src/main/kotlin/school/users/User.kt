@@ -11,6 +11,7 @@ import arrow.core.Either.Left
 import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -55,7 +56,7 @@ data class User(
     @field:NotNull
     @field:Pattern(regexp = LOGIN_REGEX)
     @field:Size(min = 1, max = 50)
-    val login: String,
+    val login: String = EMPTY_STRING,
 
     @JsonIgnore
     @field:NotNull
@@ -243,21 +244,41 @@ data class User(
                 e.left()
             }
 
+            suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
+                mutableSetOf<Role>().apply {
+                    getBean<DatabaseClient>()
+                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+                        .bind("userId", userId)
+                        .fetch()
+                        .all()
+                        .collect { add(Role(it["ROLE"].toString())) }
+                }.toSet().right()
+            } catch (e: Throwable) {
+                e.left()
+            }
+
+            suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
+                User().withId(id).copy(password = EMPTY_STRING).run user@{
+                    findAuthsById(id).getOrNull().run roles@{
+                        return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
+                        else copy(roles = this@roles).right()
+                    }
+                }
+            } catch (e: Throwable) {
+                e.left()
+            }
+
+            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
+                .getBean<Validator>()
+                .validateValue(User::class.java, "email", first)
+                .isEmpty()
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
                 when (T::class) {
                     User::class -> {
                         try {
+
                             var u = User(email = emailOrLogin, login = emailOrLogin)
-//                            getBean<TransactionalOperator>().executeAndAwait {
-                            findOne<T>(emailOrLogin).getOrNull()?.run {
-                                u = u.withId(this)
-                                findAuthsByEmail(emailOrLogin).getOrNull()?.run {
-                                    u = u.copy(roles = this)
-                                    return u.right()
-                                }
-                            }
-//                            }
                             Throwable("not expected to be there").left()
                         } catch (e: Throwable) {
                             e.left()
