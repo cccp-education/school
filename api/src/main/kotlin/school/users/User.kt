@@ -47,6 +47,7 @@ import school.users.security.Role
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.util.*
+import java.util.UUID.randomUUID
 import jakarta.validation.constraints.Email as EmailConstraint
 
 data class User(
@@ -218,7 +219,7 @@ data class User(
                     User::class -> {
                         try {
                             (getBean<DatabaseClient>()
-                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
+                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
                                 .bind("email", emailOrLogin)
                                 .bind("login", emailOrLogin)
                                 .fetch()
@@ -233,7 +234,6 @@ data class User(
                 }
 
 
-            //TODO: change sinature to return UUID
 //            fun findAuthsByUserId(userId: UUID): Either<Throwable, Set<Role>>{}
 
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
@@ -266,28 +266,18 @@ data class User(
 //                }
 
 
-            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, T> =
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
                 when (T::class) {
                     User::class -> {
                         try {
-                            val user = getBean<DatabaseClient>()
-                                .sql("SELECT * FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
+                            (getBean<DatabaseClient>()
+                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
                                 .bind("login", login)
                                 .fetch()
                                 .awaitOne()
-                                .let { row ->
-                                    User(
-                                        id = row["id"] as UUID?,
-                                        login = row["login"] as String,
-                                        password = row["password"] as String,
-                                        email = row["email"] as String,
-                                        langKey = row["lang_key"] as String,
-                                        version = row["version"] as Long
-                                    )
-                                }
-                            Right(user as T)
+                                .let { it["`id`"] as UUID }).right()
                         } catch (e: Throwable) {
-                            Left(e)
+                            e.left()
                         }
                     }
 
@@ -295,28 +285,19 @@ data class User(
                 }
 
 
-            suspend inline fun <reified T : EntityModel<*>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, T> =
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, UUID> =
                 when (T::class) {
                     User::class -> {
                         try {
-                            val user = getBean<DatabaseClient>()
-                                .sql("SELECT * FROM `user` u WHERE LOWER(u.email) = LOWER(:email)")
+                            getBean<DatabaseClient>()
+                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.email) = LOWER(:email)")
                                 .bind("email", email)
                                 .fetch()
                                 .awaitOne()
-                                .let { row ->
-                                    User(
-                                        id = row["id"] as UUID?,
-                                        login = row["login"] as String,
-                                        password = row["password"] as String,
-                                        email = row["email"] as String,
-                                        langKey = row["lang_key"] as String,
-                                        version = row["version"] as Long
-                                    )
-                                }
-                            Right(user as T)
+                                .let { it["id"] as UUID }
+                                .right()
                         } catch (e: Throwable) {
-                            Left(e)
+                            e.left()
                         }
                     }
 
@@ -331,26 +312,28 @@ data class User(
                 second.findOneByEmail<User>(first.email)
                     .mapLeft { return Exception("Unable to find user by email").left() }
                     .map {
-                        (UserRole(userId = it.id!!, role = ROLE_USER) to second).signup()
-                        return it.id.right()
+                        (UserRole(userId = it, role = ROLE_USER) to second).signup()
+                        return it.right()
                     }
             } catch (e: Throwable) {
                 e.left()
             }
 
-            fun ApplicationContext.signupToUser(signup: Signup): User {
+            fun ApplicationContext.signupToUser(signup: Signup): User = signup.apply {
                 // Validation du mot de passe et de la confirmation
-                require(signup.password == signup.repassword) { "Passwords do not match!" }
+                require(password == repassword) { "Passwords do not match!" }
+            }.run {
                 // Création d'un utilisateur à partir des données de Signup
-                return User(
-                    id = UUID.randomUUID(), // Génération d'un UUID
-                    login = signup.login,
-                    password = getBean<PasswordEncoder>().encode(signup.password),
-                    email = signup.email,
-                    roles = mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
+                User(
+                    id = randomUUID(), // Génération d'un UUID
+                    login = login,
+                    password = getBean<PasswordEncoder>().encode(password),
+                    email = email,
+                    roles = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
                     langKey = "en" // Valeur par défaut, ajustez si nécessaire
                 )
             }
+
         }
     }
 }

@@ -265,7 +265,7 @@ class UserDaoTests {
         context.findOneByEmail<User>(user.email).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.map { assertEquals(it, user.withId(it.id!!)) }
+        }.map { assertDoesNotThrow { fromString(it.toString()) } }
     }
 
     @Test

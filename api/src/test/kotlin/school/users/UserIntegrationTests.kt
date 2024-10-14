@@ -116,7 +116,7 @@ class UserIntegrationTests {
             when (this) {
                 is Left -> assertEquals(EmptyResultDataAccessException::class.java, value::class.java)
                 is Right -> {
-                    assertEquals(user, value)
+                    assertEquals(user.id, value)
                 }
             }
         }
@@ -149,7 +149,7 @@ class UserIntegrationTests {
             when (this) {
                 is Left -> assertEquals(value::class.java, NullPointerException::class.java)
                 is Right -> {
-                    assertEquals(user, value)
+                    assertEquals(user.id, value)
                 }
             }
         }
