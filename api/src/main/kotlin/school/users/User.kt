@@ -217,12 +217,12 @@ data class User(
                     User::class -> {
                         try {
                             (getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.email) = LOWER(:emailOrLogin) ||  LOWER(u.login) = LOWER(:emailOrLogin)")
+                                .sql("SELECT `u`.`id` FROM `user` as `u` WHERE LOWER(`u`.`email`) = LOWER(:email) or LOWER(`u`.`login`) = LOWER(:login) ")
                                 .bind("email", emailOrLogin)
                                 .bind("login", emailOrLogin)
                                 .fetch()
-                                .awaitOne()
-                                .let { it["`id`"] } as UUID).right()
+                                .awaitSingle()
+                                .let { it["id"] } as UUID).right()
                         } catch (e: Throwable) {
                             e.left()
                         }
@@ -244,10 +244,23 @@ data class User(
                 e.left()
             }
 
+            suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
+                mutableSetOf<Role>().apply {
+                    getBean<DatabaseClient>()
+                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
+                        .bind("login", login)
+                        .fetch()
+                        .all()
+                        .collect { add(Role(it["ROLE"].toString())) }
+                }.toSet().right()
+            } catch (e: Throwable) {
+                e.left()
+            }
+
             suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {
                     getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+                        .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
                         .bind("userId", userId)
                         .fetch()
                         .all()
@@ -273,27 +286,23 @@ data class User(
                 .validateValue(User::class.java, "email", first)
                 .isEmpty()
 
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
-                when (T::class) {
-                    User::class -> {
-                        try {
-
-                            var u = User(email = emailOrLogin, login = emailOrLogin)
-                            Throwable("not expected to be there").left()
-                        } catch (e: Throwable) {
-                            e.left()
-                        }
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String)
+                    : Either<Throwable, Pair<UUID, Set<Role>>> = when (T::class) {
+                User::class -> {
+                    try {
+                        findOne<User>(emailOrLogin).map { id ->
+                            findAuthsById(id)
+                                .mapLeft { Exception("not able to retrieve roles").left() }
+                                .map { roles -> (id to roles).right() }
+                        }.mapLeft { Exception("not able to retrieve userId").left() }
+                        Exception("not able to retrieve userId and roles").left()
+                    } catch (e: Throwable) {
+                        e.left()
                     }
-
-                    else -> Left(
-                        IllegalArgumentException(
-                            "Unsupported type: ${
-                                T::
-                                class.simpleName
-                            }"
-                        )
-                    )
                 }
+
+                else -> IllegalArgumentException("Unsupported type: ${T::class.simpleName}").left()
+            }
 
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =

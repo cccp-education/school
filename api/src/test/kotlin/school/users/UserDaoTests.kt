@@ -2,6 +2,7 @@
 
 package school.users
 
+import arrow.core.Either
 import arrow.core.getOrElse
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
@@ -16,6 +17,9 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.executeAndAwait
+import reactor.kotlin.core.publisher.toMono
 import school.base.model.EntityModel.Members.withId
 import school.base.property.EMPTY_STRING
 import school.base.property.ROLE_USER
@@ -26,8 +30,10 @@ import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findAuthsByEmail
+import school.users.User.UserDao.Dao.findAuthsByLogin
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
+import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Dao.findUserById
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
@@ -44,17 +50,6 @@ import kotlin.test.*
 @ActiveProfiles("test")
 class UserDaoTests {
 
-    //TODO: move this test RoleDaoTests
-    @Test
-    fun `count roles, expected 3`() = runBlocking {
-        context.run {
-            assertEquals(
-                defaultRoles.size,
-                countRoles(),
-                "Because init sql script does insert default roles."
-            )
-        }
-    }
 
     @Autowired
     lateinit var context: ApplicationContext
@@ -62,13 +57,23 @@ class UserDaoTests {
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
-    //TODO : renvoyer une pair de pair avec Pair<Pair<String/*UUID*/,String/*roles*/>,Pair<String/*login*/,String/*email*/>>
-    // pour signup()
-    // save
-    // find
+    @Test
+    fun `test findOneWithAuths`(): Unit = runBlocking {
+        (user to context).signup()
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+//        context.findOneWithAuths<User>(user.email)
+//            .map { println("context.findOneWithAuths<User>(${user.email}).map : " + it) }
+//            .mapLeft { println("onLeft") }
+//        println("context.findOneWithAuths<User>(user.email).getOrNull() : " + context.findOneWithAuths<User>(user.email).getOrNull())
+        println("context.findOne<User>(user.email).getOrNull() : ${context.findOne<User>(user.email).getOrNull()}")
+        println("context.findAuthsByEmail(user.email).getOrNull() : ${context.findAuthsByEmail(user.email).getOrNull()}")
+    }
+
+//    fun ApplicationContext.findAuthsByEmailOrLogin(emailOrLogin:String):Either<Throwable,Set<Role>>{ }
 
     @Test
-    fun `test findUserById`() = runBlocking {
+    fun `test findUserById`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -105,7 +110,32 @@ class UserDaoTests {
 
 
     @Test
-    fun `test findAuthsByEmail`() = runBlocking {
+    fun `test findAuthsByLogin`(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        assertEquals(0, countUserBefore)
+        val countUserAuthBefore = context.countUserAuthority()
+        assertEquals(0, countUserAuthBefore)
+        lateinit var userWithAuths: User
+        (user to context).signup().apply {
+            isRight().run(::assertTrue)
+            isLeft().run(::assertFalse)
+        }.map {
+            userWithAuths = user.withId(it).copy(password = EMPTY_STRING)
+            userWithAuths.roles.isEmpty().run(::assertTrue)
+        }
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+        context.findAuthsByLogin(user.login)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .run { userWithAuths = userWithAuths.copy(roles = this!!) }
+        userWithAuths.roles.isNotEmpty().run(::assertTrue)
+        assertEquals(ROLE_USER, userWithAuths.roles.first().id)
+        "userWithAuths : $userWithAuths".run(::println)
+    }
+
+    @Test
+    fun `test findAuthsByEmail`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -130,7 +160,7 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test findOneWithAuths with existing email login and roles`() = runBlocking {
+    fun `test findOneWithAuths with existing email login and roles`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -148,7 +178,7 @@ class UserDaoTests {
 
 
     @Test
-    fun `try to do implementation of findOneWithAuths with existing email login and roles using composed query`() =
+    fun `try to do implementation of findOneWithAuths with existing email login and roles using composed query`(): Unit =
         runBlocking {
             val countUserBefore = context.countUsers()
             assertEquals(0, countUserBefore)
@@ -172,7 +202,7 @@ class UserDaoTests {
         }
 
     @Test
-    fun `try to do implementation of findOneWithAuths with existing email login and roles`() = runBlocking {
+    fun `try to do implementation of findOneWithAuths with existing email login and roles`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -303,7 +333,7 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test findOne with not existing email or login`() = runBlocking {
+    fun `test findOne with not existing email or login`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         context.findOne<User>(user.email).apply {
             assertFalse(isRight())
@@ -316,16 +346,21 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test findOne`() = runBlocking {
-        assertEquals(0, context.countUsers())
-        (user to context).save()
-        assertEquals(1, context.countUsers())
-
-        context.findOne<User>(user.email).apply {
+    fun `test findOne`(): Unit = runBlocking {
+        context.getBean<TransactionalOperator>().executeAndAwait {
+            assertEquals(0, context.countUsers())
+            (user to context).save()
+            assertEquals(1, context.countUsers())
+        }
+        lateinit var findOneEmailResult: Either<Throwable, UUID>
+        context.getBean<TransactionalOperator>().executeAndAwait {
+            findOneEmailResult = context.findOne<User>(user.email)
+        }
+        findOneEmailResult.apply {
             assertTrue(isRight())
             assertFalse(isLeft())
         }.map { assertDoesNotThrow { fromString(it.toString()) } }
-
+        println("findOneEmailResult : $findOneEmailResult")
         context.findOne<User>(user.login).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
@@ -334,14 +369,14 @@ class UserDaoTests {
 
 
     @Test
-    fun `save default user should work in this context `() = runBlocking {
+    fun `save default user should work in this context `(): Unit = runBlocking {
         val count = context.countUsers()
         (user to context).save()
         assertEquals(expected = count + 1, context.countUsers())
     }
 
     @Test
-    fun `test retrieve id from user by existing login`() = runBlocking {
+    fun `test retrieve id from user by existing login`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -362,7 +397,7 @@ class UserDaoTests {
     }
 
     @Test
-    fun `count users, expected 0`() = runBlocking {
+    fun `count users, expected 0`(): Unit = runBlocking {
         assertEquals(
             0,
             context.countUsers(),
@@ -370,4 +405,15 @@ class UserDaoTests {
         )
     }
 
+    //TODO: move this test RoleDaoTests
+    @Test
+    fun `count roles, expected 3`(): Unit = runBlocking {
+        context.run {
+            assertEquals(
+                defaultRoles.size,
+                countRoles(),
+                "Because init sql script does insert default roles."
+            )
+        }
+    }
 }
