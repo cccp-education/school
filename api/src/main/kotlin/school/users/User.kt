@@ -263,7 +263,9 @@ data class User(
                     User::class -> {
                         try {
                             if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
-                                Exception("not a valid login or not a valid email").left()
+                                "not a valid login or not a valid email"
+                                    .run(::Exception)
+                                    .left()
                             val user = findOne<User>(emailOrLogin).getOrNull()
                             val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
                             when {
@@ -401,7 +403,6 @@ data class User(
                     langKey = "en" // Valeur par défaut, ajustez si nécessaire
                 )
             }
-
         }
     }
 }
