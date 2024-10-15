@@ -83,19 +83,31 @@ dependencies {
     // Jackson marshaller
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Spring
+    // Spring tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 //    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+
+    // Springboot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+
+    // Spring security
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-data")
-    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
+
+
+    // Spring cloud
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:${properties["spring_cloud_starter.version"]}") {
+        exclude(module = "commons-collections")
+    }
+
+
 
     // Spring tests
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -135,9 +147,6 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:${properties["archunit_junit5.version"]}")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:${properties["archunit_junit5.version"]}")
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:${properties["spring_cloud_starter.version"]}") {
-        exclude(module = "commons-collections")
-    }
     implementation("io.arrow-kt:arrow-core:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-fx-coroutines:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
