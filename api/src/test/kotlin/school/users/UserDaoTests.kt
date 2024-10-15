@@ -19,7 +19,6 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import reactor.kotlin.core.publisher.toMono
 import school.base.model.EntityModel.Members.withId
 import school.base.property.EMPTY_STRING
 import school.base.property.ROLE_USER
@@ -30,6 +29,7 @@ import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findAuthsByEmail
+import school.users.User.UserDao.Dao.findAuthsById
 import school.users.User.UserDao.Dao.findAuthsByLogin
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
@@ -65,9 +65,25 @@ class UserDaoTests {
 //        context.findOneWithAuths<User>(user.email)
 //            .map { println("context.findOneWithAuths<User>(${user.email}).map : " + it) }
 //            .mapLeft { println("onLeft") }
-//        println("context.findOneWithAuths<User>(user.email).getOrNull() : " + context.findOneWithAuths<User>(user.email).getOrNull())
+
+        context.findOneWithAuths<User>(user.email)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .run { "context.findOneWithAuths<User>(${user.email}).getOrNull() : $this" }
+            .run(::println)
         println("context.findOne<User>(user.email).getOrNull() : ${context.findOne<User>(user.email).getOrNull()}")
-        println("context.findAuthsByEmail(user.email).getOrNull() : ${context.findAuthsByEmail(user.email).getOrNull()}")
+        println(
+            "context.findAuthsByEmail(user.email).getOrNull() : ${
+                context.findAuthsByEmail(user.email).getOrNull()
+            }"
+        )
+        println(
+            "context.findOneWithAuths<User>(user.email).getOrNull() : " + context.findAuthsById(
+                context.findOne<User>(
+                    user.email
+                ).getOrNull()!!
+            ).getOrNull()
+        )
     }
 
 //    fun ApplicationContext.findAuthsByEmailOrLogin(emailOrLogin:String):Either<Throwable,Set<Role>>{ }

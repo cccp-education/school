@@ -231,148 +231,149 @@ data class User(
                     else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
-            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
-                        .bind("email", email)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
-
-            suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
-                        .bind("login", login)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
-
-            suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
-                        .bind("userId", userId)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
-
-            suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
-                User().withId(id).copy(password = EMPTY_STRING).run user@{
-                    findAuthsById(id).getOrNull().run roles@{
-                        return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
-                        else copy(roles = this@roles).right()
-                    }
-                }
-            } catch (e: Throwable) {
-                e.left()
-            }
-
-            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
-                .getBean<Validator>()
-                .validateValue(User::class.java, "email", first)
-                .isEmpty()
-
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String)
                     : Either<Throwable, Pair<UUID, Set<Role>>> = when (T::class) {
                 User::class -> {
                     try {
-                        findOne<User>(emailOrLogin).map { id ->
-                            findAuthsById(id)
-                                .mapLeft { Exception("not able to retrieve roles").left() }
-                                .map { roles -> (id to roles).right() }
-                        }.mapLeft { Exception("not able to retrieve userId").left() }
-                        Exception("not able to retrieve userId and roles").left()
+                        val idNullable: UUID? = findOne<User>(emailOrLogin).getOrNull()
+                        val rolesNullable: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
+                        if (idNullable != null && rolesNullable != null) {
+                            (idNullable to rolesNullable).right()
+                        } else Exception("not able to retrieve user  id and roles").left()
+                }
+
+                catch(e: Throwable) {
+                    e.left()
+                }
+            }
+
+            else -> IllegalArgumentException("Unsupported type: ${T::
+            class.simpleName}").left()
+        }
+
+        suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+            mutableSetOf<Role>().apply {
+                getBean<DatabaseClient>()
+                    .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                    .bind("email", email)
+                    .fetch()
+                    .all()
+                    .collect { add(Role(it["ROLE"].toString())) }
+            }.toSet().right()
+        } catch (e: Throwable) {
+            e.left()
+        }
+
+        suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
+            mutableSetOf<Role>().apply {
+                getBean<DatabaseClient>()
+                    .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
+                    .bind("login", login)
+                    .fetch()
+                    .all()
+                    .collect { add(Role(it["ROLE"].toString())) }
+            }.toSet().right()
+        } catch (e: Throwable) {
+            e.left()
+        }
+
+        suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
+            mutableSetOf<Role>().apply {
+                getBean<DatabaseClient>()
+                    .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+                    .bind("userId", userId)
+                    .fetch()
+                    .all()
+                    .collect { add(Role(it["ROLE"].toString())) }
+            }.toSet().right()
+        } catch (e: Throwable) {
+            e.left()
+        }
+
+        suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
+            User().withId(id).copy(password = EMPTY_STRING).run user@{
+                findAuthsById(id).getOrNull().run roles@{
+                    return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
+                    else copy(roles = this@roles).right()
+                }
+            }
+        } catch (e: Throwable) {
+            e.left()
+        }
+
+        fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
+            .getBean<Validator>()
+            .validateValue(User::class.java, "email", first)
+            .isEmpty()
+
+        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
+            when (T::class) {
+                User::class -> {
+                    try {
+                        (getBean<DatabaseClient>()
+                            .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
+                            .bind("login", login)
+                            .fetch()
+                            .awaitOne()
+                            .let { it["`id`"] as UUID }).right()
                     } catch (e: Throwable) {
                         e.left()
                     }
                 }
 
-                else -> IllegalArgumentException("Unsupported type: ${T::class.simpleName}").left()
+                else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
             }
 
 
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
-                when (T::class) {
-                    User::class -> {
-                        try {
-                            (getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
-                                .bind("login", login)
-                                .fetch()
-                                .awaitOne()
-                                .let { it["`id`"] as UUID }).right()
-                        } catch (e: Throwable) {
-                            e.left()
-                        }
+        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, UUID> =
+            when (T::class) {
+                User::class -> {
+                    try {
+                        getBean<DatabaseClient>()
+                            .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:email)")
+                            .bind("email", email)
+                            .fetch()
+                            .awaitOne()
+                            .let { it["id"] as UUID }
+                            .right()
+                    } catch (e: Throwable) {
+                        e.left()
                     }
-
-                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
                 }
 
-
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByEmail(email: String): Either<Throwable, UUID> =
-                when (T::class) {
-                    User::class -> {
-                        try {
-                            getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:email)")
-                                .bind("email", email)
-                                .fetch()
-                                .awaitOne()
-                                .let { it["id"] as UUID }
-                                .right()
-                        } catch (e: Throwable) {
-                            e.left()
-                        }
-                    }
-
-                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
-                }
-
-            @Throws(EmptyResultDataAccessException::class)
-            suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
-                second.getBean<TransactionalOperator>().executeAndAwait {
-                    (first to second).save()
-                }
-                second.findOneByEmail<User>(first.email)
-                    .mapLeft { return Exception("Unable to find user by email").left() }
-                    .map {
-                        (UserRole(userId = it, role = ROLE_USER) to second).signup()
-                        return it.right()
-                    }
-            } catch (e: Throwable) {
-                e.left()
+                else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
             }
 
-            fun ApplicationContext.signupToUser(signup: Signup): User = signup.apply {
-                // Validation du mot de passe et de la confirmation
-                require(password == repassword) { "Passwords do not match!" }
-            }.run {
-                // Création d'un utilisateur à partir des données de Signup
-                User(
-                    id = randomUUID(), // Génération d'un UUID
-                    login = login,
-                    password = getBean<PasswordEncoder>().encode(password),
-                    email = email,
-                    roles = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
-                    langKey = "en" // Valeur par défaut, ajustez si nécessaire
-                )
+        @Throws(EmptyResultDataAccessException::class)
+        suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
+            second.getBean<TransactionalOperator>().executeAndAwait {
+                (first to second).save()
             }
-
+            second.findOneByEmail<User>(first.email)
+                .mapLeft { return Exception("Unable to find user by email").left() }
+                .map {
+                    (UserRole(userId = it, role = ROLE_USER) to second).signup()
+                    return it.right()
+                }
+        } catch (e: Throwable) {
+            e.left()
         }
+
+        fun ApplicationContext.signupToUser(signup: Signup): User = signup.apply {
+            // Validation du mot de passe et de la confirmation
+            require(password == repassword) { "Passwords do not match!" }
+        }.run {
+            // Création d'un utilisateur à partir des données de Signup
+            User(
+                id = randomUUID(), // Génération d'un UUID
+                login = login,
+                password = getBean<PasswordEncoder>().encode(password),
+                email = email,
+                roles = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
+                langKey = "en" // Valeur par défaut, ajustez si nécessaire
+            )
+        }
+
     }
+}
 }
