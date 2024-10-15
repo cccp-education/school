@@ -50,7 +50,6 @@ import school.users.security.Role
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.util.*
-import java.util.UUID.randomUUID
 import jakarta.validation.constraints.Email as EmailConstraint
 
 data class User(
@@ -230,18 +229,25 @@ data class User(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
-            //TODO: return the complete user from db without roles
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, UUID> =
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, User> =
                 when (T::class) {
                     User::class -> try {
                         FIND_USER_BY_LOGIN_OR_EMAIL
                             .run(getBean<DatabaseClient>()::sql)
-                            .bind("email", emailOrLogin)
-                            .bind("login", emailOrLogin)
+                            .bind(EMAIL_ATTR, emailOrLogin)
+                            .bind(LOGIN_ATTR, emailOrLogin)
                             .fetch()
                             .awaitSingle()
-                            .let { it[ID_ATTR] as UUID }
-                            .right()
+                            .let {
+                                User(
+                                    id = it[ID_FIELD] as UUID,
+                                    email = if ((emailOrLogin to this).isThisEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
+                                    login = if ((emailOrLogin to this).isThisLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
+                                    password = it[PASSWORD_FIELD] as String,
+                                    langKey = it[LANG_KEY_FIELD] as String,
+                                    version = it[VERSION_FIELD] as Long,
+                                )
+                            }.right()
                     } catch (e: Throwable) {
                         e.left()
                     }
@@ -252,33 +258,29 @@ data class User(
                         .left()
                 }
 
-            //TODO: return the complete user from db with roles
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String)
-                    : Either<Throwable, Pair<UUID, Set<Role>>> = when (T::class) {
-                User::class -> {
-                    try {
-                        var user = User()
-                        when {
-                            (emailOrLogin to this).isThisEmail() -> user = user.copy(email = emailOrLogin)
-                            (emailOrLogin to this).isThisLogin() -> user = user.copy(login = emailOrLogin)
-                            else -> Exception("not a valid login or not a valid email").left()
-                        }
-                        val idNullable: UUID? = findOne<User>(emailOrLogin).getOrNull()
-                        val rolesNullable: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
-                        if (idNullable != null && rolesNullable != null) {
-                            user = user.copy(roles = rolesNullable)
-                            (idNullable to rolesNullable).right()
-                        } else Exception("not able to retrieve user  id and roles").left()
-                    } catch (e: Throwable) {
-                        e.left()
-                    }
-                }
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
+                when (T::class) {
+                    User::class -> {
+                        try {
+                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
+                                Exception("not a valid login or not a valid email").left()
+                            val user = findOne<User>(emailOrLogin).getOrNull()
+                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
+                            when {
+                                user != null && roles != null -> user.copy(roles = roles).right()
 
-                else -> (T::class.simpleName)
-                    .run { "Unsupported type: $this" }
-                    .run(::IllegalArgumentException)
-                    .left()
-            }
+                                else -> Exception("not able to retrieve user  id and roles").left()
+                            }
+                        } catch (e: Throwable) {
+                            e.left()
+                        }
+                    }
+
+                    else -> (T::class.simpleName)
+                        .run { "Unsupported type: $this" }
+                        .run(::IllegalArgumentException)
+                        .left()
+                }
 
             //TODO: return the complete user from db with roles
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
@@ -391,7 +393,7 @@ data class User(
             }.run {
                 // Création d'un utilisateur à partir des données de Signup
                 User(
-                    id = randomUUID(), // Génération d'un UUID
+//                    id = randomUUID(), // Génération d'un UUID
                     login = login,
                     password = getBean<PasswordEncoder>().encode(password),
                     email = email,
