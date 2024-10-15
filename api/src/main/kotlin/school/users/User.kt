@@ -68,7 +68,7 @@ data class User(
     val email: String = EMPTY_STRING,
 
     @JsonIgnore
-    val roles: Set<Role> = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)),
+    val roles: Set<Role> = emptySet(),
 
     @field:Size(min = 2, max = 10)
     val langKey: String = EMPTY_STRING,
