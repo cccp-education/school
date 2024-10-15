@@ -1,4 +1,7 @@
-@file:Suppress("JUnitMalformedDeclaration", "SqlNoDataSourceInspection")
+@file:Suppress(
+    "JUnitMalformedDeclaration",
+    "SqlNoDataSourceInspection"
+)
 
 package school.users
 
@@ -43,11 +46,9 @@ import java.util.*
 import java.util.UUID.fromString
 import kotlin.test.*
 
-@SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
+@SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 class UserDaoTests {
-
-
     @Autowired
     lateinit var context: ApplicationContext
 
@@ -90,6 +91,26 @@ class UserDaoTests {
 //        context.findAuthsById(context.findOne<User>(user.email).getOrNull()!!.id!!).getOrNull()
 //            .run { "context.findOneWithAuths<User>(user.email).getOrNull() : $this" }
 //            .run(::println)
+    }
+
+    @Test
+    fun `test findOne`(): Unit = runBlocking {
+        assertEquals(0, context.countUsers())
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+        lateinit var findOneEmailResult: Either<Throwable, User>
+//        context.getBean<TransactionalOperator>().executeAndAwait {
+        findOneEmailResult = context.findOne<User>(user.email)
+//        }
+//        findOneEmailResult.apply {
+//            assertTrue(isRight())
+//            assertFalse(isLeft())
+//        }.map { assertDoesNotThrow { fromString(it.toString()) } }
+        println("findOneEmailResult : ${findOneEmailResult.getOrNull()}")
+        context.findOne<User>(user.login).apply {
+//            assertTrue(isRight())
+//            assertFalse(isLeft())
+        }.map { assertDoesNotThrow { fromString(it.toString()) } }
     }
 
     @Test
@@ -370,27 +391,6 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test findOne`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers())
-        (user to context).save()
-        assertEquals(1, context.countUsers())
-        lateinit var findOneEmailResult: Either<Throwable, User>
-//        context.getBean<TransactionalOperator>().executeAndAwait {
-        findOneEmailResult = context.findOne<User>(user.email)
-//        }
-//        findOneEmailResult.apply {
-//            assertTrue(isRight())
-//            assertFalse(isLeft())
-//        }.map { assertDoesNotThrow { fromString(it.toString()) } }
-        println("findOneEmailResult : ${findOneEmailResult.getOrNull()}")
-        context.findOne<User>(user.login).apply {
-//            assertTrue(isRight())
-//            assertFalse(isLeft())
-        }.map { assertDoesNotThrow { fromString(it.toString()) } }
-    }
-
-
-    @Test
     fun `save default user should work in this context `(): Unit = runBlocking {
         val count = context.countUsers()
         (user to context).save()
@@ -438,5 +438,4 @@ class UserDaoTests {
             )
         }
     }
-
 }
