@@ -22,9 +22,9 @@ import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel.Members.withId
 import school.base.property.EMPTY_STRING
 import school.base.property.ROLE_USER
-import school.base.tdd.TestUtils.Data.user
-import school.base.tdd.TestUtils.defaultRoles
 import school.base.utils.i
+import school.tdd.TestUtils.Data.user
+import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
@@ -374,11 +374,9 @@ class UserDaoTests {
 
     @Test
     fun `test findOne`(): Unit = runBlocking {
-        context.getBean<TransactionalOperator>().executeAndAwait {
-            assertEquals(0, context.countUsers())
-            (user to context).save()
-            assertEquals(1, context.countUsers())
-        }
+        assertEquals(0, context.countUsers())
+        (user to context).save()
+        assertEquals(1, context.countUsers())
         lateinit var findOneEmailResult: Either<Throwable, UUID>
         context.getBean<TransactionalOperator>().executeAndAwait {
             findOneEmailResult = context.findOne<User>(user.email)
@@ -443,4 +441,5 @@ class UserDaoTests {
             )
         }
     }
+
 }

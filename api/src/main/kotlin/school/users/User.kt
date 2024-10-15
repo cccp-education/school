@@ -78,6 +78,7 @@ data class User(
     val version: Long = -1,
 ) : EntityModel<UUID>() {
     companion object {
+        val USERCLASS = User::class.java
         @JvmStatic
         fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
     }
@@ -166,12 +167,10 @@ data class User(
 
             //TODO: signup, findByEmailOrLogin,
             val FIND_USER_BY_LOGIN =
-                "SELECT u.${UserDao.Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} AS u WHERE u.${UserDao.Fields.LOGIN_FIELD}= LOWER(:${UserDao.Attributes.LOGIN_ATTR})"
-            val FIND_USER_BY_LOGIN_OR_EMAIL = """                            
-                             SELECT `u`.`id`
-                             FROM `user` AS `u`
-                             WHERE LOWER(CAST(`u`.`email` AS CITEXT)) = LOWER(:email AS CITEXT) 
-                             or LOWER(CAST(`u`.`login` AS CITEXT)) = LOWER(:login AS CITEXT)""".trimIndent()
+                "SELECT `u`.${UserDao.Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} AS `u` WHERE u.${UserDao.Fields.LOGIN_FIELD}= LOWER(:${UserDao.Attributes.LOGIN_ATTR})"
+            val FIND_USER_BY_LOGIN_OR_EMAIL =
+                "SELECT `u`.`id` FROM `user` AS `u` WHERE LOWER(`u`.`email`) = LOWER(:email) OR LOWER(`u`.`login`) = LOWER(:login)"
+                    .trimIndent()
 
             @JvmStatic
             val CREATE_TABLES: String
@@ -194,6 +193,7 @@ data class User(
                     .toString()
                     .toInt()
 
+            //TODO: return the complete user from db without roles
             @Throws(EmptyResultDataAccessException::class)
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
                 second.getBean<R2dbcEntityTemplate>()
@@ -218,22 +218,20 @@ data class User(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
+            //TODO: return the complete user from db without roles
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, UUID> =
                 when (T::class) {
-                    User::class -> {
-                        try {
-                            FIND_USER_BY_LOGIN_OR_EMAIL
-                                .trimIndent()
-                                .run(getBean<DatabaseClient>()::sql)
-                                .bind("email", emailOrLogin)
-                                .bind("login", emailOrLogin)
-                                .fetch()
-                                .awaitSingle()
-                                .let { it["id"] as UUID }
-                                .right()
-                        } catch (e: Throwable) {
-                            e.left()
-                        }
+                    User::class -> try {
+                        FIND_USER_BY_LOGIN_OR_EMAIL
+                            .run(getBean<DatabaseClient>()::sql)
+                            .bind("email", emailOrLogin)
+                            .bind("login", emailOrLogin)
+                            .fetch()
+                            .awaitSingle()
+                            .let { it[ID_ATTR] as UUID }
+                            .right()
+                    } catch (e: Throwable) {
+                        e.left()
                     }
 
                     else -> (T::class.simpleName)
@@ -243,13 +241,31 @@ data class User(
 
                 }
 
+            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
+                .getBean<Validator>()
+                .validateValue(USERCLASS, "email", first)
+                .isEmpty()
+
+            fun Pair<String, ApplicationContext>.isThisLogin(): Boolean = second
+                .getBean<Validator>()
+                .validateValue(USERCLASS, "login", first)
+                .isEmpty()
+
+            //TODO: return the complete user from db with roles
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String)
                     : Either<Throwable, Pair<UUID, Set<Role>>> = when (T::class) {
                 User::class -> {
                     try {
+                        var user: User = User()
+                        when {
+                            (emailOrLogin to this).isThisEmail() -> user = user.copy(email = emailOrLogin)
+                            (emailOrLogin to this).isThisLogin() -> user = user.copy(login = emailOrLogin)
+                            else -> Exception("not a valid login or not a valid email").left()
+                        }
                         val idNullable: UUID? = findOne<User>(emailOrLogin).getOrNull()
                         val rolesNullable: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
                         if (idNullable != null && rolesNullable != null) {
+                            user = user.copy(roles = rolesNullable)
                             (idNullable to rolesNullable).right()
                         } else Exception("not able to retrieve user  id and roles").left()
                     } catch (e: Throwable) {
@@ -257,14 +273,13 @@ data class User(
                     }
                 }
 
-                else -> IllegalArgumentException(
-                    "Unsupported type: ${
-                        T::
-                        class.simpleName
-                    }"
-                ).left()
+                else -> (T::class.simpleName)
+                    .run { "Unsupported type: $this" }
+                    .run(::IllegalArgumentException)
+                    .left()
             }
 
+            //TODO: return the complete user from db with roles
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {
                     getBean<DatabaseClient>()
@@ -315,10 +330,6 @@ data class User(
                 e.left()
             }
 
-            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
-                .getBean<Validator>()
-                .validateValue(User::class.java, "email", first)
-                .isEmpty()
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
                 when (T::class) {

@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
-import school.base.tdd.TestUtils.Data.OFFICIAL_SITE
+import school.tdd.TestUtils.Data.OFFICIAL_SITE
 import school.base.property.Config
 import school.base.property.DEVELOPMENT
 import school.base.property.PRODUCTION

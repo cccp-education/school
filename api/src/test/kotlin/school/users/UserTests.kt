@@ -11,7 +11,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.base.tdd.TestUtils.Data.user
+import school.tdd.TestUtils.Data.user
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
 import school.base.utils.i
