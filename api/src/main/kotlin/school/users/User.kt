@@ -35,6 +35,8 @@ import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Attributes.PASSWORD_ATTR
 import school.users.User.UserDao.Attributes.VERSION_ATTR
+import school.users.User.UserDao.Attributes.isThisEmail
+import school.users.User.UserDao.Attributes.isThisLogin
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.ID_FIELD
@@ -79,6 +81,7 @@ data class User(
 ) : EntityModel<UUID>() {
     companion object {
         val USERCLASS = User::class.java
+
         @JvmStatic
         fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
     }
@@ -138,6 +141,15 @@ data class User(
             val EMAIL_ATTR = EMAIL_FIELD.cleanField()
             const val LANG_KEY_ATTR = "langKey"
             val VERSION_ATTR = VERSION_FIELD.cleanField()
+            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
+                .getBean<Validator>()
+                .validateValue(USERCLASS, EMAIL_ATTR, first)
+                .isEmpty()
+
+            fun Pair<String, ApplicationContext>.isThisLogin(): Boolean = second
+                .getBean<Validator>()
+                .validateValue(USERCLASS, LOGIN_ATTR, first)
+                .isEmpty()
         }
 
         object Relations {
@@ -238,25 +250,14 @@ data class User(
                         .run { "Unsupported type: $this" }
                         .run(::IllegalArgumentException)
                         .left()
-
                 }
-
-            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
-                .getBean<Validator>()
-                .validateValue(USERCLASS, "email", first)
-                .isEmpty()
-
-            fun Pair<String, ApplicationContext>.isThisLogin(): Boolean = second
-                .getBean<Validator>()
-                .validateValue(USERCLASS, "login", first)
-                .isEmpty()
 
             //TODO: return the complete user from db with roles
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String)
                     : Either<Throwable, Pair<UUID, Set<Role>>> = when (T::class) {
                 User::class -> {
                     try {
-                        var user: User = User()
+                        var user = User()
                         when {
                             (emailOrLogin to this).isThisEmail() -> user = user.copy(email = emailOrLogin)
                             (emailOrLogin to this).isThisLogin() -> user = user.copy(login = emailOrLogin)
