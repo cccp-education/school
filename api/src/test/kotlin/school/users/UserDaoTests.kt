@@ -59,41 +59,50 @@ class UserDaoTests {
 
     @Test
     fun `test findOneWithAuths`(): Unit = runBlocking {
-        (user to context).signup()
+        assertEquals(0, context.countUsers())
+        assertEquals(0, context.countUserAuthority())
+
+        val id = (user to context).signup().getOrNull()!!
+
+        id.apply { run(::assertNotNull) }
+            .run { "(user to context).signup() : $this" }
+            .run(::println)
+
+
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-//        context.findOneWithAuths<User>(user.email)
-//            .map { println("context.findOneWithAuths<User>(${user.email}).map : " + it) }
-//            .mapLeft { println("onLeft") }
 
         context.findOneWithAuths<User>(user.email)
             .getOrNull()
-            .apply { run(::assertNotNull) }
-            .run { "context.findOneWithAuths<User>(${user.email}).getOrNull() : $this" }
+            .apply {
+                run(::assertNotNull)
+                assertEquals(1, this?.second?.size)
+                assertEquals(ROLE_USER, this?.second?.first()?.id)
+                assertEquals(id, this?.first)
+            }.run { "context.findOneWithAuths<User>(${user.email}).getOrNull() : $this" }
             .run(::println)
-        println("context.findOne<User>(user.email).getOrNull() : ${context.findOne<User>(user.email).getOrNull()}")
-        println(
-            "context.findAuthsByEmail(user.email).getOrNull() : ${
-                context.findAuthsByEmail(user.email).getOrNull()
-            }"
-        )
-        println(
-            "context.findOneWithAuths<User>(user.email).getOrNull() : " + context.findAuthsById(
-                context.findOne<User>(
-                    user.email
-                ).getOrNull()!!
-            ).getOrNull()
-        )
-    }
 
-//    fun ApplicationContext.findAuthsByEmailOrLogin(emailOrLogin:String):Either<Throwable,Set<Role>>{ }
+        context.findOne<User>(user.email).getOrNull()
+            .run { "context.findOne<User>(user.email).getOrNull() : $this" }
+            .run(::println)
+
+        context.findAuthsByEmail(user.email).getOrNull()
+            .run { "context.findAuthsByEmail(user.email).getOrNull() : $this" }
+            .run(::println)
+
+        context.findAuthsById(context.findOne<User>(user.email).getOrNull()!!).getOrNull()
+            .run { "context.findOneWithAuths<User>(user.email).getOrNull() : $this" }
+            .run(::println)
+    }
 
     @Test
     fun `test findUserById`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
+
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
+
         lateinit var userWithAuths: User
 
         (user to context).signup().apply {
@@ -118,7 +127,9 @@ class UserDaoTests {
             assertEquals(first?.roles?.size, second.roles.size)
             assertEquals(first?.roles?.first(), second.roles.first())
         }
+
         userWithAuths.roles.isNotEmpty().run(::assertTrue)
+
         assertEquals(ROLE_USER, userWithAuths.roles.first().id)
         "userWithAuths : $userWithAuths".run(::println)
         "userResult : $userResult".run(::println)
