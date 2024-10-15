@@ -12,6 +12,7 @@ import school.base.configurations.http.ProblemsModel
 import java.net.URI
 import java.util.*
 import java.util.Locale.ENGLISH
+import java.util.Locale.forLanguageTag
 
 @Suppress("unused")
 //val ServerWebExchange.spaExchange: ServerWebExchange
@@ -36,7 +37,7 @@ val ServerWebExchange.validator: Validator
         .configure()
         .localeResolver {
             try {
-                Locale(
+                forLanguageTag(
                     request
                         .headers
                         .acceptLanguage
