@@ -19,7 +19,7 @@ import org.springframework.boot.runApplication
 import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironment
 import org.springframework.context.ConfigurableApplicationContext
 import school.Application
-import school.base.property.*
+import school.base.utils.*
 import school.base.utils.TEST
 import school.base.utils.VIRGULE
 import school.base.utils.i
