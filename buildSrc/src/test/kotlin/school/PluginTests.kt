@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.junit.jupiter.api.assertDoesNotThrow
 import school.GradleTestUtils.captureOutput
+import school.GradleTestUtils.displayWorkspaceDataSchemaStructure
 import school.GradleTestUtils.displayWorkspaceStructure
 import school.GradleTestUtils.initWorkspace
 import school.GradleTestUtils.projectInstance
