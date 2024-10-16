@@ -21,6 +21,7 @@ object GradleTestUtils {
             .run(::println)
     }
 
+    val initWorkspace get() = mutableMapOf<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>()
 
     val captureOutput: ByteArrayOutputStream
         get() = "captureOutput"

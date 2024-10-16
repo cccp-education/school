@@ -8,6 +8,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import school.GradleTestUtils.captureOutput
 import school.GradleTestUtils.displayWorkspaceDataSchemaStructure
 import school.GradleTestUtils.displayWorkspaceStructure
+import school.GradleTestUtils.initWorkspace
 import school.GradleTestUtils.projectInstance
 import school.GradleTestUtils.releaseOutput
 import school.PluginTests.Workspace.Education
@@ -155,7 +156,6 @@ class PluginTests {
 
     }
 
-    val initWorkspace get() = mutableMapOf<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>()
 
     fun Office.addEntry(entry: OfficeEntry) {
 //        put(entry.first.last(),entry.second)
