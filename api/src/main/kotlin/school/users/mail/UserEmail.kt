@@ -3,7 +3,7 @@ package school.users.mail
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
-import school.base.property.EMPTY_STRING
+import school.base.utils.EMPTY_STRING
 import java.time.Instant
 import java.util.*
 

@@ -56,7 +56,7 @@ package school.users//@file:Suppress(
 //    private lateinit var context: ConfigurableApplicationContext
 //    private lateinit var mailService: MailService
 //
-//    private val properties: school.base.property.Properties by lazy { context.getBean() }
+//    private val properties: school.base.utils.Properties by lazy { context.getBean() }
 //
 //    private val messageSource: MessageSource by lazy { context.getBean() }
 //

@@ -5,7 +5,7 @@ package school
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
-import school.base.property.Properties
+import school.base.utils.Properties
 import school.base.utils.startupLog
 
 

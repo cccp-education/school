@@ -21,8 +21,8 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
-import school.base.property.EMPTY_STRING
-import school.base.property.ROLE_USER
+import school.base.utils.EMPTY_STRING
+import school.base.utils.ROLE_USER
 import school.base.utils.i
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.defaultRoles

@@ -20,7 +20,7 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
-import school.base.property.Properties
+import school.base.utils.Properties
 import school.base.utils.i
 import school.users.User.UserDao
 import java.io.File

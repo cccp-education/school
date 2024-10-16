@@ -26,8 +26,8 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
 import school.base.model.EntityModel.Members.withId
-import school.base.property.EMPTY_STRING
-import school.base.property.ROLE_USER
+import school.base.utils.EMPTY_STRING
+import school.base.utils.ROLE_USER
 import school.base.utils.AppUtils.cleanField
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
 import school.users.User.UserDao.Attributes.ID_ATTR

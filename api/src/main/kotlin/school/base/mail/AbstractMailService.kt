@@ -11,7 +11,7 @@
 //import school.base.property.TITLE_KEY_SIGNUP
 //import school.base.property.USER
 //import school.base.logging.d
-//import school.base.property.Properties
+//import school.base.utils.Properties
 ////import school.accounts.models.AccountCredentials
 //import java.util.Locale.forLanguageTag
 //

@@ -7,10 +7,10 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.OFFICIAL_SITE
-import school.base.property.Properties
-import school.base.property.DEVELOPMENT
-import school.base.property.PRODUCTION
-import school.base.property.STARTUP_LOG_MSG_KEY
+import school.base.utils.Properties
+import school.base.utils.DEVELOPMENT
+import school.base.utils.PRODUCTION
+import school.base.utils.STARTUP_LOG_MSG_KEY
 import school.base.utils.i
 import java.util.*
 import java.util.Locale.FRENCH

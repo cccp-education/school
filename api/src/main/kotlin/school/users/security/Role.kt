@@ -8,9 +8,9 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingle
-import school.base.property.ROLE_ADMIN
-import school.base.property.ROLE_ANONYMOUS
-import school.base.property.ROLE_USER
+import school.base.utils.ROLE_ADMIN
+import school.base.utils.ROLE_ANONYMOUS
+import school.base.utils.ROLE_USER
 import school.base.model.EntityModel
 import school.users.security.Role.RoleDao.Fields.ID_FIELD
 

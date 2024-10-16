@@ -21,7 +21,7 @@ package school.users.security
 //import school.base.logging.i
 //import school.base.logging.t
 //import school.base.logging.w
-//import school.base.property.Properties
+//import school.base.utils.Properties
 //import java.security.Key
 //import java.util.*
 //import kotlin.text.Charsets.UTF_8

@@ -14,7 +14,7 @@
 //import school.base.logging.w
 //import school.base.property.GMAIL
 //import school.base.property.MAILSLURP
-//import school.base.property.Properties
+//import school.base.utils.Properties
 //import kotlin.text.Charsets.UTF_8
 //
 ///*=================================================================================*/

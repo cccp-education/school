@@ -7,7 +7,7 @@
 //import org.thymeleaf.spring6.SpringTemplateEngine
 //import school.base.property.GMAIL
 //import school.base.logging.i
-//import school.base.property.Properties
+//import school.base.utils.Properties
 //
 //@Suppress("unused")
 //@Async

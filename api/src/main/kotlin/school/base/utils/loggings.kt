@@ -7,7 +7,6 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import school.Application
-import school.base.property.*
 import java.net.InetAddress.getLocalHost
 import java.net.UnknownHostException
 import java.util.Locale.getDefault

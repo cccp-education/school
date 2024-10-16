@@ -23,8 +23,8 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
-import school.base.property.Properties
-import school.base.property.PRODUCTION
+import school.base.utils.Properties
+import school.base.utils.PRODUCTION
 import java.util.*
 import java.util.regex.Pattern
 

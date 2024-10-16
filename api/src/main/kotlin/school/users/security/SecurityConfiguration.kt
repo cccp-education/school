@@ -24,7 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 //import school.base.property.FEATURE_POLICY
 //import school.base.property.ROLE_ADMIN
 //import school.base.logging.d
-//import school.base.property.Properties
+//import school.base.utils.Properties
 //import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager as RepositoryAuthentication
 //
 @Configuration

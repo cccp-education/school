@@ -4,7 +4,7 @@ package school.users.profile
 
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
-import school.base.property.EMPTY_STRING
+import school.base.utils.EMPTY_STRING
 import school.users.User.UserDao
 import school.users.User.UserDao.Fields.ID_FIELD
 import school.users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD

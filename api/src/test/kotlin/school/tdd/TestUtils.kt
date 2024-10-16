@@ -7,7 +7,7 @@
 package school.tdd
 
 import org.springframework.context.ApplicationContext
-import school.base.property.*
+import school.base.utils.*
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
 import java.util.regex.Pattern

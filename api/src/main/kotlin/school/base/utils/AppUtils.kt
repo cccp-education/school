@@ -25,6 +25,7 @@ object AppUtils {
     .deleteCharAt(0)
     .deleteCharAt(length - 2)
     .toString()
+
   @JvmStatic
   val String.upperFirstLetter
     get() = run {
