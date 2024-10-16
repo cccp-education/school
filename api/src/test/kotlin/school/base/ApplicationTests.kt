@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.OFFICIAL_SITE
-import school.base.property.Config
+import school.base.property.Properties
 import school.base.property.DEVELOPMENT
 import school.base.property.PRODUCTION
 import school.base.property.STARTUP_LOG_MSG_KEY
@@ -64,6 +64,6 @@ class ApplicationTests {
     fun `ConfigurationsTests - test go visit message`() =
         assertEquals(
             OFFICIAL_SITE,
-            context.getBean<Config>().goVisitMessage
+            context.getBean<Properties>().goVisitMessage
         )
 }

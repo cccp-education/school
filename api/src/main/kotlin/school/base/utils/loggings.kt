@@ -31,7 +31,7 @@ val ApplicationContext.startupLog
     get() = logProfiles.run {
         i(startupLogMessage(StartupLogMsg(
             appName = environment.getProperty(SPRING_APPLICATION_NAME),
-            goVisitMessage = getBean<Config>().goVisitMessage,
+            goVisitMessage = getBean<Properties>().goVisitMessage,
             protocol = when {
                 environment.getProperty(SERVER_SSL_KEY_STORE) != null -> HTTPS
                 else -> HTTP

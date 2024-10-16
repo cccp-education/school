@@ -67,7 +67,7 @@ const val CLI = "utils"
 const val GMAIL = "gmail"
 const val MAILSLURP = "mailslurp"
 
-//Config
+//Properties
 const val DEV_HOST = "localhost"
 
 //HTTP param

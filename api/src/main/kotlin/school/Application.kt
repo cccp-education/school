@@ -5,12 +5,12 @@ package school
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
-import school.base.property.Config
+import school.base.property.Properties
 import school.base.utils.startupLog
 
 
 @SpringBootApplication
-@EnableConfigurationProperties(Config::class)
+@EnableConfigurationProperties(Properties::class)
 class Application {
   companion object {
     @JvmStatic

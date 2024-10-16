@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration
     )
 )
 @ConfigurationProperties(prefix = "school", ignoreUnknownFields = false)
-class Config @ConstructorBinding constructor(
+class Properties @ConstructorBinding constructor(
     val message: String = "",
     val item: String,
     val goVisitMessage: String,

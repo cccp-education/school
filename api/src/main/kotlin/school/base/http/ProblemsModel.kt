@@ -15,7 +15,7 @@ data class ProblemsModel(
 //import org.springframework.http.ProblemDetail
 //import org.springframework.http.ResponseEntity
 //import org.springframework.web.server.ServerWebExchange
-//import community.Config
+//import community.Properties
 //import java.io.Serializable
 
 //import org.zalando.problem.Problem.DEFAULT_TYPE as PROBLEM_DEFAULT_TYPE
@@ -264,7 +264,7 @@ public class BookmarkNotFoundException extends ErrorResponseException {
 //@ControllerAdvice
 //class ProblemTranslator(
 //    private val env: Environment,
-//    private val properties: Config
+//    private val properties: Properties
 //) {
 ////ProblemHandling, SecurityAdviceTrait
 //    companion object {

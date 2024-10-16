@@ -23,7 +23,7 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
-import school.base.property.Config
+import school.base.property.Properties
 import school.base.property.PRODUCTION
 import java.util.*
 import java.util.regex.Pattern
@@ -32,7 +32,7 @@ import java.util.regex.Pattern
 @EnableWebFlux
 @Configuration
 class Web (
-    private val config: Config,
+    private val config: Properties,
     private val context: ApplicationContext
 ) : WebFluxConfigurer {
 

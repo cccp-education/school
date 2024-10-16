@@ -20,7 +20,7 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
-import school.base.property.Config
+import school.base.property.Properties
 import school.base.utils.i
 import school.users.User.UserDao
 import java.io.File
@@ -32,7 +32,7 @@ import kotlin.text.Charsets.UTF_8
 @Configuration
 @EnableTransactionManagement
 @EnableR2dbcRepositories("school")
-class Database(private val config: Config) {
+class Database(private val properties: Properties) {
 
     //TODO: https://reflectoring.io/spring-bean-lifecycle/
     fun createSystemUser() {
