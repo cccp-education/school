@@ -9,10 +9,8 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
 object GradleTestUtils {
-    @JvmStatic
-    val projectInstance: Project by lazy(ProjectBuilder.builder()::build)
 
-    fun Project.displayWorkspaceDataSchemaStructure():Unit {
+    fun Project.displayWorkspaceDataSchemaStructure(): Unit {
 
     }
 
@@ -20,6 +18,10 @@ object GradleTestUtils {
         run(yamlMapper::writeValueAsString)
             .run(::println)
     }
+
+    @JvmStatic
+    val projectInstance: Project by lazy(ProjectBuilder.builder()::build)
+
 
     val initWorkspace get() = mutableMapOf<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, MutableMap<String, Any>>>>?>?>>()
 
