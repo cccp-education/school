@@ -14,6 +14,6 @@ import school.base.utils.startupLog
 class Application {
   companion object {
     @JvmStatic
-    fun main(args: Array<String>) = runApplication<Application>(*args).startupLog
+    fun main(args: Array<String>): Unit = runApplication<Application>(*args).startupLog
   }
 }

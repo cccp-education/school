@@ -5,13 +5,13 @@
 .start
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/postgresql/postgresql.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/postgresql/postgresql.yml up -d
 ----
 
 .stop
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/postgresql/postgresql.yml down
+sudo docker compose -f ~/workspace/atelier/database/postgresql/postgresql.yml down
 ----
 
 
@@ -20,13 +20,13 @@ docker compose -f ~/workspace/atelier/database/postgresql/postgresql.yml down
 .start
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/mongodb/mongodb.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/mongodb/mongodb.yml up -d
 ----
 
 .stop
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/mongodb/mongodb.yml down
+sudo docker compose -f ~/workspace/atelier/database/mongodb/mongodb.yml down
 ----
 
 
@@ -35,13 +35,13 @@ docker compose -f ~/workspace/atelier/database/mongodb/mongodb.yml down
 .start
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/mysql/mysql.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/mysql/mysql.yml up -d
 ----
 
 .stop
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/mysql/mysql.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/mysql/mysql.yml up -d
 ----
 
 == Cassandra
@@ -49,11 +49,11 @@ docker compose -f ~/workspace/atelier/database/mysql/mysql.yml up -d
 .start
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/cassandra/cassandra.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/cassandra/cassandra.yml up -d
 ----
 
 .stop
 [source,bash]
 ----
-docker compose -f ~/workspace/atelier/database/cassandra/cassandra.yml up -d
+sudo docker compose -f ~/workspace/atelier/database/cassandra/cassandra.yml up -d
 ----
