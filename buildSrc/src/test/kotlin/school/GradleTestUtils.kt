@@ -1,0 +1,38 @@
+package school
+
+import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
+import school.PluginTests.Companion.workspace
+import school.PluginTests.Workspace
+import school.workspace.WorkspaceUtils.yamlMapper
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+
+object GradleTestUtils {
+    @JvmStatic
+    val projectInstance: Project by lazy(ProjectBuilder.builder()::build)
+
+    fun Project.displayWorkspaceDataSchemaStructure():Unit {
+
+    }
+
+    fun Project.displayWorkspaceStructure(): Workspace = workspace.apply {
+        run(yamlMapper::writeValueAsString)
+            .run(::println)
+    }
+
+
+    val captureOutput: ByteArrayOutputStream
+        get() = "captureOutput"
+            .let(::println).run {
+                ByteArrayOutputStream().apply {
+                    let(::PrintStream).let(System::setOut)
+                }
+            }
+
+
+    val PrintStream.releaseOutput
+        get() = let(System::setOut)
+            .run { "releaseOutput" }
+            .let(::println)
+}

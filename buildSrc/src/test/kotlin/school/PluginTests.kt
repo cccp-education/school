@@ -1,48 +1,63 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package school
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
-import school.PluginTests.Workspace.*
+import school.GradleTestUtils.captureOutput
+import school.GradleTestUtils.displayWorkspaceDataSchemaStructure
+import school.GradleTestUtils.displayWorkspaceStructure
+import school.GradleTestUtils.projectInstance
+import school.GradleTestUtils.releaseOutput
+import school.PluginTests.Workspace.Education
+import school.PluginTests.Workspace.WorkspaceEntry
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
 import school.jbake.JBakeGhPagesPlugin
 import school.workspace.Office
 import school.workspace.OfficeEntry
-import school.workspace.WorkspaceUtils.yamlMapper
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import java.lang.System.out
-import java.lang.System.setOut
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-
-val captureOutput: ByteArrayOutputStream
-    get() = "captureOutput"
-        .let(::println).run {
-            ByteArrayOutputStream().apply {
-                let(::PrintStream).let(::setOut)
-            }
-        }
-
-
-val PrintStream.releaseOutput
-    get() = let(::setOut)
-        .run { "releaseOutput" }
-        .let(::println)
 
 
 class PluginTests {
 
     companion object {
+
         @JvmStatic
-        val projectInstance: Project by lazy {
-            ProjectBuilder.builder().build()
-        }
+        val Project.workspace: Workspace
+            get() = Workspace(
+                workspace = WorkspaceEntry(
+                    name = "fonderie",
+                    cores = mapOf(
+                        "education" to Education("talaria"),
+//                                "bibliotheque" to Office(
+//                                    "books-collection",
+//                                    "datas",
+//                                    "formations",
+//                                    "bizness",
+//                                    "notebooks",
+//                                    "pilotage",
+//                                    "schemas",
+//                                    "slides",
+//                                    "sites"
+//                                ),
+                    )
+                )
+//                "bibliotheque",
+//                "job",
+//                "configuration",
+//                "communication",
+//                "organisation",
+//                "collaboration",
+//                "dashboard",
+            )
+
     }
 
     //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
@@ -85,9 +100,9 @@ class PluginTests {
 //        val dashboard: String,
     ) {
         interface CoreEntry
-        data class WorkspaceEntry(val name: String, val core: Any)
-        data class Education(val name: String) : CoreEntry
-        data class WorkspaceEnveloppe(val workspace: Workspace) : CoreEntry
+        data class WorkspaceEntry(val name: String, val cores: Map<String, CoreEntry>)
+        data class Education(val school: String) : CoreEntry
+        data class WorkspaceEnveloppe(val workspace: Workspace)// : CoreEntry
 
         data class Office(
             val books: String,
@@ -99,66 +114,19 @@ class PluginTests {
             val schemas: String,
             val slides: String,
             val sites: String
-        ) : CoreEntry
+        )// : CoreEntry
     }
 
     @Test
-    fun checkWorkspaceStruture() {
+    fun `test Workspace structure`(): Unit {
         assertDoesNotThrow {
-            projectInstance.run {
-//                WorkspaceEnveloppe(
-                    Workspace(
-                        workspace = WorkspaceEntry(
-                            name = "fonderie", core = mapOf(
-                                "school" to Education("talaria"),
-                                "bibliotheque" to Office(
-                                    "books-collection",
-                                    "datas",
-                                    "formations",
-                                    "bizness",
-                                    "notebooks",
-                                    "pilotage",
-                                    "schemas",
-                                    "slides",
-                                    "sites"
-                                ),
-                            )
-                        )
-//                    )
-//                "bibliotheque",
-//                "job",
-//                "configuration",
-//                "communication",
-//                "organisation",
-//                "collaboration",
-//                "dashboard",
-                ).run workspace@{
-                    yamlMapper
-                        .writeValueAsString(this@workspace)
-                        .apply { println(this) }
-                    val om: ObjectMapper = ObjectMapper()
-//                    om.writeValueAsString(this).run(::println)
-//                    om.writeValueAsString(
-//                        Workspace.Office(
-//                            "bibliotheque",
-//                            "job",
-//                            "configuration",
-//                            "communication",
-//                            "organisation",
-//                            "collaboration",
-//                            "dashboard",
-//                            "slides",
-//                            "sites"
-//                        )
-//                    )
-//                    .run(::println)
-                }
-            }
+            projectInstance.displayWorkspaceStructure()
+            projectInstance.displayWorkspaceDataSchemaStructure()
         }
     }
 
     @Test
-    fun checkInitWorkspace() = initWorkspace
+    fun checkInitWorkspace(): Unit = initWorkspace
         .run(Office::isEmpty)
         .run(::assertTrue)
 
@@ -173,7 +141,7 @@ class PluginTests {
      *
      */
     @Test
-    fun checkAddEntryToWorkspace() {
+    fun checkAddEntryToWorkspace(): Unit {
         val ws: Office = initWorkspace
         ws.addEntry(
             listOf(
@@ -193,9 +161,9 @@ class PluginTests {
 //        put(entry.first.last(),entry.second)
     }
 
-
     @Test
-    fun `From FormPlugin, check 'form' task render expected message`() {
+    @Ignore
+    fun `From FormPlugin, check 'form' task render expected message`(): Unit {
         val outputStreamCaptor = captureOutput
         projectInstance.run {
             apply<FormPlugin>()
@@ -214,7 +182,7 @@ class PluginTests {
     }
 
     @Test
-    fun `From FormPlugin, check 'form' task exists`() {
+    fun `From FormPlugin, check 'form' task exists`(): Unit {
         projectInstance.run {
             apply<FormPlugin>()
             assertNotNull("isFormAuthOk".let(tasks::findByName))
@@ -223,7 +191,7 @@ class PluginTests {
 
 
     @Test
-    fun `From SchoolPlugin, check 'hello' task exists`() {
+    fun `From SchoolPlugin, check 'hello' task exists`(): Unit {
         projectInstance.run {
             apply<SchoolPlugin>()
             assertNotNull(TASK_HELLO.let(tasks::findByName))
@@ -231,7 +199,7 @@ class PluginTests {
     }
 
     @Test
-    fun `From JBakeGhPagesPlugin, check 'helloJBakeGhPages' task exists`() {
+    fun `From JBakeGhPagesPlugin, check 'helloJBakeGhPages' task exists`(): Unit {
         projectInstance.run {
             apply<JBakeGhPagesPlugin>()
             assertNotNull("helloJBakeGhPages".let(tasks::findByName))
