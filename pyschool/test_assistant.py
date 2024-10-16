@@ -6,7 +6,7 @@ from assertpy import assert_that
 from datasets import load_dataset
 from langchain_openai import ChatOpenAI
 
-from assistant import format_dataset_to_json
+from dataset import format_dataset_to_json
 from assistant_utils import ASSISTANT_ENV, set_environment
 from config import OPENAI_API_KEY
 
