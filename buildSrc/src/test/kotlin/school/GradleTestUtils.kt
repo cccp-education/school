@@ -11,7 +11,7 @@ import java.io.PrintStream
 object GradleTestUtils {
 
     fun Project.displayWorkspaceDataSchemaStructure(): Unit {
-
+        println(workspace)
     }
 
     fun Project.displayWorkspaceStructure(): Workspace = workspace.apply {
