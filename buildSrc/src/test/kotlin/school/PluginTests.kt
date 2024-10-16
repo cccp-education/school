@@ -5,8 +5,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
-import school.PluginTests.Workspace.Education
-import school.PluginTests.Workspace.WorkspaceEntry
+import school.PluginTests.Workspace.*
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -38,9 +37,12 @@ val PrintStream.releaseOutput
 
 
 class PluginTests {
+
     companion object {
         @JvmStatic
-        val projectInstance: Project get() = ProjectBuilder.builder().build()
+        val projectInstance: Project by lazy {
+            ProjectBuilder.builder().build()
+        }
     }
 
     //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
@@ -85,6 +87,7 @@ class PluginTests {
         interface CoreEntry
         data class WorkspaceEntry(val name: String, val core: Any)
         data class Education(val name: String) : CoreEntry
+        data class WorkspaceEnveloppe(val workspace: Workspace) : CoreEntry
 
         data class Office(
             val books: String,
@@ -96,20 +99,32 @@ class PluginTests {
             val schemas: String,
             val slides: String,
             val sites: String
-        )
+        ) : CoreEntry
     }
 
     @Test
     fun checkWorkspaceStruture() {
         assertDoesNotThrow {
             projectInstance.run {
-                Workspace(
-                    workspace = WorkspaceEntry(
-                        name = "fonderie", core = mapOf(
-                            "school" to Education("talaria"),
-                            "core" to mapOf("school" to Education("talaria"))
+//                WorkspaceEnveloppe(
+                    Workspace(
+                        workspace = WorkspaceEntry(
+                            name = "fonderie", core = mapOf(
+                                "school" to Education("talaria"),
+                                "bibliotheque" to Office(
+                                    "books-collection",
+                                    "datas",
+                                    "formations",
+                                    "bizness",
+                                    "notebooks",
+                                    "pilotage",
+                                    "schemas",
+                                    "slides",
+                                    "sites"
+                                ),
+                            )
                         )
-                    ),
+//                    )
 //                "bibliotheque",
 //                "job",
 //                "configuration",
@@ -122,20 +137,21 @@ class PluginTests {
                         .writeValueAsString(this@workspace)
                         .apply { println(this) }
                     val om: ObjectMapper = ObjectMapper()
-                    om.writeValueAsString(this).run(::println)
-                    om.writeValueAsString(
-                        Workspace.Office(
-                            "bibliotheque",
-                            "job",
-                            "configuration",
-                            "communication",
-                            "organisation",
-                            "collaboration",
-                            "dashboard",
-                            "slides",
-                            "sites"
-                        )
-                    ).run(::println)
+//                    om.writeValueAsString(this).run(::println)
+//                    om.writeValueAsString(
+//                        Workspace.Office(
+//                            "bibliotheque",
+//                            "job",
+//                            "configuration",
+//                            "communication",
+//                            "organisation",
+//                            "collaboration",
+//                            "dashboard",
+//                            "slides",
+//                            "sites"
+//                        )
+//                    )
+//                    .run(::println)
                 }
             }
         }
