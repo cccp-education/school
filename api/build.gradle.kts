@@ -79,15 +79,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${properties["kotlinx-serialization-json.version"]}")
-
     // Jackson marshaller
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
     // Spring tools
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
-//    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+    //developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     // Springboot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -135,13 +133,12 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-fx-coroutines:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
-//    // Spring AI
-//    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
-//
-//    // OpenAI
-//    implementation("org.springframework.ai:spring-ai-openai")
-//    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
-
+    // Spring AI
+    //    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
+    //
+    //    // OpenAI
+    //    implementation("org.springframework.ai:spring-ai-openai")
+    //    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")

@@ -35,9 +35,7 @@ import kotlin.text.Charsets.UTF_8
 class Database(private val properties: Properties) {
 
     //TODO: https://reflectoring.io/spring-bean-lifecycle/
-    fun createSystemUser() {
-        i("Creating system user")
-    }
+    fun createSystemUser(): Unit = i("Creating system user")
 
     @Bean
     fun inMemoryConnectionFactory(
