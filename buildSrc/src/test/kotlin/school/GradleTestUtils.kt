@@ -3,6 +3,8 @@ package school
 // Classe principale pour la génération des schémas
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
+import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.SchemaOutputResolver
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.yaml.snakeyaml.DumperOptions
@@ -18,8 +20,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.PrintStream
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.SchemaOutputResolver
 import javax.xml.transform.Result
 import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
