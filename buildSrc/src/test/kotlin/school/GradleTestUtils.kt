@@ -89,23 +89,6 @@ class PersonSchemaGenerator {
             // Afficher le contenu du fichier généré
             println(File("person.xsd").readText())
         }
-//        @Throws(Exception::class)
-//        fun generateXmlSchema() {
-//            val context = JAXBContext.newInstance(Person::class.java)
-//            val outputResolver: SchemaOutputResolver = object : SchemaOutputResolver() {
-//                @Throws(IOException::class)
-//                override fun createOutput(namespaceUri: String, suggestedFileName: String): Result {
-//                    val file = File("person.xsd").apply {
-//                        readText(UTF_8).run(::println)
-//                    }
-//                    val result = StreamResult(file)
-//                    result.systemId = file.toURI().toURL().toString()
-//                    return result
-//                }
-//            }
-//            context.generateSchema(outputResolver)
-//
-//        }
 
         @Throws(Exception::class)
         fun generateYamlSchema(): String {
