@@ -120,10 +120,17 @@ class PluginTests {
                         data class EducationTools(val name: String) : EducationEntry()
                     }
                 }
-                //Job,Configuration,Communication,Organisation,Collaboration,Dashboard,Office
-
-
             }
+
+            interface JobEntry
+            interface ConfigurationEntry
+            interface CommunicationEntry
+            interface OrganisationEntry
+            interface CollaborationEntry
+            interface DashboardEntry
+            interface OfficeEntry
+
+
         }
 
         data class Office(
