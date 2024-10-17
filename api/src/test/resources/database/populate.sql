@@ -45,5 +45,3 @@ insert into "user_authority" (user_id, role)
 select u.id, 'ADMIN'
 from "user" as u
 where u.login = 'admin';
-
--- values (select u.id from "user" as u where u.login,'USER');
