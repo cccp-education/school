@@ -106,7 +106,7 @@ class PluginTests {
     ) {
 
         data class WorkspaceEntry(val name: String, val cores: Map<String, CoreEntry>) {
-            interface CoreEntry {
+            sealed interface CoreEntry {
                 data class Education(
                     val school: School,
                     val student: Student,
@@ -129,8 +129,6 @@ class PluginTests {
             interface CollaborationEntry
             interface DashboardEntry
             interface OfficeEntry
-
-
         }
 
         data class Office(
@@ -174,6 +172,7 @@ class PluginTests {
         fun Office.addEntry(entry: OfficeEntry) {
 //        put(entry.first.last(),entry.second)
         }
+
         val ws: Office = initWorkspace
         ws.addEntry(
             listOf(
