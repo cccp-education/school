@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.SchemaOutputResolver
+import jakarta.xml.bind.annotation.*
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.yaml.snakeyaml.DumperOptions
@@ -25,26 +26,41 @@ import javax.xml.transform.Result
 import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
-import kotlin.text.Charsets.UTF_8
 
 
 class PersonSchemaGenerator {
-
-    // Data classes Kotlin (équivalent des Records Java)
+    @XmlRootElement(name = "person")
+    @XmlAccessorType(XmlAccessType.FIELD)
     data class Person(
+        @field:XmlElement(required = true)
         val firstName: String,
+        @field:XmlElement(required = true)
         val lastName: String,
+        @field:XmlElement(required = true)
         val age: Int,
+        @field:XmlElement(required = true)
         val address: Address,
+        @field:XmlElementWrapper(name = "phoneNumbers")
+        @field:XmlElement(name = "phoneNumber")
         val phoneNumbers: List<String>
-    )
+    ) {
+        constructor() : this("", "", -1, Address(), listOf(""))
+    }
 
+    @XmlType(name = "address")
+    @XmlAccessorType(XmlAccessType.FIELD)
     data class Address(
+        @field:XmlElement(required = true)
         val street: String,
+        @field:XmlElement(required = true)
         val city: String,
+        @field:XmlElement(required = true)
         val zipCode: String,
+        @field:XmlElement(required = true)
         val country: String
-    )
+    ) {
+        constructor() : this("", "", "", "")
+    }
 
     companion object {
         @Throws(Exception::class)
@@ -54,18 +70,15 @@ class PersonSchemaGenerator {
             val schema = schemaGen.generateSchema(Person::class.java)
             return mapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(schema)
-
         }
 
         @Throws(Exception::class)
         fun generateXmlSchema() {
             val context = JAXBContext.newInstance(Person::class.java)
-            val outputResolver: SchemaOutputResolver = object : SchemaOutputResolver() {
+            val outputResolver = object : SchemaOutputResolver() {
                 @Throws(IOException::class)
                 override fun createOutput(namespaceUri: String, suggestedFileName: String): Result {
-                    val file = File("person.xsd").apply {
-                        readText(UTF_8).run(::println)
-                    }
+                    val file = File("person.xsd")
                     val result = StreamResult(file)
                     result.systemId = file.toURI().toURL().toString()
                     return result
@@ -73,7 +86,26 @@ class PersonSchemaGenerator {
             }
             context.generateSchema(outputResolver)
 
+            // Afficher le contenu du fichier généré
+            println(File("person.xsd").readText())
         }
+//        @Throws(Exception::class)
+//        fun generateXmlSchema() {
+//            val context = JAXBContext.newInstance(Person::class.java)
+//            val outputResolver: SchemaOutputResolver = object : SchemaOutputResolver() {
+//                @Throws(IOException::class)
+//                override fun createOutput(namespaceUri: String, suggestedFileName: String): Result {
+//                    val file = File("person.xsd").apply {
+//                        readText(UTF_8).run(::println)
+//                    }
+//                    val result = StreamResult(file)
+//                    result.systemId = file.toURI().toURL().toString()
+//                    return result
+//                }
+//            }
+//            context.generateSchema(outputResolver)
+//
+//        }
 
         @Throws(Exception::class)
         fun generateYamlSchema(): String {
