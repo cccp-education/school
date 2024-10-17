@@ -11,6 +11,7 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import school.PersonSchemaGenerator.Address
 import school.PersonSchemaGenerator.Companion.generateJsonSchema
+import school.PersonSchemaGenerator.Companion.generateXmlSchema
 import school.PersonSchemaGenerator.Companion.generateYamlSchema
 import school.PersonSchemaGenerator.Person
 import school.PluginTests.Companion.workspace
@@ -24,6 +25,7 @@ import javax.xml.transform.Result
 import javax.xml.transform.stream.StreamResult
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
+import kotlin.text.Charsets.UTF_8
 
 
 class PersonSchemaGenerator {
@@ -58,16 +60,19 @@ class PersonSchemaGenerator {
         @Throws(Exception::class)
         fun generateXmlSchema() {
             val context = JAXBContext.newInstance(Person::class.java)
-            val outputResolver = object : SchemaOutputResolver() {
+            val outputResolver: SchemaOutputResolver = object : SchemaOutputResolver() {
                 @Throws(IOException::class)
                 override fun createOutput(namespaceUri: String, suggestedFileName: String): Result {
-                    val file = File("person.xsd")
+                    val file = File("person.xsd").apply {
+                        readText(UTF_8).run(::println)
+                    }
                     val result = StreamResult(file)
                     result.systemId = file.toURI().toURL().toString()
                     return result
                 }
             }
             context.generateSchema(outputResolver)
+
         }
 
         @Throws(Exception::class)
@@ -122,7 +127,7 @@ object GradleTestUtils {
             this::class.java.simpleName
                 .apply { "$this json data schema : \n${generateJsonSchema()}".run(::println) }
                 .apply { "$this yaml data schema : \n${generateYamlSchema()}".run(::println) }
-//                .apply { "$this xml DTD : ${generateXmlSchema()}"/*.run(::println)*/ }
+                .apply { "$this xml DTD : ".run(::println).run { generateXmlSchema() } }
         }
 
     }

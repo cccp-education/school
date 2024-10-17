@@ -52,7 +52,6 @@ dependencies {
         "com.github.node-gradle:gradle-node-plugin:7.0.1",
         "org.jetbrains.kotlin:kotlin-stdlib",
         "commons-io:commons-io:$commonsIoVersion",
-//        "javax.xml.bind:jaxb-api:2.4.0-b180830.0359",
         "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2",
         "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion",
@@ -82,11 +81,12 @@ dependencies {
         "org.testcontainers:ollama:$testcontainersVersion",
         "org.gradle:gradle-tooling-api:8.6",
     ).forEach(::implementation)
-
     setOf("org.jetbrains.kotlin:kotlin-test-junit5")
         .forEach(::testImplementation)
-
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    setOf("org.junit.platform:junit-platform-launcher")
+        .forEach(::testRuntimeOnly)
+    setOf("com.sun.xml.bind:jaxb-impl:4.0.5")
+        .forEach(::runtimeOnly)
 }
 
 //tasks.named("build") {
