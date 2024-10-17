@@ -11,8 +11,9 @@ import school.GradleTestUtils.displayWorkspaceStructure
 import school.GradleTestUtils.initWorkspace
 import school.GradleTestUtils.projectInstance
 import school.GradleTestUtils.releaseOutput
-import school.PluginTests.Workspace.Education
 import school.PluginTests.Workspace.WorkspaceEntry
+import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education
+import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry.*
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -27,16 +28,19 @@ import kotlin.test.assertTrue
 
 
 class PluginTests {
-
     companion object {
-
         @JvmStatic
         val Project.workspace: Workspace
             get() = Workspace(
                 workspace = WorkspaceEntry(
                     name = "fonderie",
                     cores = mapOf(
-                        "education" to Education("talaria"),
+                        "education" to Education(
+                            school = School(name = "talaria"),
+                            student = Student(name = "olivier"),
+                            teacher = Teacher(name = "cheroliv"),
+                            educationTools = EducationTools(name = "edTools")
+                        ),
 //                                "bibliotheque" to Office(
 //                                    "books-collection",
 //                                    "datas",
@@ -100,10 +104,27 @@ class PluginTests {
 //        val collaboration: String,
 //        val dashboard: String,
     ) {
-        interface CoreEntry
-        data class WorkspaceEntry(val name: String, val cores: Map<String, CoreEntry>)
-        data class Education(val school: String) : CoreEntry
-        data class WorkspaceEnveloppe(val workspace: Workspace)// : CoreEntry
+
+        data class WorkspaceEntry(val name: String, val cores: Map<String, CoreEntry>) {
+            interface CoreEntry {
+                data class Education(
+                    val school: School,
+                    val student: Student,
+                    val teacher: Teacher,
+                    val educationTools: EducationTools,
+                ) : CoreEntry {
+                    sealed class EducationEntry {
+                        data class Student(val name: String) : EducationEntry()
+                        data class Teacher(val name: String) : EducationEntry()
+                        data class School(val name: String) : EducationEntry()
+                        data class EducationTools(val name: String) : EducationEntry()
+                    }
+                }
+                //Job,Configuration,Communication,Organisation,Collaboration,Dashboard,Office
+
+
+            }
+        }
 
         data class Office(
             val books: String,
@@ -117,11 +138,6 @@ class PluginTests {
             val sites: String
         )// : CoreEntry
     }
-    fun Office.addEntry(entry: OfficeEntry) {
-//        put(entry.first.last(),entry.second)
-    }
-
-
 
     @Test
     fun `test Workspace structure`(): Unit {
@@ -148,6 +164,9 @@ class PluginTests {
      */
     @Test
     fun checkAddEntryToWorkspace(): Unit {
+        fun Office.addEntry(entry: OfficeEntry) {
+//        put(entry.first.last(),entry.second)
+        }
         val ws: Office = initWorkspace
         ws.addEntry(
             listOf(
