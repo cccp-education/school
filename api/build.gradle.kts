@@ -88,7 +88,6 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
 //    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
-
     // Springboot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
@@ -96,53 +95,39 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-
     // Spring security
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-data")
-
-
     // Spring cloud
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:${properties["spring_cloud_starter.version"]}") {
         exclude(module = "commons-collections")
     }
-
-
-
     // Spring tests
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
-
     // JWT
     implementation("io.jsonwebtoken:jjwt-impl:${properties["jsonwebtoken.version"]}")
     implementation("io.jsonwebtoken:jjwt-jackson:${properties["jsonwebtoken.version"]}")
-
     // SSL
     implementation("io.netty:netty-tcnative-boringssl-static:${properties["boring_ssl.version"]}")
-
     // Database
     runtimeOnly("com.h2database:h2")
     runtimeOnly("io.r2dbc:r2dbc-h2")
     runtimeOnly("org.postgresql:r2dbc-postgresql:${properties["r2dbc-postgresql.version"]}")
-
     // Kotlin-JUnit5
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.projectreactor:reactor-test")
-
     // Mock
     testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito_kotlin_version"]}")
     testImplementation("org.mockito:mockito-junit-jupiter:${properties["mockito_jupiter.version"]}")
-
     testImplementation("io.mockk:mockk:${properties["mockk.version"]}")
     testImplementation("org.wiremock:wiremock:${properties["wiremock.version"]}") {
         exclude(module = "commons-fileupload")
     }
     testImplementation("commons-fileupload:commons-fileupload:1.5.0.redhat-00001")
     testImplementation("com.ninja-squad:springmockk:${properties["springmockk.version"]}")
-
-
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:${properties["archunit_junit5.version"]}")
@@ -150,7 +135,6 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-fx-coroutines:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
-
 //    // Spring AI
 //    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
 //
