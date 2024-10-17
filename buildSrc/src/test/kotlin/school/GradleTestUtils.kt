@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import school.PersonSchemaGenerator.Address
 import school.PersonSchemaGenerator.Companion.generateJsonSchema
+import school.PersonSchemaGenerator.Companion.generateYamlSchema
 import school.PersonSchemaGenerator.Person
 import school.PluginTests.Companion.workspace
 import school.PluginTests.Workspace
@@ -70,7 +71,7 @@ class PersonSchemaGenerator {
         }
 
         @Throws(Exception::class)
-        fun generateYamlSchema() {
+        fun generateYamlSchema(): String {
             val yaml = Yaml(DumperOptions().apply {
                 defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
                 isPrettyFlow = true
@@ -80,7 +81,7 @@ class PersonSchemaGenerator {
             schema["type"] = "object"
             schema["properties"] = generateProperties(Person::class)
 
-            println(yaml.dump(schema))
+            return yaml.dump(schema)
         }
 
         private fun generateProperties(kClass: KClass<*>): Map<String, Any> {
@@ -117,10 +118,11 @@ object GradleTestUtils {
             ),
             listOf("0033606060606"),
         ).run {
-//            run(::println)
+            println(this)
             this::class.java.simpleName
-                .run { "$this json schema : ${generateJsonSchema()}" }
-                .run(::println)
+                .apply { "$this json data schema : \n${generateJsonSchema()}".run(::println) }
+                .apply { "$this yaml data schema : \n${generateYamlSchema()}".run(::println) }
+//                .apply { "$this xml DTD : ${generateXmlSchema()}"/*.run(::println)*/ }
         }
 
     }
