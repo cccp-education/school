@@ -12,8 +12,11 @@ import school.GradleTestUtils.initWorkspace
 import school.GradleTestUtils.projectInstance
 import school.GradleTestUtils.releaseOutput
 import school.PluginTests.Workspace.WorkspaceEntry
+import school.PluginTests.Workspace.WorkspaceEntry.CommunicationEntry.Communication
+import school.PluginTests.Workspace.WorkspaceEntry.ConfigurationEntry.Configuration
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry.*
+import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -28,42 +31,6 @@ import kotlin.test.assertTrue
 
 
 class PluginTests {
-    companion object {
-        @JvmStatic
-        val Project.workspace: Workspace
-            get() = Workspace(
-                workspace = WorkspaceEntry(
-                    name = "fonderie",
-                    cores = mapOf(
-                        "education" to Education(
-                            school = School(name = "talaria"),
-                            student = Student(name = "olivier"),
-                            teacher = Teacher(name = "cheroliv"),
-                            educationTools = EducationTools(name = "edTools")
-                        ),
-//                                "bibliotheque" to Office(
-//                                    "books-collection",
-//                                    "datas",
-//                                    "formations",
-//                                    "bizness",
-//                                    "notebooks",
-//                                    "pilotage",
-//                                    "schemas",
-//                                    "slides",
-//                                    "sites"
-//                                ),
-                    )
-                )
-//                "bibliotheque",
-//                "job",
-//                "configuration",
-//                "communication",
-//                "organisation",
-//                "collaboration",
-//                "dashboard",
-            )
-
-    }
 
     //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
 //data class SchoolOffice(
@@ -95,23 +62,25 @@ class PluginTests {
 //}
     data class Workspace(
         val workspace: WorkspaceEntry,
-//        val core: WorkspaceEntry,
-//        val office: String,
-//        val job: String,
-//        val configuration: String,
-//        val communication: String,
-//        val organisation: String,
-//        val collaboration: String,
-//        val dashboard: String,
     ) {
 
-        data class WorkspaceEntry(val name: String, val cores: Map<String, CoreEntry>) {
+        data class WorkspaceEntry(
+            val name: String,
+            val cores: Map<String, CoreEntry>,
+            val job: JobEntry,
+            val configuration: ConfigurationEntry,
+            val office: school.workspace.OfficeEntry,
+            val communication: CommunicationEntry,
+            val organisation: OrganisationEntry,
+            val collaboration: CollaborationEntry,
+            val dashboard: DashboardEntry,
+        ) {
             sealed interface CoreEntry {
                 data class Education(
-                    val school: School,
-                    val student: Student,
-                    val teacher: Teacher,
-                    val educationTools: EducationTools,
+                    val school: EducationEntry,
+                    val student: EducationEntry,
+                    val teacher: EducationEntry,
+                    val educationTools: EducationEntry,
                 ) : CoreEntry {
                     sealed class EducationEntry {
                         data class Student(val name: String) : EducationEntry()
@@ -122,26 +91,80 @@ class PluginTests {
                 }
             }
 
-            interface JobEntry
-            interface ConfigurationEntry
-            interface CommunicationEntry
-            interface OrganisationEntry
-            interface CollaborationEntry
-            interface DashboardEntry
-            interface OfficeEntry
+            sealed interface JobEntry {
+                data class Job(val position: String) : JobEntry
+            }
+
+            sealed interface ConfigurationEntry {
+                data class Configuration(val configuration: String) : ConfigurationEntry
+            }
+
+            sealed interface CommunicationEntry {
+                data class Communication(val site: String) : CommunicationEntry
+            }
+
+            sealed interface OrganisationEntry {
+                data class Organisation(val organisation: String) : OrganisationEntry
+            }
+
+            sealed interface CollaborationEntry {
+                data class Collaboration(val collaboration: String) : CollaborationEntry
+            }
+
+            sealed interface DashboardEntry {
+                data class Dashboard(val dashboard: String) : DashboardEntry
+            }
+
+            sealed interface OfficeEntry {
+                data class Office(
+                    val books: String,
+                    val datas: String,
+                    val formations: String,
+                    val bizness: String,
+                    val notebooks: String,
+                    val pilotage: String,
+                    val schemas: String,
+                    val slides: String,
+                    val sites: String
+                ) : OfficeEntry
+            }
         }
 
-        data class Office(
-            val books: String,
-            val datas: String,
-            val formations: String,
-            val bizness: String,
-            val notebooks: String,
-            val pilotage: String,
-            val schemas: String,
-            val slides: String,
-            val sites: String
-        )// : CoreEntry
+    }
+
+    companion object {
+        @JvmStatic
+        val Project.workspace: Workspace
+            get() = Workspace(
+                workspace = WorkspaceEntry(
+                    name = "fonderie",
+                    cores = mapOf(
+                        "education" to Education(
+                            school = School(name = "talaria"),
+                            student = Student(name = "olivier"),
+                            teacher = Teacher(name = "cheroliv"),
+                            educationTools = EducationTools(name = "edTools")
+                        ),
+                    ),
+                    job = Job(position = "Teacher"),
+                    configuration = Configuration(configuration = "school-configuration"),
+                    communication = Communication(site = "static-website"),
+                    office = WorkspaceEntry.OfficeEntry.Office(
+//                                    "books-collection",
+//                                    "datas",
+//                                    "formations",
+//                                    "bizness",
+//                                    "notebooks",
+//                                    "pilotage",
+//                                    "schemas",
+//                                    "slides",
+//                                    "sites"
+                    ),
+                    organisation = WorkspaceEntry.OrganisationEntry.Organisation(),
+                    collaboration = WorkspaceEntry.CollaborationEntry.Collaboration(),
+                    dashboard = WorkspaceEntry.DashboardEntry.Dashboard(),
+                )
+            )
     }
 
     @Test
