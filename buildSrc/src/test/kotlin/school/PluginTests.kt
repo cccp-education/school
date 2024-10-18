@@ -38,10 +38,9 @@ class PluginTests {
         //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
         val workspace: WorkspaceEntry,
     ) {
-        data class HumanResources(val cv: String)
-
-        //    data class Workspace(val portfolio: MutableMap<String, Project>) {
-//        data class Project(
+//        data class HumanResources(val cv: String)
+//    data class Workspace(val portfolio: MutableMap<String, Project>) {
+//        data class Project(//a mettre dans configuration
 //            val name: String,
 //            val cred: String,
 //            val builds: MutableMap<String, ProjectBuild>
