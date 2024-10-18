@@ -12,17 +12,19 @@ import school.GradleTestUtils.initWorkspace
 import school.GradleTestUtils.projectInstance
 import school.GradleTestUtils.releaseOutput
 import school.PluginTests.Workspace.WorkspaceEntry
+import school.PluginTests.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
 import school.PluginTests.Workspace.WorkspaceEntry.CommunicationEntry.Communication
 import school.PluginTests.Workspace.WorkspaceEntry.ConfigurationEntry.Configuration
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry.*
+import school.PluginTests.Workspace.WorkspaceEntry.DashboardEntry.Dashboard
 import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job
+import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office
+import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisation
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
 import school.jbake.JBakeGhPagesPlugin
-import school.workspace.Office
-import school.workspace.OfficeEntry
 import java.lang.System.out
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -32,23 +34,13 @@ import kotlin.test.assertTrue
 
 class PluginTests {
 
-    //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
-//data class SchoolOffice(
-//    val bibliotheque: Bibliotheque? = null,
-//    val workspace: Workspace,
-//    val humanResources: HumanResources? = null
-//) {
-//    data class Bibliotheque(
-//        val courses: MutableMap<String, Course>?,
-//        val catalogue: MutableMap<String, Training>?,
-//        val projectDocs: MutableMap<String, ProjectDocumentation>,
-//    ) {
-//        data class Course(val name: String)
-//        data class Training(val name: String)
-//        data class ProjectDocumentation(val name: String)
-//    }
-//
-//    data class Workspace(val portfolio: MutableMap<String, Project>) {
+    data class Workspace(
+        //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
+        val workspace: WorkspaceEntry,
+    ) {
+        data class HumanResources(val cv: String)
+
+        //    data class Workspace(val portfolio: MutableMap<String, Project>) {
 //        data class Project(
 //            val name: String,
 //            val cred: String,
@@ -57,19 +49,12 @@ class PluginTests {
 //            data class ProjectBuild(val name: String)
 //        }
 //    }
-//
-//    data class HumanResources(val cv: String)
-//}
-    data class Workspace(
-        val workspace: WorkspaceEntry,
-    ) {
-
         data class WorkspaceEntry(
             val name: String,
             val cores: Map<String, CoreEntry>,
             val job: JobEntry,
             val configuration: ConfigurationEntry,
-            val office: school.workspace.OfficeEntry,
+            val office: OfficeEntry,
             val communication: CommunicationEntry,
             val organisation: OrganisationEntry,
             val collaboration: CollaborationEntry,
@@ -129,7 +114,6 @@ class PluginTests {
                 ) : OfficeEntry
             }
         }
-
     }
 
     companion object {
@@ -149,20 +133,20 @@ class PluginTests {
                     job = Job(position = "Teacher"),
                     configuration = Configuration(configuration = "school-configuration"),
                     communication = Communication(site = "static-website"),
-                    office = WorkspaceEntry.OfficeEntry.Office(
-//                                    "books-collection",
-//                                    "datas",
-//                                    "formations",
-//                                    "bizness",
-//                                    "notebooks",
-//                                    "pilotage",
-//                                    "schemas",
-//                                    "slides",
-//                                    "sites"
+                    office = Office(
+                        books = "books-collection",
+                        datas = "datas",
+                        formations = "formations",
+                        bizness = "bizness",
+                        notebooks = "notebooks",
+                        pilotage = "pilotage",
+                        schemas = "schemas",
+                        slides = "slides",
+                        sites = "sites"
                     ),
-                    organisation = WorkspaceEntry.OrganisationEntry.Organisation(),
-                    collaboration = WorkspaceEntry.CollaborationEntry.Collaboration(),
-                    dashboard = WorkspaceEntry.DashboardEntry.Dashboard(),
+                    organisation = Organisation(organisation = "organisation"),
+                    collaboration = Collaboration(collaboration = "collaboration"),
+                    dashboard = Dashboard(dashboard = "dashboard"),
                 )
             )
     }
@@ -177,7 +161,7 @@ class PluginTests {
 
     @Test
     fun checkInitWorkspace(): Unit = initWorkspace
-        .run(Office::isEmpty)
+        .run(school.workspace.Office::isEmpty)
         .run(::assertTrue)
 
     /**
@@ -192,11 +176,11 @@ class PluginTests {
      */
     @Test
     fun checkAddEntryToWorkspace(): Unit {
-        fun Office.addEntry(entry: OfficeEntry) {
+        fun school.workspace.Office.addEntry(entry: school.workspace.OfficeEntry) {
 //        put(entry.first.last(),entry.second)
         }
 
-        val ws: Office = initWorkspace
+        val ws: school.workspace.Office = initWorkspace
         ws.addEntry(
             listOf(
                 "workspace",
