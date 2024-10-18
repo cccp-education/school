@@ -16,10 +16,12 @@ import school.PluginTests.Workspace.WorkspaceEntry.CollaborationEntry.Collaborat
 import school.PluginTests.Workspace.WorkspaceEntry.CommunicationEntry.Communication
 import school.PluginTests.Workspace.WorkspaceEntry.ConfigurationEntry.Configuration
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education
+import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry.*
 import school.PluginTests.Workspace.WorkspaceEntry.DashboardEntry.Dashboard
 import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job
 import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office
+import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Books
 import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisation
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
@@ -38,7 +40,7 @@ class PluginTests {
         //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
         val workspace: WorkspaceEntry,
     ) {
-//        data class HumanResources(val cv: String)
+        //        data class HumanResources(val cv: String)
 //    data class Workspace(val portfolio: MutableMap<String, Project>) {
 //        data class Project(//a mettre dans configuration
 //            val name: String,
@@ -50,15 +52,40 @@ class PluginTests {
 //    }
         data class WorkspaceEntry(
             val name: String,
+            val office: OfficeEntry,
             val cores: Map<String, CoreEntry>,
             val job: JobEntry,
             val configuration: ConfigurationEntry,
-            val office: OfficeEntry,
             val communication: CommunicationEntry,
             val organisation: OrganisationEntry,
             val collaboration: CollaborationEntry,
             val dashboard: DashboardEntry,
         ) {
+            sealed interface OfficeEntry {
+                data class Office(
+                    val books: LibraryEntry,
+                    val datas: String,
+                    val formations: String,
+                    val bizness: String,
+                    val notebooks: String,
+                    val pilotage: String,
+                    val schemas: String,
+                    val slides: String,
+                    val sites: String
+                ) : OfficeEntry{
+                    sealed class LibraryEntry {
+                        data class Books(val name: String) : LibraryEntry()
+//                        val datas: String,
+//                        val formations: String,
+//                        val bizness: String,
+//                        val notebooks: String,
+//                        val pilotage: String,
+//                        val schemas: String,
+//                        val slides: String,
+//                        val sites: String
+                    }
+                }
+            }
             sealed interface CoreEntry {
                 data class Education(
                     val school: EducationEntry,
@@ -98,20 +125,6 @@ class PluginTests {
             sealed interface DashboardEntry {
                 data class Dashboard(val dashboard: String) : DashboardEntry
             }
-
-            sealed interface OfficeEntry {
-                data class Office(
-                    val books: String,
-                    val datas: String,
-                    val formations: String,
-                    val bizness: String,
-                    val notebooks: String,
-                    val pilotage: String,
-                    val schemas: String,
-                    val slides: String,
-                    val sites: String
-                ) : OfficeEntry
-            }
         }
     }
 
@@ -133,7 +146,7 @@ class PluginTests {
                     configuration = Configuration(configuration = "school-configuration"),
                     communication = Communication(site = "static-website"),
                     office = Office(
-                        books = "books-collection",
+                        books = Books("books-collection"),
                         datas = "datas",
                         formations = "formations",
                         bizness = "bizness",
