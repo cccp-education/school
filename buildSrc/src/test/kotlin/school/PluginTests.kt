@@ -19,6 +19,8 @@ import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education
 import school.PluginTests.Workspace.WorkspaceEntry.CoreEntry.Education.EducationEntry.*
 import school.PluginTests.Workspace.WorkspaceEntry.DashboardEntry.Dashboard
 import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job
+import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job.HumanResourcesEntry.Position
+import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job.HumanResourcesEntry.Resume
 import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office
 import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.*
 import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisation
@@ -67,7 +69,7 @@ class PluginTests {
                         data class Datas(val name: String) : LibraryEntry()
                         data class TrainingCatalogue(val catalogue: String) : LibraryEntry()
                         data class Notebooks(val notebooks: String) : LibraryEntry()
-                        data class Pilotage(val name: String) : LibraryEntry(){
+                        data class Pilotage(val name: String) : LibraryEntry() {
 //    data class Workspace(val portfolio: MutableMap<String, Project>) {
 //        data class Project(//a mettre dans configuration
 //            val name: String,
@@ -77,8 +79,8 @@ class PluginTests {
 //            data class ProjectBuild(val name: String)
 //        }
 //    }
-
                         }
+
                         data class Schemas(val name: String) : LibraryEntry()
                         data class Slides(val name: String) : LibraryEntry()
                         data class Sites(val name: String) : LibraryEntry()
@@ -104,8 +106,16 @@ class PluginTests {
             }
 
             sealed interface JobEntry {
-                data class Job(val position: String) : JobEntry
-                //        data class HumanResources(val cv: String)
+                data class Job(
+                    val position: HumanResourcesEntry,
+                    val resume: HumanResourcesEntry
+                ) : JobEntry {
+                    sealed class HumanResourcesEntry {
+                        data class Resume(val name: String) : HumanResourcesEntry()
+                        data class Position(val name: String) : HumanResourcesEntry()
+                    }
+                }
+
             }
 
             sealed interface ConfigurationEntry {
@@ -144,7 +154,10 @@ class PluginTests {
                             educationTools = EducationTools(name = "edTools")
                         ),
                     ),
-                    job = Job(position = "Teacher"),
+                    job = Job(
+                        position = Position("Teacher"),
+                        resume = Resume(name = "CV")
+                    ),
                     configuration = Configuration(configuration = "school-configuration"),
                     communication = Communication(site = "static-website"),
                     office = Office(
