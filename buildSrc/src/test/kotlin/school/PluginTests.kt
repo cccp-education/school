@@ -24,6 +24,9 @@ import school.PluginTests.Workspace.WorkspaceEntry.JobEntry.Job.HumanResourcesEn
 import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office
 import school.PluginTests.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.*
 import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisation
+import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio
+import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject
+import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject.ProjectBuild
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
@@ -38,9 +41,7 @@ import kotlin.test.assertTrue
 //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
 class PluginTests {
 
-    data class Workspace(
-        val workspace: WorkspaceEntry,
-    ) {
+    data class Workspace(val workspace: WorkspaceEntry) {
         data class WorkspaceEntry(
             val name: String,
             val office: OfficeEntry,
@@ -51,40 +52,16 @@ class PluginTests {
             val organisation: OrganisationEntry,
             val collaboration: CollaborationEntry,
             val dashboard: DashboardEntry,
+            val portfolio: PortfolioEntry,
         ) {
-            sealed interface OfficeEntry {
-                data class Office(
-                    val books: LibraryEntry,
-                    val datas: LibraryEntry,
-                    val formations: LibraryEntry,
-                    val bizness: LibraryEntry,
-                    val notebooks: LibraryEntry,
-                    val pilotage: LibraryEntry,
-                    val schemas: LibraryEntry,
-                    val slides: LibraryEntry,
-                    val sites: LibraryEntry,
-                ) : OfficeEntry {
-                    sealed class LibraryEntry {
-                        data class Books(val name: String) : LibraryEntry()
-                        data class Datas(val name: String) : LibraryEntry()
-                        data class TrainingCatalogue(val catalogue: String) : LibraryEntry()
-                        data class Notebooks(val notebooks: String) : LibraryEntry()
-                        data class Pilotage(val name: String) : LibraryEntry() {
-//    data class Workspace(val portfolio: MutableMap<String, Project>) {
-//        data class Project(//a mettre dans configuration
-//            val name: String,
-//            val cred: String,
-//            val builds: MutableMap<String, ProjectBuild>
-//        ) {
-//            data class ProjectBuild(val name: String)
-//        }
-//    }
-                        }
-
-                        data class Schemas(val name: String) : LibraryEntry()
-                        data class Slides(val name: String) : LibraryEntry()
-                        data class Sites(val name: String) : LibraryEntry()
-                        data class Profession(val name: String) : LibraryEntry()
+            sealed interface PortfolioEntry {
+                data class Portfolio(val project: MutableMap<String, PortfolioProject>) : PortfolioEntry {
+                    data class PortfolioProject(
+                        val name: String,
+                        val cred: String,
+                        val builds: MutableMap<String, ProjectBuild>
+                    ) {
+                        data class ProjectBuild(val name: String)
                     }
                 }
             }
@@ -104,6 +81,33 @@ class PluginTests {
                     }
                 }
             }
+
+            sealed interface OfficeEntry {
+                data class Office(
+                    val books: LibraryEntry,
+                    val datas: LibraryEntry,
+                    val formations: LibraryEntry,
+                    val bizness: LibraryEntry,
+                    val notebooks: LibraryEntry,
+                    val pilotage: LibraryEntry,
+                    val schemas: LibraryEntry,
+                    val slides: LibraryEntry,
+                    val sites: LibraryEntry,
+                ) : OfficeEntry {
+                    sealed class LibraryEntry {
+                        data class Books(val name: String) : LibraryEntry()
+                        data class Datas(val name: String) : LibraryEntry()
+                        data class TrainingCatalogue(val catalogue: String) : LibraryEntry()
+                        data class Notebooks(val notebooks: String) : LibraryEntry()
+                        data class Pilotage(val name: String) : LibraryEntry()
+                        data class Schemas(val name: String) : LibraryEntry()
+                        data class Slides(val name: String) : LibraryEntry()
+                        data class Sites(val name: String) : LibraryEntry()
+                        data class Profession(val name: String) : LibraryEntry()
+                    }
+                }
+            }
+
 
             sealed interface JobEntry {
                 data class Job(
@@ -174,8 +178,15 @@ class PluginTests {
                     organisation = Organisation(organisation = "organisation"),
                     collaboration = Collaboration(collaboration = "collaboration"),
                     dashboard = Dashboard(dashboard = "dashboard"),
-                )
-            )
+                    portfolio = Portfolio(
+                        mutableMapOf("school" to PortfolioProject(
+                            name = "name",
+                            cred = "credential",
+                            builds = mutableMapOf("training" to ProjectBuild(name = "training"))
+                        ))
+                    )
+            ),
+        )
     }
 
     @Test

@@ -14,7 +14,7 @@ object SchoolContentManager {
         .run(::println)
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun printDocxStructure(path: String) = path.run(::FileInputStream)
+    fun printDocxStructure(path: String): Unit = path.run(::FileInputStream)
         .run(::XWPFDocument)
         .run {
             paragraphs.forEach { p ->

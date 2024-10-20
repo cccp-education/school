@@ -6,17 +6,20 @@ object RepositoryInfo {
     const val REMOTE = "remote"
 }
 
+@JvmRecord
 data class RepositoryConfiguration(
     val name: String,
     val repository: String,
     val credentials: RepositoryCredentials,
 )
 
+@JvmRecord
 data class RepositoryCredentials(
     val username: String,
     val password: String
 )
 
+@JvmRecord
 data class GitPushConfiguration(
     val from: String,
     val to: String,

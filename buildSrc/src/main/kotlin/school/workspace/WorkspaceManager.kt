@@ -44,15 +44,20 @@ object WorkspaceManager {
     val Project.localConf: SiteConfiguration
         get() = readSiteConfigurationFile { "$rootDir$sep${properties[CONFIG_PATH_KEY]}" }
     val Map<*, *>.isCnameExists: Boolean
-        get() = DNS_CNAME.lowercase().let {
-            contains(it) && this[it] is String && this[it] as String != ""
-        }
+        get() = DNS_CNAME
+            .lowercase()
+            .let { contains(it) && this[it] is String && this[it] as String != "" }
 
     @JvmStatic
     fun Project.gradleProperties(key: String = "artifact.version"): String =
-        "${System.getProperty("user.home")}/workspace/school/gradle.properties"
+        "/workspace/school/gradle.properties"
+            .run { "${System.getProperty("user.home")}$this" }
             .let(::File)
-            .run { Properties().apply { inputStream().use(::load) }[key].toString() }
+            .run {
+                Properties().apply {
+                    inputStream().use(::load)
+                }[key].toString()
+            }
 
     @JvmStatic
     val Project.privateProps: Properties
@@ -97,8 +102,24 @@ object WorkspaceManager {
     } catch (e: Exception) {
         // Handle exception or log error
         SiteConfiguration(
-            BakeConfiguration("", "", null), GitPushConfiguration(
-                "", "", RepositoryConfiguration("", "", RepositoryCredentials("", "")), "", ""
+            BakeConfiguration(
+                "",
+                "",
+                null
+            ),
+            GitPushConfiguration(
+                "",
+                "",
+                RepositoryConfiguration(
+                    "",
+                    "",
+                    RepositoryCredentials(
+                        "",
+                        ""
+                    )
+                ),
+                "",
+                ""
             )
         )
     }
@@ -116,8 +137,13 @@ object WorkspaceManager {
             pushPage = GitPushConfiguration(
                 "",
                 "",
-                RepositoryConfiguration("", "", RepositoryCredentials("", "")),
-                "", ""
+                RepositoryConfiguration(
+                    "",
+                    "",
+                    RepositoryCredentials("", "")
+                ),
+                "",
+                ""
             )
         )
     }

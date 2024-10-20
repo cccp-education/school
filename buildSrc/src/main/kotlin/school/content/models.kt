@@ -2,6 +2,7 @@
 
 package school.content
 
+@JvmRecord
 data class Formation(
     val nom: String,
     val spg: SPG
@@ -10,6 +11,7 @@ data class Formation(
 /**
  * SPG: Scénario Pédagogique Global
  */
+@JvmRecord
 data class SPG(
     val spd: SPD = SPD(),
     val content: List<Triple<String, String, String>>? = listOf(
@@ -40,9 +42,8 @@ data class SPG(
 /**
  * SPD : Scénario Pédagogique Détaillé
  */
+@JvmRecord
 data class SPD(
     val titre: String = "",
     val objectif: String = ""
 )
-
-
