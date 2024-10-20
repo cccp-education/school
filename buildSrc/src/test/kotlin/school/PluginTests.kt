@@ -108,7 +108,6 @@ class PluginTests {
                 }
             }
 
-
             sealed interface JobEntry {
                 data class Job(
                     val position: HumanResourcesEntry,
@@ -119,7 +118,6 @@ class PluginTests {
                         data class Position(val name: String) : HumanResourcesEntry()
                     }
                 }
-
             }
 
             sealed interface ConfigurationEntry {
@@ -179,14 +177,16 @@ class PluginTests {
                     collaboration = Collaboration(collaboration = "collaboration"),
                     dashboard = Dashboard(dashboard = "dashboard"),
                     portfolio = Portfolio(
-                        mutableMapOf("school" to PortfolioProject(
-                            name = "name",
-                            cred = "credential",
-                            builds = mutableMapOf("training" to ProjectBuild(name = "training"))
-                        ))
+                        mutableMapOf(
+                            "school" to PortfolioProject(
+                                name = "name",
+                                cred = "credential",
+                                builds = mutableMapOf("training" to ProjectBuild(name = "training"))
+                            )
+                        )
                     )
-            ),
-        )
+                ),
+            )
     }
 
     @Test

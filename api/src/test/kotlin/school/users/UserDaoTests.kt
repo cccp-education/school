@@ -55,6 +55,24 @@ class UserDaoTests {
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
+
+    @Test
+    fun `test findOneWithAuths with one query`() {
+        val sqlQuery = """SELECT
+        u.id AS user_id,
+        u.email AS user_email,
+        u.login AS user_login,
+        array_agg(DISTINCT a.role) AS user_roles
+        FROM
+        "user" u
+                JOIN
+        user_authority ua ON u.id = ua.user_id
+                JOIN
+        authority a ON ua.role = a.role
+                GROUP BY
+                u.id, u.email, u.login;"""
+    }
+
     @Test
     fun `test findOneWithAuths`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
