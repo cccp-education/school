@@ -34,7 +34,7 @@ import school.users.User.UserDao.Dao.findAuthsByEmail
 import school.users.User.UserDao.Dao.findAuthsByLogin
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
-import school.users.User.UserDao.Dao.findOneWithAuths
+import school.users.User.UserDao.Dao.__findOneWithAuths__
 import school.users.User.UserDao.Dao.findUserById
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
@@ -91,10 +91,10 @@ class UserDaoTests {
             u.password,
             u.lang_key,
             u.version,
-            GROUP_CONCAT(DISTINCT a.role) AS user_roles
-        FROM `user` as u
+            GROUP_CONCAT(DISTINCT a.role) AS `user_roles`
+        FROM `user` as `u`
         LEFT JOIN 
-            user_authority ua ON u.id = ua.user_id
+            `user_authority` ua ON u.id = ua.user_id
         LEFT JOIN 
             `authority` as a ON ua.role = a.role
         WHERE 
@@ -113,20 +113,25 @@ class UserDaoTests {
             toString()
                 .run { "userWithAuths : $this" }
                 .run(::println)
-        }
-//            .run {
-//                map {
-//                    User(
-//                        id = fromString(it.get("id").toString()),
-//                        email = it.get("email").toString(),
-//                        login = it.get("login").toString(),
-//                        roles = it.get("user_roles").toString().split(",").map { Role(it) }.toSet(),
-//                        password = it.get("password").toString(),
-//                        langKey = it.get("lang_key").toString(),
-//                    )
-//                }
-//            }.run(::println)
+        }?.run {
+            User(
+                id = fromString(get("id".uppercase()).toString()),
+                email = get("email".uppercase()).toString(),
+                login = get("login".uppercase()).toString(),
+                roles = get("user_roles".uppercase())
+                    .toString()
+                    .split(",")
+                    .map { Role(it) }
+                    .toSet(),
+                password = get("password".uppercase()).toString(),
+                langKey = get("lang_key".uppercase()).toString(),
+                version = get("version".uppercase()).toString().toLong(),
+            )
+        }.run(::println)
 
+        context.__findOneWithAuths__<User>(user.login).getOrNull()
+            .run { "context.findOneWithAuths<User>(user.login).getOrNull() : $this" }
+            .run(::println)
     }
 
     @Test
@@ -144,7 +149,7 @@ class UserDaoTests {
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
 
-        context.findOneWithAuths<User>(user.email)
+        context.__findOneWithAuths__<User>(user.email)
             .getOrNull()
             .apply {
 //                run(::assertNotNull)

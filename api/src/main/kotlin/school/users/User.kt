@@ -26,9 +26,9 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
 import school.base.model.EntityModel.Members.withId
+import school.base.utils.AppUtils.cleanField
 import school.base.utils.EMPTY_STRING
 import school.base.utils.ROLE_USER
-import school.base.utils.AppUtils.cleanField
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
 import school.users.User.UserDao.Attributes.ID_ATTR
 import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
@@ -50,6 +50,7 @@ import school.users.security.Role
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.util.*
+import java.util.Locale.ENGLISH
 import jakarta.validation.constraints.Email as EmailConstraint
 
 data class User(
@@ -73,10 +74,10 @@ data class User(
     val roles: Set<Role> = emptySet(),
 
     @field:Size(min = 2, max = 10)
-    val langKey: String = EMPTY_STRING,
+    val langKey: String = ENGLISH.language,
 
     @JsonIgnore
-    val version: Long = -1,
+    val version: Long = 0,
 ) : EntityModel<UUID>() {
     companion object {
         val USERCLASS = User::class.java
@@ -258,7 +259,7 @@ data class User(
                         .left()
                 }
 
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
                 when (T::class) {
                     User::class -> {
                         try {
@@ -266,12 +267,14 @@ data class User(
                                 "not a valid login or not a valid email"
                                     .run(::Exception)
                                     .left()
+                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
                             val user = findOne<User>(emailOrLogin).getOrNull()
                             val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
+                            // No need for that test, let catch intercept throwable.
                             when {
                                 user != null && roles != null -> user.copy(roles = roles).right()
 
-                                else -> Exception("not able to retrieve user  id and roles").left()
+                                else -> Exception("not able to retrieve user id and roles").left()
                             }
                         } catch (e: Throwable) {
                             e.left()
