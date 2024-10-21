@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.EMPTY_STRING
@@ -57,20 +58,74 @@ class UserDaoTests {
 
 
     @Test
-    fun `test findOneWithAuths with one query`() {
-        val sqlQuery = """SELECT
-        u.id AS user_id,
-        u.email AS user_email,
-        u.login AS user_login,
-        array_agg(DISTINCT a.role) AS user_roles
-        FROM
-        "user" u
-                JOIN
-        user_authority ua ON u.id = ua.user_id
-                JOIN
-        authority a ON ua.role = a.role
-                GROUP BY
-                u.id, u.email, u.login;"""
+    fun `test findOneWithAuths with one query`(): Unit = runBlocking {
+        assertEquals(0, context.countUsers())
+        assertEquals(0, context.countUserAuthority())
+        (user to context).signup()
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+
+        val pgSQLquery = """
+        SELECT 
+            u.id AS user_id,
+            u.email AS user_email,
+            u.login AS user_login,
+            array_agg(DISTINCT a.role) AS user_roles
+        FROM 
+            "user" u
+        LEFT JOIN 
+            "user_authority" ua ON u.id = ua.user_id
+        LEFT JOIN 
+            "authority" a ON ua.role = a.role
+        WHERE 
+            LOWER(u.email) = LOWER(:email) OR LOWER(u.login) = LOWER(:login)
+        GROUP BY 
+            u.id, u.email, u.login;
+        """.trimIndent()
+
+        val h2SQLquery = """
+        SELECT 
+            u.id,
+            u.email,
+            u.login,
+            u.password,
+            u.lang_key,
+            GROUP_CONCAT(DISTINCT a.role) AS user_roles
+        FROM `user` as u
+        LEFT JOIN 
+            user_authority ua ON u.id = ua.user_id
+        LEFT JOIN 
+            `authority` as a ON ua.role = a.role
+        WHERE 
+            lower(u.email) = lower(:emailOrLogin) OR lower(u.login) = lower(:emailOrLogin)
+        GROUP BY 
+            u.id, u.email, u.login;
+            """
+        val userWithAuths: MutableMap<String, Any>? = context
+            .getBean<DatabaseClient>()
+            .sql(h2SQLquery)
+            .bind("emailOrLogin", user.email)
+            .fetch()
+            .awaitSingleOrNull()
+
+        userWithAuths.apply {
+            toString()
+                .run { "userWithAuths : $this" }
+                .run(::println)
+        }
+//            .run {
+//                map {
+//                    User(
+//                        id = fromString(it.get("id").toString()),
+//                        email = it.get("email").toString(),
+//                        login = it.get("login").toString(),
+//                        roles = it.get("user_roles").toString().split(",").map { Role(it) }.toSet(),
+//                        password = it.get("password").toString(),
+//                        langKey = it.get("lang_key").toString(),
+//                    )
+//                }
+//            }.run(::println)
+
     }
 
     @Test
