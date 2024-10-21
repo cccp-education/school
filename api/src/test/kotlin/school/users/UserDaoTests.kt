@@ -58,7 +58,7 @@ class UserDaoTests {
 
 
     @Test
-    fun `test findOneWithAuths with one query`(): Unit = runBlocking {
+    fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
         (user to context).signup()
@@ -90,6 +90,7 @@ class UserDaoTests {
             u.login,
             u.password,
             u.lang_key,
+            u.version,
             GROUP_CONCAT(DISTINCT a.role) AS user_roles
         FROM `user` as u
         LEFT JOIN 
