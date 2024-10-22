@@ -295,7 +295,6 @@ class UserDaoTests {
         "userWithAuths : $userWithAuths".run(::println)
     }
 
-    @Ignore
     @Test
     fun `test findOneWithAuths with existing email login and roles`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
