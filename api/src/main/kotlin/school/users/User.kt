@@ -322,18 +322,18 @@ data class User(
                         .left()
                 }
 
-            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
-                        .bind("email", email)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
+//            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+//                mutableSetOf<Role>().apply {
+//                    getBean<DatabaseClient>()
+//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+//                        .bind("email", email)
+//                        .fetch()
+//                        .all()
+//                        .collect { add(Role(it["ROLE"].toString())) }
+//                }.toSet().right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
 
 
 //            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
@@ -378,42 +378,42 @@ data class User(
 //                e.left()
 //            }
 
-            suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
-                        .bind("login", login)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
+//            suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
+//                mutableSetOf<Role>().apply {
+//                    getBean<DatabaseClient>()
+//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
+//                        .bind("login", login)
+//                        .fetch()
+//                        .all()
+//                        .collect { add(Role(it["ROLE"].toString())) }
+//                }.toSet().right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
 
-            suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
-                mutableSetOf<Role>().apply {
-                    getBean<DatabaseClient>()
-                        .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
-                        .bind("userId", userId)
-                        .fetch()
-                        .all()
-                        .collect { add(Role(it["ROLE"].toString())) }
-                }.toSet().right()
-            } catch (e: Throwable) {
-                e.left()
-            }
+//            suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
+//                mutableSetOf<Role>().apply {
+//                    getBean<DatabaseClient>()
+//                        .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+//                        .bind("userId", userId)
+//                        .fetch()
+//                        .all()
+//                        .collect { add(Role(it["ROLE"].toString())) }
+//                }.toSet().right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
 
-            suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
-                User().withId(id).copy(password = EMPTY_STRING).run user@{
-                    findAuthsById(id).getOrNull().run roles@{
-                        return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
-                        else copy(roles = this@roles).right()
-                    }
-                }
-            } catch (e: Throwable) {
-                e.left()
-            }
+//            suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
+//                User().withId(id).copy(password = EMPTY_STRING).run user@{
+//                    findAuthsById(id).getOrNull().run roles@{
+//                        return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
+//                        else copy(roles = this@roles).right()
+//                    }
+//                }
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
 
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
