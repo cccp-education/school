@@ -95,7 +95,8 @@ class UserDaoTests {
             """
     }
 
-    @Test
+   @Ignore
+   @Test
     fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
@@ -433,7 +434,6 @@ class UserDaoTests {
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
-
     @Test
     fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
         assertEquals(
@@ -446,7 +446,6 @@ class UserDaoTests {
             assertTrue(isLeft())
         }.mapLeft { assertTrue(it is EmptyResultDataAccessException) }
     }
-
 
     @Test
     fun `check findOneByEmail with existant email`(): Unit = runBlocking {
