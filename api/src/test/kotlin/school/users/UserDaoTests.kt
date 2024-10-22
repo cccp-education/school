@@ -6,7 +6,8 @@
 package school.users
 
 import arrow.core.Either
-import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.right
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -95,8 +96,59 @@ class UserDaoTests {
             """
     }
 
-   @Ignore
-   @Test
+    suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            getBean<DatabaseClient>()
+                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                .bind("email", email)
+                .fetch()
+                .all()
+                .collect { add(Role(it["ROLE"].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            getBean<DatabaseClient>()
+                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
+                .bind("login", login)
+                .fetch()
+                .all()
+                .collect { add(Role(it["ROLE"].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
+        User().withId(id).copy(password = EMPTY_STRING).run user@{
+            findAuthsById(id).getOrNull().run roles@{
+                return if (isNullOrEmpty()) Exception("Unable to retrieve roles from user by id").left()
+                else copy(roles = this@roles).right()
+            }
+        }
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            getBean<DatabaseClient>()
+                .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+                .bind("userId", userId)
+                .fetch()
+                .all()
+                .collect { add(Role(it["ROLE"].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+
+    @Ignore
+    @Test
     fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
@@ -125,15 +177,20 @@ class UserDaoTests {
                 langKey = get("lang_key".uppercase()).toString(),
                 version = get("version".uppercase()).toString().toLong(),
             )
-
             val userResult = context
                 .findOneWithAuths<User>(user.login)
                 .getOrNull()
             assertNotNull(expectedUserResult)
             assertNotNull(expectedUserResult.id)
             assertTrue(expectedUserResult.roles.isNotEmpty())
-            assertEquals(expectedUserResult.roles.first().id, ROLE_USER)
-            assertEquals(1, expectedUserResult.roles.size)
+            assertEquals(
+                expectedUserResult.roles.first().id,
+                ROLE_USER
+            )
+            assertEquals(
+                1,
+                expectedUserResult.roles.size
+            )
             assertEquals(expectedUserResult, userResult)
             assertEquals(
                 user.withId(expectedUserResult.id!!)
@@ -143,77 +200,51 @@ class UserDaoTests {
         }
     }
 
-    @Ignore
     @Test
     fun `test findOneWithAuths`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
-
         val userId: UUID = (user to context).signup().getOrNull()!!
-
         userId.apply { run(::assertNotNull) }
             .run { "(user to context).signup() : $this" }
             .run(::println)
-
-
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-
         context.findOneWithAuths<User>(user.email)
             .getOrNull()
             .apply {
-//                run(::assertNotNull)
-//                assertEquals(1, this?.roles?.size)
-//                assertEquals(ROLE_USER, this?.roles?.first()?.id)
-//                assertEquals(userId, this?.id)
+                run(::assertNotNull)
+                assertEquals(1, this?.roles?.size)
+                assertEquals(ROLE_USER, this?.roles?.first()?.id)
+                assertEquals(userId, this?.id)
             }.run { "context.findOneWithAuths<User>(${user.email}).getOrNull() : $this" }
             .run(::println)
-
         context.findOne<User>(user.email).getOrNull()
             .run { "context.findOne<User>(user.email).getOrNull() : $this" }
             .run(::println)
-
-//        context.findAuthsByEmail(user.email).getOrNull()
-//            .run { "context.findAuthsByEmail(user.email).getOrNull() : $this" }
-//            .run(::println)
-
-//        context.findAuthsById(context.findOne<User>(user.email).getOrNull()!!.id!!).getOrNull()
-//            .run { "context.findOneWithAuths<User>(user.email).getOrNull() : $this" }
-//            .run(::println)
+        context.findAuthsByEmail(user.email).getOrNull()
+            .run { "context.findAuthsByEmail(${user.email}).getOrNull() : $this" }
+            .run(::println)
     }
 
-    @Ignore
     @Test
     fun `test findOne`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         (user to context).save()
         assertEquals(1, context.countUsers())
-        lateinit var findOneEmailResult: Either<Throwable, User>
-//        context.getBean<TransactionalOperator>().executeAndAwait {
-        findOneEmailResult = context.findOne<User>(user.email)
-//        }
-//        findOneEmailResult.apply {
-//            assertTrue(isRight())
-//            assertFalse(isLeft())
-//        }.map { assertDoesNotThrow { fromString(it.toString()) } }
+        val findOneEmailResult: Either<Throwable, User> = context.findOne<User>(user.email)
+        findOneEmailResult.map { assertDoesNotThrow { fromString(it.toString()) } }
         println("findOneEmailResult : ${findOneEmailResult.getOrNull()}")
-        context.findOne<User>(user.login).apply {
-//            assertTrue(isRight())
-//            assertFalse(isLeft())
-        }.map { assertDoesNotThrow { fromString(it.toString()) } }
+        context.findOne<User>(user.login).map { assertDoesNotThrow { fromString(it.toString()) } }
     }
 
-    @Ignore
     @Test
     fun `test findUserById`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
-
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-
         lateinit var userWithAuths: User
-
         (user to context).signup().apply {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
@@ -221,30 +252,24 @@ class UserDaoTests {
             userWithAuths = user.withId(it).copy(password = EMPTY_STRING)
             userWithAuths.roles.isEmpty().run(::assertTrue)
         }
-
         userWithAuths.id.run(::assertNotNull)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-
-//        val userResult = context.findUserById(userWithAuths.id!!)
-//            .getOrNull()
-//            .apply { run(::assertNotNull) }
-//            .apply { userWithAuths = userWithAuths.copy(roles = this?.roles ?: emptySet()) }
-
-//        (userResult to userWithAuths).run {
-//            assertEquals(first?.id, second.id)
-//            assertEquals(first?.roles?.size, second.roles.size)
-//            assertEquals(first?.roles?.first(), second.roles.first())
-//        }
-
+        val userResult = context.findUserById(userWithAuths.id!!)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .apply { userWithAuths = userWithAuths.copy(roles = this?.roles ?: emptySet()) }
+        (userResult to userWithAuths).run {
+            assertEquals(first?.id, second.id)
+            assertEquals(first?.roles?.size, second.roles.size)
+            assertEquals(first?.roles?.first(), second.roles.first())
+        }
         userWithAuths.roles.isNotEmpty().run(::assertTrue)
-
         assertEquals(ROLE_USER, userWithAuths.roles.first().id)
         "userWithAuths : $userWithAuths".run(::println)
-//        "userResult : $userResult".run(::println)
+        "userResult : $userResult".run(::println)
     }
 
-    @Ignore
     @Test
     fun `test findAuthsByLogin`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -261,16 +286,15 @@ class UserDaoTests {
         }
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-//        context.findAuthsByLogin(user.login)
-//            .getOrNull()
-//            .apply { run(::assertNotNull) }
-//            .run { userWithAuths = userWithAuths.copy(roles = this!!) }
+        context.findAuthsByLogin(user.login)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .run { userWithAuths = userWithAuths.copy(roles = this!!) }
         userWithAuths.roles.isNotEmpty().run(::assertTrue)
         assertEquals(ROLE_USER, userWithAuths.roles.first().id)
         "userWithAuths : $userWithAuths".run(::println)
     }
 
-    @Ignore
     @Test
     fun `test findAuthsByEmail`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -287,10 +311,10 @@ class UserDaoTests {
         }
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-//        context.findAuthsByEmail(user.email)
-//            .getOrNull()
-//            .apply { run(::assertNotNull) }
-//            .run { userWithAuths = userWithAuths.copy(roles = this!!) }
+        context.findAuthsByEmail(user.email)
+            .getOrNull()
+            .apply { run(::assertNotNull) }
+            .run { userWithAuths = userWithAuths.copy(roles = this!!) }
         userWithAuths.roles.isNotEmpty().run(::assertTrue)
         assertEquals(ROLE_USER, userWithAuths.roles.first().id)
         "userWithAuths : $userWithAuths".run(::println)
@@ -407,6 +431,7 @@ class UserDaoTests {
         userSaveResult//TODO: Problem with the either result do not return the user id but persist it on database
             .map { i("on passe ici!") }
             .mapLeft { i("on passe par la!") }
+        @Suppress("SqlSourceToSinkFlow")
         val userId = context.getBean<DatabaseClient>().sql(FIND_USER_BY_LOGIN)
             .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
             .fetch()
