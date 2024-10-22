@@ -30,12 +30,9 @@ import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
-//import school.users.User.UserDao.Dao.findAuthsByEmail
-//import school.users.User.UserDao.Dao.findAuthsByLogin
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserDao.Dao.findOneWithAuths
-//import school.users.User.UserDao.Dao.findUserById
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
@@ -98,7 +95,6 @@ class UserDaoTests {
             """
     }
 
-    @Ignore
     @Test
     fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
@@ -132,10 +128,6 @@ class UserDaoTests {
             val userResult = context
                 .findOneWithAuths<User>(user.login)
                 .getOrNull()
-                .apply {
-                    run { "context.findOneWithAuths<User>(user.login).getOrNull() : $this" }
-                        .run(::println)
-                }
             assertNotNull(expectedUserResult)
             assertNotNull(expectedUserResult.id)
             assertTrue(expectedUserResult.roles.isNotEmpty())
@@ -148,8 +140,6 @@ class UserDaoTests {
                 userResult
             )
         }
-//            .run(::println)
-
     }
 
     @Ignore
@@ -323,7 +313,6 @@ class UserDaoTests {
         assertEquals(1, context.countUserAuthority())
     }
 
-    @Ignore
     @Test
     fun `try to do implementation of findOneWithAuths with existing email login and roles using composed query`(): Unit =
         runBlocking {
@@ -348,7 +337,6 @@ class UserDaoTests {
             assertEquals(1, context.countUserAuthority())
         }
 
-    @Ignore
     @Test
     fun `try to do implementation of findOneWithAuths with existing email login and roles`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -390,7 +378,6 @@ class UserDaoTests {
         assertEquals(1, context.countUserAuthority())
     }
 
-    @Ignore
     @Test
     fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
@@ -409,7 +396,6 @@ class UserDaoTests {
         }
     }
 
-    @Ignore
     @Test
     fun `test UserRoleDao signup with existing user without user_role`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -449,7 +435,6 @@ class UserDaoTests {
     }
 
 
-    @Ignore
     @Test
     fun `check findOneByEmail with non-existent email`(): Unit = runBlocking {
         assertEquals(
@@ -464,7 +449,6 @@ class UserDaoTests {
     }
 
 
-    @Ignore
     @Test
     fun `check findOneByEmail with existant email`(): Unit = runBlocking {
         assertEquals(
@@ -484,7 +468,6 @@ class UserDaoTests {
         }.map { assertDoesNotThrow { fromString(it.toString()) } }
     }
 
-    @Ignore
     @Test
     fun `test findOne with not existing email or login`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
@@ -498,7 +481,6 @@ class UserDaoTests {
         }
     }
 
-    @Ignore
     @Test
     fun `save default user should work in this context `(): Unit = runBlocking {
         val count = context.countUsers()
@@ -506,7 +488,6 @@ class UserDaoTests {
         assertEquals(expected = count + 1, context.countUsers())
     }
 
-    @Ignore
     @Test
     fun `test retrieve id from user by existing login`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
@@ -528,7 +509,6 @@ class UserDaoTests {
         }
     }
 
-    @Ignore
     @Test
     fun `count users, expected 0`(): Unit = runBlocking {
         assertEquals(
@@ -539,7 +519,6 @@ class UserDaoTests {
     }
 
     //TODO: move this test RoleDaoTests
-    @Ignore
     @Test
     fun `count roles, expected 3`(): Unit = runBlocking {
         context.run {
