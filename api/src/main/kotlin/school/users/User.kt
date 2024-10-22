@@ -51,6 +51,7 @@ import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.util.*
 import java.util.Locale.ENGLISH
+import java.util.UUID.fromString
 import jakarta.validation.constraints.Email as EmailConstraint
 
 data class User(
@@ -259,7 +260,8 @@ data class User(
                         .left()
                 }
 
-            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
+
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
                 when (T::class) {
                     User::class -> {
                         try {
@@ -267,14 +269,47 @@ data class User(
                                 "not a valid login or not a valid email"
                                     .run(::Exception)
                                     .left()
-                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
-                            val user = findOne<User>(emailOrLogin).getOrNull()
-                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
-                            // No need for that test, let catch intercept throwable.
-                            when {
-                                user != null && roles != null -> user.copy(roles = roles).right()
+                            val h2SQLquery = """
+                                SELECT 
+                                    u.id,
+                                    u.email,
+                                    u.login,
+                                    u.password,
+                                    u.lang_key,
+                                    u.version,
+                                    `GROUP_CONCAT`(DISTINCT `a`.`role`) AS `user_roles`
+                                FROM `user` as `u`
+                                LEFT JOIN 
+                                    `user_authority` ua ON u.id = ua.user_id
+                                LEFT JOIN 
+                                    `authority` as a ON ua.role = a.role
+                                WHERE 
+                                    lower(u.email) = lower(:emailOrLogin) OR lower(u.login) = lower(:emailOrLogin)
+                                GROUP BY 
+                                    u.id, u.email, u.login;
+            """
+                            val userWithAuths: MutableMap<String, Any>? = getBean<DatabaseClient>()
+                                .sql(h2SQLquery)
+                                .bind("emailOrLogin", emailOrLogin)
+                                .fetch()
+                                .awaitSingleOrNull()
 
-                                else -> Exception("not able to retrieve user id and roles").left()
+                            userWithAuths.run {
+                                if (this == null) Exception("not able to retrieve user id and roles").left()
+                                else
+                                    User(
+                                        id = fromString(get("id".uppercase()).toString()),
+                                        email = get("email".uppercase()).toString(),
+                                        login = get("login".uppercase()).toString(),
+                                        roles = get("user_roles".uppercase())
+                                            .toString()
+                                            .split(",")
+                                            .map { Role(it) }
+                                            .toSet(),
+                                        password = get("password".uppercase()).toString(),
+                                        langKey = get("lang_key".uppercase()).toString(),
+                                        version = get("version".uppercase()).toString().toLong(),
+                                    ).right()
                             }
                         } catch (e: Throwable) {
                             e.left()
@@ -287,7 +322,6 @@ data class User(
                         .left()
                 }
 
-            //TODO: return the complete user from db with roles
             suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {
                     getBean<DatabaseClient>()
@@ -300,6 +334,49 @@ data class User(
             } catch (e: Throwable) {
                 e.left()
             }
+
+
+//            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
+//                when (T::class) {
+//                    User::class -> {
+//                        try {
+//                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
+//                                "not a valid login or not a valid email"
+//                                    .run(::Exception)
+//                                    .left()
+//                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
+//                            val user = findOne<User>(emailOrLogin).getOrNull()
+//                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
+//                            // No need for that test, let catch intercept throwable.
+//                            when {
+//                                user != null && roles != null -> user.copy(roles = roles).right()
+//
+//                                else -> Exception("not able to retrieve user id and roles").left()
+//                            }
+//                        } catch (e: Throwable) {
+//                            e.left()
+//                        }
+//                    }
+//
+//                    else -> (T::class.simpleName)
+//                        .run { "Unsupported type: $this" }
+//                        .run(::IllegalArgumentException)
+//                        .left()
+//                }
+
+//            //TODO: return the complete user from db with roles
+//            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+//                mutableSetOf<Role>().apply {
+//                    getBean<DatabaseClient>()
+//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+//                        .bind("email", email)
+//                        .fetch()
+//                        .all()
+//                        .collect { add(Role(it["ROLE"].toString())) }
+//                }.toSet().right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
 
             suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
                 mutableSetOf<Role>().apply {

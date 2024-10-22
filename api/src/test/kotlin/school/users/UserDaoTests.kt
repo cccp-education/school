@@ -34,11 +34,12 @@ import school.users.User.UserDao.Dao.findAuthsByEmail
 import school.users.User.UserDao.Dao.findAuthsByLogin
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
-import school.users.User.UserDao.Dao.__findOneWithAuths__
+import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Dao.findUserById
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
+import school.users.UserDaoTests.Queries.h2SQLquery
 import school.users.security.Role
 import school.users.security.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
@@ -56,16 +57,8 @@ class UserDaoTests {
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
 
-
-    @Test
-    fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
-        assertEquals(0, context.countUsers())
-        assertEquals(0, context.countUserAuthority())
-        (user to context).signup()
-        assertEquals(1, context.countUsers())
-        assertEquals(1, context.countUserAuthority())
-
-        val pgSQLquery = """
+    object Queries {
+        const val pgSQLquery = """
         SELECT 
             u.id AS user_id,
             u.email AS user_email,
@@ -81,9 +74,9 @@ class UserDaoTests {
             LOWER(u.email) = LOWER(:email) OR LOWER(u.login) = LOWER(:login)
         GROUP BY 
             u.id, u.email, u.login;
-        """.trimIndent()
+        """
 
-        val h2SQLquery = """
+        const val h2SQLquery = """
         SELECT 
             u.id,
             u.email,
@@ -91,7 +84,7 @@ class UserDaoTests {
             u.password,
             u.lang_key,
             u.version,
-            GROUP_CONCAT(DISTINCT a.role) AS `user_roles`
+            `GROUP_CONCAT`(DISTINCT `a`.`role`) AS `user_roles`
         FROM `user` as `u`
         LEFT JOIN 
             `user_authority` ua ON u.id = ua.user_id
@@ -102,6 +95,16 @@ class UserDaoTests {
         GROUP BY 
             u.id, u.email, u.login;
             """
+    }
+
+    @Test
+    fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
+        assertEquals(0, context.countUsers())
+        assertEquals(0, context.countUserAuthority())
+        (user to context).signup()
+        assertEquals(1, context.countUsers())
+        assertEquals(1, context.countUserAuthority())
+
         val userWithAuths: MutableMap<String, Any>? = context
             .getBean<DatabaseClient>()
             .sql(h2SQLquery)
@@ -114,7 +117,8 @@ class UserDaoTests {
                 .run { "userWithAuths : $this" }
                 .run(::println)
         }?.run {
-            User(
+
+            val expectedUserResult = User(
                 id = fromString(get("id".uppercase()).toString()),
                 email = get("email".uppercase()).toString(),
                 login = get("login".uppercase()).toString(),
@@ -127,11 +131,16 @@ class UserDaoTests {
                 langKey = get("lang_key".uppercase()).toString(),
                 version = get("version".uppercase()).toString().toLong(),
             )
+
+            val userResult = context.findOneWithAuths<User>(user.login).getOrNull().apply {
+                run { "context.findOneWithAuths<User>(user.login).getOrNull() : $this" }
+                    .run(::println)
+            }
+
+            assertNotNull(expectedUserResult)
+            assertEquals(expectedUserResult, userResult)
         }.run(::println)
 
-        context.__findOneWithAuths__<User>(user.login).getOrNull()
-            .run { "context.findOneWithAuths<User>(user.login).getOrNull() : $this" }
-            .run(::println)
     }
 
     @Test
@@ -149,7 +158,7 @@ class UserDaoTests {
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
 
-        context.__findOneWithAuths__<User>(user.email)
+        context.findOneWithAuths<User>(user.email)
             .getOrNull()
             .apply {
 //                run(::assertNotNull)
