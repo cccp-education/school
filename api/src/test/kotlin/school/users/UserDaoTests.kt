@@ -136,9 +136,17 @@ class UserDaoTests {
                 run { "context.findOneWithAuths<User>(user.login).getOrNull() : $this" }
                     .run(::println)
             }
-
             assertNotNull(expectedUserResult)
+            assertNotNull(expectedUserResult.id)
+            assertTrue(expectedUserResult.roles.isNotEmpty())
+            assertEquals(expectedUserResult.roles.first().id, ROLE_USER)
+            assertEquals(1, expectedUserResult.roles.size)
             assertEquals(expectedUserResult, userResult)
+            assertEquals(
+                user.withId(expectedUserResult.id!!)
+                    .copy(roles = setOf(Role(ROLE_USER))),
+                userResult
+            )
         }.run(::println)
 
     }
