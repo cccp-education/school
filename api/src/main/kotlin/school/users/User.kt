@@ -82,7 +82,7 @@ data class User(
         val USERCLASS = User::class.java
 
         @JvmStatic
-        fun main(args: Array<String>) = println(UserDao.Relations.CREATE_TABLES)
+        fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
     }
 
     data class Signup(
@@ -286,29 +286,29 @@ data class User(
                                 GROUP BY 
                                     u.id, u.email, u.login;
             """
-                            val userWithAuths: MutableMap<String, Any>? = getBean<DatabaseClient>()
+                            getBean<DatabaseClient>()
                                 .sql(h2SQLquery)
                                 .bind("emailOrLogin", emailOrLogin)
                                 .fetch()
                                 .awaitSingleOrNull()
-
-                            userWithAuths.run {
-                                if (this == null) Exception("not able to retrieve user id and roles").left()
-                                else
-                                    User(
-                                        id = fromString(get("id".uppercase()).toString()),
-                                        email = get("email".uppercase()).toString(),
-                                        login = get("login".uppercase()).toString(),
-                                        roles = get("user_roles".uppercase())
-                                            .toString()
-                                            .split(",")
-                                            .map { Role(it) }
-                                            .toSet(),
-                                        password = get("password".uppercase()).toString(),
-                                        langKey = get("lang_key".uppercase()).toString(),
-                                        version = get("version".uppercase()).toString().toLong(),
-                                    ).right()
-                            }
+                                .run {
+                                    when {
+                                        this == null -> Exception("not able to retrieve user id and roles").left()
+                                        else -> User(
+                                            id = fromString(get("id".uppercase()).toString()),
+                                            email = get("email".uppercase()).toString(),
+                                            login = get("login".uppercase()).toString(),
+                                            roles = get("user_roles".uppercase())
+                                                .toString()
+                                                .split(",")
+                                                .map { Role(it) }
+                                                .toSet(),
+                                            password = get("password".uppercase()).toString(),
+                                            langKey = get("lang_key".uppercase()).toString(),
+                                            version = get("version".uppercase()).toString().toLong(),
+                                        ).right()
+                                    }
+                                }
                         } catch (e: Throwable) {
                             e.left()
                         }
@@ -319,50 +319,6 @@ data class User(
                         .run(::IllegalArgumentException)
                         .left()
                 }
-
-
-//            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
-//                when (T::class) {
-//                    User::class -> {
-//                        try {
-//                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
-//                                "not a valid login or not a valid email"
-//                                    .run(::Exception)
-//                                    .left()
-//                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
-//                            val user = findOne<User>(emailOrLogin).getOrNull()
-//                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
-//                            // No need for that test, let catch intercept throwable.
-//                            when {
-//                                user != null && roles != null -> user.copy(roles = roles).right()
-//
-//                                else -> Exception("not able to retrieve user id and roles").left()
-//                            }
-//                        } catch (e: Throwable) {
-//                            e.left()
-//                        }
-//                    }
-//
-//                    else -> (T::class.simpleName)
-//                        .run { "Unsupported type: $this" }
-//                        .run(::IllegalArgumentException)
-//                        .left()
-//                }
-
-//            //TODO: return the complete user from db with roles
-//            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
-//                mutableSetOf<Role>().apply {
-//                    getBean<DatabaseClient>()
-//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
-//                        .bind("email", email)
-//                        .fetch()
-//                        .all()
-//                        .collect { add(Role(it["ROLE"].toString())) }
-//                }.toSet().right()
-//            } catch (e: Throwable) {
-//                e.left()
-//            }
-
 
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneByLogin(login: String): Either<Throwable, UUID> =
                 when (T::class) {
@@ -423,12 +379,9 @@ data class User(
             }.run {
                 // Création d'un utilisateur à partir des données de Signup
                 User(
-//                    id = randomUUID(), // Génération d'un UUID
                     login = login,
                     password = getBean<PasswordEncoder>().encode(password),
                     email = email,
-                    roles = emptySet(),//mutableSetOf(Role(ANONYMOUS_USER)), // Role par défaut
-                    langKey = "en" // Valeur par défaut, ajustez si nécessaire
                 )
             }
         }

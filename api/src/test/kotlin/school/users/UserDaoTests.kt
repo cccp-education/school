@@ -6,6 +6,7 @@
 package school.users
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import kotlinx.coroutines.reactive.collect
@@ -147,7 +148,6 @@ class UserDaoTests {
     }
 
 
-    @Ignore
     @Test
     fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
@@ -327,12 +327,12 @@ class UserDaoTests {
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
         (user to context).signup()
-//        val resultRoles = mutableSetOf<Role>()
-//        context.findAuthsByEmail(user.email).run {
-//            resultRoles.addAll(map { it }.getOrElse { emptySet() })
-//        }
-//        assertEquals(ROLE_USER, resultRoles.first().id)
-//        assertEquals(ROLE_USER, resultRoles.first().id)
+        val resultRoles = mutableSetOf<Role>()
+        context.findAuthsByEmail(user.email).run {
+            resultRoles.addAll(map { it }.getOrElse { emptySet() })
+        }
+        assertEquals(ROLE_USER, resultRoles.first().id)
+        assertEquals(ROLE_USER, resultRoles.first().id)
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
     }
@@ -553,3 +553,47 @@ class UserDaoTests {
         }
     }
 }
+
+
+//            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
+//                when (T::class) {
+//                    User::class -> {
+//                        try {
+//                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
+//                                "not a valid login or not a valid email"
+//                                    .run(::Exception)
+//                                    .left()
+//                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
+//                            val user = findOne<User>(emailOrLogin).getOrNull()
+//                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
+//                            // No need for that test, let catch intercept throwable.
+//                            when {
+//                                user != null && roles != null -> user.copy(roles = roles).right()
+//
+//                                else -> Exception("not able to retrieve user id and roles").left()
+//                            }
+//                        } catch (e: Throwable) {
+//                            e.left()
+//                        }
+//                    }
+//
+//                    else -> (T::class.simpleName)
+//                        .run { "Unsupported type: $this" }
+//                        .run(::IllegalArgumentException)
+//                        .left()
+//                }
+
+//            //TODO: return the complete user from db with roles
+//            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+//                mutableSetOf<Role>().apply {
+//                    getBean<DatabaseClient>()
+//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+//                        .bind("email", email)
+//                        .fetch()
+//                        .all()
+//                        .collect { add(Role(it["ROLE"].toString())) }
+//                }.toSet().right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
+
