@@ -59,7 +59,6 @@ class UserIntegrationTests {
 
 
     @Test
-    @Ignore
     fun `SignupController - vérifie que la requête contient bien des données cohérentes`() {
         client
             .post()
@@ -90,7 +89,6 @@ class UserIntegrationTests {
     }
 
     @Test
-    @Ignore
     fun `SignupController - test signup avec une url invalide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
 //        val countUserAuthBefore = context.countUserAuthority()
