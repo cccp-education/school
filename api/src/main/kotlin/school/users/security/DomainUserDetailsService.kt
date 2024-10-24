@@ -2,6 +2,7 @@ package school.users.security
 
 import jakarta.validation.Validator
 import kotlinx.coroutines.reactor.mono
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
@@ -10,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
-import reactor.core.publisher.Mono.empty
 import school.users.User
 import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Fields.EMAIL_FIELD
@@ -20,29 +20,28 @@ import org.springframework.security.core.userdetails.User as UserSecurity
 @Suppress("unused")
 @Component("userDetailsService")
 class DomainUserDetailsService(
-    private val context: ApplicationContext,
-    private val validator: Validator,
+    private val context: ApplicationContext
 ) : ReactiveUserDetailsService {
 
     @Transactional
     @Throws(UsernameNotFoundException::class)
-    override fun findByUsername(emailOrLogin: String): Mono<UserDetails> {
-        if (validator.validateProperty(
+    override fun findByUsername(emailOrLogin: String): Mono<UserDetails> = context.getBean<Validator>().run {
+        when {
+            validateProperty(
                 User(email = emailOrLogin),
                 EMAIL_FIELD
-            ).isNotEmpty() && validator.validateProperty(
+            ).isNotEmpty() && validateProperty(
                 User(login = emailOrLogin),
                 LOGIN_FIELD
-            ).isNotEmpty()
-        ) throw UsernameNotFoundException("User $emailOrLogin was not found")
-        mono {
-            context.findOneWithAuths<User>(emailOrLogin).onRight {
-                return@mono createSpringSecurityUser(emailOrLogin, it) as UserDetails
+            ).isNotEmpty() -> throw UsernameNotFoundException("User $emailOrLogin was not found")
+
+            else -> mono {
+                context.findOneWithAuths<User>(emailOrLogin).map {
+                    return@mono createSpringSecurityUser(emailOrLogin, it)
+                }.getOrNull() ?: throw UsernameNotFoundException("User $emailOrLogin was not found")
             }
         }
-        return empty()
     }
-
 
     //        @Throws(UserNotActivatedException::class)
     fun createSpringSecurityUser(
@@ -55,7 +54,6 @@ class DomainUserDetailsService(
         user.password,
         user.roles.map { SimpleGrantedAuthority(it.id) }
     )
-//    }
 }
 
 

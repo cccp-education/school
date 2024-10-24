@@ -3,6 +3,7 @@
 package school.users.security
 
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.ReactiveSecurityContextHolder.getContext
@@ -31,13 +32,13 @@ suspend fun getCurrentUserJwt() = getContext()
     .map { it.credentials as String }
     .awaitSingle()!!
 
-suspend fun isAuthenticated() = getContext()
+suspend fun isAuthenticated(): Boolean = getContext()
     .map(SecurityContext::getAuthentication)
     .map(Authentication::getAuthorities)
     .map { roles: Collection<GrantedAuthority> ->
         roles.map(GrantedAuthority::getAuthority)
             .none { it == ROLE_ANONYMOUS }
-    }.awaitSingle()!!
+    }.awaitSingleOrNull()!!
 
 
 suspend fun isCurrentUserInRole(authority: String) = getContext()
