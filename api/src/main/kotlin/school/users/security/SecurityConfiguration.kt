@@ -2,6 +2,9 @@ package school.users.security
 //
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 //import org.springframework.http.HttpMethod.*
 //import org.springframework.security.authentication.ReactiveAuthenticationManager
 //import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
@@ -12,6 +15,9 @@ import org.springframework.context.annotation.Configuration
 //import org.springframework.security.base.userdetails.ReactiveUserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import school.base.utils.Properties
+import school.base.utils.Properties.Security
+
 //import org.springframework.security.web.server.SecurityWebFilterChain
 //import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
 //import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher
@@ -28,12 +34,12 @@ import org.springframework.security.crypto.password.PasswordEncoder
 //import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager as RepositoryAuthentication
 //
 @Configuration
-//@EnableWebFluxSecurity
-//@EnableReactiveMethodSecurity
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
 class SecurityConfiguration(
-//    private val properties: Properties,
-//    private val security: Security,
-//    private val userDetailsService: ReactiveUserDetailsService,
+    private val properties: Properties,
+    private val security: school.users.security.Security,
+    private val userDetailsService: ReactiveUserDetailsService,
 ) {
     @Bean("passwordEncoder")
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()

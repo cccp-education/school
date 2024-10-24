@@ -33,8 +33,8 @@ import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Attributes.PASSWORD_ATTR
 import school.users.User.UserDao.Attributes.VERSION_ATTR
-import school.users.User.UserDao.Attributes.isThisEmail
-import school.users.User.UserDao.Attributes.isThisLogin
+import school.users.User.UserDao.Attributes.isEmail
+import school.users.User.UserDao.Attributes.isLogin
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.ID_FIELD
@@ -140,12 +140,12 @@ data class User(
             val EMAIL_ATTR = EMAIL_FIELD.cleanField()
             const val LANG_KEY_ATTR = "langKey"
             val VERSION_ATTR = VERSION_FIELD.cleanField()
-            fun Pair<String, ApplicationContext>.isThisEmail(): Boolean = second
+            fun Pair<String, ApplicationContext>.isEmail(): Boolean = second
                 .getBean<Validator>()
                 .validateValue(USERCLASS, EMAIL_ATTR, first)
                 .isEmpty()
 
-            fun Pair<String, ApplicationContext>.isThisLogin(): Boolean = second
+            fun Pair<String, ApplicationContext>.isLogin(): Boolean = second
                 .getBean<Validator>()
                 .validateValue(USERCLASS, LOGIN_ATTR, first)
                 .isEmpty()
@@ -241,8 +241,8 @@ data class User(
                             .let {
                                 User(
                                     id = it[ID_FIELD] as UUID,
-                                    email = if ((emailOrLogin to this).isThisEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
-                                    login = if ((emailOrLogin to this).isThisLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
+                                    email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
+                                    login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
                                     password = it[PASSWORD_FIELD] as String,
                                     langKey = it[LANG_KEY_FIELD] as String,
                                     version = it[VERSION_FIELD] as Long,
@@ -263,7 +263,7 @@ data class User(
                 when (T::class) {
                     User::class -> {
                         try {
-                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
+                            if (!((emailOrLogin to this).isEmail() || (emailOrLogin to this).isLogin()))
                                 "not a valid login or not a valid email"
                                     .run(::Exception)
                                     .left()
