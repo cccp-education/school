@@ -12,13 +12,14 @@ import school.users.User.Signup
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import school.users.signup.SignupService
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
-class UserServiceTests {
+class SignupServiceTests {
 
     @Autowired
     lateinit var context: ApplicationContext
@@ -32,7 +33,7 @@ class UserServiceTests {
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
-        context.getBean<UserService>().signup(
+        context.getBean<SignupService>().signup(
             Signup(
                 login = "jdoe",
                 email = "jdoe@acme.com",

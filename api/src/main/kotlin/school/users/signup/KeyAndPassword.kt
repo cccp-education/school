@@ -1,6 +1,7 @@
 package school.users.signup
-//
-//data class KeyAndPassword(
-//    val key: String? = null,
-//    val newPassword: String? = null
-//)
+
+@JvmRecord
+data class KeyAndPassword(
+    val key: String? = null,
+    val newPassword: String? = null
+)

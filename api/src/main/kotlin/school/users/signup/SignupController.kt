@@ -1,38 +1,43 @@
-package school.users
+package school.users.signup
 
+import org.springframework.http.HttpStatus.OK
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ServerWebExchange
+import school.users.User.Signup
+import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
 
 @RestController
 @RequestMapping(API_USERS)
-class UserController {
+class SignupController {
     internal class SignupException(message: String) : RuntimeException(message)
-//    /**
-//     * {@code POST  /signup} : register the user.
-//     *
-//     * @param account the managed user View Model.
-//     */
-//    @PostMapping(
-//        API_SIGNUP,
-//        produces = [APPLICATION_PROBLEM_JSON_VALUE]
-//    )
-//    suspend fun signup(
-//        @RequestBody account: AccountCredentials,
-//        exchange: ServerWebExchange
-//    ): ResponseEntity<ProblemDetail> = account.validate(exchange).run {
-//        i("signup attempt: ${this@run} ${account.login} ${account.email}")
-//        if (isNotEmpty()) return signupProblems.badResponse(this)
-//    }.run {
-//        when {
-//            account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-//            account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
-//            else -> {
-//                signupService.signup(account)
-//                ResponseEntity<ProblemDetail>(CREATED)
-//            }
-//        }
-//    }
+
+    /**
+     * {@code POST  /signup} : register the user.
+     *
+     * @param signup the managed user View Model.
+     */
+    @PostMapping(API_SIGNUP, produces = [APPLICATION_PROBLEM_JSON_VALUE])
+    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> = OK.run(::ResponseEntity)
+    /*signup.validate(exchange).run {
+           i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+           if (isNotEmpty()) return signupProblems.badResponse(this)
+       }.run {
+           when {
+               signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
+               signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
+               else -> {
+                   signupService.signup(signup)
+                   ResponseEntity<ProblemDetail>(CREATED)
+               }
+           }
+       }*/
 }
 
 

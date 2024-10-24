@@ -1,4 +1,6 @@
-package school.users//@file:Suppress(
+package school.users
+
+//@file:Suppress(
 //    "NonAsciiCharacters",
 //    "MemberVisibilityCanBePrivate",
 //    "PropertyName"
