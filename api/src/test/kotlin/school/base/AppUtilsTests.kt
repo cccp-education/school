@@ -13,7 +13,7 @@ import school.tdd.TestUtils.Data.user
 import school.Application
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
-import school.base.utils.i
+import school.base.utils.Log.i
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

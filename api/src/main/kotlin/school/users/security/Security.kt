@@ -6,8 +6,8 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm.HS512
 import io.jsonwebtoken.io.Decoders.BASE64
 import io.jsonwebtoken.jackson.io.JacksonSerializer
-import io.jsonwebtoken.lang.Strings
-import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.lang.Strings.hasLength
+import io.jsonwebtoken.security.Keys.hmacShaKeyFor
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -15,6 +15,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import school.base.utils.*
+import school.base.utils.Log.d
+import school.base.utils.Log.i
+import school.base.utils.Log.t
+import school.base.utils.Log.w
 import java.security.Key
 import java.util.Date
 
@@ -80,22 +84,24 @@ class Security(
             .jwt
             .secret
             .run {
-                key = Keys.hmacShaKeyFor(
+                key = hmacShaKeyFor(
                     when {
-                        !Strings.hasLength(this) -> w(
-                            "Warning: the Jwt key used is not Base64-encoded. " +
-                                    "We recommend using the `school.security.authentication.jwt.base64-secret`" +
-                                    " key for optimum security."
-                        ).run { toByteArray(Charsets.UTF_8) }
+                        !hasLength(this) -> (
+                                buildString {
+                                    append("Warning: the Jwt key used is not Base64-encoded. ")
+                                    append("We recommend using the `school.security.authentication.jwt.base64-secret`")
+                                    append(" key for optimum security.")
+                                }
+                        ).run(::w)
+                            .run { toByteArray() }
 
                         else -> d("Using a Base64-encoded Jwt secret key").run {
-                            BASE64.decode(
-                                properties
-                                    .security
-                                    .authentication
-                                    .jwt
-                                    .base64Secret
-                            )
+                            properties
+                                .security
+                                .authentication
+                                .jwt
+                                .base64Secret
+                                .run(BASE64::decode)
                         }
                     }
                 )

@@ -1,7 +1,7 @@
 package school.base.http
 
 import org.springframework.http.HttpHeaders
-import school.base.utils.e
+import school.base.utils.Log.e
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import kotlin.text.Charsets.UTF_8

@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.EMPTY_STRING
 import school.base.utils.ROLE_USER
-import school.base.utils.i
+import school.base.utils.Log.i
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserDao

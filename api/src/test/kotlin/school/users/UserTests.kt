@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.user
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
-import school.base.utils.i
+import school.base.utils.Log.i
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import kotlin.test.AfterTest
 import kotlin.test.Test

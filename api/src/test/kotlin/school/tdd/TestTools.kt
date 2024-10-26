@@ -22,7 +22,7 @@ import school.Application
 import school.base.utils.*
 import school.base.utils.TEST
 import school.base.utils.VIRGULE
-import school.base.utils.i
+import school.base.utils.Log.i
 import java.io.IOException
 import java.lang.Byte.parseByte
 import java.time.ZonedDateTime

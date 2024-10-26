@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.AsyncConfigurer
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
-import school.base.utils.d
-import school.base.utils.e
+import school.base.utils.Log.d
+import school.base.utils.Log.e
 
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor

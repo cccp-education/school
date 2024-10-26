@@ -11,7 +11,7 @@ import school.base.utils.Properties
 import school.base.utils.DEVELOPMENT
 import school.base.utils.PRODUCTION
 import school.base.utils.STARTUP_LOG_MSG_KEY
-import school.base.utils.i
+import school.base.utils.Log.i
 import java.util.*
 import java.util.Locale.FRENCH
 import kotlin.test.Test

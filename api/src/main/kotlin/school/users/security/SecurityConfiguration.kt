@@ -25,9 +25,9 @@ import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.server.WebFilter
 import school.base.http.Web.SpaWebFilter
+import school.base.utils.Log.d
 import school.base.utils.Properties
 import school.base.utils.ROLE_ADMIN
-import school.base.utils.d
 
 
 @Configuration
@@ -105,7 +105,7 @@ class SecurityConfiguration(
             .build()
 
     @Bean
-    fun corsFilter(): CorsWebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
+    fun corsFilter(): WebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
         properties.cors.apply config@{
             when {
                 allowedOrigins != null && allowedOrigins!!.isNotEmpty() -> this@source.apply {
