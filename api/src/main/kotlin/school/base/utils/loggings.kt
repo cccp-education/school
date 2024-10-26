@@ -105,13 +105,17 @@ private val ApplicationContext.logProfiles: ApplicationContext
             when {
                 contains(DEVELOPMENT) && contains(PRODUCTION) -> e(
                     getBean<MessageSource>().getMessage(
-                        STARTUP_LOG_MSG_KEY, arrayOf(DEVELOPMENT, PRODUCTION), getDefault()
+                        STARTUP_LOG_MSG_KEY,
+                        arrayOf(DEVELOPMENT, PRODUCTION),
+                        getDefault()
                     )
                 )
 
                 contains(DEVELOPMENT) && contains(CLOUD) -> e(
                     getBean<MessageSource>().getMessage(
-                        STARTUP_LOG_MSG_KEY, arrayOf(DEVELOPMENT, CLOUD), getDefault()
+                        STARTUP_LOG_MSG_KEY,
+                        arrayOf(DEVELOPMENT, CLOUD),
+                        getDefault()
                     )
                 )
             }

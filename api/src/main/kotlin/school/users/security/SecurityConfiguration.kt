@@ -23,24 +23,25 @@ import org.springframework.security.web.server.util.matcher.OrServerWebExchangeM
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
+import org.springframework.web.server.WebFilter
 import school.base.http.Web.SpaWebFilter
 import school.base.utils.Properties
 import school.base.utils.ROLE_ADMIN
 import school.base.utils.d
 
-//
+
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 class SecurityConfiguration(
     private val properties: Properties,
-    private val security: school.users.security.Security,
+    private val security: Security,
     private val userDetailsService: ReactiveUserDetailsService,
 ) {
     @Bean("passwordEncoder")
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
-        @Suppress("removal")
+    @Suppress("removal")
     @Bean
     fun springSecurityFilterChain(
         http: ServerHttpSecurity
@@ -104,7 +105,7 @@ class SecurityConfiguration(
             .build()
 
     @Bean
-    fun corsFilter() = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
+    fun corsFilter(): CorsWebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
         properties.cors.apply config@{
             when {
                 allowedOrigins != null && allowedOrigins!!.isNotEmpty() -> this@source.apply {

@@ -1,4 +1,4 @@
-package school.users.signup
+package school.users.password
 
 @JvmRecord
 data class KeyAndPassword(

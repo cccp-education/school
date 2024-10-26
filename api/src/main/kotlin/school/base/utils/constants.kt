@@ -2,7 +2,7 @@ package school.base.utils
 
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import school.base.configurations.http.ProblemsModel
+import school.base.http.ProblemsModel
 import java.net.URI
 import java.net.URI.create
 

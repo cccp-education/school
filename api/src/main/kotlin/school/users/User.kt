@@ -85,6 +85,7 @@ data class User(
         fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
     }
 
+    @JvmRecord
     data class Signup(
         val login: String,
         val password: String,

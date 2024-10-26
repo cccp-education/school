@@ -1,4 +1,4 @@
-package school.base.configurations.http
+package school.base.http
 
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpHeaders

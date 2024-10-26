@@ -1,4 +1,4 @@
-package school.base.configurations.http
+package school.base.http
 
 
 data class ProblemsModel(

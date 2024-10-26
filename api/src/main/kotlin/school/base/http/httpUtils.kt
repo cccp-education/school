@@ -8,9 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.server.ServerWebExchange
-import school.base.configurations.http.ProblemsModel
 import java.net.URI
-import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.Locale.forLanguageTag
 
