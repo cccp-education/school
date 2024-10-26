@@ -20,7 +20,7 @@ class JwtFilter(private val context: ApplicationContext) : WebFilter {
             chain.apply {
                 return when {
                     !isNullOrBlank() &&
-                            context.getBean<Security>().validateToken(this@token) -> filter(exchange)
+                            this@token.run(context.getBean<Security>()::validateToken) -> exchange.run(::filter)
                         .contextWrite(withAuthentication(context.getBean<Security>().getAuthentication(this@token)))
 
                     else -> filter(exchange)
@@ -39,11 +39,9 @@ class JwtFilter(private val context: ApplicationContext) : WebFilter {
             ) substring(startIndex = 7)
             else null
         }
-
 }
 /*
 package community.security
-
 
 import community.*
 import community.Properties
@@ -195,18 +193,5 @@ class SecurityJwt(
         t("Invalid Jwt token trace. $e")
         INVALID_TOKEN
     }
-
-
-    private fun resolveToken(request: ServerHttpRequest): String? = request
-        .headers
-        .getFirst(AUTHORIZATION_HEADER)
-        .apply {
-            return when {
-                !isNullOrBlank() && startsWith(BEARER_START_WITH) ->
-                    substring(startIndex = 7)
-
-                else -> null
-            }
-        }
 }
  */

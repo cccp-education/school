@@ -22,7 +22,6 @@ import school.base.utils.Log.i
 import school.base.utils.Log.t
 import school.base.utils.Log.w
 import java.security.Key
-import java.time.ZonedDateTime
 import java.time.ZonedDateTime.now
 import java.util.Date
 
@@ -123,12 +122,12 @@ class Security(
     }
 
     private fun calculateExpirationDate(rememberMe: Boolean): Date = when {
-        rememberMe -> tokenValidityInMillisecondsForRememberMe / 1000
+        rememberMe -> tokenValidityInMillisecondsForRememberMe
 
-        else -> tokenValidityInMilliseconds / 1000
+        else -> tokenValidityInMilliseconds
     }.run {
         now()
-            .plusSeconds(this)
+            .plusSeconds(this / 1000)
             .toInstant()
             .run(Date::from)
     }
