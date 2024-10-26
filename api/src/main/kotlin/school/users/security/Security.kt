@@ -9,6 +9,8 @@ import io.jsonwebtoken.jackson.io.JacksonSerializer
 import io.jsonwebtoken.lang.Strings.hasLength
 import io.jsonwebtoken.security.Keys.hmacShaKeyFor
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -20,11 +22,13 @@ import school.base.utils.Log.i
 import school.base.utils.Log.t
 import school.base.utils.Log.w
 import java.security.Key
+import java.time.ZonedDateTime
+import java.time.ZonedDateTime.now
 import java.util.Date
 
 @Component
 class Security(
-    private val properties: Properties,
+    private val context: ApplicationContext,
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private var key: Key? = null,
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
@@ -78,7 +82,7 @@ class Security(
 
     @Throws(Exception::class)
     override fun afterPropertiesSet() {
-        properties
+        context.getBean<Properties>()
             .security
             .authentication
             .jwt
@@ -92,11 +96,11 @@ class Security(
                                     append("We recommend using the `school.security.authentication.jwt.base64-secret`")
                                     append(" key for optimum security.")
                                 }
-                        ).run(::w)
+                                ).run(::w)
                             .run { toByteArray() }
 
                         else -> d("Using a Base64-encoded Jwt secret key").run {
-                            properties
+                            context.getBean<Properties>()
                                 .security
                                 .authentication
                                 .jwt
@@ -106,23 +110,35 @@ class Security(
                     }
                 )
             }
-        tokenValidityInMilliseconds = properties
+        tokenValidityInMilliseconds = context.getBean<Properties>()
             .security
             .authentication
             .jwt
             .tokenValidityInSeconds * 1000
-        tokenValidityInMillisecondsForRememberMe = properties
+        tokenValidityInMillisecondsForRememberMe = context.getBean<Properties>()
             .security
             .authentication
             .jwt
             .tokenValidityInSecondsForRememberMe * 1000
     }
 
+    private fun calculateExpirationDate(rememberMe: Boolean): Date = when {
+        rememberMe -> tokenValidityInMillisecondsForRememberMe / 1000
+
+        else -> tokenValidityInMilliseconds / 1000
+    }.run {
+        now()
+            .plusSeconds(this)
+            .toInstant()
+            .run(Date::from)
+    }
+
+
     suspend fun createToken(
         authentication: Authentication,
         rememberMe: Boolean
     ): String {
-        Date().time.run {
+        now().run {
             return builder()
                 .setSubject(authentication.name)
                 .claim(
@@ -132,12 +148,7 @@ class Security(
                         .map { it.authority }
                         .joinToString(separator = ","))
                 .signWith(key, HS512)
-                .setExpiration(
-                    when {
-                        rememberMe -> Date(this + tokenValidityInMillisecondsForRememberMe)
-                        else -> Date(this + tokenValidityInMilliseconds)
-                    }
-                )
+                .setExpiration(calculateExpirationDate(rememberMe))
                 .serializeToJsonWith(JacksonSerializer())
                 .compact()
         }
@@ -180,9 +191,7 @@ class Security(
         INVALID_TOKEN
     }
 }
-///*
-//package community.security
-//
+
 //import community.Properties
 //import community.d
 //import org.springframework.context.annotation.Bean
@@ -279,15 +288,3 @@ class Security(
 //            }
 //        }
 //    })
-//
-//
-//    @Bean("passwordEncoder")
-//    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
-//
-//    @Bean
-//    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager =
-//        UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService).apply {
-//            setPasswordEncoder(passwordEncoder())
-//        }
-//}
-// */

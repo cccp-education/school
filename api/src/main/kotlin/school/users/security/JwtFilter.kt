@@ -1,5 +1,7 @@
 package school.users.security
 
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.security.core.context.ReactiveSecurityContextHolder.withAuthentication
 import org.springframework.stereotype.Component
@@ -11,15 +13,15 @@ import school.base.utils.AUTHORIZATION_HEADER
 import school.base.utils.BEARER_START_WITH
 
 @Component("jwtFilter")
-class JwtFilter(private val security: Security) : WebFilter {
+class JwtFilter(private val context: ApplicationContext) : WebFilter {
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         resolveToken(exchange.request).apply token@{
             chain.apply {
                 return when {
                     !isNullOrBlank() &&
-                            security.validateToken(this@token) -> filter(exchange)
-                        .contextWrite(withAuthentication(security.getAuthentication(this@token)))
+                            context.getBean<Security>().validateToken(this@token) -> filter(exchange)
+                        .contextWrite(withAuthentication(context.getBean<Security>().getAuthentication(this@token)))
 
                     else -> filter(exchange)
                 }
@@ -37,6 +39,7 @@ class JwtFilter(private val security: Security) : WebFilter {
             ) substring(startIndex = 7)
             else null
         }
+
 }
 /*
 package community.security

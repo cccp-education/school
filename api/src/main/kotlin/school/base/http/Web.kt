@@ -23,7 +23,6 @@ import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
-import school.base.utils.Properties
 import school.base.utils.PRODUCTION
 import java.util.*
 import java.util.regex.Pattern
@@ -31,10 +30,7 @@ import java.util.regex.Pattern
 
 @EnableWebFlux
 @Configuration
-class Web (
-    private val config: Properties,
-    private val context: ApplicationContext
-) : WebFluxConfigurer {
+class Web (private val context: ApplicationContext) : WebFluxConfigurer {
 
     @Component
     class SpaWebFilter : WebFilter {
@@ -57,7 +53,7 @@ class Web (
                             .path("/index.html")
                             .build()
                     ).build()
-                ) else chain.filter(exchange)
+                ) else exchange.run(chain::filter)
             }
         }
     }

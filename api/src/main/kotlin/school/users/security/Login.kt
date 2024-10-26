@@ -3,7 +3,6 @@ package school.users.security
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
-/*=================================================================================*/
 @JvmRecord
 data class Login(
     @field:NotNull

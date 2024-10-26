@@ -1,6 +1,7 @@
 package school.users.security
 
-
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.OPTIONS
@@ -33,13 +34,16 @@ import school.base.utils.ROLE_ADMIN
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
-class SecurityConfiguration(
-    private val properties: Properties,
-    private val security: Security,
-    private val userDetailsService: ReactiveUserDetailsService,
-) {
+class SecurityConfiguration(val context: ApplicationContext) {
+
     @Bean("passwordEncoder")
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+
+    @Bean
+    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager =
+        context.getBean<ReactiveUserDetailsService>()
+            .run(::UserDetailsRepositoryReactiveAuthenticationManager)
+            .apply { setPasswordEncoder(passwordEncoder()) }
 
     @Suppress("removal")
     @Bean
@@ -62,11 +66,12 @@ class SecurityConfiguration(
         ).csrf()
             .disable()
             .addFilterAt(SpaWebFilter(), AUTHENTICATION)
-            .addFilterAt(JwtFilter(security), HTTP_BASIC)
+            .addFilterAt(JwtFilter(context), HTTP_BASIC)
             .authenticationManager(reactiveAuthenticationManager())
             .exceptionHandling()
             .and()
-            .headers().contentSecurityPolicy(ContentSecurityPolicyServerHttpHeadersWriter.CONTENT_SECURITY_POLICY)
+            .headers()
+            .contentSecurityPolicy(ContentSecurityPolicyServerHttpHeadersWriter.CONTENT_SECURITY_POLICY)
             .and()
             .referrerPolicy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
             .and()
@@ -105,8 +110,8 @@ class SecurityConfiguration(
             .build()
 
     @Bean
-    fun corsFilter(): WebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
-        properties.cors.apply config@{
+    fun corsFilter(): CorsWebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
+        context.getBean<Properties>().cors.apply config@{
             when {
                 allowedOrigins != null && allowedOrigins!!.isNotEmpty() -> this@source.apply {
                     d("Registering CORS filter")
@@ -119,13 +124,4 @@ class SecurityConfiguration(
             }
         }
     })
-
-
-    @Bean
-    fun reactiveAuthenticationManager(): ReactiveAuthenticationManager =
-        UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService).apply {
-            setPasswordEncoder(passwordEncoder())
-        }
-
-
 }

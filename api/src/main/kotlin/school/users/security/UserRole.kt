@@ -24,7 +24,7 @@ import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD
 import school.users.security.UserRole.UserRoleDao.Fields.USER_ID_FIELD
 import java.util.*
 
-@Suppress("unused")
+@JvmRecord
 data class UserRole(
     val id: Long = -1,
     @field:NotNull
@@ -86,7 +86,6 @@ data class UserRole(
                 e.left()
             }
 
-
             suspend fun ApplicationContext.countUserAuthority(): Int =
                 "SELECT COUNT(*) FROM `user_authority`"
                     .let(getBean<DatabaseClient>()::sql)
@@ -102,16 +101,12 @@ data class UserRole(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
-            suspend fun ApplicationContext.deleteAllUserAuthorityByUserId(
-                id: UUID
-            ) = "delete from user_authority where user_id = :userId"
+            suspend fun ApplicationContext.deleteAllUserAuthorityByUserId(id: UUID) = "delete from user_authority where user_id = :userId"
                 .let(getBean<DatabaseClient>()::sql)
                 .bind("userId", id)
                 .await()
 
-            suspend fun ApplicationContext.deleteAuthorityByRole(
-                role: String
-            ): Unit =
+            suspend fun ApplicationContext.deleteAuthorityByRole(role: String): Unit =
                 "delete from `authority` a where lower(a.role) = lower(:role)"
                     .let(getBean<DatabaseClient>()::sql)
                     .bind("role", role)

@@ -20,11 +20,11 @@ import java.security.SecureRandom
 
 
 object SecurityUtils {
+
     private const val DEF_COUNT = 20
     private val SECURE_RANDOM: SecureRandom by lazy {
         SecureRandom().apply { nextBytes(ByteArray(size = 64)) }
     }
-
     private val generateRandomAlphanumericString: String
         get() = RandomStringUtils.random(
             DEF_COUNT,
@@ -36,7 +36,6 @@ object SecurityUtils {
             SECURE_RANDOM
         )
 
-    @Suppress("unused")
     val generatePassword: String
         get() = generateRandomAlphanumericString
 
