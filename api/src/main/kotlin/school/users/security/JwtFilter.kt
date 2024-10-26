@@ -132,30 +132,6 @@ class SecurityJwt(
         }
     }
 
-    suspend fun createToken(
-        authentication: Authentication,
-        rememberMe: Boolean
-    ): String {
-        Date().time.run {
-            return builder()
-                .setSubject(authentication.name)
-                .claim(
-                    AUTHORITIES_KEY,
-                    authentication.authorities
-                        .asSequence()
-                        .map { it.authority }
-                        .joinToString(separator = ","))
-                .signWith(key, HS512)
-                .setExpiration(
-                    when {
-                        rememberMe -> Date(this + tokenValidityInMillisecondsForRememberMe)
-                        else -> Date(this + tokenValidityInMilliseconds)
-                    }
-                )
-                .serializeToJsonWith(JacksonSerializer())
-                .compact()
-        }
-    }
 
     private fun authentication(token: String): Authentication {
         parserBuilder()
@@ -178,20 +154,5 @@ class SecurityJwt(
             }
     }
 
-    private fun validateToken(token: String): Boolean = try {
-        parserBuilder()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-        VALID_TOKEN
-    } catch (e: JwtException) {
-        i("Invalid Jwt token.")
-        t("Invalid Jwt token trace. $e")
-        INVALID_TOKEN
-    } catch (e: IllegalArgumentException) {
-        i("Invalid Jwt token.")
-        t("Invalid Jwt token trace. $e")
-        INVALID_TOKEN
-    }
 }
  */

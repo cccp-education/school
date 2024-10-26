@@ -7,6 +7,7 @@ import school.base.utils.EMPTY_STRING
 import java.time.Instant
 import java.util.*
 
+@JvmRecord
 data class UserEmail(
     @field:NotNull
     val id: UUID,

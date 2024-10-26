@@ -12,6 +12,7 @@ import school.users.profile.UserProfile.UserProfileDao.Fields.IMAGE_URL_FIELD
 import school.users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD
 import java.util.*
 
+@JvmRecord
 data class UserProfile(
     @field:NotNull
     val id: UUID,

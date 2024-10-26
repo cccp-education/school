@@ -3,6 +3,7 @@ package school.users.management
 import java.time.Instant
 import java.util.*
 
+@JvmRecord
 data class UserEnabled(
     val id: UUID,
     val userId: UUID,
