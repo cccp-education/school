@@ -82,7 +82,7 @@ class SecurityConfiguration(val context: ApplicationContext) {
             .authorizeExchange()
             .pathMatchers(
                 "/",
-                "/**",
+//                "/**",//DEVMODE
                 "/*.*",
                 "/api/users/signup",
                 "/api/users/activate",
