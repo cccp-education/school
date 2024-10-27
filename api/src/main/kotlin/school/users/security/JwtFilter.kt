@@ -11,6 +11,7 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import school.base.utils.AUTHORIZATION_HEADER
 import school.base.utils.BEARER_START_WITH
+import school.users.security.SecurityManager
 
 @Component("jwtFilter")
 class JwtFilter(private val context: ApplicationContext) : WebFilter {

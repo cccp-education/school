@@ -81,9 +81,9 @@ class SecurityConfiguration(val context: ApplicationContext) {
             .and()
             .authorizeExchange()
             .pathMatchers(
-                "/",
+//                "/",
 //                "/**",//DEVMODE
-                "/*.*",
+//                "/*.*",
                 "/api/users/signup",
                 "/api/users/activate",
                 "/api/users/authenticate",
@@ -97,7 +97,7 @@ class SecurityConfiguration(val context: ApplicationContext) {
                 "/v2/api-docs",
                 "/api/auth-info",
                 "/api/users/**",
-                ).authenticated()
+            ).authenticated()
             .pathMatchers(
                 "/management/info",
                 "/management/prometheus",
@@ -105,7 +105,7 @@ class SecurityConfiguration(val context: ApplicationContext) {
                 "/management/health/**",
                 "/management/**",
                 "/api/admin/**",
-                ).hasAuthority(ROLE_ADMIN)
+            ).hasAuthority(ROLE_ADMIN)
             .and()
             .build()
 

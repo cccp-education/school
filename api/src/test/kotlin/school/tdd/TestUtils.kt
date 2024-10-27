@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext
 import school.base.utils.*
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
+import school.users.User.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 
@@ -27,6 +28,14 @@ object TestUtils {
     "login": "$USER",
     "email": "$USER@$DOMAIN_DEV_URL",
     "password": "$USER"}"""
+        val signup: Signup by lazy {
+            Signup(
+                login = user.login,
+                password = user.password,
+                email = user.email,
+                repassword = user.password
+            )
+        }
 
         fun userFactory(login: String): User = User(
             password = login,

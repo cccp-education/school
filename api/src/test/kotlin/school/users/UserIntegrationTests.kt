@@ -24,6 +24,7 @@ import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.user
 import school.base.utils.Log.i
+import school.tdd.TestUtils.Data.signup
 import school.users.User.Signup
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
@@ -94,31 +95,28 @@ class UserIntegrationTests {
     @Test
     fun `SignupController - test signup avec une url invalide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
-//        val countUserAuthBefore = context.countUserAuthority()
+        val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserBefore)
-//        assertEquals(0, countUserAuthBefore)
+        assertEquals(0, countUserAuthBefore)
         client
             .post()
             .uri("/api/users/foobar")
             .contentType(APPLICATION_JSON)
-            .bodyValue(user)
+            .bodyValue(signup)
             .exchange()
             .expectStatus()
-            .isNotFound
-            .returnResult<Unit>()
+            .isUnauthorized
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .logBody()
-            .isNotEmpty()
+            .isEmpty()
             .let(::assertTrue)
-        assertEquals(countUserBefore, context.countUsers())
-//        assertEquals(countUserBefore + 1, context.countUsers())
-//        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        assertEquals(countUserBefore , context.countUsers())
+        assertEquals(countUserAuthBefore , context.countUserAuthority())
         context.findOneByEmail<User>(user.email).run {
             when (this) {
                 is Left -> assertEquals(EmptyResultDataAccessException::class.java, value::class.java)
-                is Right -> {
-                    assertEquals(user.id, value)
-                }
+                is Right -> assertEquals(user.id, value)
             }
         }
     }
@@ -133,12 +131,7 @@ class UserIntegrationTests {
             .post()
             .uri(API_SIGNUP_PATH)
             .contentType(APPLICATION_JSON)
-            .bodyValue(Signup(
-                login = user.login,
-                password = user.password,
-                email = user.email,
-                repassword = user.password
-            ))
+            .bodyValue(signup)
             .exchange()
             .expectStatus()
             .isCreated

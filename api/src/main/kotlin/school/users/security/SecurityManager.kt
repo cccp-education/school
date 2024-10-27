@@ -1,8 +1,8 @@
 package school.users.security
 
-import io.jsonwebtoken.Jwts.builder
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.Jwts.builder
 import io.jsonwebtoken.SignatureAlgorithm.HS512
 import io.jsonwebtoken.io.Decoders.BASE64
 import io.jsonwebtoken.jackson.io.JacksonSerializer
@@ -16,14 +16,16 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
-import school.base.utils.*
+import school.base.utils.AUTHORITIES_KEY
+import school.base.utils.INVALID_TOKEN
 import school.base.utils.Log.d
 import school.base.utils.Log.i
 import school.base.utils.Log.t
-import school.base.utils.Log.w
+import school.base.utils.Properties
+import school.base.utils.VALID_TOKEN
 import java.security.Key
 import java.time.ZonedDateTime.now
-import java.util.Date
+import java.util.*
 
 @Component
 class SecurityManager(
@@ -38,7 +40,7 @@ class SecurityManager(
     companion object {
         val permitAll = arrayOf(
             "/",
-            "/**",
+//            "/**",//DEVMODE
             "/*.*",
             "/api/accounts/signup",
             "/api/accounts/activate",
@@ -95,7 +97,7 @@ class SecurityManager(
                                     append("We recommend using the `school.security.authentication.jwt.base64-secret`")
                                     append(" key for optimum security.")
                                 }
-                                ).run(::w)
+                                ).run(_root_ide_package_.school.base.utils.Log::w)
                             .run { toByteArray() }
 
                         else -> d("Using a Base64-encoded Jwt secret key").run {
