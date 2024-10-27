@@ -89,28 +89,28 @@ class SecurityConfiguration(val context: ApplicationContext) {
                 "/api/users/authenticate",
                 "/api/users/reset-password/init",
                 "/api/users/reset-password/finish",
-                "/api/auth-info",
-                "/api/users/**",
-                "/management/health",
-                "/management/health/**",
-                "/management/info",
-                "/management/prometheus",
-                "/api/**"
             ).permitAll()
             .pathMatchers(
+                "/api/**",
                 "/services/**",
                 "/swagger-resources/**",
-                "/v2/api-docs"
-            ).authenticated()
+                "/v2/api-docs",
+                "/api/auth-info",
+                "/api/users/**",
+                ).authenticated()
             .pathMatchers(
+                "/management/info",
+                "/management/prometheus",
+                "/management/health",
+                "/management/health/**",
                 "/management/**",
-                "/api/admin/**"
-            ).hasAuthority(ROLE_ADMIN)
+                "/api/admin/**",
+                ).hasAuthority(ROLE_ADMIN)
             .and()
             .build()
 
     @Bean
-    fun corsFilter(): CorsWebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
+    fun corsFilter(): WebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
         context.getBean<Properties>().cors.apply config@{
             when {
                 allowedOrigins != null && allowedOrigins!!.isNotEmpty() -> this@source.apply {

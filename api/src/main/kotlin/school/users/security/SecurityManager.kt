@@ -136,21 +136,19 @@ class SecurityManager(
     suspend fun createToken(
         authentication: Authentication,
         rememberMe: Boolean
-    ): String {
-        now().run {
-            return builder()
-                .setSubject(authentication.name)
-                .claim(
-                    AUTHORITIES_KEY,
-                    authentication.authorities
-                        .asSequence()
-                        .map { it.authority }
-                        .joinToString(separator = ","))
-                .signWith(key, HS512)
-                .setExpiration(calculateExpirationDate(rememberMe))
-                .serializeToJsonWith(JacksonSerializer())
-                .compact()
-        }
+    ): String = now().run {
+        builder()
+            .setSubject(authentication.name)
+            .claim(
+                AUTHORITIES_KEY,
+                authentication.authorities
+                    .asSequence()
+                    .map { it.authority }
+                    .joinToString(separator = ","))
+            .signWith(key, HS512)
+            .setExpiration(calculateExpirationDate(rememberMe))
+            .serializeToJsonWith(JacksonSerializer())
+            .compact()
     }
 
     fun getAuthentication(token: String): Authentication {

@@ -161,6 +161,10 @@ configurations {
 
 //java { sourceCompatibility = VERSION_21 }
 
+tasks.withType<JavaCompile>() {
+    options.compilerArgs.add("-parameters")
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")

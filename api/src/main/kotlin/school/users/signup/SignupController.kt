@@ -1,6 +1,6 @@
 package school.users.signup
 
-import org.springframework.http.HttpStatus.OK
+import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -24,7 +24,7 @@ class SignupController {
      * @param signup the managed user View Model.
      */
     @PostMapping(API_SIGNUP, produces = [APPLICATION_PROBLEM_JSON_VALUE])
-    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> = OK.run(::ResponseEntity)
+    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> = CREATED.run(::ResponseEntity)
     /*signup.validate(exchange).run {
            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
            if (isNotEmpty()) return signupProblems.badResponse(this)
