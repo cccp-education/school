@@ -15,7 +15,7 @@ import org.springframework.security.web.server.util.matcher.NegatedServerWebExch
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import school.base.utils.ROLE_ANONYMOUS
-import school.users.security.Security.Companion.negated
+import school.users.security.SecurityManager.Companion.negated
 import java.security.SecureRandom
 
 

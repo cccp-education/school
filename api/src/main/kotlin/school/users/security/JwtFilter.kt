@@ -20,8 +20,8 @@ class JwtFilter(private val context: ApplicationContext) : WebFilter {
             chain.apply {
                 return when {
                     !isNullOrBlank() &&
-                            this@token.run(context.getBean<Security>()::validateToken) -> exchange.run(::filter)
-                        .contextWrite(withAuthentication(context.getBean<Security>().getAuthentication(this@token)))
+                            this@token.run(context.getBean<SecurityManager>()::validateToken) -> exchange.run(::filter)
+                        .contextWrite(withAuthentication(context.getBean<SecurityManager>().getAuthentication(this@token)))
 
                     else -> filter(exchange)
                 }

@@ -26,7 +26,7 @@ import java.time.ZonedDateTime.now
 import java.util.Date
 
 @Component
-class Security(
+class SecurityManager(
     private val context: ApplicationContext,
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private var key: Key? = null,
