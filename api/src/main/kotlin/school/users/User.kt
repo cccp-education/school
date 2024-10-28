@@ -192,6 +192,12 @@ data class User(
                     UserRole.UserRoleDao.Relations.SQL_SCRIPT
                 ).joinToString("")
                     .trimMargin()
+
+            @Suppress("unused")
+            object Rdbms {
+                object Pg {}
+                object H2 {}
+            }
         }
 
         object Dao {

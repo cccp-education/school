@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.junit.jupiter.api.assertDoesNotThrow
 import school.GradleTestUtils.captureOutput
+import school.GradleTestUtils.displayPersonDataSchemaStructure
 import school.GradleTestUtils.displayWorkspaceDataSchemaStructure
 import school.GradleTestUtils.displayWorkspaceStructure
 import school.GradleTestUtils.initWorkspace
@@ -190,11 +191,14 @@ class PluginTests {
     }
 
     @Test
-    fun `test Workspace structure`(): Unit {
-        assertDoesNotThrow {
-            projectInstance.displayWorkspaceStructure()
-            projectInstance.displayWorkspaceDataSchemaStructure()
-        }
+    fun `test Workspace structure`(): Unit = assertDoesNotThrow {
+        projectInstance.displayWorkspaceStructure()
+        projectInstance.displayWorkspaceDataSchemaStructure()
+    }
+
+    @Test
+    fun `test Person structure`(): Unit = assertDoesNotThrow {
+        projectInstance.displayPersonDataSchemaStructure()
     }
 
     @Test

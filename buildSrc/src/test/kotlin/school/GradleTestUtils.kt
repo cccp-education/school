@@ -17,7 +17,7 @@ import java.io.PrintStream
 
 object GradleTestUtils {
 
-    fun Project.displayWorkspaceDataSchemaStructure(): Unit {
+    fun Project.displayPersonDataSchemaStructure(): Unit {
 //        println(workspace)
         val person = Person(
             "john",
@@ -38,6 +38,10 @@ object GradleTestUtils {
                 .apply { "$this xml DTD : ".run(::println).run { generateXmlSchema() } }
         }
 
+    }
+
+    fun Project.displayWorkspaceDataSchemaStructure(): Unit {
+        println(workspace)
     }
 
     fun Project.displayWorkspaceStructure(): Workspace = workspace.apply {
