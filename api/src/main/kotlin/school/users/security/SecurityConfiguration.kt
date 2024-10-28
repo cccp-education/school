@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.security.web.server.header.ContentSecurityPolicyServerHttpHeadersWriter
+import org.springframework.security.web.server.header.ContentSecurityPolicyServerHttpHeadersWriter.CONTENT_SECURITY_POLICY
 import org.springframework.security.web.server.header.FeaturePolicyServerHttpHeadersWriter.FEATURE_POLICY
 import org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher
@@ -93,21 +93,9 @@ class SecurityConfiguration(private val context: ApplicationContext) {
             .run(::UserDetailsRepositoryReactiveAuthenticationManager)
             .apply { setPasswordEncoder(passwordEncoder()) }
 
-
-//    @Bean
-//    fun signupSecurityFilterChain(http: org.springframework.security.config.annotation.web.builders.HttpSecurity): org.springframework.security.web.SecurityFilterChain = http.authorizeHttpRequests {
-//    }.build()
-    /*.apply {
-    authorizeExchange {
-        securityMatcher(pathMatchers("/api/users/signup"))
-    }
-}.build()*/
-
-    @Suppress("removal")
     @Bean
-    fun springSecurityFilterChain(http: ServerHttpSecurity)
-            : SecurityWebFilterChain =
-        http.securityMatcher(
+    fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = http
+        .securityMatcher(
             NegatedServerWebExchangeMatcher(
                 OrServerWebExchangeMatcher(
                     pathMatchers(
@@ -120,51 +108,47 @@ class SecurityConfiguration(private val context: ApplicationContext) {
                     ), pathMatchers(OPTIONS, "/**")
                 )
             )
-        ).csrf()
-            .disable()
-            .addFilterAt(SpaWebFilter(), AUTHENTICATION)
-            .addFilterAt(JwtFilter(context), HTTP_BASIC)
-            .authenticationManager(reactiveAuthenticationManager())
-            .exceptionHandling()
-            .and()
-            .headers()
-            .contentSecurityPolicy(ContentSecurityPolicyServerHttpHeadersWriter.CONTENT_SECURITY_POLICY)
-            .and()
-            .referrerPolicy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-            .and()
-            .permissionsPolicy().policy(FEATURE_POLICY)
-            .and()
-            .frameOptions().disable()
-            .and()
-            .authorizeExchange()
-            .pathMatchers(
-                "/",
-//                "/**",//DEVMODE
-                "/*.*",
-                "/api/users/signup",
-                "/api/users/activate",
-                "/api/users/authenticate",
-                "/api/users/reset-password/init",
-                "/api/users/reset-password/finish",
-            ).permitAll()
-            .pathMatchers(
-                "/api/**",
-                "/services/**",
-                "/swagger-resources/**",
-                "/v2/api-docs",
-                "/api/auth-info",
-                "/api/users/**",
-            ).authenticated()
-            .pathMatchers(
-                "/management/info",
-                "/management/prometheus",
-                "/management/health",
-                "/management/health/**",
-                "/management/**",
-                "/api/admin/**",
-            ).hasAuthority(ROLE_ADMIN)
-            .and()
-            .build()
+        ).csrf { csrf ->
+            csrf.disable()
+                .addFilterAt(SpaWebFilter(), AUTHENTICATION)
+                .addFilterAt(JwtFilter(context), HTTP_BASIC)
+                .authenticationManager(reactiveAuthenticationManager())
+                .exceptionHandling { }
+                .headers { h ->
+                    h.contentSecurityPolicy { p ->
+                        p.policyDirectives(CONTENT_SECURITY_POLICY)
+                    }
+                    h.referrerPolicy { p -> p.policy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN) }
+                    h.permissionsPolicy { p -> p.policy(FEATURE_POLICY) }
+                    h.frameOptions { f -> f.disable() }
+                }.authorizeExchange {
+                    it.pathMatchers(
+                        "/",
+                        "/*.*",
+                        "/api/users/signup",
+                        "/api/users/activate",
+                        "/api/users/authenticate",
+                        "/api/users/reset-password/init",
+                        "/api/users/reset-password/finish",
+                    ).permitAll()
+                    it.pathMatchers(
+                        "/api/**",
+                        "/services/**",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/api/auth-info",
+                        "/api/users/**",
+                    ).authenticated()
+                    it.pathMatchers(
+                        "/management/info",
+                        "/management/prometheus",
+                        "/management/health",
+                        "/management/health/**",
+                        "/management/**",
+                        "/api/admin/**",
+                    ).hasAuthority(ROLE_ADMIN)
+                }
+        }.build()
 
     @Bean
     fun corsFilter(): WebFilter = CorsWebFilter(UrlBasedCorsConfigurationSource().apply source@{
