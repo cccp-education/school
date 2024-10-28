@@ -8,7 +8,7 @@ import school.PersonSchemaGenerator.Companion.generateJsonSchema
 import school.PersonSchemaGenerator.Companion.generateXmlSchema
 import school.PersonSchemaGenerator.Companion.generateYamlSchema
 import school.PersonSchemaGenerator.Person
-import school.PluginTests.Companion.workspace
+import school.PluginTests.Companion.testConfiguration
 import school.PluginTests.Workspace
 import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.ByteArrayOutputStream
@@ -41,10 +41,10 @@ object GradleTestUtils {
     }
 
     fun Project.displayWorkspaceDataSchemaStructure(): Unit {
-        println(workspace)
+        println(testConfiguration)
     }
 
-    fun Project.displayWorkspaceStructure(): Workspace = workspace.apply {
+    fun Project.displayWorkspaceStructure(): Workspace = testConfiguration.apply {
         run(yamlMapper::writeValueAsString)
             .run(::println)
     }

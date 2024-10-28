@@ -33,10 +33,7 @@ import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
 import school.jbake.JBakeGhPagesPlugin
 import java.lang.System.out
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 
 //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
@@ -45,7 +42,7 @@ class PluginTests {
     data class Workspace(val workspace: WorkspaceEntry) {
         data class WorkspaceEntry(
             val name: String,
-            val office: OfficeEntry,
+            val office: Office,
             val cores: Map<String, CoreEntry>,
             val job: JobEntry,
             val configuration: ConfigurationEntry,
@@ -92,7 +89,7 @@ class PluginTests {
                     val notebooks: LibraryEntry,
                     val pilotage: LibraryEntry,
                     val schemas: LibraryEntry,
-                    val slides: LibraryEntry,
+                    val slides: Slides,
                     val sites: LibraryEntry,
                 ) : OfficeEntry {
                     sealed class LibraryEntry {
@@ -102,7 +99,7 @@ class PluginTests {
                         data class Notebooks(val notebooks: String) : LibraryEntry()
                         data class Pilotage(val name: String) : LibraryEntry()
                         data class Schemas(val name: String) : LibraryEntry()
-                        data class Slides(val name: String) : LibraryEntry()
+                        data class Slides(val path: String) : LibraryEntry()
                         data class Sites(val name: String) : LibraryEntry()
                         data class Profession(val name: String) : LibraryEntry()
                     }
@@ -145,7 +142,7 @@ class PluginTests {
 
     companion object {
         @JvmStatic
-        val Project.workspace: Workspace
+        val Project.testConfiguration: Workspace
             get() = Workspace(
                 workspace = WorkspaceEntry(
                     name = "fonderie",
@@ -171,7 +168,7 @@ class PluginTests {
                         notebooks = Notebooks(notebooks = "notebooks"),
                         pilotage = Pilotage(name = "pilotage"),
                         schemas = Schemas(name = "schemas"),
-                        slides = Slides(name = "slides"),
+                        slides = Slides(path = "${System.getProperty("user.home")}/workspace/bibliotheque/slides"),
                         sites = Sites(name = "sites")
                     ),
                     organisation = Organisation(organisation = "organisation"),
@@ -195,6 +192,28 @@ class PluginTests {
         projectInstance.displayWorkspaceStructure()
         projectInstance.displayWorkspaceDataSchemaStructure()
     }
+
+
+    @Test
+    fun `test when loading the project if yaml config is provided`(): Unit = assertDoesNotThrow {
+        assertEquals(
+            "${System.getProperty("user.home")}/workspace/bibliotheque/slides",
+            projectInstance.testConfiguration.workspace.office.slides.path
+        )
+    }
+
+
+    @Test
+    fun `test when yaml config is not provided`(): Unit = assertDoesNotThrow {
+        projectInstance
+    }
+
+
+    @Test
+    fun `test when yaml config is provided`(): Unit = assertDoesNotThrow {
+        projectInstance
+    }
+
 
     @Test
     fun `test Person structure`(): Unit = assertDoesNotThrow {
