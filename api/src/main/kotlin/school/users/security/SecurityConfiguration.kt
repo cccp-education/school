@@ -138,9 +138,9 @@ class SecurityConfiguration(private val context: ApplicationContext) {
             .and()
             .authorizeExchange()
             .pathMatchers(
-//                "/",
+                "/",
 //                "/**",//DEVMODE
-//                "/*.*",
+                "/*.*",
                 "/api/users/signup",
                 "/api/users/activate",
                 "/api/users/authenticate",
