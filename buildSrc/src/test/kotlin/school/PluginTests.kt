@@ -141,6 +141,13 @@ class PluginTests {
     }
 
     companion object {
+        /**
+         * return the project workspace configuration
+         */
+        @JvmStatic
+        val Project.workspaceWrapper: Workspace
+            get() = TODO("Not yet implemented")
+
         @JvmStatic
         val Project.testConfiguration: Workspace
             get() = Workspace(
@@ -195,7 +202,7 @@ class PluginTests {
 
 
     @Test
-    fun `test when loading the project if yaml config is provided`(): Unit = assertDoesNotThrow {
+    fun `test when loading with workspaceWrapper ext fun of the project if yaml config is provided`(): Unit = assertDoesNotThrow {
         assertEquals(
             "${System.getProperty("user.home")}/workspace/bibliotheque/slides",
             projectInstance.testConfiguration.workspace.office.slides.path
