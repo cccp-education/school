@@ -48,6 +48,48 @@ import org.springframework.security.core.userdetails.User as UserSecurity
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 class SecurityConfiguration(private val context: ApplicationContext) {
+    companion object {
+        val permitAll = arrayOf(
+            "/",
+            "/*.*",
+            "/api/users/signup",
+            "/api/users/activate",
+            "/api/users/authenticate",
+            "/api/users/reset-password/init",
+            "/api/users/reset-password/finish",
+        )
+        val authenticated = arrayOf(
+            "/api/**",
+            "/services/**",
+            "/swagger-resources/**",
+            "/v2/api-docs",
+            "/api/auth-info",
+            "/api/users/**",
+        )
+        val adminAuthority = arrayOf(
+            "/management/info",
+            "/management/prometheus",
+            "/management/health",
+            "/management/health/**",
+            "/management/**",
+            "/api/admin/**",
+        )
+        val negated = arrayOf(
+            "/app/**",
+            "/i18n/**",
+            "/content/**",
+            "/swagger-ui/**",
+            "/test/**",
+            "/webjars/**"
+        )
+        val spaNegated = arrayOf(
+            "/api",
+            "/management",
+            "/services",
+            "/swagger",
+            "/v2/api-docs",
+        )
+    }
 
     @Component("userDetailsService")
     class DomainUserDetailsService(private val context: ApplicationContext) : ReactiveUserDetailsService {
@@ -122,31 +164,9 @@ class SecurityConfiguration(private val context: ApplicationContext) {
                     h.permissionsPolicy { p -> p.policy(FEATURE_POLICY) }
                     h.frameOptions { f -> f.disable() }
                 }.authorizeExchange {
-                    it.pathMatchers(
-                        "/",
-                        "/*.*",
-                        "/api/users/signup",
-                        "/api/users/activate",
-                        "/api/users/authenticate",
-                        "/api/users/reset-password/init",
-                        "/api/users/reset-password/finish",
-                    ).permitAll()
-                    it.pathMatchers(
-                        "/api/**",
-                        "/services/**",
-                        "/swagger-resources/**",
-                        "/v2/api-docs",
-                        "/api/auth-info",
-                        "/api/users/**",
-                    ).authenticated()
-                    it.pathMatchers(
-                        "/management/info",
-                        "/management/prometheus",
-                        "/management/health",
-                        "/management/health/**",
-                        "/management/**",
-                        "/api/admin/**",
-                    ).hasAuthority(ROLE_ADMIN)
+                    it.pathMatchers(*permitAll).permitAll()
+                    it.pathMatchers(*authenticated).authenticated()
+                    it.pathMatchers(*adminAuthority).hasAuthority(ROLE_ADMIN)
                 }
         }.build()
 

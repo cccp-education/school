@@ -15,7 +15,7 @@ import org.springframework.security.web.server.util.matcher.NegatedServerWebExch
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import school.base.utils.ROLE_ANONYMOUS
-import school.users.security.SecurityManager.Companion.negated
+import school.users.security.SecurityConfiguration.Companion.negated
 import java.security.SecureRandom
 
 
@@ -92,37 +92,4 @@ object SecurityUtils {
                 pathMatchers(OPTIONS, "/**")
             )
         )
-
-//    fun ServerHttpSecurity.securityWebFilterChain(
-//        security: Security,
-//        spaFilter: SpaFilter,
-//        authenticationManager: ReactiveAuthenticationManager
-//    ): SecurityWebFilterChain? = securityMatcher(exchangeMatcher)
-//        .csrf()
-//        .disable()
-//        .addFilterAt(spaFilter, AUTHENTICATION)
-//        .addFilterAt(security, HTTP_BASIC)
-//        .authenticationManager(authenticationManager)
-//        .exceptionHandling()
-//        .and()
-//        .headers()
-//        .contentSecurityPolicy(CONTENT_SECURITY_POLICY)
-//        .and()
-//        .referrerPolicy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-//        .and()
-//        .permissionsPolicy()
-//        .policy(FEATURE_POLICY)
-//        .and()
-//        .frameOptions()
-//        .disable()
-//        .and()
-//        .authorizeExchange()
-//        .pathMatchers(*permitAll)
-//        .permitAll()
-//        .pathMatchers(*authenticated)
-//        .authenticated()
-//        .pathMatchers(*adminAuthority)
-//        .hasAuthority(ROLE_ADMIN)
-//        .and()
-//        .build()
 }

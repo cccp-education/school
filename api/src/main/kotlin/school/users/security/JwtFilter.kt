@@ -11,7 +11,6 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import school.base.utils.AUTHORIZATION_HEADER
 import school.base.utils.BEARER_START_WITH
-import school.users.security.SecurityManager
 
 @Component("jwtFilter")
 class JwtFilter(private val context: ApplicationContext) : WebFilter {
@@ -22,7 +21,11 @@ class JwtFilter(private val context: ApplicationContext) : WebFilter {
                 return when {
                     !isNullOrBlank() &&
                             this@token.run(context.getBean<SecurityManager>()::validateToken) -> exchange.run(::filter)
-                        .contextWrite(withAuthentication(context.getBean<SecurityManager>().getAuthentication(this@token)))
+                        .contextWrite(
+                            withAuthentication(
+                                context.getBean<SecurityManager>().getAuthentication(this@token)
+                            )
+                        )
 
                     else -> filter(exchange)
                 }
