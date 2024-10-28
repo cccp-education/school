@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder.HTTP_BASIC
 import org.springframework.security.config.web.server.ServerHttpSecurity
-import org.springframework.security.config.web.server.ServerHttpSecurity.http
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
@@ -96,13 +95,13 @@ class SecurityConfiguration(private val context: ApplicationContext) {
 
 
 //    @Bean
-//    fun signupSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-//        return http.apply {
-//            authorizeExchange() {
-//                pathMatchers("/api/users/signup")
-//            }
-//        }.build()
-//    }
+//    fun signupSecurityFilterChain(http: org.springframework.security.config.annotation.web.builders.HttpSecurity): org.springframework.security.web.SecurityFilterChain = http.authorizeHttpRequests {
+//    }.build()
+    /*.apply {
+    authorizeExchange {
+        securityMatcher(pathMatchers("/api/users/signup"))
+    }
+}.build()*/
 
     @Suppress("removal")
     @Bean
