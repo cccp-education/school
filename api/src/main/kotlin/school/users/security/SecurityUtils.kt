@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package school.users.security
 
 import kotlinx.coroutines.reactive.awaitSingle

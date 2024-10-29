@@ -39,8 +39,8 @@ import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
 import school.users.UserDaoTests.Queries.h2SQLquery
-import school.users.security.Role
-import school.users.security.Role.RoleDao.Dao.countRoles
+import school.users.security.UserRole.Role
+import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*

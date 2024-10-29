@@ -1,8 +1,3 @@
-@file:Suppress(
-    "MemberVisibilityCanBePrivate",
-    "RemoveRedundantQualifierName"
-)
-
 package school.users.security
 
 import arrow.core.Either
@@ -17,10 +12,13 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.r2dbc.core.awaitSingle
+import school.base.model.EntityModel
 import school.base.utils.AppUtils.cleanField
-import school.users.User
-import school.users.security.Role.RoleDao
-import school.users.security.UserRole.UserRoleDao.Fields.ID_FIELD
+import school.base.utils.ROLE_ADMIN
+import school.base.utils.ROLE_ANONYMOUS
+import school.base.utils.ROLE_USER
+import school.users.User.UserDao
+import school.users.security.UserRole.Role.RoleDao
 import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD
 import school.users.security.UserRole.UserRoleDao.Fields.USER_ID_FIELD
 import java.util.*
@@ -33,6 +31,44 @@ data class UserRole(
     @field:NotNull
     val role: String
 ) {
+    data class Role(
+        @field:NotNull
+        @field:Size(max = 50)
+        override val id: String
+    ) : EntityModel<String>() {
+        object RoleDao {
+            object Fields {
+                const val ID_FIELD = "`role`"
+            }
+
+            object Constraints
+
+            object Relations {
+                const val TABLE_NAME = "`authority`"
+                const val SQL_SCRIPT = """
+        CREATE TABLE IF NOT EXISTS $TABLE_NAME(
+            ${RoleDao.Fields.ID_FIELD} VARCHAR(50) PRIMARY KEY);
+        MERGE INTO $TABLE_NAME
+            VALUES ('$ROLE_ADMIN'),
+                   ('$ROLE_USER'),
+                   ('$ROLE_ANONYMOUS');
+"""
+            }
+
+            object Dao {
+                suspend fun ApplicationContext.countRoles(): Int =
+                    "select count(*) from `authority`"
+                        .let(getBean<DatabaseClient>()::sql)
+                        .fetch()
+                        .awaitSingle()
+                        .values
+                        .first()
+                        .toString()
+                        .toInt()
+            }
+        }
+    }
+
     @JvmRecord
     data class Login(
         @field:NotNull
@@ -45,6 +81,7 @@ data class UserRole(
         String? = null,
         val rememberMe: Boolean? = null
     )
+
     @Suppress("unused")
     object UserRoleDao {
         object Fields {
@@ -54,19 +91,19 @@ data class UserRole(
         }
 
         object Attributes {
-            val ID_ATTR = ID_FIELD.cleanField()
+            val ID_ATTR = UserRoleDao.Fields.ID_FIELD.cleanField()
             const val USER_ID_ATTR = "userId"
             val ROLE_ATTR = ROLE_FIELD.cleanField()
         }
 
         object Relations {
             const val TABLE_NAME = "`user_authority`"
-            const val SQL_SCRIPT = """
+            val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME(
-            $ID_FIELD         IDENTITY NOT NULL PRIMARY KEY,
+            ${UserRoleDao.Fields.ID_FIELD}         IDENTITY NOT NULL PRIMARY KEY,
             $USER_ID_FIELD    UUID,
             $ROLE_FIELD       VARCHAR,
-            FOREIGN KEY ($USER_ID_FIELD) REFERENCES ${User.UserDao.Relations.TABLE_NAME} (${User.UserDao.Fields.ID_FIELD})
+            FOREIGN KEY ($USER_ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
                 ON DELETE CASCADE
                 ON UPDATE CASCADE,
             FOREIGN KEY ($ROLE_FIELD) REFERENCES ${RoleDao.Relations.TABLE_NAME} (${RoleDao.Fields.ID_FIELD})
@@ -91,7 +128,7 @@ data class UserRole(
                     .bind(UserRoleDao.Attributes.ROLE_ATTR, first.role)
                     .fetch()
                     .one()
-                    .collect { it[ID_FIELD.uppercase()] }
+                    .collect { it[UserRoleDao.Fields.ID_FIELD.uppercase()] }
                     .toString()
                     .toLong()
                     .right()
@@ -114,10 +151,11 @@ data class UserRole(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
-            suspend fun ApplicationContext.deleteAllUserAuthorityByUserId(id: UUID) = "delete from user_authority where user_id = :userId"
-                .let(getBean<DatabaseClient>()::sql)
-                .bind("userId", id)
-                .await()
+            suspend fun ApplicationContext.deleteAllUserAuthorityByUserId(id: UUID) =
+                "delete from user_authority where user_id = :userId"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .bind("userId", id)
+                    .await()
 
             suspend fun ApplicationContext.deleteAuthorityByRole(role: String): Unit =
                 "delete from `authority` a where lower(a.role) = lower(:role)"
