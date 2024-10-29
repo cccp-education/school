@@ -1,4 +1,4 @@
-//package school.users.signup
+package school.users.signup
 //
 //import school.*
 //import school.accounts.models.AccountCredentials

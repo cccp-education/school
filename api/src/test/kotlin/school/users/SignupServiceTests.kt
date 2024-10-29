@@ -8,7 +8,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.users.User.Signup
+import school.users.signup.Signup
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority

@@ -25,7 +25,6 @@ import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.user
 import school.base.utils.Log.i
 import school.tdd.TestUtils.Data.signup
-import school.users.User.Signup
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly

@@ -47,6 +47,7 @@ import school.users.User.UserDao.Relations.INSERT
 import school.users.security.UserRole.Role
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
+import school.users.signup.Signup
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -97,14 +98,6 @@ data class User(
         @JvmStatic
         fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
     }
-
-    @JvmRecord
-    data class Signup(
-        val login: String,
-        val password: String,
-        val repassword: String,
-        val email: String,
-    )
 
     /** Account REST API URIs */
     object UserRestApiRoutes {

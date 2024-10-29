@@ -10,6 +10,7 @@ import school.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KE
 import school.users.signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
 import java.time.Instant
 import java.util.*
+
 @JvmRecord
 data class UserActivation(
     val id: UUID,

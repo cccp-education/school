@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext
 import school.base.utils.*
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
-import school.users.User.Signup
+import school.users.signup.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 
