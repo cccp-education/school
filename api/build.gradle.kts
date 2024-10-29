@@ -97,6 +97,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-data")
     // Spring cloud
+    @Suppress("VulnerableLibrariesLocal", "RedundantSuppression")
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-verifier:${properties["spring_cloud_starter.version"]}") {
         exclude(module = "commons-collections")
     }
