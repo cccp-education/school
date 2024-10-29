@@ -9,6 +9,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
@@ -32,6 +33,18 @@ data class UserRole(
     @field:NotNull
     val role: String
 ) {
+    @JvmRecord
+    data class Login(
+        @field:NotNull
+        val username:
+        @Size(min = 1, max = 50)
+        String? = null,
+        @field:NotNull
+        @field:Size(min = 4, max = 100)
+        val password:
+        String? = null,
+        val rememberMe: Boolean? = null
+    )
     @Suppress("unused")
     object UserRoleDao {
         object Fields {
