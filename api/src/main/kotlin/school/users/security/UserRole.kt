@@ -47,7 +47,7 @@ data class UserRole(
                 const val TABLE_NAME = "`authority`"
                 const val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME(
-            ${RoleDao.Fields.ID_FIELD} VARCHAR(50) PRIMARY KEY);
+            ${Fields.ID_FIELD} VARCHAR(50) PRIMARY KEY);
         MERGE INTO $TABLE_NAME
             VALUES ('$ROLE_ADMIN'),
                    ('$ROLE_USER'),
@@ -91,7 +91,7 @@ data class UserRole(
         }
 
         object Attributes {
-            val ID_ATTR = UserRoleDao.Fields.ID_FIELD.cleanField()
+            val ID_ATTR = Fields.ID_FIELD.cleanField()
             const val USER_ID_ATTR = "userId"
             val ROLE_ATTR = ROLE_FIELD.cleanField()
         }
@@ -100,7 +100,7 @@ data class UserRole(
             const val TABLE_NAME = "`user_authority`"
             val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME(
-            ${UserRoleDao.Fields.ID_FIELD}         IDENTITY NOT NULL PRIMARY KEY,
+            ${Fields.ID_FIELD}         IDENTITY NOT NULL PRIMARY KEY,
             $USER_ID_FIELD    UUID,
             $ROLE_FIELD       VARCHAR,
             FOREIGN KEY ($USER_ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
@@ -115,20 +115,20 @@ data class UserRole(
         ON $TABLE_NAME ($ROLE_FIELD, $USER_ID_FIELD);
 """
             val INSERT = """
-                INSERT INTO ${UserRoleDao.Relations.TABLE_NAME} (${UserRoleDao.Fields.USER_ID_FIELD},${RoleDao.Fields.ID_FIELD})
-                VALUES (:${UserRoleDao.Attributes.USER_ID_ATTR}, :${UserRoleDao.Attributes.ROLE_ATTR})
+                INSERT INTO $TABLE_NAME ($USER_ID_FIELD,${RoleDao.Fields.ID_FIELD})
+                VALUES (:${Attributes.USER_ID_ATTR}, :${Attributes.ROLE_ATTR})
                 """.trimIndent()
         }
 
         object Dao {
             suspend fun Pair<UserRole, ApplicationContext>.signup(): Either<Throwable, Long> = try {
                 second.getBean<R2dbcEntityTemplate>()
-                    .databaseClient.sql(UserRoleDao.Relations.INSERT)
-                    .bind(UserRoleDao.Attributes.USER_ID_ATTR, first.userId)
-                    .bind(UserRoleDao.Attributes.ROLE_ATTR, first.role)
+                    .databaseClient.sql(Relations.INSERT)
+                    .bind(Attributes.USER_ID_ATTR, first.userId)
+                    .bind(Attributes.ROLE_ATTR, first.role)
                     .fetch()
                     .one()
-                    .collect { it[UserRoleDao.Fields.ID_FIELD.uppercase()] }
+                    .collect { it[Fields.ID_FIELD.uppercase()] }
                     .toString()
                     .toLong()
                     .right()
