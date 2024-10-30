@@ -53,6 +53,8 @@ val Pair<String, String>.artifactVersion: String
 //springBoot.mainClass.set("school.Application")
 
 tasks.register("installerGui"){
+    group = "application"
+    description = "Run workspace installer : ./gradlew -p api :installerGui"
     application.mainClass.set("school.base.installer.Setup")
     finalizedBy("run")
 }
