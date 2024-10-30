@@ -16,7 +16,7 @@ buildscript {
         gradlePluginPortal()
         google()
     }
-    dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20-Beta2") }
+    dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21") }
 }
 
 plugins {
@@ -30,6 +30,7 @@ plugins {
     kotlin("plugin.serialization")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    application
 }
 
 group = properties["artifact.group"].toString()
@@ -49,13 +50,36 @@ val Pair<String, String>.artifactVersion: String
         }::get
     ).toString()
 
-springBoot.mainClass.set("school.Application")
+//springBoot.mainClass.set("school.Application")
+
+tasks.register("installerGui"){
+    application.mainClass.set("school.base.installer.Setup")
+    finalizedBy("run")
+}
 
 tasks.register("cli") {
-    //./gradlew -q cli --args='your args there'
     group = "application"
-    description = "Run school cli"
-    doFirst { springBoot.mainClass.set("school.CommandLine") }
+    description = "Run school cli : ./gradlew -p api :cli -Pargs=--gui"
+    doFirst {
+        with(springBoot) {
+            tasks.bootRun.configure {
+                args = (project.findProperty("args") as String?)
+                    ?.trim()
+                    ?.split(" ")
+                    ?.filter(String::isNotEmpty)
+                    ?.also { println("Passing args to Spring Boot: $it") }
+                    ?: emptyList()
+            }
+            mainClass.set("school.base.cli.CommandLine")
+        }
+    }
+    finalizedBy(tasks.bootRun)
+}
+
+tasks.register("api") {
+    group = "application"
+    description = "Run school api"
+    doFirst { springBoot.mainClass.set("school.Application") }
     finalizedBy("bootRun")
 }
 

@@ -2,24 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package school.base.cli;
+package school.base.installer;
 
-import jakarta.validation.Validator;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import school.Application;
+
+import static java.awt.EventQueue.invokeLater;
+import static java.util.Arrays.stream;
+import static org.springframework.boot.SpringApplication.run;
 
 /**
  * @author cheroliv
  */
-public class Setup extends javax.swing.JFrame implements ApplicationContextAware {
 
-    private ApplicationContext context;
+public class Setup extends javax.swing.JFrame {
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
-    }
+    protected ApplicationContext context;
 
     /**
      * Creates new form Setup
@@ -156,12 +154,15 @@ public class Setup extends javax.swing.JFrame implements ApplicationContextAware
 
     private void createWorkspaceButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createWorkspaceButtonMouseClicked
         // TODO add your handling code here:
+        stream(context.getBeanDefinitionNames())
+                .sequential()
+                .forEach(System.out::println);
     }//GEN-LAST:event_createWorkspaceButtonMouseClicked
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -186,8 +187,11 @@ public class Setup extends javax.swing.JFrame implements ApplicationContextAware
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new Setup().setVisible(true);
+
+        invokeLater(() -> {
+            var f = new Setup();
+            f.setVisible(true);
+            f.context = run(Application.class, args);
         });
     }
 
