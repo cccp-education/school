@@ -103,7 +103,5 @@ data class Workspace(val workspace: WorkspaceEntry) {
             data class Dashboard(val dashboard: String) : DashboardEntry
         }
     }
-    fun someLibraryMethod(): Boolean {
-        return true
-    }
+    fun someLibraryMethod() = true
 }

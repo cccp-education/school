@@ -1,5 +1,6 @@
 package workspace
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import workspace.Workspace.WorkspaceEntry
 import workspace.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
 import workspace.Workspace.WorkspaceEntry.CommunicationEntry.Communication
@@ -20,56 +21,60 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class WorkspaceTest {
-    @Test
-    fun someLibraryMethodReturnsTrue() {
-        val classUnderTest = Workspace(
-            workspace = WorkspaceEntry(
-                name = "fonderie",
-                cores = mapOf(
-                    "education" to Education(
-                        school = School(name = "talaria"),
-                        student = Student(name = "olivier"),
-                        teacher = Teacher(name = "cheroliv"),
-                        educationTools = EducationTools(name = "edTools")
-                    ),
+    private val classUnderTest = Workspace(
+        workspace = WorkspaceEntry(
+            name = "fonderie",
+            cores = mapOf(
+                "education" to Education(
+                    school = School(name = "talaria"),
+                    student = Student(name = "olivier"),
+                    teacher = Teacher(name = "cheroliv"),
+                    educationTools = EducationTools(name = "edTools")
                 ),
-                job = Job(
-                    position = Position("Teacher"),
-                    resume = Resume(name = "CV")
-                ),
-                configuration = Configuration(configuration = "school-configuration"),
-                communication = Communication(site = "static-website"),
-                office = Office(
-                    books = Books(name = "books-collection"),
-                    datas = Datas(name = "datas"),
-                    formations = TrainingCatalogue(catalogue = "formations"),
-                    bizness = Profession("bizness"),
-                    notebooks = Notebooks(notebooks = "notebooks"),
-                    pilotage = Pilotage(name = "pilotage"),
-                    schemas = Schemas(name = "schemas"),
-                    slides = Slides(path = "${
-                            System.getProperty("user.home")
-                        }/workspace/bibliotheque/slides"),
-                    sites = Sites(name = "sites")
-                ),
-                organisation = Organisation(organisation = "organisation"),
-                collaboration = Collaboration(collaboration = "collaboration"),
-                dashboard = Dashboard(dashboard = "dashboard"),
-                portfolio = Portfolio(
-                    mutableMapOf(
-                        "school" to PortfolioProject(
-                            name = "name",
-                            cred = "credential",
-                            builds = mutableMapOf("training" to ProjectBuild(name = "training"))
-                        )
+            ),
+            job = Job(
+                position = Position("Teacher"),
+                resume = Resume(name = "CV")
+            ),
+            configuration = Configuration(configuration = "school-configuration"),
+            communication = Communication(site = "static-website"),
+            office = Office(
+                books = Books(name = "books-collection"),
+                datas = Datas(name = "datas"),
+                formations = TrainingCatalogue(catalogue = "formations"),
+                bizness = Profession("bizness"),
+                notebooks = Notebooks(notebooks = "notebooks"),
+                pilotage = Pilotage(name = "pilotage"),
+                schemas = Schemas(name = "schemas"),
+                slides = Slides(path = "${
+                    System.getProperty("user.home")
+                }/workspace/bibliotheque/slides"),
+                sites = Sites(name = "sites")
+            ),
+            organisation = Organisation(organisation = "organisation"),
+            collaboration = Collaboration(collaboration = "collaboration"),
+            dashboard = Dashboard(dashboard = "dashboard"),
+            portfolio = Portfolio(
+                mutableMapOf(
+                    "school" to PortfolioProject(
+                        name = "name",
+                        cred = "credential",
+                        builds = mutableMapOf("training" to ProjectBuild(name = "training"))
                     )
                 )
             )
         )
+    )
+
+
+    @Test
+    fun someLibraryMethodReturnsTrue() {
         assertTrue(
             actual = classUnderTest.someLibraryMethod(),
             message = "someLibraryMethod should return 'true'"
         )
         classUnderTest.toString().run(::println)
+        classUnderTest.run(YAMLMapper()::writeValueAsString)
+            .run(::println)
     }
 }

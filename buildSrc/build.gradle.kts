@@ -189,6 +189,7 @@ tasks.register("installerGui"){
     application.mainClass.set("school.base.installer.Setup")
     finalizedBy("run")
 }
+
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")
 
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
