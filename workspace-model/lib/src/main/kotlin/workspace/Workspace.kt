@@ -1,10 +1,13 @@
 package workspace
 
+import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office
+import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Slides
+
 
 data class Workspace(val workspace: WorkspaceEntry) {
     data class WorkspaceEntry(
         val name: String,
-        val office: OfficeEntry.Office,
+        val office: Office,
         val cores: Map<String, CoreEntry>,
         val job: JobEntry,
         val configuration: ConfigurationEntry,
@@ -51,7 +54,7 @@ data class Workspace(val workspace: WorkspaceEntry) {
                 val notebooks: LibraryEntry,
                 val pilotage: LibraryEntry,
                 val schemas: LibraryEntry,
-                val slides: LibraryEntry.Slides,
+                val slides: Slides,
                 val sites: LibraryEntry,
             ) : OfficeEntry {
                 sealed class LibraryEntry {
