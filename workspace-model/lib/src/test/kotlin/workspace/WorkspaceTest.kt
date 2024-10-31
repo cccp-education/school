@@ -20,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class WorkspaceTest {
-    private val classUnderTest = Workspace(
+    private val workspace = Workspace(
         workspace = WorkspaceEntry(
             name = "fonderie",
             cores = mapOf(
@@ -65,14 +65,41 @@ class WorkspaceTest {
         )
     )
 
-
     @Test
     fun someLibraryMethodReturnsTrue() {
         assertTrue(
-            actual = classUnderTest.someLibraryMethod(),
+            actual = workspace.someLibraryMethod(),
             message = "someLibraryMethod should return 'true'"
         )
-        classUnderTest.toString().run(::println)
-        classUnderTest.displayWorkspaceStructure()
+        workspace.toString().run(::println)
+        workspace.displayWorkspaceStructure()
     }
+    /*
+    1/ Workspace
+        a. create a workspace
+        b. add an entry to the workspace
+        c. remove an entry from the workspace
+        d. update an entry in the workspace
+        e. find an entry in the workspace
+    2/ WorkspaceEntry
+        a. create an Education
+        b. create an Office
+        c. create a Job
+        d. create a Configuration
+        e. create a Communication
+        f. create an Organisation
+        g. create a Collaboration
+        h. create a Dashboard
+        i. create a Portfolio
+    3/ name
+    4/ office
+    5/ cores
+    6/ job
+    7/ configuration
+    8/ communication
+    9/ organisation
+    10/ collaboration
+    11/ dashboard
+    12/ portfolio
+     */
 }
