@@ -1,5 +1,6 @@
 package workspace
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office
 import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Slides
 
@@ -103,5 +104,11 @@ data class Workspace(val workspace: WorkspaceEntry) {
             data class Dashboard(val dashboard: String) : DashboardEntry
         }
     }
-    fun someLibraryMethod() = true
+
+    fun someLibraryMethod(): Boolean = true
 }
+
+fun Workspace.displayWorkspaceStructure(): Unit = toYaml.run(::println)
+
+val Workspace.toYaml: String
+    get() = YAMLMapper().writeValueAsString(this)

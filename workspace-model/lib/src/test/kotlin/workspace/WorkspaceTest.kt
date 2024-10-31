@@ -1,6 +1,5 @@
 package workspace
 
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import workspace.Workspace.WorkspaceEntry
 import workspace.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
 import workspace.Workspace.WorkspaceEntry.CommunicationEntry.Communication
@@ -74,7 +73,6 @@ class WorkspaceTest {
             message = "someLibraryMethod should return 'true'"
         )
         classUnderTest.toString().run(::println)
-        classUnderTest.run(YAMLMapper()::writeValueAsString)
-            .run(::println)
+        classUnderTest.displayWorkspaceStructure()
     }
 }
