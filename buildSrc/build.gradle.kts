@@ -1,4 +1,16 @@
-plugins { `kotlin-dsl` }
+import Build_gradle.Constants.arrowKtVersion
+import Build_gradle.Constants.asciidoctorGradleVersion
+import Build_gradle.Constants.commonsIoVersion
+import Build_gradle.Constants.jacksonVersion
+import Build_gradle.Constants.jgitVersion
+import Build_gradle.Constants.langchain4jVersion
+import Build_gradle.Constants.schoolVersion
+import Build_gradle.Constants.testcontainersVersion
+import org.gradle.api.logging.LogLevel.ERROR
+import org.gradle.api.logging.LogLevel.INFO
+
+plugins { `kotlin-dsl`
+application}
 
 repositories {
     google()
@@ -11,38 +23,18 @@ repositories {
     maven("https://archiva-repository.apache.org/archiva/repository/public/")
 }
 
+object Constants {
+    const val langchain4jVersion = "0.35.0"
+    const val testcontainersVersion = "1.20.1"
+    const val asciidoctorGradleVersion = "4.0.0-alpha.1"
+    const val commonsIoVersion = "2.13.0"
+    const val jacksonVersion = "2.17.2"//2.18.0
+    const val arrowKtVersion = "1.2.4"
+    const val jgitVersion = "6.10.0.202406032230-r"
+    const val schoolVersion = "0.0.1"
+}
+
 dependencies {
-    // les dependances : base, model, assistant n'existe pas alors il faut les builder
-    val langchain4jVersion = "0.35.0"
-    val testcontainersVersion = "1.20.1"
-    val asciidoctorGradleVersion = "4.0.0-alpha.1"
-    val commonsIoVersion = "2.13.0"
-    val jacksonVersion = "2.17.2"//2.18.0
-    val arrowKtVersion = "1.2.4"
-    val jgitVersion = "6.10.0.202406032230-r"
-    val schoolVersion = "0.0.1"
-//    rootDir.parentFile
-//        .listFiles()!!.find { it.name == "base" }!!
-//        .listFiles()!!.find { it.name == "build" }!!
-//        .listFiles()!!.find { it.name == "libs" }!!
-//        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
-//        .let(::fileTree)
-//        .let(::implementation)
-//    rootDir.parentFile
-//        .listFiles()!!.find { it.name == "model" }!!
-//        .listFiles()!!.find { it.name == "build" }!!
-//        .listFiles()!!.find { it.name == "libs" }!!
-//        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
-//        .let(::fileTree)
-//        .let(::implementation)
-//    rootDir
-//        .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
-//        .listFiles()!!.find { it.name == "api" }!!
-//        .listFiles()!!.find { it.name == "build" }!!
-//        .listFiles()!!.find { it.name == "libs" }!!
-//        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
-//        .let(::fileTree)
-//        .let(::implementation)
     setOf(
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
@@ -80,6 +72,13 @@ dependencies {
         "org.testcontainers:testcontainers:$testcontainersVersion",
         "org.testcontainers:ollama:$testcontainersVersion",
         "org.gradle:gradle-tooling-api:8.6",
+        rootDir
+            .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
+            .listFiles()!!.find { it.name == "api" }!!
+            .listFiles()!!.find { it.name == "build" }!!
+            .listFiles()!!.find { it.name == "libs" }!!
+            .listFiles()!!.first { it.name == "api-$schoolVersion.jar" }!!
+            .let(::fileTree)
     ).forEach(::implementation)
     setOf("org.jetbrains.kotlin:kotlin-test-junit5")
         .forEach(::testImplementation)
@@ -87,13 +86,36 @@ dependencies {
         .forEach(::testRuntimeOnly)
     setOf("com.sun.xml.bind:jaxb-impl:4.0.5")
         .forEach(::runtimeOnly)
-}
 
+    // les dependances : base, model, assistant n'existe pas alors il faut les builder
+//    rootDir.parentFile
+//        .listFiles()!!.find { it.name == "base" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "base-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
+//    rootDir.parentFile
+//        .listFiles()!!.find { it.name == "model" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "model-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
+//    rootDir
+//        .parentFile// si base lib n'existe pas alors lancer une exception qui demande de lancer son build avant
+//        .listFiles()!!.find { it.name == "api" }!!
+//        .listFiles()!!.find { it.name == "build" }!!
+//        .listFiles()!!.find { it.name == "libs" }!!
+//        .listFiles()!!.first { it.name == "api-$schoolVersion.jar" }!!
+//        .let(::fileTree)
+//        .let(::implementation)
+}
 //tasks.named("build") {
 //    // Avant de lancer la tâche "build", assure-toi que le JAR du projet 'base' est à jour
 //    dependsOn(":buildBaseJar")
 //}
-
+//
 //gradle.beforeProject {
 //    if (name == "buildSrc") {
 //        tasks.named("build") {
@@ -102,42 +124,71 @@ dependencies {
 //        }
 //    }
 //}
-
-
-//tasks.register("logBuildBaseJar") {
+//
+//tasks.register("logbuildApiJar") {
 //    group = "build"
-//    description = "Builds the base project and generates the JAR file."
+//    description = "Builds the api project and generates the JAR file."
 //    doLast {
 //        exec {
-//            commandLine("gradle", "-p", "../base", "build")
+//            commandLine("./gradlew", "-p", "../api", "build")
 //        }
 //    }
 //}
-//tasks["build"].dependsOn(":logBuildBaseJar")
+//tasks["build"].dependsOn(":logbuildApiJar")
 
+//tasks["build"].dependsOn(project.project(rootDir
+//    .parentFile
+//    .listFiles()!!
+//    .find { it.name == "api" }!!.absolutePath)
+//    .tasks.build)
 
-tasks["build"].dependsOn(":buildBaseJar")
+//tasks["build"].dependsOn(":buildApiJar")
 
-tasks.register<Exec>("buildBaseJar") {
+tasks.register/*<Exec>*/("buildApiJar") {
+    group = "application"
     description = "Build the base project to generate the updated JAR."
-    // Lancer la commande gradle pour construire le projet base
-    commandLine("./gradlew", ":build")
+//    workingDir = rootDir
+//        .parentFile
+//        .listFiles()!!
+//        .find { it.name == "api" }!!
+    // Lancer la commande gradle pour construire le projet api
+
+//    commandLine("./gradlew", "-p","../api",":build")
+    doFirst {
+//load gradle project not relative in multimodule, from given path, not using exec
+        tasks.build.invoke {
+            project("../api").tasks.build
+        }
+    }
 
     doLast {
         // Vérifie que le fichier JAR est bien mis à jour
-        val jarFile = file("../base/build/libs/base-0.0.1.jar")
-        if (!jarFile.exists()) {
-            val messageError = "The base JAR was not built successfully."
-            logger.log(LogLevel.ERROR, messageError)
-            throw GradleException(messageError)
+        file("../api/build/libs/api-$schoolVersion.jar").run {
+            when {
+                !exists() -> {
+                    val messageError = "The api JAR was not built successfully."
+                    logger.log(ERROR, messageError)
+                    throw GradleException(messageError)
+                }
+
+                else -> {
+                    logger.log(INFO, "The api JAR was built successfully.")
+                    project.dependencies.add(name, this).also {
+                        logger.log(INFO, "Add $name dependency to classpath successfully.")
+                    }
+                }
+            }
+
         }
-        logger.log(LogLevel.INFO, "The base JAR was built successfully.")
     }
-    workingDir = rootDir
-        .parentFile
-        .listFiles()!!.find { it.name == "base" }!!
 }
 
+tasks.register("installerGui"){
+    group = "application"
+    description = "Run workspace installer : ./gradlew -p api :installerGui"
+    application.mainClass.set("school.base.installer.Setup")
+    finalizedBy("run")
+}
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")
 
 configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
@@ -160,5 +211,3 @@ tasks.withType<JavaExec> {
         "--enable-preview"
     ).toList()
 }
-
-//kotlin { jvmToolchain(JavaVersion.VERSION_21.ordinal) }

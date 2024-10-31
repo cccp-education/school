@@ -24,3 +24,8 @@ tasks.withType<JavaExec> {
         "--enable-preview"
     )
 }
+//ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+tasks.register<Exec>("buildSchool") { commandLine("./gradlew", "-p", "api", "build") }
+
+//tasks["build"].dependsOn(tasks["buildApi"])
