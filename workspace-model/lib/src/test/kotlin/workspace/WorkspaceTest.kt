@@ -23,6 +23,22 @@ class WorkspaceTest {
     private val workspace = Workspace(
         workspace = WorkspaceEntry(
             name = "fonderie",
+            path = "${System.getProperty("user.home")}/workspace/school",
+            office = Office(
+                books = Books(name = "books-collection"),
+                datas = Datas(name = "datas"),
+                formations = TrainingCatalogue(catalogue = "formations"),
+                bizness = Profession("bizness"),
+                notebooks = Notebooks(notebooks = "notebooks"),
+                pilotage = Pilotage(name = "pilotage"),
+                schemas = Schemas(name = "schemas"),
+                slides = Slides(
+                    path = "${
+                        System.getProperty("user.home")
+                    }/workspace/bibliotheque/slides"
+                ),
+                sites = Sites(name = "sites")
+            ),
             cores = mapOf(
                 "education" to Education(
                     school = School(name = "talaria"),
@@ -37,19 +53,6 @@ class WorkspaceTest {
             ),
             configuration = Configuration(configuration = "school-configuration"),
             communication = Communication(site = "static-website"),
-            office = Office(
-                books = Books(name = "books-collection"),
-                datas = Datas(name = "datas"),
-                formations = TrainingCatalogue(catalogue = "formations"),
-                bizness = Profession("bizness"),
-                notebooks = Notebooks(notebooks = "notebooks"),
-                pilotage = Pilotage(name = "pilotage"),
-                schemas = Schemas(name = "schemas"),
-                slides = Slides(path = "${
-                    System.getProperty("user.home")
-                }/workspace/bibliotheque/slides"),
-                sites = Sites(name = "sites")
-            ),
             organisation = Organisation(organisation = "organisation"),
             collaboration = Collaboration(collaboration = "collaboration"),
             dashboard = Dashboard(dashboard = "dashboard"),
@@ -61,7 +64,7 @@ class WorkspaceTest {
                         builds = mutableMapOf("training" to ProjectBuild(name = "training"))
                     )
                 )
-            )
+            ),
         )
     )
 
@@ -73,6 +76,13 @@ class WorkspaceTest {
         )
         workspace.toString().run(::println)
         workspace.displayWorkspaceStructure()
+    }
+
+    @Test
+    fun `install workspace`() {
+        Workspace.install(path = "${System.getProperty("user.home")}/workspace/school")
+        // default type : all-in-one
+        //
     }
     /*
     1/ Workspace

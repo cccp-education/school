@@ -8,6 +8,7 @@ import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Slides
 data class Workspace(val workspace: WorkspaceEntry) {
     data class WorkspaceEntry(
         val name: String,
+        val path: String,
         val office: Office,
         val cores: Map<String, CoreEntry>,
         val job: JobEntry,
@@ -106,6 +107,11 @@ data class Workspace(val workspace: WorkspaceEntry) {
     }
 
     fun someLibraryMethod(): Boolean = true
+
+    companion object {
+        @JvmStatic
+        fun install(path: String) = println("Installing workspace on path : $path")
+    }
 }
 
 fun Workspace.displayWorkspaceStructure(): Unit = toYaml.run(::println)
