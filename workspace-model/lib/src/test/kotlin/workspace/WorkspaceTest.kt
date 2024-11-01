@@ -81,8 +81,8 @@ class WorkspaceTest {
     @Test
     fun `install workspace`() {
         Workspace.install(path = "${System.getProperty("user.home")}/workspace/school")
-        // default type : all-in-one
-        //
+        // default type : AllInOneWorkspace
+        // ExplodedWorkspace
     }
     /*
     1/ Workspace
