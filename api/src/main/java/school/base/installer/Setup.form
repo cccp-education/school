@@ -102,19 +102,12 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="workspacePathLabel1" min="-2" pref="52" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="workspaceCompletePathTextField" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="workspacePathTextField" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="browseWorkspacePathButton" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="workspacePathLabel1" min="-2" pref="52" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="workspacePathTextField" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="browseWorkspacePathButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -126,11 +119,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="workspacePathTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="browseWorkspacePathButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="workspacePathLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="workspaceCompletePathTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -149,8 +138,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Path"/>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JTextField" name="workspaceCompletePathTextField">
         </Component>
       </SubComponents>
     </Container>
@@ -247,16 +234,16 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="900" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="912" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
-                              <Component id="jLabel3" alignment="1" max="32767" attributes="0"/>
-                              <Component id="jLabel7" alignment="1" max="32767" attributes="0"/>
-                              <Component id="jLabel8" alignment="1" max="32767" attributes="0"/>
-                              <Component id="jLabel9" alignment="1" min="-2" pref="190" max="-2" attributes="0"/>
+                              <Component id="officePathLabel" alignment="0" max="32767" attributes="0"/>
+                              <Component id="educationPathLabel" alignment="1" max="32767" attributes="0"/>
+                              <Component id="communicationPathLabel" alignment="1" max="32767" attributes="0"/>
+                              <Component id="configurationPathLabel" alignment="1" max="32767" attributes="0"/>
+                              <Component id="jobPathLabel" alignment="1" min="-2" pref="190" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -271,8 +258,8 @@
                               <Component id="jButton3" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton2" alignment="1" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton7" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton8" min="-2" max="-2" attributes="0"/>
-                              <Component id="jButton9" min="-2" max="-2" attributes="0"/>
+                              <Component id="browseConfigurationPathButton" min="-2" max="-2" attributes="0"/>
+                              <Component id="browsejobPathButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -286,7 +273,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel2" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="officePathLabel" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                               <Component id="jButton2" alignment="3" max="32767" attributes="0"/>
                               <Component id="jTextField3" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -294,25 +281,25 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jButton3" alignment="3" max="32767" attributes="0"/>
                               <Component id="jTextField4" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel3" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="educationPathLabel" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jButton7" alignment="3" max="32767" attributes="0"/>
                               <Component id="jTextField8" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel7" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="communicationPathLabel" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jButton8" alignment="3" max="32767" attributes="0"/>
+                              <Component id="browseConfigurationPathButton" alignment="3" max="32767" attributes="0"/>
                               <Component id="jTextField9" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel8" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="configurationPathLabel" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jButton9" alignment="3" max="32767" attributes="0"/>
+                              <Component id="browsejobPathButton" alignment="3" max="32767" attributes="0"/>
                               <Component id="jTextField10" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel9" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
+                              <Component id="jobPathLabel" alignment="3" min="-2" pref="42" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                       </Group>
@@ -328,13 +315,13 @@
                 <Property name="text" type="java.lang.String" value="Select directory"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel2">
+            <Component class="javax.swing.JLabel" name="officePathLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Office"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel3">
+            <Component class="javax.swing.JLabel" name="educationPathLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Education"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -347,7 +334,7 @@
                 <Property name="text" type="java.lang.String" value="Select directory"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel7">
+            <Component class="javax.swing.JLabel" name="communicationPathLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Communication"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -360,25 +347,25 @@
                 <Property name="text" type="java.lang.String" value="Select directory"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton8">
+            <Component class="javax.swing.JButton" name="browseConfigurationPathButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Select directory"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextField9">
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel8">
+            <Component class="javax.swing.JLabel" name="configurationPathLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Configuration"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton9">
+            <Component class="javax.swing.JButton" name="browsejobPathButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Select directory"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel9">
+            <Component class="javax.swing.JLabel" name="jobPathLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Job"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
