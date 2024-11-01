@@ -188,13 +188,13 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="School"/>
+            <Property name="text" type="java.lang.String" value="Office"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Office"/>
+            <Property name="text" type="java.lang.String" value="Education"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
         </Component>

@@ -100,10 +100,10 @@ public class Setup extends javax.swing.JFrame {
 
         jButton2.setText("Select directory");
 
-        jLabel2.setText("School");
+        jLabel2.setText("Office");
         jLabel2.setToolTipText("");
 
-        jLabel3.setText("Office");
+        jLabel3.setText("Education");
         jLabel3.setToolTipText("");
 
         jButton3.setText("Select directory");
