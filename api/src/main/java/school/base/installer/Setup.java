@@ -48,21 +48,21 @@ public class Setup extends javax.swing.JFrame {
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
         jPanel7 = new javax.swing.JPanel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
         officePathLabel = new javax.swing.JLabel();
+        officePathTextField = new javax.swing.JTextField();
+        browseOfficePathButton = new javax.swing.JButton();
         educationPathLabel = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
+        educationPathTextField = new javax.swing.JTextField();
+        browseEducationPathButton = new javax.swing.JButton();
         communicationPathLabel = new javax.swing.JLabel();
-        jTextField8 = new javax.swing.JTextField();
-        jButton7 = new javax.swing.JButton();
-        browseConfigurationPathButton = new javax.swing.JButton();
-        jTextField9 = new javax.swing.JTextField();
+        communicationPathTextField = new javax.swing.JTextField();
+        browseCommunicationPathButton = new javax.swing.JButton();
         configurationPathLabel = new javax.swing.JLabel();
-        browsejobPathButton = new javax.swing.JButton();
+        configurationPathTextField = new javax.swing.JTextField();
+        browseConfigurationPathButton = new javax.swing.JButton();
         jobPathLabel = new javax.swing.JLabel();
-        jTextField10 = new javax.swing.JTextField();
+        jobPathTextField = new javax.swing.JTextField();
+        browsejobPathButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("setupFrame"); // NOI18N
@@ -153,30 +153,30 @@ public class Setup extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton2.setText("Select directory");
-
         officePathLabel.setText("Office");
         officePathLabel.setToolTipText("");
+
+        browseOfficePathButton.setText("Select directory");
 
         educationPathLabel.setText("Education");
         educationPathLabel.setToolTipText("");
 
-        jButton3.setText("Select directory");
+        browseEducationPathButton.setText("Select directory");
 
         communicationPathLabel.setText("Communication");
         communicationPathLabel.setToolTipText("");
 
-        jButton7.setText("Select directory");
-
-        browseConfigurationPathButton.setText("Select directory");
+        browseCommunicationPathButton.setText("Select directory");
 
         configurationPathLabel.setText("Configuration");
         configurationPathLabel.setToolTipText("");
 
-        browsejobPathButton.setText("Select directory");
+        browseConfigurationPathButton.setText("Select directory");
 
         jobPathLabel.setText("Job");
         jobPathLabel.setToolTipText("");
+
+        browsejobPathButton.setText("Select directory");
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -194,16 +194,16 @@ public class Setup extends javax.swing.JFrame {
                         .addComponent(jobPathLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
-                        .addComponent(jTextField4)
-                        .addComponent(jTextField8)
-                        .addComponent(jTextField9)
-                        .addComponent(jTextField10))
+                        .addComponent(officePathTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
+                        .addComponent(educationPathTextField)
+                        .addComponent(communicationPathTextField)
+                        .addComponent(configurationPathTextField)
+                        .addComponent(jobPathTextField))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButton3)
-                        .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton7)
+                        .addComponent(browseEducationPathButton)
+                        .addComponent(browseOfficePathButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(browseCommunicationPathButton)
                         .addComponent(browseConfigurationPathButton)
                         .addComponent(browsejobPathButton))
                     .addContainerGap()))
@@ -216,27 +216,27 @@ public class Setup extends javax.swing.JFrame {
                     .addGap(3, 3, 3)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(officePathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(browseOfficePathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(officePathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(browseEducationPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(educationPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(educationPathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(browseCommunicationPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(communicationPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(communicationPathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(browseConfigurationPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(configurationPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(configurationPathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(browsejobPathButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jobPathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jobPathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGap(3, 3, 3)))
         );
@@ -340,27 +340,27 @@ public class Setup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton browseCommunicationPathButton;
     private javax.swing.JButton browseConfigurationPathButton;
+    private javax.swing.JButton browseEducationPathButton;
+    private javax.swing.JButton browseOfficePathButton;
     private javax.swing.JButton browseWorkspacePathButton;
     private javax.swing.JButton browsejobPathButton;
     private javax.swing.JLabel communicationPathLabel;
+    private javax.swing.JTextField communicationPathTextField;
     private javax.swing.JLabel configurationPathLabel;
+    private javax.swing.JTextField configurationPathTextField;
     private javax.swing.JButton createWorkspaceButton;
     private javax.swing.JLabel educationPathLabel;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton7;
+    private javax.swing.JTextField educationPathTextField;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JTextField jTextField10;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField8;
-    private javax.swing.JTextField jTextField9;
     private javax.swing.JLabel jobPathLabel;
+    private javax.swing.JTextField jobPathTextField;
     private javax.swing.JLabel officePathLabel;
+    private javax.swing.JTextField officePathTextField;
     public javax.swing.JLabel titleLabel;
     private javax.swing.JLabel workspacePathLabel1;
     private javax.swing.JPanel workspacePathPanel;
