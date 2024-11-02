@@ -104,7 +104,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="workspacePathLabel1" min="-2" pref="52" max="-2" attributes="0"/>
+                  <Component id="workspacePathLabel" min="-2" pref="52" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="workspacePathTextField" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -120,7 +120,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="workspacePathTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="browseWorkspacePathButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="workspacePathLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="workspacePathLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -135,7 +135,7 @@
             <Property name="text" type="java.lang.String" value="Select directory"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="workspacePathLabel1">
+        <Component class="javax.swing.JLabel" name="workspacePathLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Path"/>
           </Properties>
@@ -197,9 +197,9 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jRadioButton2" min="-2" max="-2" attributes="0"/>
+                      <Component id="allInOneWorkspaceRadioButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="jRadioButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="separatedEntriesWorkspaceRadioButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="508" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -209,8 +209,8 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jRadioButton1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jRadioButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="separatedEntriesWorkspaceRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="allInOneWorkspaceRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -218,14 +218,14 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JRadioButton" name="jRadioButton1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Separated folders"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JRadioButton" name="jRadioButton2">
+            <Component class="javax.swing.JRadioButton" name="allInOneWorkspaceRadioButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="All-in-one"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="separatedEntriesWorkspaceRadioButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Separated folders"/>
               </Properties>
             </Component>
           </SubComponents>

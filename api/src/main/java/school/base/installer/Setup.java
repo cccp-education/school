@@ -4,27 +4,180 @@
  */
 package school.base.installer;
 
+import static java.util.Arrays.stream;
+
+import javax.swing.BorderFactory;
+
 import org.springframework.context.ApplicationContext;
 import school.Application;
 
+import javax.swing.*;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.awt.EventQueue.invokeLater;
-import static java.util.Arrays.stream;
-import javax.swing.BorderFactory;
+import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
 import static org.springframework.boot.SpringApplication.run;
 
 /**
  * @author cheroliv
  */
-
 public class Setup extends javax.swing.JFrame {
-
-    protected ApplicationContext context;
 
     /**
      * Creates new form Setup
      */
     public Setup() {
         initComponents();
+        initializeCustomComponents();
+    }
+
+    protected ApplicationContext context;
+
+    private enum InstallationType {
+        ALL_IN_ONE,
+        SEPARATED_FOLDERS
+    }
+
+    private final Map<String, Path> selectedPaths = new HashMap<>();
+    private InstallationType currentInstallationType = InstallationType.ALL_IN_ONE;
+
+
+    private void initializeCustomComponents() {
+        // Group the radio buttons
+        installationTypeGroup.add(allInOneWorkspaceRadioButton); // Separated folders
+        installationTypeGroup.add(separatedEntriesWorkspaceRadioButton); // All-in-one
+        separatedEntriesWorkspaceRadioButton.setSelected(false);
+        allInOneWorkspaceRadioButton.setSelected(true);
+
+        // Add action listeners to radio buttons
+        separatedEntriesWorkspaceRadioButton.addActionListener(e -> handleInstallationTypeChange(InstallationType.ALL_IN_ONE));
+        allInOneWorkspaceRadioButton.addActionListener(e -> handleInstallationTypeChange(InstallationType.SEPARATED_FOLDERS));
+
+        // Add action listeners to browse buttons
+        browseWorkspacePathButton.addActionListener(e -> selectDirectory("workspace", workspacePathTextField));
+        browseOfficePathButton.addActionListener(e -> selectDirectory("office", officePathTextField));
+        browseEducationPathButton.addActionListener(e -> selectDirectory("education", educationPathTextField));
+        browseCommunicationPathButton.addActionListener(e -> selectDirectory("communication", communicationPathTextField));
+        browseConfigurationPathButton.addActionListener(e -> selectDirectory("configuration", configurationPathTextField));
+        browsejobPathButton.addActionListener(e -> selectDirectory("job", jobPathTextField));
+
+        // Initialize workspace entries panel visibility
+        setWorkspaceEntriesVisibility(false);
+
+        // Create workspace button action
+        createWorkspaceButton.addActionListener(e -> handleCreateWorkspace());
+    }
+
+    private void handleInstallationTypeChange(InstallationType type) {
+        currentInstallationType = type;
+        setWorkspaceEntriesVisibility(type == InstallationType.ALL_IN_ONE);
+
+        if (type == InstallationType.ALL_IN_ONE) {
+            // Clear all specific paths when switching to all-in-one
+            clearSpecificPaths();
+        }
+    }
+
+    private void setWorkspaceEntriesVisibility(boolean visible) {
+        officePathLabel.setVisible(visible);
+        officePathTextField.setVisible(visible);
+        browseOfficePathButton.setVisible(visible);
+
+        educationPathLabel.setVisible(visible);
+        educationPathTextField.setVisible(visible);
+        browseEducationPathButton.setVisible(visible);
+
+        communicationPathLabel.setVisible(visible);
+        communicationPathTextField.setVisible(visible);
+        browseCommunicationPathButton.setVisible(visible);
+
+        configurationPathLabel.setVisible(visible);
+        configurationPathTextField.setVisible(visible);
+        browseConfigurationPathButton.setVisible(visible);
+
+        jobPathLabel.setVisible(visible);
+        jobPathTextField.setVisible(visible);
+        browsejobPathButton.setVisible(visible);
+    }
+
+    private void selectDirectory(String pathKey, JTextField textField) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(DIRECTORIES_ONLY);
+        chooser.setDialogTitle("Select Directory");
+
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            Path selectedPath = selectedFile.toPath();
+            selectedPaths.put(pathKey, selectedPath);
+            textField.setText(selectedPath.toString());
+        }
+    }
+
+    private void clearSpecificPaths() {
+        officePathTextField.setText("");
+        educationPathTextField.setText("");
+        communicationPathTextField.setText("");
+        configurationPathTextField.setText("");
+        jobPathTextField.setText("");
+
+        selectedPaths.remove("office");
+        selectedPaths.remove("education");
+        selectedPaths.remove("communication");
+        selectedPaths.remove("configuration");
+        selectedPaths.remove("job");
+    }
+
+    private void handleCreateWorkspace() {
+        String workspacePath = workspacePathTextField.getText();
+        if (workspacePath.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select a workspace directory",
+                    "Validation Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            if (currentInstallationType == InstallationType.SEPARATED_FOLDERS) {
+                createSeparatedFoldersWorkspace();
+            } else {
+                createAllInOneWorkspace();
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Workspace created successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error creating workspace: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void createSeparatedFoldersWorkspace() {
+        // Validate all required paths are selected
+        String[] requiredPaths = {"office", "education", "communication", "configuration", "job"};
+        for (String path : requiredPaths) {
+            if (!selectedPaths.containsKey(path) || selectedPaths.get(path) == null) {
+                throw new IllegalStateException("All paths must be selected for separated folders installation");
+            }
+        }
+
+        // TODO: Implement the actual creation of separated folders
+        // You can access the paths using selectedPaths.get("office") etc.
+    }
+
+    private void createAllInOneWorkspace() {
+        Path workspacePath = Paths.get(workspacePathTextField.getText());
+        // TODO: Implement the creation of an all-in-one workspace
+        // This would typically involve creating subdirectories in the main workspace
     }
 
     /**
@@ -43,11 +196,11 @@ public class Setup extends javax.swing.JFrame {
         workspacePathPanel = new javax.swing.JPanel();
         workspacePathTextField = new javax.swing.JTextField();
         browseWorkspacePathButton = new javax.swing.JButton();
-        workspacePathLabel1 = new javax.swing.JLabel();
+        workspacePathLabel = new javax.swing.JLabel();
         workspaceTypePanel = new javax.swing.JPanel();
         workspaceTypeSelectorPanel = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        allInOneWorkspaceRadioButton = new javax.swing.JRadioButton();
+        separatedEntriesWorkspaceRadioButton = new javax.swing.JRadioButton();
         workspaceEntriesPanel = new javax.swing.JPanel();
         officePathLabel = new javax.swing.JLabel();
         officePathTextField = new javax.swing.JTextField();
@@ -101,7 +254,7 @@ public class Setup extends javax.swing.JFrame {
 
         browseWorkspacePathButton.setText("Select directory");
 
-        workspacePathLabel1.setText("Path");
+        workspacePathLabel.setText("Path");
 
         javax.swing.GroupLayout workspacePathPanelLayout = new javax.swing.GroupLayout(workspacePathPanel);
         workspacePathPanel.setLayout(workspacePathPanelLayout);
@@ -109,7 +262,7 @@ public class Setup extends javax.swing.JFrame {
             workspacePathPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(workspacePathPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(workspacePathLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(workspacePathLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(workspacePathTextField)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -123,15 +276,15 @@ public class Setup extends javax.swing.JFrame {
                 .addGroup(workspacePathPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(workspacePathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(browseWorkspacePathButton)
-                    .addComponent(workspacePathLabel1))
+                    .addComponent(workspacePathLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         workspaceTypePanel.setBorder(BorderFactory.createTitledBorder("Installation type"));
 
-        jRadioButton1.setText("Separated folders");
+        allInOneWorkspaceRadioButton.setText("All-in-one");
 
-        jRadioButton2.setText("All-in-one");
+        separatedEntriesWorkspaceRadioButton.setText("Separated folders");
 
         javax.swing.GroupLayout workspaceTypeSelectorPanelLayout = new javax.swing.GroupLayout(workspaceTypeSelectorPanel);
         workspaceTypeSelectorPanel.setLayout(workspaceTypeSelectorPanelLayout);
@@ -139,9 +292,9 @@ public class Setup extends javax.swing.JFrame {
             workspaceTypeSelectorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(workspaceTypeSelectorPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jRadioButton2)
+                .addComponent(allInOneWorkspaceRadioButton)
                 .addGap(18, 18, 18)
-                .addComponent(jRadioButton1)
+                .addComponent(separatedEntriesWorkspaceRadioButton)
                 .addContainerGap(508, Short.MAX_VALUE))
         );
         workspaceTypeSelectorPanelLayout.setVerticalGroup(
@@ -149,8 +302,8 @@ public class Setup extends javax.swing.JFrame {
             .addGroup(workspaceTypeSelectorPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(workspaceTypeSelectorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2))
+                    .addComponent(separatedEntriesWorkspaceRadioButton)
+                    .addComponent(allInOneWorkspaceRadioButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -332,7 +485,6 @@ public class Setup extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-
         invokeLater(() -> {
             var f = new Setup();
             f.setVisible(true);
@@ -341,6 +493,7 @@ public class Setup extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton allInOneWorkspaceRadioButton;
     private javax.swing.JButton browseCommunicationPathButton;
     private javax.swing.JButton browseConfigurationPathButton;
     private javax.swing.JButton browseEducationPathButton;
@@ -355,15 +508,14 @@ public class Setup extends javax.swing.JFrame {
     private javax.swing.JLabel educationPathLabel;
     private javax.swing.JTextField educationPathTextField;
     private javax.swing.ButtonGroup installationTypeGroup;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JLabel jobPathLabel;
     private javax.swing.JTextField jobPathTextField;
     private javax.swing.JLabel officePathLabel;
     private javax.swing.JTextField officePathTextField;
+    private javax.swing.JRadioButton separatedEntriesWorkspaceRadioButton;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JPanel workspaceEntriesPanel;
-    private javax.swing.JLabel workspacePathLabel1;
+    private javax.swing.JLabel workspacePathLabel;
     private javax.swing.JPanel workspacePathPanel;
     private javax.swing.JTextField workspacePathTextField;
     private javax.swing.JPanel workspaceTopPanel;
