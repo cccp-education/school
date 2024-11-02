@@ -31,56 +31,6 @@ import kotlin.Short.Companion.MAX_VALUE
  * @author cheroliv
  */
 open class Setup : JFrame("School Project Setup") {
-    private enum class InstallationType {
-        ALL_IN_ONE,
-        SEPARATED_FOLDERS
-    }
-
-    private data class WorkspaceConfig(
-        val basePath: Path,
-        val type: InstallationType,
-        val subPaths: Map<String, Path> = emptyMap()
-    )
-
-    // Service class for workspace operations
-    private inner class WorkspaceService {
-        fun createWorkspace(config: WorkspaceConfig) {
-            when (config.type) {
-                ALL_IN_ONE -> createAllInOneWorkspace(config.basePath)
-                SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace(config.basePath, config.subPaths)
-            }
-        }
-
-        private fun createAllInOneWorkspace(basePath: Path) {
-            val directories = listOf("office", "education", "communication", "configuration", "job")
-            directories.forEach { dir ->
-                createDirectory(basePath.resolve(dir))
-            }
-            createConfigFiles(basePath)
-        }
-
-        private fun createSeparatedFoldersWorkspace(basePath: Path, subPaths: Map<String, Path>) {
-            subPaths.forEach { (name, path) ->
-                createDirectory(path)
-                createConfigFiles(path)
-            }
-        }
-
-        private fun createDirectory(path: Path) {
-            path.toFile().mkdirs()
-        }
-
-        private fun createConfigFiles(basePath: Path) {
-            // Création des fichiers de configuration nécessaires
-            File(basePath.toFile(), "application.properties").writeText(
-                """
-                school.workspace.path=${basePath}
-                # Add other configuration properties here
-            """.trimIndent()
-            )
-        }
-    }
-
     private lateinit var context: ApplicationContext
     private val selectedPaths: MutableMap<String, Path?> = HashMap()
     private var currentInstallationType = ALL_IN_ONE
@@ -488,12 +438,6 @@ open class Setup : JFrame("School Project Setup") {
         }
     }
 
-
-//    // UI Components
-//    private val components = SetupComponents()
-    /**
-     * Creates new form Setup
-     */
     init {
         name = "setupFrame" // NOI18N
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -534,37 +478,6 @@ open class Setup : JFrame("School Project Setup") {
             browsejobPathButton,
         ).onEach { "Select directory".run(it::setText) }
         this.pack()
-    }
-
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            setupLookAndFeel()
-            /* Create and display the form */
-            invokeLater {
-                Setup().run {
-                    isVisible = true
-                    context = run(Application::class.java, *args)
-                }
-            }
-        }
-
-        private fun setupLookAndFeel() {
-            try {
-                getInstalledLookAndFeels()
-                    .find { it.name == "Nimbus" }
-                    ?.let { setLookAndFeel(it.className) }
-            } catch (ex: ClassNotFoundException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
-            } catch (ex: InstantiationException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
-            } catch (ex: IllegalAccessException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
-            } catch (ex: UnsupportedLookAndFeelException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
-            }
-        }
     }
 
     private fun handleInstallationTypeChange(type: InstallationType) {
@@ -684,6 +597,87 @@ open class Setup : JFrame("School Project Setup") {
             .sequential()
             .forEach { x: String? -> println(x) }
     }
+
+    private enum class InstallationType {
+        ALL_IN_ONE,
+        SEPARATED_FOLDERS
+    }
+
+    private data class WorkspaceConfig(
+        val basePath: Path,
+        val type: InstallationType,
+        val subPaths: Map<String, Path> = emptyMap()
+    )
+
+    // Service class for workspace operations
+    private inner class WorkspaceService {
+        fun createWorkspace(config: WorkspaceConfig) {
+            when (config.type) {
+                ALL_IN_ONE -> createAllInOneWorkspace(config.basePath)
+                SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace(config.basePath, config.subPaths)
+            }
+        }
+
+        private fun createAllInOneWorkspace(basePath: Path) {
+            val directories = listOf("office", "education", "communication", "configuration", "job")
+            directories.forEach { dir ->
+                createDirectory(basePath.resolve(dir))
+            }
+            createConfigFiles(basePath)
+        }
+
+        private fun createSeparatedFoldersWorkspace(basePath: Path, subPaths: Map<String, Path>) {
+            subPaths.forEach { (name, path) ->
+                createDirectory(path)
+                createConfigFiles(path)
+            }
+        }
+
+        private fun createDirectory(path: Path) {
+            path.toFile().mkdirs()
+        }
+
+        private fun createConfigFiles(basePath: Path) {
+            // Création des fichiers de configuration nécessaires
+            File(basePath.toFile(), "application.properties").writeText(
+                """
+                school.workspace.path=${basePath}
+                # Add other configuration properties here
+            """.trimIndent()
+            )
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            setupLookAndFeel()
+            /* Create and display the form */
+            invokeLater {
+                Setup().run {
+                    isVisible = true
+                    context = run(Application::class.java, *args)
+                }
+            }
+        }
+
+        private fun setupLookAndFeel() {
+            try {
+                getInstalledLookAndFeels()
+                    .find { it.name == "Nimbus" }
+                    ?.let { setLookAndFeel(it.className) }
+            } catch (ex: ClassNotFoundException) {
+                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+            } catch (ex: InstantiationException) {
+                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+            } catch (ex: IllegalAccessException) {
+                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+            } catch (ex: UnsupportedLookAndFeelException) {
+                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+            }
+        }
+    }
+
 }
 
 //class Setup_ : JFrame() {
