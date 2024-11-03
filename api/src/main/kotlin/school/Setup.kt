@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication.run
 import org.springframework.context.ApplicationContext
 import school.Setup.InstallationType.ALL_IN_ONE
 import school.Setup.InstallationType.SEPARATED_FOLDERS
+import school.Setup.SetupHelper.addListeners
 import school.Setup.SetupHelper.initUI
-import school.Setup.SetupHelper.setWorkspaceEntriesVisibility
 import school.base.utils.Log.i
 import java.awt.EventQueue.invokeLater
 import java.io.File
@@ -71,116 +71,8 @@ class Setup(
     private val workspaceService = WorkspaceService()
 
     init {
-        initUI()
-        addListeners()
-        this.pack()
+        initUI().addListeners().pack()
         "Init, currentInstallationType : $currentInstallationType".run(::i)
-    }
-
-    private fun addListeners() {
-        splitWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
-        allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
-        browseCommunicationPathButton.addActionListener { selectDirectory("communication", communicationPathTextField) }
-        browseConfigurationPathButton.addActionListener { selectDirectory("configuration", configurationPathTextField) }
-        browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
-        browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
-        browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
-        browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
-        createWorkspaceButton.addActionListener { handleCreateWorkspace() }
-        installationTypeGroup.selection.addActionListener {
-        }
-    }
-
-    private fun handleInstallationTypeChange(type: InstallationType) {
-        "currentInstallationType : $currentInstallationType".run(::i)
-        currentInstallationType = type
-        "Installation type changed to $type".run(::i)
-        setWorkspaceEntriesVisibility(type == SEPARATED_FOLDERS)
-        if (type == ALL_IN_ONE) {
-            // Clear all specific paths when switching to all-in-one
-            clearSpecificPaths()
-        }
-    }
-
-    private fun selectDirectory(pathKey: String, textField: JTextField) {
-        val chooser = JFileChooser()
-        chooser.fileSelectionMode = DIRECTORIES_ONLY
-        chooser.dialogTitle = "Select Directory"
-
-        if (chooser.showOpenDialog(this) == APPROVE_OPTION) {
-            val selectedFile = chooser.selectedFile
-            val selectedPath = selectedFile.toPath()
-            selectedPaths[pathKey] = selectedPath
-            textField.text = selectedPath.toString()
-        }
-    }
-
-    private fun clearSpecificPaths() {
-        officePathTextField.text = ""
-        educationPathTextField.text = ""
-        communicationPathTextField.text = ""
-        configurationPathTextField.text = ""
-        jobPathTextField.text = ""
-
-        selectedPaths.remove("office")
-        selectedPaths.remove("education")
-        selectedPaths.remove("communication")
-        selectedPaths.remove("configuration")
-        selectedPaths.remove("job")
-    }
-
-    private fun handleCreateWorkspace() {
-//        context.beanDefinitionNames.forEach(::i)
-        when {
-            workspacePathTextField.text.isEmpty() -> {
-                showMessageDialog(
-                    this,
-                    "Please select a workspace directory",
-                    "Validation Error",
-                    ERROR_MESSAGE
-                )
-                return
-            }
-
-            else -> try {
-                i("Creating workspace... : $currentInstallationType")
-                when {
-                    currentInstallationType == SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace()
-                    else -> createAllInOneWorkspace()
-                }
-
-                showMessageDialog(
-                    this,
-                    "Workspace created successfully!",
-                    "Success",
-                    INFORMATION_MESSAGE
-                )
-            } catch (e: Exception) {
-                showMessageDialog(
-                    this,
-                    "Error creating workspace: " + e.message,
-                    "Error",
-                    ERROR_MESSAGE
-                )
-            }
-        }
-    }
-
-    private fun Setup.createSeparatedFoldersWorkspace() {
-        // Validate all required paths are selected
-        val requiredPaths = arrayOf("office", "education", "communication", "configuration", "job")
-        for (path in requiredPaths) {
-            check(!(!selectedPaths.containsKey(path) || selectedPaths[path] == null)) { "All paths must be selected for separated folders installation" }
-        }
-
-        // TODO: Implement the actual creation of separated folders
-        // You can access the paths using selectedPaths.get("office") etc.
-    }
-
-    private fun Setup.createAllInOneWorkspace() {
-        val workspacePath = Paths.get(workspacePathTextField.text)
-        // TODO: Implement the creation of an all-in-one workspace
-        // This would typically involve creating subdirectories in the main workspace
     }
 
     enum class InstallationType {
@@ -256,7 +148,124 @@ class Setup(
             }
         }
 
-        internal fun Setup.setWorkspaceEntriesVisibility(visible: Boolean) {
+        private fun Setup.clearSpecificPaths() {
+            officePathTextField.text = ""
+            educationPathTextField.text = ""
+            communicationPathTextField.text = ""
+            configurationPathTextField.text = ""
+            jobPathTextField.text = ""
+
+            selectedPaths.remove("office")
+            selectedPaths.remove("education")
+            selectedPaths.remove("communication")
+            selectedPaths.remove("configuration")
+            selectedPaths.remove("job")
+        }
+
+        private fun Setup.handleCreateWorkspace() {
+            when {
+                workspacePathTextField.text.isEmpty() -> {
+                    showMessageDialog(
+                        this,
+                        "Please select a workspace directory",
+                        "Validation Error",
+                        ERROR_MESSAGE
+                    )
+                    return
+                }
+
+                else -> try {
+                    i("Creating workspace... : $currentInstallationType")
+                    when {
+                        currentInstallationType == SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace()
+                        else -> createAllInOneWorkspace()
+                    }
+
+                    showMessageDialog(
+                        this,
+                        "Workspace created successfully!",
+                        "Success",
+                        INFORMATION_MESSAGE
+                    )
+                } catch (e: Exception) {
+                    showMessageDialog(
+                        this,
+                        "Error creating workspace: " + e.message,
+                        "Error",
+                        ERROR_MESSAGE
+                    )
+                }
+            }
+        }
+
+        private fun Setup.createSeparatedFoldersWorkspace() {
+            // Validate all required paths are selected
+            val requiredPaths = arrayOf("office", "education", "communication", "configuration", "job")
+            for (path in requiredPaths) {
+                check(!(!selectedPaths.containsKey(path) || selectedPaths[path] == null)) { "All paths must be selected for separated folders installation" }
+            }
+
+            // TODO: Implement the actual creation of separated folders
+            // You can access the paths using selectedPaths.get("office") etc.
+        }
+
+
+        private fun Setup.selectDirectory(pathKey: String, textField: JTextField) {
+            val chooser = JFileChooser()
+            chooser.fileSelectionMode = DIRECTORIES_ONLY
+            chooser.dialogTitle = "Select Directory"
+
+            if (chooser.showOpenDialog(this) == APPROVE_OPTION) {
+                val selectedFile = chooser.selectedFile
+                val selectedPath = selectedFile.toPath()
+                selectedPaths[pathKey] = selectedPath
+                textField.text = selectedPath.toString()
+            }
+        }
+
+        private fun Setup.handleInstallationTypeChange(type: InstallationType) {
+            "currentInstallationType : $currentInstallationType".run(::i)
+            currentInstallationType = type
+            "Installation type changed to $type".run(::i)
+            setWorkspaceEntriesVisibility(type == SEPARATED_FOLDERS)
+            if (type == ALL_IN_ONE) {
+                // Clear all specific paths when switching to all-in-one
+                clearSpecificPaths()
+            }
+        }
+
+        internal fun Setup.createAllInOneWorkspace() {
+            val workspacePath = Paths.get(workspacePathTextField.text)
+            // TODO: Implement the creation of an all-in-one workspace
+            // This would typically involve creating subdirectories in the main workspace
+        }
+
+        internal fun Setup.addListeners(): Setup {
+            splitWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
+            allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
+            browseCommunicationPathButton.addActionListener {
+                selectDirectory(
+                    "communication",
+                    communicationPathTextField
+                )
+            }
+            browseConfigurationPathButton.addActionListener {
+                selectDirectory(
+                    "configuration",
+                    configurationPathTextField
+                )
+            }
+            browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
+            browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
+            browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
+            browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
+            createWorkspaceButton.addActionListener { handleCreateWorkspace() }
+            installationTypeGroup.selection.addActionListener {
+            }
+            return this
+        }
+
+        private fun Setup.setWorkspaceEntriesVisibility(visible: Boolean): Setup {
             officePathLabel.isVisible = visible
             officePathTextField.isVisible = visible
             browseOfficePathButton.isVisible = visible
@@ -276,9 +285,11 @@ class Setup(
             jobPathLabel.isVisible = visible
             jobPathTextField.isVisible = visible
             browsejobPathButton.isVisible = visible
+
+            return this
         }
 
-        fun Setup.initUI() {
+        internal fun Setup.initUI(): Setup {
             name = "setupFrame" // NOI18N
             defaultCloseOperation = EXIT_ON_CLOSE
             setWorkspaceEntriesVisibility(false)
@@ -673,6 +684,7 @@ class Setup(
                     )
                 }
             }
+            return this
         }
     }
 }
