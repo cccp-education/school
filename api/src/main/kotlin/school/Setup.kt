@@ -1,17 +1,19 @@
 package school
 
-import org.springframework.boot.SpringApplication.run
+import org.springframework.boot.SpringApplication
 import org.springframework.context.ApplicationContext
 import school.Setup.InstallationType.ALL_IN_ONE
 import school.Setup.InstallationType.SEPARATED_FOLDERS
-import java.awt.EventQueue.invokeLater
+import school.Setup.SetupHelper.initUI
+import school.Setup.SetupHelper.setWorkspaceEntriesVisibility
+import java.awt.EventQueue
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-import java.util.logging.Level.SEVERE
+import java.util.logging.Level
 import java.util.logging.Logger
 import javax.swing.*
 import javax.swing.BorderFactory.createTitledBorder
@@ -20,18 +22,15 @@ import javax.swing.GroupLayout.DEFAULT_SIZE
 import javax.swing.GroupLayout.PREFERRED_SIZE
 import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
-import javax.swing.JFrame.EXIT_ON_CLOSE
 import javax.swing.JOptionPane.*
 import javax.swing.LayoutStyle.ComponentPlacement.RELATED
 import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
-import javax.swing.UIManager.getInstalledLookAndFeels
-import javax.swing.UIManager.setLookAndFeel
 import kotlin.Short.Companion.MAX_VALUE
 
 /**
  * @author cheroliv
  */
-open class Setup(
+class Setup(
     private val selectedPaths: MutableMap<String, Path?> = HashMap(),
     private var currentInstallationType: InstallationType = ALL_IN_ONE,
     internal val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
@@ -67,8 +66,8 @@ open class Setup(
         add(allInOneWorkspaceRadioButton)
         add(separatedEntriesWorkspaceRadioButton)
     },
+    private val context: ApplicationContext,
 ) : JFrame("School Project Setup") {
-    private lateinit var context: ApplicationContext
 
     // Service pour gérer les opérations sur le workspace
     private val workspaceService = WorkspaceService()
@@ -77,6 +76,21 @@ open class Setup(
         initUI()
         addListeners()
         this.pack()
+    }
+
+    private fun addListeners() {
+        separatedEntriesWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
+        allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
+        browseCommunicationPathButton.addActionListener { selectDirectory("communication", communicationPathTextField) }
+        browseConfigurationPathButton.addActionListener { selectDirectory("configuration", configurationPathTextField) }
+        browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
+        browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
+        browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
+        browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
+        createWorkspaceButton.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(evt: MouseEvent) = createWorkspaceButtonMouseClicked(evt)
+        })
+        createWorkspaceButton.addActionListener { handleCreateWorkspace() }
     }
 
     internal fun handleInstallationTypeChange(type: InstallationType) {
@@ -88,27 +102,6 @@ open class Setup(
         }
     }
 
-    internal fun setWorkspaceEntriesVisibility(visible: Boolean) {
-        officePathLabel.isVisible = visible
-        officePathTextField.isVisible = visible
-        browseOfficePathButton.isVisible = visible
-
-        educationPathLabel.isVisible = visible
-        educationPathTextField.isVisible = visible
-        browseEducationPathButton.isVisible = visible
-
-        communicationPathLabel.isVisible = visible
-        communicationPathTextField.isVisible = visible
-        browseCommunicationPathButton.isVisible = visible
-
-        configurationPathLabel.isVisible = visible
-        configurationPathTextField.isVisible = visible
-        browseConfigurationPathButton.isVisible = visible
-
-        jobPathLabel.isVisible = visible
-        jobPathTextField.isVisible = visible
-        browsejobPathButton.isVisible = visible
-    }
 
     internal fun selectDirectory(pathKey: String, textField: JTextField) {
         val chooser = JFileChooser()
@@ -247,443 +240,450 @@ open class Setup(
         }
     }
 
-    companion object {
+    object SetupHelper {
         @JvmStatic
         fun main(args: Array<String>) {
             setupLookAndFeel()
-            /* Create and display the form */
-            invokeLater {
-                Setup().run {
-                    isVisible = true
-                    context = run(Application::class.java, *args)
-                }
+            EventQueue.invokeLater {
+                Setup(context = SpringApplication.run(Application::class.java, *args)).run { isVisible = true }
             }
         }
 
         private fun setupLookAndFeel() {
             try {
-                getInstalledLookAndFeels()
+                UIManager.getInstalledLookAndFeels()
                     .find { it.name == "Nimbus" }
-                    ?.let { setLookAndFeel(it.className) }
+                    ?.let { UIManager.setLookAndFeel(it.className) }
             } catch (ex: ClassNotFoundException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
             } catch (ex: InstantiationException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
             } catch (ex: IllegalAccessException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
             } catch (ex: UnsupportedLookAndFeelException) {
-                Logger.getLogger(Setup::class.java.name).log(SEVERE, null, ex)
+                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
+            }
+        }
+
+        internal fun Setup.setWorkspaceEntriesVisibility(visible: Boolean) {
+            officePathLabel.isVisible = visible
+            officePathTextField.isVisible = visible
+            browseOfficePathButton.isVisible = visible
+
+            educationPathLabel.isVisible = visible
+            educationPathTextField.isVisible = visible
+            browseEducationPathButton.isVisible = visible
+
+            communicationPathLabel.isVisible = visible
+            communicationPathTextField.isVisible = visible
+            browseCommunicationPathButton.isVisible = visible
+
+            configurationPathLabel.isVisible = visible
+            configurationPathTextField.isVisible = visible
+            browseConfigurationPathButton.isVisible = visible
+
+            jobPathLabel.isVisible = visible
+            jobPathTextField.isVisible = visible
+            browsejobPathButton.isVisible = visible
+        }
+
+        fun Setup.initUI() {
+            name = "setupFrame" // NOI18N
+            defaultCloseOperation = EXIT_ON_CLOSE
+            setWorkspaceEntriesVisibility(false)
+            mutableSetOf(
+                browseEducationPathButton,
+                browseOfficePathButton,
+                browseCommunicationPathButton,
+                browseWorkspacePathButton,
+                browseConfigurationPathButton,
+                browsejobPathButton,
+            ).onEach { "Select directory".run(it::setText) }
+            workspaceTypePanel.apply {
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGap(0, 924, MAX_VALUE.toInt())
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        TRAILING, createSequentialGroup()
+                                            .addContainerGap()
+                                            .addComponent(
+                                                workspaceTypeSelectorPanel,
+                                                DEFAULT_SIZE,
+                                                DEFAULT_SIZE,
+                                                MAX_VALUE.toInt()
+                                            )
+                                            .addContainerGap()
+                                    )
+                            )
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        createSequentialGroup()
+                                            .addContainerGap()
+                                            .addComponent(
+                                                workspaceEntriesPanel,
+                                                DEFAULT_SIZE,
+                                                DEFAULT_SIZE,
+                                                MAX_VALUE.toInt()
+                                            )
+                                            .addContainerGap()
+                                    )
+                            )
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGap(0, 344, MAX_VALUE.toInt())
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        createSequentialGroup()
+                                            .addContainerGap()
+                                            .addComponent(
+                                                workspaceTypeSelectorPanel,
+                                                PREFERRED_SIZE,
+                                                DEFAULT_SIZE,
+                                                PREFERRED_SIZE
+                                            )
+                                            .addContainerGap(263, MAX_VALUE.toInt())
+                                    )
+                            )
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        TRAILING, createSequentialGroup()
+                                            .addContainerGap(69, MAX_VALUE.toInt())
+                                            .addComponent(
+                                                workspaceEntriesPanel,
+                                                PREFERRED_SIZE,
+                                                DEFAULT_SIZE,
+                                                PREFERRED_SIZE
+                                            )
+                                            .addContainerGap()
+                                    )
+                            )
+                    )
+                }
+            }
+            contentPane.apply {
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(workspaceTopPanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
+                                    .addContainerGap()
+                            )
+                            .addComponent(workspacePathPanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
+                            .addComponent(workspaceTypePanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addComponent(workspaceTopPanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
+                                    .addPreferredGap(RELATED)
+                                    .addComponent(workspacePathPanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
+                                    .addPreferredGap(RELATED)
+                                    .addComponent(workspaceTypePanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
+                                    .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
+                            )
+                    )
+                }
+            }
+            workspaceTypeSelectorPanel.apply {
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(allInOneWorkspaceRadioButton)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(separatedEntriesWorkspaceRadioButton)
+                                    .addContainerGap(508, MAX_VALUE.toInt())
+                            )
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(
+                                        createParallelGroup(BASELINE)
+                                            .addComponent(separatedEntriesWorkspaceRadioButton)
+                                            .addComponent(allInOneWorkspaceRadioButton)
+                                    )
+                                    .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
+                            )
+                    )
+                }
+            }
+            workspaceTopPanel.apply {
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(titleLabel)
+                                    .addPreferredGap(
+                                        RELATED,
+                                        DEFAULT_SIZE,
+                                        MAX_VALUE.toInt()
+                                    ).addComponent(createWorkspaceButton)
+                            )
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(
+                                        createParallelGroup(BASELINE)
+                                            .addComponent(titleLabel, PREFERRED_SIZE, 43, PREFERRED_SIZE)
+                                            .addComponent(createWorkspaceButton)
+                                    )
+                                    .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
+                            )
+                    )
+                }
+            }
+            workspacePathPanel.apply {
+                border = createTitledBorder("Workspace")
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(workspacePathLabel, PREFERRED_SIZE, 52, PREFERRED_SIZE)
+                                    .addPreferredGap(RELATED)
+                                    .addComponent(workspacePathTextField)
+                                    .addPreferredGap(RELATED)
+                                    .addComponent(browseWorkspacePathButton)
+                                    .addContainerGap()
+                            )
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGroup(
+                                createSequentialGroup()
+                                    .addContainerGap()
+                                    .addGroup(
+                                        createParallelGroup(BASELINE)
+                                            .addComponent(
+                                                workspacePathTextField,
+                                                PREFERRED_SIZE,
+                                                DEFAULT_SIZE,
+                                                PREFERRED_SIZE
+                                            )
+                                            .addComponent(browseWorkspacePathButton)
+                                            .addComponent(workspacePathLabel)
+                                    )
+                                    .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
+                            )
+                    )
+                }
+            }
+            workspaceEntriesPanel.apply {
+                run(::GroupLayout).run {
+                    this@apply.layout = this
+                    setHorizontalGroup(
+                        createParallelGroup(LEADING)
+                            .addGap(0, 912, MAX_VALUE.toInt())
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        createSequentialGroup()
+                                            .addContainerGap()
+                                            .addGroup(
+                                                createParallelGroup(LEADING, false)
+                                                    .addComponent(
+                                                        officePathLabel,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        educationPathLabel,
+                                                        TRAILING,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        communicationPathLabel,
+                                                        TRAILING,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        configurationPathLabel,
+                                                        TRAILING,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        jobPathLabel,
+                                                        TRAILING,
+                                                        PREFERRED_SIZE,
+                                                        190,
+                                                        PREFERRED_SIZE
+                                                    )
+                                            )
+                                            .addPreferredGap(RELATED)
+                                            .addGroup(
+                                                createParallelGroup(LEADING)
+                                                    .addComponent(
+                                                        officePathTextField,
+                                                        TRAILING,
+                                                        DEFAULT_SIZE,
+                                                        475,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(educationPathTextField)
+                                                    .addComponent(communicationPathTextField)
+                                                    .addComponent(configurationPathTextField)
+                                                    .addComponent(jobPathTextField)
+                                            )
+                                            .addPreferredGap(RELATED)
+                                            .addGroup(
+                                                createParallelGroup(LEADING)
+                                                    .addComponent(browseEducationPathButton)
+                                                    .addComponent(browseOfficePathButton, TRAILING)
+                                                    .addComponent(browseCommunicationPathButton)
+                                                    .addComponent(browseConfigurationPathButton)
+                                                    .addComponent(browsejobPathButton)
+                                            )
+                                            .addContainerGap()
+                                    )
+                            )
+                    )
+                    setVerticalGroup(
+                        createParallelGroup(LEADING)
+                            .addGap(0, 269, MAX_VALUE.toInt())
+                            .addGroup(
+                                createParallelGroup(LEADING)
+                                    .addGroup(
+                                        createSequentialGroup()
+                                            .addGap(3, 3, 3)
+                                            .addGroup(
+                                                createParallelGroup(BASELINE)
+                                                    .addComponent(officePathLabel, PREFERRED_SIZE, 42, PREFERRED_SIZE)
+                                                    .addComponent(
+                                                        browseOfficePathButton,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        officePathTextField,
+                                                        PREFERRED_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        PREFERRED_SIZE
+                                                    )
+                                            )
+                                            .addPreferredGap(UNRELATED)
+                                            .addGroup(
+                                                createParallelGroup(BASELINE)
+                                                    .addComponent(
+                                                        browseEducationPathButton,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        educationPathTextField,
+                                                        PREFERRED_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        PREFERRED_SIZE
+                                                    )
+                                                    .addComponent(
+                                                        educationPathLabel,
+                                                        PREFERRED_SIZE,
+                                                        42,
+                                                        PREFERRED_SIZE
+                                                    )
+                                            )
+                                            .addPreferredGap(UNRELATED)
+                                            .addGroup(
+                                                createParallelGroup(BASELINE)
+                                                    .addComponent(
+                                                        browseCommunicationPathButton,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        communicationPathTextField,
+                                                        PREFERRED_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        PREFERRED_SIZE
+                                                    )
+                                                    .addComponent(
+                                                        communicationPathLabel,
+                                                        PREFERRED_SIZE,
+                                                        42,
+                                                        PREFERRED_SIZE
+                                                    )
+                                            )
+                                            .addPreferredGap(UNRELATED)
+                                            .addGroup(
+                                                createParallelGroup(BASELINE)
+                                                    .addComponent(
+                                                        browseConfigurationPathButton,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        configurationPathTextField,
+                                                        PREFERRED_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        PREFERRED_SIZE
+                                                    )
+                                                    .addComponent(
+                                                        configurationPathLabel,
+                                                        PREFERRED_SIZE,
+                                                        42,
+                                                        PREFERRED_SIZE
+                                                    )
+                                            )
+                                            .addPreferredGap(UNRELATED)
+                                            .addGroup(
+                                                createParallelGroup(BASELINE)
+                                                    .addComponent(
+                                                        browsejobPathButton,
+                                                        DEFAULT_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        MAX_VALUE.toInt()
+                                                    )
+                                                    .addComponent(
+                                                        jobPathTextField,
+                                                        PREFERRED_SIZE,
+                                                        DEFAULT_SIZE,
+                                                        PREFERRED_SIZE
+                                                    )
+                                                    .addComponent(jobPathLabel, PREFERRED_SIZE, 42, PREFERRED_SIZE)
+                                            )
+                                            .addGap(3, 3, 3)
+                                    )
+                            )
+                    )
+                }
             }
         }
     }
-
 }
 
-fun Setup.addListeners(){
-    separatedEntriesWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
-    allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
-    browseCommunicationPathButton.addActionListener { selectDirectory("communication", communicationPathTextField) }
-    browseConfigurationPathButton.addActionListener { selectDirectory("configuration", configurationPathTextField) }
-    browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
-    browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
-    browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
-    browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
-    createWorkspaceButton.addMouseListener(object : MouseAdapter() {
-        override fun mouseClicked(evt: MouseEvent) = createWorkspaceButtonMouseClicked(evt)
-    })
-    createWorkspaceButton.addActionListener { handleCreateWorkspace() }
 
-}
-
-fun Setup.initUI(){
-    name = "setupFrame" // NOI18N
-    defaultCloseOperation = EXIT_ON_CLOSE
-    setWorkspaceEntriesVisibility(false)
-    mutableSetOf(
-        browseEducationPathButton,
-        browseOfficePathButton,
-        browseCommunicationPathButton,
-        browseWorkspacePathButton,
-        browseConfigurationPathButton,
-        browsejobPathButton,
-    ).onEach { "Select directory".run(it::setText) }
-    workspaceTypePanel.apply {
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGap(0, 924, MAX_VALUE.toInt())
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                TRAILING, createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(
-                                        workspaceTypeSelectorPanel,
-                                        DEFAULT_SIZE,
-                                        DEFAULT_SIZE,
-                                        MAX_VALUE.toInt()
-                                    )
-                                    .addContainerGap()
-                            )
-                    )
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(
-                                        workspaceEntriesPanel,
-                                        DEFAULT_SIZE,
-                                        DEFAULT_SIZE,
-                                        MAX_VALUE.toInt()
-                                    )
-                                    .addContainerGap()
-                            )
-                    )
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGap(0, 344, MAX_VALUE.toInt())
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(
-                                        workspaceTypeSelectorPanel,
-                                        PREFERRED_SIZE,
-                                        DEFAULT_SIZE,
-                                        PREFERRED_SIZE
-                                    )
-                                    .addContainerGap(263, MAX_VALUE.toInt())
-                            )
-                    )
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                TRAILING, createSequentialGroup()
-                                    .addContainerGap(69, MAX_VALUE.toInt())
-                                    .addComponent(
-                                        workspaceEntriesPanel,
-                                        PREFERRED_SIZE,
-                                        DEFAULT_SIZE,
-                                        PREFERRED_SIZE
-                                    )
-                                    .addContainerGap()
-                            )
-                    )
-            )
-        }
-    }
-    contentPane.apply {
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addComponent(workspaceTopPanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
-                            .addContainerGap()
-                    )
-                    .addComponent(workspacePathPanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
-                    .addComponent(workspaceTypePanel, DEFAULT_SIZE, DEFAULT_SIZE, MAX_VALUE.toInt())
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addComponent(workspaceTopPanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
-                            .addPreferredGap(RELATED)
-                            .addComponent(workspacePathPanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
-                            .addPreferredGap(RELATED)
-                            .addComponent(workspaceTypePanel, PREFERRED_SIZE, DEFAULT_SIZE, PREFERRED_SIZE)
-                            .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
-                    )
-            )
-        }
-    }
-    workspaceTypeSelectorPanel.apply {
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(allInOneWorkspaceRadioButton)
-                            .addGap(18, 18, 18)
-                            .addComponent(separatedEntriesWorkspaceRadioButton)
-                            .addContainerGap(508, MAX_VALUE.toInt())
-                    )
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(
-                                createParallelGroup(BASELINE)
-                                    .addComponent(separatedEntriesWorkspaceRadioButton)
-                                    .addComponent(allInOneWorkspaceRadioButton)
-                            )
-                            .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
-                    )
-            )
-        }
-    }
-    workspaceTopPanel.apply {
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(titleLabel)
-                            .addPreferredGap(
-                                RELATED,
-                                DEFAULT_SIZE,
-                                MAX_VALUE.toInt()
-                            ).addComponent(createWorkspaceButton)
-                    )
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(
-                                createParallelGroup(BASELINE)
-                                    .addComponent(titleLabel, PREFERRED_SIZE, 43, PREFERRED_SIZE)
-                                    .addComponent(createWorkspaceButton)
-                            )
-                            .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
-                    )
-            )
-        }
-    }
-    workspacePathPanel.apply {
-        border = createTitledBorder("Workspace")
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(workspacePathLabel, PREFERRED_SIZE, 52, PREFERRED_SIZE)
-                            .addPreferredGap(RELATED)
-                            .addComponent(workspacePathTextField)
-                            .addPreferredGap(RELATED)
-                            .addComponent(browseWorkspacePathButton)
-                            .addContainerGap()
-                    )
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGroup(
-                        createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(
-                                createParallelGroup(BASELINE)
-                                    .addComponent(
-                                        workspacePathTextField,
-                                        PREFERRED_SIZE,
-                                        DEFAULT_SIZE,
-                                        PREFERRED_SIZE
-                                    )
-                                    .addComponent(browseWorkspacePathButton)
-                                    .addComponent(workspacePathLabel)
-                            )
-                            .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
-                    )
-            )
-        }
-    }
-    workspaceEntriesPanel.apply {
-        run(::GroupLayout).run {
-            this@apply.layout = this
-            setHorizontalGroup(
-                createParallelGroup(LEADING)
-                    .addGap(0, 912, MAX_VALUE.toInt())
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                createSequentialGroup()
-                                    .addContainerGap()
-                                    .addGroup(
-                                        createParallelGroup(LEADING, false)
-                                            .addComponent(
-                                                officePathLabel,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                educationPathLabel,
-                                                TRAILING,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                communicationPathLabel,
-                                                TRAILING,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                configurationPathLabel,
-                                                TRAILING,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                jobPathLabel,
-                                                TRAILING,
-                                                PREFERRED_SIZE,
-                                                190,
-                                                PREFERRED_SIZE
-                                            )
-                                    )
-                                    .addPreferredGap(RELATED)
-                                    .addGroup(
-                                        createParallelGroup(LEADING)
-                                            .addComponent(
-                                                officePathTextField,
-                                                TRAILING,
-                                                DEFAULT_SIZE,
-                                                475,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(educationPathTextField)
-                                            .addComponent(communicationPathTextField)
-                                            .addComponent(configurationPathTextField)
-                                            .addComponent(jobPathTextField)
-                                    )
-                                    .addPreferredGap(RELATED)
-                                    .addGroup(
-                                        createParallelGroup(LEADING)
-                                            .addComponent(browseEducationPathButton)
-                                            .addComponent(browseOfficePathButton, TRAILING)
-                                            .addComponent(browseCommunicationPathButton)
-                                            .addComponent(browseConfigurationPathButton)
-                                            .addComponent(browsejobPathButton)
-                                    )
-                                    .addContainerGap()
-                            )
-                    )
-            )
-            setVerticalGroup(
-                createParallelGroup(LEADING)
-                    .addGap(0, 269, MAX_VALUE.toInt())
-                    .addGroup(
-                        createParallelGroup(LEADING)
-                            .addGroup(
-                                createSequentialGroup()
-                                    .addGap(3, 3, 3)
-                                    .addGroup(
-                                        createParallelGroup(BASELINE)
-                                            .addComponent(officePathLabel, PREFERRED_SIZE, 42, PREFERRED_SIZE)
-                                            .addComponent(
-                                                browseOfficePathButton,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                officePathTextField,
-                                                PREFERRED_SIZE,
-                                                DEFAULT_SIZE,
-                                                PREFERRED_SIZE
-                                            )
-                                    )
-                                    .addPreferredGap(UNRELATED)
-                                    .addGroup(
-                                        createParallelGroup(BASELINE)
-                                            .addComponent(
-                                                browseEducationPathButton,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                educationPathTextField,
-                                                PREFERRED_SIZE,
-                                                DEFAULT_SIZE,
-                                                PREFERRED_SIZE
-                                            )
-                                            .addComponent(educationPathLabel, PREFERRED_SIZE, 42, PREFERRED_SIZE)
-                                    )
-                                    .addPreferredGap(UNRELATED)
-                                    .addGroup(
-                                        createParallelGroup(BASELINE)
-                                            .addComponent(
-                                                browseCommunicationPathButton,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                communicationPathTextField,
-                                                PREFERRED_SIZE,
-                                                DEFAULT_SIZE,
-                                                PREFERRED_SIZE
-                                            )
-                                            .addComponent(
-                                                communicationPathLabel,
-                                                PREFERRED_SIZE,
-                                                42,
-                                                PREFERRED_SIZE
-                                            )
-                                    )
-                                    .addPreferredGap(UNRELATED)
-                                    .addGroup(
-                                        createParallelGroup(BASELINE)
-                                            .addComponent(
-                                                browseConfigurationPathButton,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                configurationPathTextField,
-                                                PREFERRED_SIZE,
-                                                DEFAULT_SIZE,
-                                                PREFERRED_SIZE
-                                            )
-                                            .addComponent(
-                                                configurationPathLabel,
-                                                PREFERRED_SIZE,
-                                                42,
-                                                PREFERRED_SIZE
-                                            )
-                                    )
-                                    .addPreferredGap(UNRELATED)
-                                    .addGroup(
-                                        createParallelGroup(BASELINE)
-                                            .addComponent(
-                                                browsejobPathButton,
-                                                DEFAULT_SIZE,
-                                                DEFAULT_SIZE,
-                                                MAX_VALUE.toInt()
-                                            )
-                                            .addComponent(
-                                                jobPathTextField,
-                                                PREFERRED_SIZE,
-                                                DEFAULT_SIZE,
-                                                PREFERRED_SIZE
-                                            )
-                                            .addComponent(jobPathLabel, PREFERRED_SIZE, 42, PREFERRED_SIZE)
-                                    )
-                                    .addGap(3, 3, 3)
-                            )
-                    )
-            )
-        }
-    }
-
-}
