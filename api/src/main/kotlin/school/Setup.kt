@@ -6,13 +6,11 @@ import school.Setup.InstallationType.ALL_IN_ONE
 import school.Setup.InstallationType.SEPARATED_FOLDERS
 import school.Setup.SetupHelper.initUI
 import school.Setup.SetupHelper.setWorkspaceEntriesVisibility
+import school.base.utils.Log.i
 import java.awt.EventQueue.invokeLater
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 import javax.swing.*
@@ -31,6 +29,7 @@ import kotlin.Short.Companion.MAX_VALUE
  * @author cheroliv
  */
 class Setup(
+    private val context: ApplicationContext,
     private val selectedPaths: MutableMap<String, Path?> = HashMap(),
     private var currentInstallationType: InstallationType = ALL_IN_ONE,
     internal val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
@@ -51,7 +50,7 @@ class Setup(
     internal val workspaceTopPanel: JPanel = JPanel(),
     internal val workspacePathPanel: JPanel = JPanel().apply { border = createTitledBorder("Workspace") },
     internal val workspaceEntriesPanel: JPanel = JPanel(),
-    internal val separatedEntriesWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders").apply {
+    internal val splitWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders").apply {
         isSelected = false
     },
     internal val allInOneWorkspaceRadioButton: JRadioButton = JRadioButton("All-in-one").apply { isSelected = true },
@@ -64,9 +63,8 @@ class Setup(
     internal val createWorkspaceButton: JButton = JButton("Create"),
     private val installationTypeGroup: ButtonGroup = ButtonGroup().apply {
         add(allInOneWorkspaceRadioButton)
-        add(separatedEntriesWorkspaceRadioButton)
+        add(splitWorkspaceRadioButton)
     },
-    private val context: ApplicationContext,
 ) : JFrame("School Project Setup") {
 
     // Service pour gérer les opérations sur le workspace
@@ -76,26 +74,28 @@ class Setup(
         initUI()
         addListeners()
         this.pack()
+        "Init, currentInstallationType : $currentInstallationType".run(::i)
     }
 
     private fun addListeners() {
-        separatedEntriesWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
-        allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
+        splitWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
+        allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
         browseCommunicationPathButton.addActionListener { selectDirectory("communication", communicationPathTextField) }
         browseConfigurationPathButton.addActionListener { selectDirectory("configuration", configurationPathTextField) }
         browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
         browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
         browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
         browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
-        createWorkspaceButton.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(evt: MouseEvent) = createWorkspaceButtonMouseClicked(evt)
-        })
         createWorkspaceButton.addActionListener { handleCreateWorkspace() }
+        installationTypeGroup.selection.addActionListener {
+        }
     }
 
     private fun handleInstallationTypeChange(type: InstallationType) {
+        "currentInstallationType : $currentInstallationType".run(::i)
         currentInstallationType = type
-        setWorkspaceEntriesVisibility(type == ALL_IN_ONE)
+        "Installation type changed to $type".run(::i)
+        setWorkspaceEntriesVisibility(type == SEPARATED_FOLDERS)
         if (type == ALL_IN_ONE) {
             // Clear all specific paths when switching to all-in-one
             clearSpecificPaths()
@@ -130,6 +130,7 @@ class Setup(
     }
 
     private fun handleCreateWorkspace() {
+//        context.beanDefinitionNames.forEach(::i)
         when {
             workspacePathTextField.text.isEmpty() -> {
                 showMessageDialog(
@@ -142,6 +143,7 @@ class Setup(
             }
 
             else -> try {
+                i("Creating workspace... : $currentInstallationType")
                 when {
                     currentInstallationType == SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace()
                     else -> createAllInOneWorkspace()
@@ -179,13 +181,6 @@ class Setup(
         val workspacePath = Paths.get(workspacePathTextField.text)
         // TODO: Implement the creation of an all-in-one workspace
         // This would typically involve creating subdirectories in the main workspace
-    }
-
-    internal fun createWorkspaceButtonMouseClicked(evt: MouseEvent) {
-        // TODO: add your handling code here
-        Arrays.stream(context.beanDefinitionNames)
-            .sequential()
-            .forEach { x: String? -> println(x) }
     }
 
     enum class InstallationType {
@@ -401,7 +396,7 @@ class Setup(
                                     .addContainerGap()
                                     .addComponent(allInOneWorkspaceRadioButton)
                                     .addGap(18, 18, 18)
-                                    .addComponent(separatedEntriesWorkspaceRadioButton)
+                                    .addComponent(splitWorkspaceRadioButton)
                                     .addContainerGap(508, MAX_VALUE.toInt())
                             )
                     )
@@ -412,7 +407,7 @@ class Setup(
                                     .addContainerGap()
                                     .addGroup(
                                         createParallelGroup(BASELINE)
-                                            .addComponent(separatedEntriesWorkspaceRadioButton)
+                                            .addComponent(splitWorkspaceRadioButton)
                                             .addComponent(allInOneWorkspaceRadioButton)
                                     )
                                     .addContainerGap(DEFAULT_SIZE, MAX_VALUE.toInt())
