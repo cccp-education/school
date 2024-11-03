@@ -166,7 +166,7 @@ class Setup(
         }
     }
 
-    private fun createSeparatedFoldersWorkspace() {
+    private fun Setup.createSeparatedFoldersWorkspace() {
         // Validate all required paths are selected
         val requiredPaths = arrayOf("office", "education", "communication", "configuration", "job")
         for (path in requiredPaths) {
@@ -177,7 +177,7 @@ class Setup(
         // You can access the paths using selectedPaths.get("office") etc.
     }
 
-    private fun createAllInOneWorkspace() {
+    private fun Setup.createAllInOneWorkspace() {
         val workspacePath = Paths.get(workspacePathTextField.text)
         // TODO: Implement the creation of an all-in-one workspace
         // This would typically involve creating subdirectories in the main workspace
@@ -290,9 +290,9 @@ class Setup(
                 browseConfigurationPathButton,
                 browsejobPathButton,
             ).onEach { "Select directory".run(it::setText) }
-            workspaceTypePanel.apply {
+            workspaceTypePanel.apply panel@{
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGap(0, 924, MAX_VALUE.toInt())
@@ -359,9 +359,9 @@ class Setup(
                     )
                 }
             }
-            contentPane.apply {
+            contentPane.apply panel@{
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGroup(
@@ -386,9 +386,9 @@ class Setup(
                     )
                 }
             }
-            workspaceTypeSelectorPanel.apply {
+            workspaceTypeSelectorPanel.apply panel@{
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGroup(
@@ -415,9 +415,9 @@ class Setup(
                     )
                 }
             }
-            workspaceTopPanel.apply {
+            workspaceTopPanel.apply panel@{
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGroup(
@@ -446,10 +446,10 @@ class Setup(
                     )
                 }
             }
-            workspacePathPanel.apply {
+            workspacePathPanel.apply panel@{
                 border = createTitledBorder("Workspace")
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGroup(
@@ -484,9 +484,9 @@ class Setup(
                     )
                 }
             }
-            workspaceEntriesPanel.apply {
+            workspaceEntriesPanel.apply panel@{
                 run(::GroupLayout).run {
-                    this@apply.layout = this
+                    this@panel.layout = this
                     setHorizontalGroup(
                         createParallelGroup(LEADING)
                             .addGap(0, 912, MAX_VALUE.toInt())
