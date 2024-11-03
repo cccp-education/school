@@ -1,12 +1,12 @@
 package school
 
-import org.springframework.boot.SpringApplication
+import org.springframework.boot.SpringApplication.run
 import org.springframework.context.ApplicationContext
 import school.Setup.InstallationType.ALL_IN_ONE
 import school.Setup.InstallationType.SEPARATED_FOLDERS
 import school.Setup.SetupHelper.initUI
 import school.Setup.SetupHelper.setWorkspaceEntriesVisibility
-import java.awt.EventQueue
+import java.awt.EventQueue.invokeLater
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -93,7 +93,7 @@ class Setup(
         createWorkspaceButton.addActionListener { handleCreateWorkspace() }
     }
 
-    internal fun handleInstallationTypeChange(type: InstallationType) {
+    private fun handleInstallationTypeChange(type: InstallationType) {
         currentInstallationType = type
         setWorkspaceEntriesVisibility(type == ALL_IN_ONE)
         if (type == ALL_IN_ONE) {
@@ -102,8 +102,7 @@ class Setup(
         }
     }
 
-
-    internal fun selectDirectory(pathKey: String, textField: JTextField) {
+    private fun selectDirectory(pathKey: String, textField: JTextField) {
         val chooser = JFileChooser()
         chooser.fileSelectionMode = DIRECTORIES_ONLY
         chooser.dialogTitle = "Select Directory"
@@ -130,7 +129,7 @@ class Setup(
         selectedPaths.remove("job")
     }
 
-    internal fun handleCreateWorkspace() {
+    private fun handleCreateWorkspace() {
         when {
             workspacePathTextField.text.isEmpty() -> {
                 showMessageDialog(
@@ -181,7 +180,6 @@ class Setup(
         // TODO: Implement the creation of an all-in-one workspace
         // This would typically involve creating subdirectories in the main workspace
     }
-
 
     internal fun createWorkspaceButtonMouseClicked(evt: MouseEvent) {
         // TODO: add your handling code here
@@ -244,9 +242,7 @@ class Setup(
         @JvmStatic
         fun main(args: Array<String>) {
             setupLookAndFeel()
-            EventQueue.invokeLater {
-                Setup(context = SpringApplication.run(Application::class.java, *args)).run { isVisible = true }
-            }
+            invokeLater { Setup(context = run(Application::class.java, *args)).run { isVisible = true } }
         }
 
         private fun setupLookAndFeel() {
