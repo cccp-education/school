@@ -36,6 +36,7 @@ dependencyResolutionManagement {
         maven("https://maven.xillio.com/artifactory/libs-release/")
         maven("https://mvnrepository.com/repos/springio-plugins-release")
         maven("https://archiva-repository.apache.org/archiva/repository/public/")
+        maven ("https://plugins.gradle.org/m2/")
     }
 }
 
