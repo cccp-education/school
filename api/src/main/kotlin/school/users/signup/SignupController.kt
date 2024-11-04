@@ -29,6 +29,7 @@ class SignupController {
            if (isNotEmpty()) return signupProblems.badResponse(this)
        }.run {
            when {
+           //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
                signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
                else -> {

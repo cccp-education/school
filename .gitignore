@@ -1,3 +1,5 @@
+.settings
+.project
 launch4j-3.50-linux-x64.tgz
 cli_springboot_conversation.adoc
 config.yml
