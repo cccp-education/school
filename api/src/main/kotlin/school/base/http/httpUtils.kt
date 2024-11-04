@@ -1,7 +1,7 @@
 package school.base.http
 
 //import school.base.security.Security
-import jakarta.validation.Validation
+import jakarta.validation.Validation.byProvider
 import jakarta.validation.Validator
 import org.hibernate.validator.HibernateValidator
 import org.springframework.http.HttpStatus
@@ -31,7 +31,7 @@ import java.util.Locale.forLanguageTag
 
 
 val ServerWebExchange.validator: Validator
-    get() = Validation.byProvider(HibernateValidator::class.java)
+    get() = byProvider(HibernateValidator::class.java)
         .configure()
         .localeResolver {
             try {

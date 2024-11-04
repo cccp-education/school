@@ -10,7 +10,28 @@ data class ProblemsModel(
     val fieldErrors: MutableSet<Map<String, String>> = mutableSetOf()
 )
 
+/*
+package community.base.http
 
+
+import jakarta.validation.Validation.byProvider
+import jakarta.validation.Validator
+import org.hibernate.validator.HibernateValidator
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ProblemDetail.forStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.badRequest
+import org.springframework.http.ResponseEntity.internalServerError
+import org.springframework.web.server.ServerWebExchange
+import java.net.URI
+import java.util.Locale.ENGLISH
+import java.util.Locale.of
+
+
+
+ */
 //import org.springframework.base.env.Environment
 //import org.springframework.http.ProblemDetail
 //import org.springframework.http.ResponseEntity
@@ -433,63 +454,4 @@ public class BookmarkNotFoundException extends ErrorResponseException {
 
 /*=================================================================================*/
 
-/*
-package community.base.http
 
-
-import jakarta.validation.Validation.byProvider
-import jakarta.validation.Validator
-import org.hibernate.validator.HibernateValidator
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ProblemDetail.forStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.badRequest
-import org.springframework.http.ResponseEntity.internalServerError
-import org.springframework.web.server.ServerWebExchange
-import java.net.URI
-import java.util.Locale.ENGLISH
-import java.util.Locale.of
-
-
-//TODO: i18n
-fun ProblemsModel.serverErrorResponse(error: String)
-        : ResponseEntity<ProblemDetail> = internalServerError()
-    .body(forStatus(INTERNAL_SERVER_ERROR).apply {
-        type = URI(this@serverErrorResponse.type)
-        title = title
-        status = INTERNAL_SERVER_ERROR.value()
-        setProperty("path", path)
-        setProperty("message", message)
-        setProperty("error", error)
-    })
-
-val ServerWebExchange.validator: Validator
-    get() = byProvider(HibernateValidator::class.java)
-        .configure()
-        .localeResolver {
-            try {
-                of(
-                    request.headers.acceptLanguage.first().range
-                )
-            } catch (e: Exception) {
-                ENGLISH
-            }
-        }.buildValidatorFactory()
-        .validator
-
-
-
-fun ProblemsModel.badResponse(
-    fieldErrors: Set<Map<String, String?>>
-) = badRequest()
-    .body(forStatus(BAD_REQUEST).apply {
-        type = URI(this@badResponse.type)
-        title = title
-        status = BAD_REQUEST.value()
-        setProperty("path", path)
-        setProperty("message", message)
-        setProperty("fieldErrors", fieldErrors)
-    })
- */
