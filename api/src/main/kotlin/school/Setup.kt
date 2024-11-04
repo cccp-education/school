@@ -4,15 +4,13 @@ import org.springframework.boot.SpringApplication.run
 import org.springframework.context.ApplicationContext
 import school.Setup.InstallationType.ALL_IN_ONE
 import school.Setup.InstallationType.SEPARATED_FOLDERS
-import school.Setup.SetupHelper.addListeners
 import school.Setup.SetupHelper.initUI
 import school.base.utils.Log.i
+import school.base.utils.Log.w
 import java.awt.EventQueue.invokeLater
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.swing.*
 import javax.swing.BorderFactory.createTitledBorder
 import javax.swing.GroupLayout.Alignment.*
@@ -23,6 +21,8 @@ import javax.swing.JFileChooser.DIRECTORIES_ONLY
 import javax.swing.JOptionPane.*
 import javax.swing.LayoutStyle.ComponentPlacement.RELATED
 import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
+import javax.swing.UIManager.getInstalledLookAndFeels
+import javax.swing.UIManager.setLookAndFeel
 import kotlin.Short.Companion.MAX_VALUE
 
 /**
@@ -126,26 +126,27 @@ class Setup(
 
     object SetupHelper {
         @JvmStatic
-        fun main(args: Array<String>) {
-            setupLookAndFeel()
-            invokeLater { Setup(context = run(Application::class.java, *args)).run { isVisible = true } }
-        }
-
-        private fun setupLookAndFeel() {
-            try {
-                UIManager.getInstalledLookAndFeels()
-                    .find { it.name == "Nimbus" }
-                    ?.let { UIManager.setLookAndFeel(it.className) }
-            } catch (ex: ClassNotFoundException) {
-                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
-            } catch (ex: InstantiationException) {
-                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
-            } catch (ex: IllegalAccessException) {
-                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
-            } catch (ex: UnsupportedLookAndFeelException) {
-                Logger.getLogger(Setup::class.java.name).log(Level.SEVERE, null, ex)
+        fun main(args: Array<String>) = try {
+            getInstalledLookAndFeels()
+                .find { it.name == "Nimbus" }
+                ?.let { setLookAndFeel(it.className) }
+        } catch (ex: Exception) {
+            when (ex) {
+                is ClassNotFoundException,
+                is InstantiationException,
+                is IllegalAccessException,
+                is UnsupportedLookAndFeelException -> w("", ex)
+                // Rethrow unknown exceptions
+                else -> throw ex
+            }
+        }.run {
+            invokeLater {
+                run(Application::class.java, *args)
+                    .run(::Setup)
+                    .run { isVisible = true }
             }
         }
+
 
         private fun Setup.clearSpecificPaths() {
             officePathTextField.text = ""
@@ -208,17 +209,17 @@ class Setup(
             // You can access the paths using selectedPaths.get("office") etc.
         }
 
-
-        private fun Setup.selectDirectory(pathKey: String, textField: JTextField) {
-            val chooser = JFileChooser()
-            chooser.fileSelectionMode = DIRECTORIES_ONLY
-            chooser.dialogTitle = "Select Directory"
-
-            if (chooser.showOpenDialog(this) == APPROVE_OPTION) {
-                val selectedFile = chooser.selectedFile
-                val selectedPath = selectedFile.toPath()
-                selectedPaths[pathKey] = selectedPath
-                textField.text = selectedPath.toString()
+        private fun Setup.selectDirectory(
+            pathKey: String,
+            textField: JTextField
+        ) = JFileChooser().run {
+            fileSelectionMode = DIRECTORIES_ONLY
+            dialogTitle = "Select Directory"
+            when (APPROVE_OPTION) {
+                showOpenDialog(this) -> selectedFile.toPath().run {
+                    selectedPaths[pathKey] = this
+                    textField.text = toString()
+                }
             }
         }
 
@@ -233,13 +234,13 @@ class Setup(
             }
         }
 
-        internal fun Setup.createAllInOneWorkspace() {
+        private fun Setup.createAllInOneWorkspace() {
             val workspacePath = Paths.get(workspacePathTextField.text)
             // TODO: Implement the creation of an all-in-one workspace
             // This would typically involve creating subdirectories in the main workspace
         }
 
-        internal fun Setup.addListeners(): Setup {
+        private fun Setup.addListeners(): Setup {
             splitWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
             allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
             browseCommunicationPathButton.addActionListener {
@@ -264,29 +265,24 @@ class Setup(
             return this
         }
 
-        private fun Setup.setWorkspaceEntriesVisibility(visible: Boolean): Setup {
-            officePathLabel.isVisible = visible
-            officePathTextField.isVisible = visible
-            browseOfficePathButton.isVisible = visible
-
-            educationPathLabel.isVisible = visible
-            educationPathTextField.isVisible = visible
-            browseEducationPathButton.isVisible = visible
-
-            communicationPathLabel.isVisible = visible
-            communicationPathTextField.isVisible = visible
-            browseCommunicationPathButton.isVisible = visible
-
-            configurationPathLabel.isVisible = visible
-            configurationPathTextField.isVisible = visible
-            browseConfigurationPathButton.isVisible = visible
-
-            jobPathLabel.isVisible = visible
-            jobPathTextField.isVisible = visible
-            browsejobPathButton.isVisible = visible
-
-            return this
-        }
+        private fun Setup.setWorkspaceEntriesVisibility(visible: Boolean): Setup = setOf(
+            officePathLabel,
+            officePathTextField,
+            browseOfficePathButton,
+            educationPathLabel,
+            educationPathTextField,
+            browseEducationPathButton,
+            communicationPathLabel,
+            communicationPathTextField,
+            browseCommunicationPathButton,
+            configurationPathLabel,
+            configurationPathTextField,
+            browseConfigurationPathButton,
+            jobPathLabel,
+            jobPathTextField,
+            browsejobPathButton
+        ).map { it.isVisible = visible }
+            .run { this@setWorkspaceEntriesVisibility }
 
         internal fun Setup.initUI() {
             name = "setupFrame" // NOI18N
