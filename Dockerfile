@@ -5,6 +5,6 @@ RUN gradle -s -q -p api :build -x test;
 
 FROM openjdk:jre-alpine
 COPY --from=build /api/build/libs/api-0.0.1.jar school-api.jar
-EXPOSE 8080
+EXPOSE 8880
 ENTRYPOINT ["java","-jar","school-api.jar"]
 

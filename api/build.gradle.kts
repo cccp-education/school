@@ -53,7 +53,7 @@ val Pair<String, String>.artifactVersion: String
         }::get
     ).toString()
 
-//springBoot.mainClass.set("school.Application")
+springBoot.mainClass.set("school.Application")
 
 tasks.register("runInstallerGui") {
     group = "application"
