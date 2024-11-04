@@ -15,6 +15,7 @@ buildscript {
     repositories {
         gradlePluginPortal()
         google()
+        maven { url = uri("https://plugins.gradle.org/m2/") }
     }
     dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21") }
 }
@@ -23,11 +24,11 @@ plugins {
     java
     idea
     jacoco
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    kotlin("plugin.allopen")
-    kotlin("plugin.noarg")
-    kotlin("plugin.serialization")
+    kotlin("jvm").version("2.0.21")
+    kotlin("plugin.spring").version("2.0.21")
+    kotlin("plugin.allopen").version("2.0.21")
+    kotlin("plugin.noarg").version("2.0.21")
+    kotlin("plugin.serialization").version("2.0.21")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     application
@@ -35,7 +36,7 @@ plugins {
 
 group = properties["artifact.group"].toString()
 
-version="0.0.1"
+version = "0.0.1"
 //version = ("artifact.version" to "artifact.version.key").artifactVersion
 
 val Pair<String, String>.artifactVersion: String
@@ -53,7 +54,7 @@ val Pair<String, String>.artifactVersion: String
 
 //springBoot.mainClass.set("school.Application")
 
-tasks.register("runInstallerGui"){
+tasks.register("runInstallerGui") {
     group = "application"
     description = "Run workspace installer : ./gradlew -p api :installerGui"
     application.mainClass.set("school.Setup\$SetupHelper")
