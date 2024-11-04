@@ -35,7 +35,8 @@ plugins {
 
 group = properties["artifact.group"].toString()
 
-version = ("artifact.version" to "artifact.version.key").artifactVersion
+version="0.0.1"
+//version = ("artifact.version" to "artifact.version.key").artifactVersion
 
 val Pair<String, String>.artifactVersion: String
     get() = first.run(
