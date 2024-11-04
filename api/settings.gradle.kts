@@ -2,6 +2,7 @@ pluginManagement {
     val asciidoctorGradleVersion = "4.0.0-alpha.1"
 
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -31,6 +32,7 @@ pluginManagement {
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven("https://maven.xillio.com/artifactory/libs-release/")

@@ -13,6 +13,7 @@ import java.util.*
 
 buildscript {
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         google()
         maven { url = uri("https://plugins.gradle.org/m2/") }
