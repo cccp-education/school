@@ -10,6 +10,7 @@ from api import api
 # Assuming a Signup model with appropriate fields like login, password, etc.
 from users.signup import Signup  # Replace with the actual path to your model
 
+
 class ApiTestCase(unittest.TestCase):
     @staticmethod
     def test_something():
