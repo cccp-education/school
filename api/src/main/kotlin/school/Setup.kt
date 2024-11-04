@@ -71,8 +71,7 @@ class Setup(
     private val workspaceService = WorkspaceService()
 
     init {
-        initUI()
-        "Init, currentInstallationType : $currentInstallationType".run(::i)
+        initUI().let { "Init, currentInstallationType : $currentInstallationType".run(::i) }
     }
 
     enum class InstallationType {
