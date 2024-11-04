@@ -71,7 +71,7 @@ class Setup(
     private val workspaceService = WorkspaceService()
 
     init {
-        initUI().addListeners().pack()
+        initUI()
         "Init, currentInstallationType : $currentInstallationType".run(::i)
     }
 
@@ -289,7 +289,7 @@ class Setup(
             return this
         }
 
-        internal fun Setup.initUI(): Setup {
+        internal fun Setup.initUI() {
             name = "setupFrame" // NOI18N
             defaultCloseOperation = EXIT_ON_CLOSE
             setWorkspaceEntriesVisibility(false)
@@ -684,7 +684,7 @@ class Setup(
                     )
                 }
             }
-            return this
+            addListeners().pack()
         }
     }
 }
