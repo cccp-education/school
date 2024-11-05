@@ -16,13 +16,13 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
-import school.base.utils.AUTHORITIES_KEY
-import school.base.utils.INVALID_TOKEN
+import school.base.utils.Constants.AUTHORITIES_KEY
+import school.base.utils.Constants.INVALID_TOKEN
 import school.base.utils.Log.d
 import school.base.utils.Log.i
 import school.base.utils.Log.t
 import school.base.utils.Properties
-import school.base.utils.VALID_TOKEN
+import school.base.utils.Constants.VALID_TOKEN
 import java.security.Key
 import java.time.ZonedDateTime.now
 import java.util.*

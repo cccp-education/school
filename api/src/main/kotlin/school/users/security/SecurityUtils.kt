@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
-import school.base.utils.ROLE_ANONYMOUS
+import school.base.utils.Constants.ROLE_ANONYMOUS
 import school.users.security.SecurityConfiguration.Companion.negated
 import java.security.SecureRandom
 

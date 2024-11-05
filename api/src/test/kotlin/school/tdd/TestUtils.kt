@@ -8,6 +8,12 @@ package school.tdd
 
 import org.springframework.context.ApplicationContext
 import school.base.utils.*
+import school.base.utils.Constants.ADMIN
+import school.base.utils.Constants.DOMAIN_DEV_URL
+import school.base.utils.Constants.ROLE_ADMIN
+import school.base.utils.Constants.ROLE_ANONYMOUS
+import school.base.utils.Constants.ROLE_USER
+import school.base.utils.Constants.USER
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
 import school.users.signup.Signup

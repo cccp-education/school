@@ -14,9 +14,9 @@ import org.springframework.r2dbc.core.await
 import org.springframework.r2dbc.core.awaitSingle
 import school.base.model.EntityModel
 import school.base.utils.AppUtils.cleanField
-import school.base.utils.ROLE_ADMIN
-import school.base.utils.ROLE_ANONYMOUS
-import school.base.utils.ROLE_USER
+import school.base.utils.Constants.ROLE_ADMIN
+import school.base.utils.Constants.ROLE_ANONYMOUS
+import school.base.utils.Constants.ROLE_USER
 import school.users.User.UserDao
 import school.users.security.UserRole.Role.RoleDao
 import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD

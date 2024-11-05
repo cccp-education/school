@@ -8,7 +8,7 @@ import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar
 import org.springframework.web.reactive.config.DelegatingWebFluxConfiguration
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.i18n.LocaleContextResolver
-import school.base.utils.REQUEST_PARAM_LANG
+import school.base.utils.Constants.REQUEST_PARAM_LANG
 import java.util.*
 
 @Suppress("unused")

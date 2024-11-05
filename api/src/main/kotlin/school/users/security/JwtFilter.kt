@@ -9,8 +9,8 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-import school.base.utils.AUTHORIZATION_HEADER
-import school.base.utils.BEARER_START_WITH
+import school.base.utils.Constants.AUTHORIZATION_HEADER
+import school.base.utils.Constants.BEARER_START_WITH
 
 @Component("jwtFilter")
 class JwtFilter(private val context: ApplicationContext) : WebFilter {

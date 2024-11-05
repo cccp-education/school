@@ -20,8 +20,8 @@ import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironm
 import org.springframework.context.ConfigurableApplicationContext
 import school.Application
 import school.base.utils.*
-import school.base.utils.TEST
-import school.base.utils.VIRGULE
+import school.base.utils.Constants.TEST
+import school.base.utils.Constants.VIRGULE
 import school.base.utils.Log.i
 import java.io.IOException
 import java.lang.Byte.parseByte

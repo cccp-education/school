@@ -5,11 +5,10 @@ import arrow.core.left
 import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
 import school.users.User
-import school.users.User.UserDao.Dao.signupToUser
 import school.users.User.UserDao.Dao.signup
+import school.users.User.UserDao.Dao.signupToUser
 
 
 @Service
@@ -24,6 +23,19 @@ class SignupService(private val context: ApplicationContext) {
     } catch (t: Throwable) {
         t.left()
     }
+
+//    @Transactional(readOnly = true)
+//    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
+//
+//    @Transactional(readOnly = true)
+//    suspend fun accountById(emailOrLogin: String) = accountRepository.findOne(emailOrLogin)
+//
+//    @Transactional
+//    suspend fun saveAccount(account: AccountCredentials) = accountRepository.save(account)
+//
+//    @Transactional
+//    suspend fun deleteAccount(account: Account) = accountRepository.delete(account)
+
 }
 
 

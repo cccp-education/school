@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import school.base.utils.CLI
-import school.base.utils.CLI_PROPS
-import school.base.utils.NORMAL_TERMINATION
+import school.base.utils.Constants.CLI
+import school.base.utils.Constants.CLI_PROPS
+import school.base.utils.Constants.NORMAL_TERMINATION
 import school.base.utils.Log.i
 import kotlin.system.exitProcess
 

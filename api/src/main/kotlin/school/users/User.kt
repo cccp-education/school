@@ -25,8 +25,8 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
 import school.base.utils.AppUtils.cleanField
-import school.base.utils.EMPTY_STRING
-import school.base.utils.ROLE_USER
+import school.base.utils.Constants.EMPTY_STRING
+import school.base.utils.Constants.ROLE_USER
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
 import school.users.User.UserDao.Attributes.ID_ATTR
 import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
@@ -44,6 +44,7 @@ import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.User.UserDao.Relations.INSERT
+import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
@@ -345,7 +346,7 @@ data class User(
                     User::class -> {
                         try {
                             (getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:$LOGIN_ATTR)")
+                                .sql("SELECT `u`.$ID_FIELD FROM $TABLE_NAME `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)")
                                 .bind(LOGIN_ATTR, login)
                                 .fetch()
                                 .awaitOne()

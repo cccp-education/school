@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono
 import school.base.http.Web.SpaWebFilter
 import school.base.utils.Log.d
 import school.base.utils.Properties
-import school.base.utils.ROLE_ADMIN
+import school.base.utils.Constants.ROLE_ADMIN
 import school.users.User
 import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Fields.EMAIL_FIELD

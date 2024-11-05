@@ -35,10 +35,24 @@ plugins {
     application
 }
 
+extra["springShellVersion"] = "3.3.3"
 group = properties["artifact.group"].toString()
-
 version = "0.0.1"
 //version = ("artifact.version" to "artifact.version.key").artifactVersion
+idea.module.excludeDirs.plusAssign(files("node_modules"))
+springBoot.mainClass.set("school.Application")
+val BLANK = ""
+val sep: String get() = FileSystems.getDefault().separator
+
+data class DockerHub(
+    val username: String = properties["docker_hub_login"].toString(),
+    val password: String = properties["docker_hub_password"].toString(),
+    val token: String = properties["docker_hub_login_token"].toString(),
+    val email: String = properties["docker_hub_email"].toString(),
+    val image: String = "cheroliv/e3po"
+)
+
+
 
 val Pair<String, String>.artifactVersion: String
     get() = first.run(
@@ -53,43 +67,6 @@ val Pair<String, String>.artifactVersion: String
         }::get
     ).toString()
 
-springBoot.mainClass.set("school.Application")
-
-tasks.register("runInstallerGui") {
-    group = "application"
-    description = "Run workspace installer : ./gradlew -p api :installerGui"
-    application.mainClass.set("school.Setup\$SetupHelper")
-    finalizedBy("run")
-}
-
-tasks.register("cli") {
-    group = "application"
-    description = "Run school cli : ./gradlew -p api :cli -Pargs=--gui"
-    doFirst {
-        with(springBoot) {
-            tasks.bootRun.configure {
-                args = (project.findProperty("args") as String?)
-                    ?.trim()
-                    ?.split(" ")
-                    ?.filter(String::isNotEmpty)
-                    ?.also { println("Passing args to Spring Boot: $it") }
-                    ?: emptyList()
-            }
-            mainClass.set("school.base.cli.CommandLine")
-        }
-    }
-    finalizedBy(tasks.bootRun)
-}
-
-tasks.register("api") {
-    group = "application"
-    description = "Run school api"
-    doFirst { springBoot.mainClass.set("school.Application") }
-    finalizedBy("bootRun")
-}
-
-idea.module.excludeDirs.plusAssign(files("node_modules"))
-
 repositories {
     mavenCentral()
     maven(url = "https://maven.repository.redhat.com/ga/")
@@ -97,6 +74,13 @@ repositories {
     maven(url = "https://repo.spring.io/snapshot")
     maven(url = "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap/")
 }
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.shell:spring-shell-dependencies:${property("springShellVersion")}")
+    }
+}
+
 
 dependencies {
     // Kotlin
@@ -122,6 +106,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("org.springframework.shell:spring-shell-starter")
     // Spring security
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-data")
@@ -134,6 +119,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
+    testImplementation("org.springframework.shell:spring-shell-starter-test")
     // JWT
     implementation("io.jsonwebtoken:jjwt-impl:${properties["jsonwebtoken.version"]}")
     implementation("io.jsonwebtoken:jjwt-jackson:${properties["jsonwebtoken.version"]}")
@@ -172,6 +158,8 @@ dependencies {
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")
+    testImplementation("org.assertj:assertj-swing:3.17.1")
+
 }
 
 configurations {
@@ -190,6 +178,39 @@ configurations {
 }
 
 //java { sourceCompatibility = VERSION_21 }
+tasks.register("runInstallerGui") {
+    group = "application"
+    description = "Run workspace installer : ./gradlew -p api :installerGui"
+    application.mainClass.set("school.Setup\$SetupHelper")
+    finalizedBy("run")
+}
+
+tasks.register("cli") {
+    group = "application"
+    description = "Run school cli : ./gradlew -p api :cli -Pargs=--gui"
+    doFirst {
+        with(springBoot) {
+            tasks.bootRun.configure {
+                args = (project.findProperty("args") as String?)
+                    ?.trim()
+                    ?.split(" ")
+                    ?.filter(String::isNotEmpty)
+                    ?.also { println("Passing args to Spring Boot: $it") }
+                    ?: emptyList()
+            }
+            mainClass.set("school.base.cli.CommandLine")
+        }
+    }
+    finalizedBy(tasks.bootRun)
+}
+
+tasks.register("api") {
+    group = "application"
+    description = "Run school api"
+    doFirst { springBoot.mainClass.set("school.Application") }
+    finalizedBy("bootRun")
+}
+
 
 tasks.withType<JavaCompile>() {
     options.compilerArgs.add("-parameters")
@@ -210,9 +231,6 @@ tasks.withType<Test> {
         ignoreFailures = true
     }
 }
-
-val BLANK = ""
-val sep: String get() = FileSystems.getDefault().separator
 
 tasks.register<Delete>("cleanResources") {
     description = "Delete directory build/resources"
@@ -247,29 +265,16 @@ tasks.register<TestReport>("testReport") {
     reportOn("test")
 }
 
-val cucumberRuntime: Configuration by configurations.creating {
-    extendsFrom(configurations["testImplementation"])
-}
 
-data class DockerHub(
-    val username: String = properties["docker_hub_login"].toString(),
-    val password: String = properties["docker_hub_password"].toString(),
-    val token: String = properties["docker_hub_login_token"].toString(),
-    val email: String = properties["docker_hub_email"].toString(),
-    val image: String = "cheroliv/e3po"
-)
-
-//TODO: create task startLocalPostgresql() stopLocalPostgresql()
-val pullPostgresImage = tasks.register<Exec>("pullPostgresImage") {
-    commandLine(
-        "docker",
-        "pull",
-        "postgres@sha256:b2653f33e2b9a49dceb8f3444108222875e25d993c1ba03a89c116bbccc53be4"
-    )
-}
 
 tasks.register<Exec>("startLocalPostgresql") {
-    dependsOn(pullPostgresImage)
+    dependsOn(tasks.register<Exec>("pullPostgresImage") {
+        commandLine(
+            "docker",
+            "pull",
+            "postgres@sha256:b2653f33e2b9a49dceb8f3444108222875e25d993c1ba03a89c116bbccc53be4"
+        )
+    })
     commandLine("docker", "run", "-d", "-p", "5432:5432", "postgres")
 }
 
@@ -296,3 +301,4 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
 tasks.register<Exec>("buildWorkspaceModel") { commandLine("./gradlew", "-p", "../workspace-model/lib", "build") }
 
 tasks["build"].dependsOn(tasks["buildWorkspaceModel"])
+

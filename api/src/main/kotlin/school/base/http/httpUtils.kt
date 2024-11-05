@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.server.ServerWebExchange
-import school.base.utils.SPA_NEGATED_REGEX
+import school.base.utils.Constants.SPA_NEGATED_REGEX
 import school.users.User
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD

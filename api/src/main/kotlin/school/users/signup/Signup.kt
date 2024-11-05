@@ -8,7 +8,7 @@ import school.base.http.validator
 import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
-import school.base.utils.defaultProblems
+import school.base.utils.Constants.defaultProblems
 import school.users.User
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD

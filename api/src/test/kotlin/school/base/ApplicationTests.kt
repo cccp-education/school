@@ -8,9 +8,9 @@ import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.OFFICIAL_SITE
 import school.base.utils.Properties
-import school.base.utils.DEVELOPMENT
-import school.base.utils.PRODUCTION
-import school.base.utils.STARTUP_LOG_MSG_KEY
+import school.base.utils.Constants.DEVELOPMENT
+import school.base.utils.Constants.PRODUCTION
+import school.base.utils.Constants.STARTUP_LOG_MSG_KEY
 import school.base.utils.Log.i
 import java.util.*
 import java.util.Locale.FRENCH
