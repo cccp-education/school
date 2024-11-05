@@ -345,8 +345,8 @@ data class User(
                     User::class -> {
                         try {
                             (getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:login)")
-                                .bind("login", login)
+                                .sql("SELECT `u`.`id` FROM `user` u WHERE LOWER(u.login) = LOWER(:$LOGIN_ATTR)")
+                                .bind(LOGIN_ATTR, login)
                                 .fetch()
                                 .awaitOne()
                                 .let { it["`id`"] as UUID }).right()
@@ -364,8 +364,8 @@ data class User(
                     User::class -> {
                         try {
                             getBean<DatabaseClient>()
-                                .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:email)")
-                                .bind("email", email)
+                                .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:$EMAIL_ATTR)")
+                                .bind(EMAIL_ATTR, email)
                                 .fetch()
                                 .awaitOne()
                                 .let { it["id"] as UUID }
