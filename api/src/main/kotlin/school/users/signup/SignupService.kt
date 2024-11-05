@@ -5,6 +5,7 @@ import arrow.core.left
 import arrow.core.right
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import school.base.model.EntityModel.Members.withId
 import school.users.User
 import school.users.User.UserDao.Dao.signupToUser
@@ -13,6 +14,7 @@ import school.users.User.UserDao.Dao.signup
 
 @Service
 class SignupService(private val context: ApplicationContext) {
+
     suspend fun signup(signup: Signup): Either<Throwable, User> = try {
         context.signupToUser(signup).run {
             (this to context).signup()
