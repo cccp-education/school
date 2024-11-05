@@ -6,7 +6,6 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.text.MessageFormat
 
 
-/*=================================================================================*/
 /**
  * Utility class for handling pagination.
  *
@@ -17,7 +16,6 @@ import java.text.MessageFormat
  */
 private const val HEADER_X_TOTAL_COUNT = "X-Total-Count"
 private const val HEADER_LINK_FORMAT = "<{0}>; rel=\"{1}\""
-/*=================================================================================*/
 
 /**
  * Generate pagination headers for a Spring Data [org.springframework.data.domain.Page] object.
@@ -53,7 +51,6 @@ fun <T> generatePaginationHttpHeaders(uriBuilder: UriComponentsBuilder, page: Pa
     headers.add(HttpHeaders.LINK, link.toString())
     return headers
 }
-/*=================================================================================*/
 
 private fun prepareLink(
     uriBuilder: UriComponentsBuilder,
@@ -69,7 +66,6 @@ private fun prepareLink(
     ),
     relType
 )
-/*=================================================================================*/
 
 private fun preparePageUri(
     uriBuilder: UriComponentsBuilder,
@@ -85,4 +81,3 @@ private fun preparePageUri(
     .replace(oldValue = ",", newValue = "%2C")
     .replace(oldValue = ";", newValue = "%3B")
 
-/*=================================================================================*/

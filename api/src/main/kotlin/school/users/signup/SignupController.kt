@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
+import school.base.http.badResponse
+import school.base.utils.Log.i
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
+import school.users.signup.Signup.Companion.signupProblems
+import school.users.signup.Signup.Companion.validate
 
 @RestController
 @RequestMapping(API_USERS)
@@ -23,21 +27,21 @@ class SignupController {
      * @param signup the managed user View Model.
      */
     @PostMapping(API_SIGNUP, produces = [APPLICATION_PROBLEM_JSON_VALUE])
-    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> = CREATED.run(::ResponseEntity)
-    /*signup.validate(exchange).run {
-           i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
-           if (isNotEmpty()) return signupProblems.badResponse(this)
-       }.run {
-           when {
-           //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
-               signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-               signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
-               else -> {
-                   signupService.signup(signup)
-                   ResponseEntity<ProblemDetail>(CREATED)
-               }
-           }
-       }*/
+    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> =
+        signup.validate(exchange).run {
+            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+            if (isNotEmpty()) return signupProblems.badResponse(this)
+        }.run {
+//            when {
+//                //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
+//                signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
+//                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
+//                else -> {
+//                    signupService.signup(signup)
+            CREATED.run(::ResponseEntity)
+//                }
+//            }
+        }
 }
 
 

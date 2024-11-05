@@ -44,8 +44,8 @@ import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.User.UserDao.Relations.INSERT
-import school.users.security.UserRole.Role
 import school.users.security.UserRole
+import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import school.users.signup.Signup
 import java.util.*
@@ -81,7 +81,6 @@ data class User(
 ) : EntityModel<UUID>() {
 
 
-
     /**
      * Représente l'account domain model minimaliste pour la view
      */
@@ -94,6 +93,14 @@ data class User(
 
     companion object {
         val USERCLASS = User::class.java
+
+        @JvmStatic
+        val objectName: String = USERCLASS.simpleName.run {
+            replaceFirst(
+                first(),
+                first().lowercaseChar()
+            )
+        }
 
         @JvmStatic
         fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
