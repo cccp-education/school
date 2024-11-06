@@ -39,36 +39,36 @@ object Log {
     fun e(message: String, e: Exception?): Unit = log.error(message, e)
     fun w(message: String, e: Exception?): Unit = log.warn(message, e)
 
-    val ApplicationContext.startupLog
-        get() = logProfiles.run {
-            StartupLogMsg(
-                appName = environment.getProperty(SPRING_APPLICATION_NAME),
-                goVisitMessage = getBean<Properties>().goVisitMessage,
-                protocol = when {
-                    environment.getProperty(SERVER_SSL_KEY_STORE) != null -> HTTPS
-                    else -> HTTP
-                },
-                serverPort = environment.getProperty(SERVER_PORT),
-                contextPath = environment.getProperty(SERVER_SERVLET_CONTEXT_PATH) ?: EMPTY_CONTEXT_PATH,
-                hostAddress = try {
-                    getLocalHost().hostAddress
-                } catch (e: UnknownHostException) {
-                    STARTUP_HOST_WARN_LOG_MSG.run(::w)
-                    DEV_HOST
-                },
-                profiles = when {
-                    environment.defaultProfiles.isNotEmpty() -> environment.defaultProfiles.reduce { accumulator, profile -> "$accumulator, $profile" }
+    @JvmStatic
+    fun ApplicationContext.startupLog() = logProfiles.run {
+        StartupLogMsg(
+            appName = SPRING_APPLICATION_NAME.run(environment::getProperty),
+            goVisitMessage = getBean<Properties>().goVisitMessage,
+            protocol = when {
+                SERVER_SSL_KEY_STORE.run(environment::getProperty) != null -> HTTPS
+                else -> HTTP
+            },
+            serverPort = SERVER_PORT.run(environment::getProperty),
+            contextPath = SERVER_SERVLET_CONTEXT_PATH.run(environment::getProperty) ?: EMPTY_CONTEXT_PATH,
+            hostAddress = try {
+                getLocalHost().hostAddress
+            } catch (e: UnknownHostException) {
+                STARTUP_HOST_WARN_LOG_MSG.run(::w)
+                DEV_HOST
+            },
+            profiles = when {
+                environment.defaultProfiles.isNotEmpty() -> environment.defaultProfiles.reduce { accumulator, profile -> "$accumulator, $profile" }
 
-                    else -> EMPTY_STRING
-                },
-                activeProfiles = when {
-                    environment.activeProfiles.isNotEmpty() -> environment.activeProfiles.reduce { accumulator, profile -> "$accumulator, $profile" }
+                else -> EMPTY_STRING
+            },
+            activeProfiles = when {
+                environment.activeProfiles.isNotEmpty() -> environment.activeProfiles.reduce { accumulator, profile -> "$accumulator, $profile" }
 
-                    else -> EMPTY_STRING
-                },
-            ).run(::startupLogMessage)
-                .run(::i)
-        }
+                else -> EMPTY_STRING
+            },
+        ).run(::startupLogMessage)
+            .run(::i)
+    }
 
 
     private data class StartupLogMsg(

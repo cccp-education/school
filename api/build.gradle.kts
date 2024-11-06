@@ -181,7 +181,7 @@ configurations {
 tasks.register("runInstallerGui") {
     group = "application"
     description = "Run workspace installer : ./gradlew -p api :installerGui"
-    application.mainClass.set("school.Setup\$SetupHelper")
+    application.mainClass.set("school.Installer")
     finalizedBy("run")
 }
 

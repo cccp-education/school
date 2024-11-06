@@ -12,7 +12,7 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import school.users.signup.SignupService
-import school.users.signup.UserActivation.Signup
+import school.users.signup.Signup
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -15,7 +15,7 @@ import school.base.utils.Constants.ROLE_USER
 import school.base.utils.Constants.USER
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
-import school.users.signup.UserActivation.Signup
+import school.users.signup.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 

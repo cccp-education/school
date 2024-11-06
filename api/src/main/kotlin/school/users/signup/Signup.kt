@@ -1,43 +1,42 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package school.users.signup
+
 
 import jakarta.validation.constraints.Size
 import school.users.User.UserDao
 import school.users.User.UserDao.Fields.ID_FIELD
-import school.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
-import school.users.signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
-import school.users.signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
+import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
 import java.time.Instant
 import java.util.*
 
+
 @JvmRecord
-data class UserActivation(
-    val id: UUID,
-    @field:Size(max = 20)
-    val activationKey: String,
-    val activationDate: Instant,
-    val createdDate: Instant,
-) {
+data class Signup(
+    val login: String,
+    val password: String,
+    val repassword: String,
+    val email: String,
+){
     @JvmRecord
-    data class Signup(
-        val login: String,
-        val password: String,
-        val repassword: String,
-        val email: String,
-    )
+    data class UserActivation(
+        val id: UUID,
+        @field:Size(max = 20)
+        val activationKey: String,
+        val activationDate: Instant,
+        val createdDate: Instant,
+    ) {
+        object UserActivationDao {
+            object Fields {
+                const val ID_FIELD = "`id`"
+                const val ACTIVATION_KEY_FIELD = "`activation_key`"
+                const val ACTIVATION_DATE_FIELD = "`activation_date`"
+                const val CREATED_DATE_FIELD = "`created_date`"
+            }
 
-    object UserActivationDao {
-        object Fields {
-            const val ID_FIELD = "`id`"
-            const val ACTIVATION_KEY_FIELD = "`activation_key`"
-            const val ACTIVATION_DATE_FIELD = "`activation_date`"
-            const val CREATED_DATE_FIELD = "`created_date`"
-        }
-
-        object Relations {
-            const val TABLE_NAME = "`user_activation`"
-            const val SQL_SCRIPT = """
+            object Relations {
+                const val TABLE_NAME = "`user_activation`"
+                const val SQL_SCRIPT = """
             CREATE TABLE IF NOT EXISTS $TABLE_NAME (
                 $ID_FIELD                     UUID PRIMARY KEY,
                 $ACTIVATION_KEY_FIELD         VARCHAR,
@@ -47,7 +46,7 @@ data class UserActivation(
                 ON DELETE CASCADE
                 ON UPDATE CASCADE);
 """
-            const val INSERT = ""
+                const val INSERT = ""
 //                """
 //            insert into $TABLE_NAME (
 //            ${Fields.LOGIN_FIELD}, ${Fields.EMAIL_FIELD}, ${Fields.PASSWORD_FIELD},
@@ -58,9 +57,9 @@ data class UserActivation(
 //            :langKey, :imageUrl, :enabled, :activationKey, :resetKey, :resetDate,
 //            :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate, :version)
 //            """
-        }
+            }
 
-        object Dao {
+            object Dao {
 //            val Pair<User, ApplicationContext>.toJson: String
 //                get() = second.getBean<ObjectMapper>().writeValueAsString(first)
 //
@@ -91,6 +90,7 @@ data class UserActivation(
 //            } catch (e: Throwable) {
 //                e.left()
 //            }
+            }
         }
     }
 }

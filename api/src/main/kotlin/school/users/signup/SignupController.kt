@@ -2,7 +2,6 @@ package school.users.signup
 
 import jakarta.validation.ConstraintViolation
 import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.HttpStatus.EXPECTATION_FAILED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -18,14 +17,12 @@ import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.base.utils.Constants.defaultProblems
-import school.base.utils.Log.i
 import school.users.User
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
-import school.users.signup.UserActivation.Signup
 
 @RestController
 @RequestMapping(API_USERS)

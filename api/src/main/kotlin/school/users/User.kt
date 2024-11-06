@@ -49,7 +49,7 @@ import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
-import school.users.signup.UserActivation.Signup
+import school.users.signup.Signup
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
