@@ -18,8 +18,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import school.base.tdd.TestTools.logBody
-import school.base.tdd.TestTools.requestToString
+import school.tdd.TestTools.logBody
+import school.tdd.TestTools.requestToString
 import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.user

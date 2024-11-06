@@ -19,6 +19,14 @@ data class UserActivation(
     val activationDate: Instant,
     val createdDate: Instant,
 ) {
+    @JvmRecord
+    data class Signup(
+        val login: String,
+        val password: String,
+        val repassword: String,
+        val email: String,
+    )
+
     object UserActivationDao {
         object Fields {
             const val ID_FIELD = "`id`"
@@ -84,6 +92,5 @@ data class UserActivation(
 //                e.left()
 //            }
         }
-
     }
 }

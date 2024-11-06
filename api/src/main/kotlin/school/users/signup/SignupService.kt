@@ -14,7 +14,7 @@ import school.users.User.UserDao.Dao.signupToUser
 @Service
 class SignupService(private val context: ApplicationContext) {
 
-    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+    suspend fun signup(signup: UserActivation.Signup): Either<Throwable, User> = try {
         context.signupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
@@ -23,19 +23,14 @@ class SignupService(private val context: ApplicationContext) {
     } catch (t: Throwable) {
         t.left()
     }
-
-//    @Transactional(readOnly = true)
-//    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
-//
 //    @Transactional(readOnly = true)
 //    suspend fun accountById(emailOrLogin: String) = accountRepository.findOne(emailOrLogin)
-//
+//    @Transactional(readOnly = true)
+//    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
 //    @Transactional
 //    suspend fun saveAccount(account: AccountCredentials) = accountRepository.save(account)
-//
 //    @Transactional
 //    suspend fun deleteAccount(account: Account) = accountRepository.delete(account)
-
 }
 
 

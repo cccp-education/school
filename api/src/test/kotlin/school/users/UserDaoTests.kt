@@ -1,5 +1,5 @@
 @file:Suppress(
-    "JUnitMalformedDeclaration",
+//    "JUnitMalformedDeclaration",
     "SqlNoDataSourceInspection"
 )
 
@@ -48,6 +48,7 @@ import java.util.UUID.fromString
 import kotlin.test.*
 
 
+@Suppress("JpaQueryApiInspection")
 @ActiveProfiles("test")
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 class UserDaoTests {

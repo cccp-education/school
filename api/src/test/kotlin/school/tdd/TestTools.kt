@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package school.base.tdd
+package school.tdd
 
 
 //import school.accounts.models.Account

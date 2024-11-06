@@ -42,13 +42,14 @@ import school.users.User.UserDao.Fields.LANG_KEY_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserDao.Fields.VERSION_FIELD
+import school.users.User.UserDao.Relations.FIND_USER_BY_ID
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.User.UserDao.Relations.INSERT
 import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
-import school.users.signup.Signup
+import school.users.signup.UserActivation.Signup
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -197,6 +198,9 @@ data class User(
             val FIND_USER_BY_LOGIN_OR_EMAIL =
                 "SELECT `u`.`id` FROM `user` AS `u` WHERE LOWER(`u`.`email`) = LOWER(:email) OR LOWER(`u`.`login`) = LOWER(:login)"
                     .trimIndent()
+            val FIND_USER_BY_ID =
+                "SELECT * FROM `user` AS `u` WHERE `u`.`id` = :id"
+                    .trimIndent()
 
             @JvmStatic
             val CREATE_TABLES: String
@@ -264,6 +268,35 @@ data class User(
                                     id = it[ID_FIELD] as UUID,
                                     email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
                                     login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
+                                    password = it[PASSWORD_FIELD] as String,
+                                    langKey = it[LANG_KEY_FIELD] as String,
+                                    version = it[VERSION_FIELD] as Long,
+                                )
+                            }.right()
+                    } catch (e: Throwable) {
+                        e.left()
+                    }
+
+                    else -> (T::class.simpleName)
+                        .run { "Unsupported type: $this" }
+                        .run(::IllegalArgumentException)
+                        .left()
+                }
+
+            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(id: UUID): Either<Throwable, User> =
+                when (T::class) {
+                    User::class -> try {
+                        FIND_USER_BY_ID
+                            .run(getBean<DatabaseClient>()::sql)
+                            .bind(EMAIL_ATTR, id)
+                            .bind(LOGIN_ATTR, id)
+                            .fetch()
+                            .awaitSingle()
+                            .let {
+                                User(
+                                    id = it[ID_FIELD] as UUID,
+                                    email = it[EMAIL_FIELD] as String,
+                                    login = it[LOGIN_FIELD] as String,
                                     password = it[PASSWORD_FIELD] as String,
                                     langKey = it[LANG_KEY_FIELD] as String,
                                     version = it[VERSION_FIELD] as Long,

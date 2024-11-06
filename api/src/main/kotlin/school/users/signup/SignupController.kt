@@ -1,6 +1,8 @@
 package school.users.signup
 
+import jakarta.validation.ConstraintViolation
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.EXPECTATION_FAILED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -9,16 +11,25 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
+import school.base.http.ProblemsModel
 import school.base.http.badResponse
+import school.base.http.validator
+import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
+import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
+import school.base.utils.Constants.defaultProblems
 import school.base.utils.Log.i
+import school.users.User
+import school.users.User.UserDao.Fields.EMAIL_FIELD
+import school.users.User.UserDao.Fields.LOGIN_FIELD
+import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
-import school.users.signup.Signup.Companion.signupProblems
-import school.users.signup.Signup.Companion.validate
+import school.users.signup.UserActivation.Signup
 
 @RestController
 @RequestMapping(API_USERS)
-class SignupController {
+class SignupController(private val signupService: SignupService) {
     internal class SignupException(message: String) : RuntimeException(message)
 
     /**
@@ -26,22 +37,125 @@ class SignupController {
      *
      * @param signup the managed user View Model.
      */
-    @PostMapping(API_SIGNUP, produces = [APPLICATION_PROBLEM_JSON_VALUE])
-    suspend fun signup(@RequestBody signup: Signup, exchange: ServerWebExchange): ResponseEntity<ProblemDetail> =
-        signup.validate(exchange).run {
-            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
-            if (isNotEmpty()) return signupProblems.badResponse(this)
-        }.run {
-//            when {
-//                //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
-//                signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-//                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
-//                else -> {
-//                    signupService.signup(signup)
-            CREATED.run(::ResponseEntity)
+    @PostMapping(
+        API_SIGNUP,
+        produces = [APPLICATION_PROBLEM_JSON_VALUE]
+    )
+    suspend fun signup(
+        @RequestBody signup: Signup,
+        exchange: ServerWebExchange
+    ): ResponseEntity<ProblemDetail> = CREATED.run(::ResponseEntity)
+//        signup.validate(exchange).run {
+//            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+//            if (isNotEmpty()) return signupProblems.badResponse(this)
+//        }.run {
+//            Triple(true/*OK*/, true/*email*/, true/*login*/).run {
+//                when {
+//                    /*email & login not available*/
+//                    !first && !second && !third -> EXPECTATION_FAILED.run(::ResponseEntity)
+//                    /*login not available*/
+//                    !first && second && !third -> EXPECTATION_FAILED.run(::ResponseEntity)
+//                    /*email not available*/
+//                    !first && !second && third -> EXPECTATION_FAILED.run(::ResponseEntity)
+//                    //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
+////                signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
+////                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
+//                    else -> {
+//                        signupService.signup(signup)
+//                        CREATED.run(::ResponseEntity)
+//                    }
 //                }
 //            }
+//        }
+
+    companion object {
+        fun Signup.validate(
+            exchange: ServerWebExchange
+        ): Set<Map<String, String?>> = exchange.validator.run {
+            setOf(
+                PASSWORD_FIELD,
+                EMAIL_FIELD,
+                LOGIN_FIELD,
+            ).map { field: String ->
+                field to validateProperty(this@validate, field)
+            }.flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
+                violatedField.second.map {
+                    mapOf<String, String?>(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to violatedField.first,
+                        MODEL_FIELD_MESSAGE to it.message
+                    )
+                }
+            }.toSet()
         }
+
+        @JvmField
+        val signupProblems = defaultProblems.copy(path = "$API_USERS$API_SIGNUP")
+
+
+        val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to LOGIN_FIELD,
+                        MODEL_FIELD_FIELD to EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
+                    )
+                )
+            )
+
+        val ProblemsModel.badResponseLoginIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to LOGIN_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used!"
+                    )
+                )
+            )
+
+        val ProblemsModel.badResponseEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Email is already in use!"
+                    )
+                )
+            )
+
+
+//        suspend fun Signup.loginIsNotAvailable(signupService: SignupService) =
+//            signupService.accountById(login!!).run {
+//                if (this == null) return@run false
+//                return when {
+//                    !activated -> {
+//                        signupService.deleteAccount(toAccount())
+//                        false
+//                    }
+//
+//                    else -> true
+//                }
+//            }
+//
+//        suspend fun Signup.emailIsNotAvailable(signupService: SignupService) =
+//            signupService.accountById(email!!).run {
+//                if (this == null) return@run false
+//                return when {
+//                    !activated -> {
+//                        signupService.deleteAccount(toAccount())
+//                        false
+//                    }
+//
+//                    else -> true
+//                }
+//            }
+
+    }
+
 }
 
 
