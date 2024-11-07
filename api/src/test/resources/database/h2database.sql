@@ -32,3 +32,12 @@ CREATE TABLE IF NOT EXISTS `user_authority`(
 
 CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_authority`
     ON `user_authority` (`role`, `user_id`);
+
+CREATE TABLE IF NOT EXISTS `user_activation` (
+                                                 `id`                     UUID PRIMARY KEY,
+                                                 `activation_key`         VARCHAR,
+                                                 `activation_date`        datetime,
+                                                 `created_date`           datetime,
+                                                 FOREIGN KEY (`id`) REFERENCES `user` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);

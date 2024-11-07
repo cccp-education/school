@@ -50,6 +50,7 @@ import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import school.users.signup.Signup
+import school.users.signup.Signup.UserActivation
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -205,9 +206,10 @@ data class User(
             @JvmStatic
             val CREATE_TABLES: String
                 get() = setOf(
-                    UserDao.Relations.SQL_SCRIPT,
+                    User.UserDao.Relations.SQL_SCRIPT,
                     Role.RoleDao.Relations.SQL_SCRIPT,
-                    UserRole.UserRoleDao.Relations.SQL_SCRIPT
+                    UserRole.UserRoleDao.Relations.SQL_SCRIPT,
+                    UserActivation.UserActivationDao.Relations.SQL_SCRIPT,
                 ).joinToString("")
                     .trimMargin()
 

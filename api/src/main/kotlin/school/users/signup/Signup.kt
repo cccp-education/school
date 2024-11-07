@@ -9,8 +9,12 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.awaitSingle
+import school.users.User
 import school.users.User.UserDao
+import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.ID_FIELD
+import school.users.User.UserDao.Fields.LOGIN_FIELD
+import school.users.User.UserDao.Relations
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
@@ -34,6 +38,11 @@ data class Signup(
         val activationDate: Instant,
         val createdDate: Instant,
     ) {
+        companion object {
+            @JvmStatic
+            fun main(args: Array<String>): Unit = println(UserActivationDao.Relations.SQL_SCRIPT)
+        }
+
         object UserActivationDao {
             object Fields {
                 const val ID_FIELD = "`id`"
@@ -53,6 +62,12 @@ data class Signup(
             FOREIGN KEY ($ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
                 ON DELETE CASCADE
                 ON UPDATE CASCADE);
+            CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_activation_key`
+            ON $TABLE_NAME ($ACTIVATION_KEY_FIELD);
+            CREATE INDEX IF NOT EXISTS `idx_user_activation_date`
+            ON ${TABLE_NAME} ($CREATED_DATE_FIELD);
+            CREATE INDEX IF NOT EXISTS `idx_user_activation_creation_date`
+            ON ${TABLE_NAME} ($ACTIVATION_DATE_FIELD);
 """
                 const val INSERT = ""
 //                """
