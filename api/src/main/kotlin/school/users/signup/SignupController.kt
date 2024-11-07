@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 import school.base.http.ProblemsModel
-import school.base.http.badResponse
-import school.base.http.validator
+import school.base.http.HttpUtils.badResponse
+import school.base.http.HttpUtils.validator
 import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.base.utils.Constants.defaultProblems
+import school.base.utils.Log.i
 import school.users.User
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
@@ -41,11 +42,12 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody signup: Signup,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = CREATED.run(::ResponseEntity)
-//        signup.validate(exchange).run {
-//            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
-//            if (isNotEmpty()) return signupProblems.badResponse(this)
-//        }.run {
+    ): ResponseEntity<ProblemDetail> =
+//        CREATED.run(::ResponseEntity)
+        signup.validate(exchange).run {
+            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+            if (isNotEmpty()) return signupProblems.badResponse(this)
+        }.run {
 //            Triple(true/*OK*/, true/*email*/, true/*login*/).run {
 //                when {
 //                    /*email & login not available*/
@@ -59,11 +61,11 @@ class SignupController(private val signupService: SignupService) {
 ////                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
 //                    else -> {
 //                        signupService.signup(signup)
-//                        CREATED.run(::ResponseEntity)
+                        CREATED.run(::ResponseEntity)
 //                    }
 //                }
 //            }
-//        }
+        }
 
     companion object {
         fun Signup.validate(
