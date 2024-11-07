@@ -28,6 +28,7 @@ import java.util.Locale.getDefault
 
 
 object Log {
+    
     private val log: Logger by lazy { getLogger(Application::class.java) }
 
     fun i(message: String): Unit = log.info(message)
@@ -70,7 +71,7 @@ object Log {
             .run(::i)
     }
 
-
+    @JvmRecord
     private data class StartupLogMsg(
         val appName: String?,
         val goVisitMessage: String,

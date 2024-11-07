@@ -1,12 +1,20 @@
 package school.users.signup
 
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import jakarta.validation.constraints.Size
+import org.springframework.beans.factory.getBean
+import org.springframework.context.ApplicationContext
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.r2dbc.core.awaitSingle
 import school.users.User.UserDao
 import school.users.User.UserDao.Fields.ID_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
+import java.lang.Boolean.parseBoolean
 import java.time.Instant
 import java.util.*
 
@@ -17,7 +25,7 @@ data class Signup(
     val password: String,
     val repassword: String,
     val email: String,
-){
+) {
     @JvmRecord
     data class UserActivation(
         val id: UUID,
@@ -60,9 +68,42 @@ data class Signup(
             }
 
             object Dao {
-//            val Pair<User, ApplicationContext>.toJson: String
-//                get() = second.getBean<ObjectMapper>().writeValueAsString(first)
-//
+
+                suspend fun Pair<Signup, ApplicationContext>.signupAvailability()
+                        : Either<Throwable, Triple<Boolean/*OK*/,
+                        Boolean/*email*/,
+                        Boolean/*login*/>> = try {
+                    second
+                        .getBean<R2dbcEntityTemplate>()
+                        .databaseClient
+                        .sql(
+                            """
+                        SELECT
+                          CASE
+                            WHEN EXISTS(SELECT 1 FROM `user` WHERE LOWER(`login`) = LOWER(:login))
+                            OR EXISTS(SELECT 1 FROM `user` WHERE LOWER(`email`) = LOWER(:email))
+                            THEN FALSE
+                            ELSE TRUE
+                          END AS login_and_email_available,
+                          NOT EXISTS(SELECT 1 FROM `user` WHERE LOWER(`email`) = LOWER(:email)) AS email_available,
+                          NOT EXISTS(SELECT 1 FROM `user` WHERE LOWER(`login`) = LOWER(:login)) AS login_available;                    
+                        """.trimIndent()
+                        )
+                        .bind("login", first.login)
+                        .bind("email", first.email)
+                        .fetch()
+                        .awaitSingle()
+                        .run {
+                            Triple(
+                                parseBoolean(this["login_and_email_available".uppercase()].toString()),
+                                parseBoolean(this["email_available".uppercase()].toString()),
+                                parseBoolean(this["login_available".uppercase()].toString())
+                            ).right()
+                        }
+                } catch (e: Throwable) {
+                    e.left()
+                }
+
 //            suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
 //                second
 //                    .getBean<R2dbcEntityTemplate>()

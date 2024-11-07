@@ -389,7 +389,7 @@ data class User(
                         }
                     }
 
-                    else -> Left(IllegalArgumentException("Unsupported type: ${T::class.simpleName}"))
+                    else -> IllegalArgumentException("Unsupported type: ${T::class.simpleName}").left()
                 }
 
 
