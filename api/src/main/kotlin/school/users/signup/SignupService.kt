@@ -25,7 +25,6 @@ class SignupService(private val context: ApplicationContext) {
         t.left()
     }
 
-
     suspend fun signupAvailability(signup: Signup)
             : Either<Throwable, Triple<Boolean, Boolean, Boolean>> = try {
         (signup to context)
@@ -35,16 +34,10 @@ class SignupService(private val context: ApplicationContext) {
     } catch (ex: Throwable) {
         ex.left()
     }
-
-
-//    @Transactional(readOnly = true)
-//    suspend fun accountById(emailOrLogin: String) = accountRepository.findOne(emailOrLogin)
 //    @Transactional(readOnly = true)
 //    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
 //    @Transactional
-//    suspend fun saveAccount(account: AccountCredentials) = accountRepository.save(account)
-//    @Transactional
-//    suspend fun deleteAccount(account: Account) = accountRepository.delete(account)
+//    suspend fun deleteExpired(account: Account) = accountRepository.delete(account)
 }
 
 

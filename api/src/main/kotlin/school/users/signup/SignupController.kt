@@ -59,7 +59,6 @@ class SignupController(private val signupService: SignupService) {
                 SIGNUP_EMAIL_NOT_AVAILABLE -> result = signupProblems.badResponseEmailIsNotAvailable
                 else -> {
                     signupService.signup(signup)
-                    // TODO: Send activation mail
                     result = CREATED.run(::ResponseEntity)
                 }
             }
@@ -90,10 +89,10 @@ class SignupController(private val signupService: SignupService) {
             }.toSet()
         }
 
-        @JvmField
+        @JvmStatic
         val signupProblems = defaultProblems.copy(path = "$API_USERS$API_SIGNUP")
 
-
+        @JvmStatic
         val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
             get() = badResponse(
                 setOf(
@@ -106,6 +105,7 @@ class SignupController(private val signupService: SignupService) {
                 )
             )
 
+        @JvmStatic
         val ProblemsModel.badResponseLoginIsNotAvailable
             get() = badResponse(
                 setOf(
@@ -117,6 +117,7 @@ class SignupController(private val signupService: SignupService) {
                 )
             )
 
+        @JvmStatic
         val ProblemsModel.badResponseEmailIsNotAvailable
             get() = badResponse(
                 setOf(
@@ -149,35 +150,6 @@ import school.base.property.*
 @RestController
 @RequestMapping(ACCOUNT_API)
 class UserController(private val signupService: UserService) {
-
-    internal class SignupException(message: String) : RuntimeException(message)
-
-    /**
-     * {@code POST  /signup} : register the user.
-     *
-     * @param account the managed user View Model.
-     */
-    @PostMapping(
-        SIGNUP_API,
-        produces = [MediaType.APPLICATION_PROBLEM_JSON_VALUE]
-    )
-    suspend fun signup(
-        @RequestBody account: AccountCredentials,
-        exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = account.validate(exchange).run {
-        i("signup attempt: ${this@run} ${account.login} ${account.email}")
-        if (isNotEmpty()) return signupProblems.badResponse(this)
-    }.run {
-         when {
-            account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-            account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
-            else -> {
-                signupService.signup(account)
-                ResponseEntity<ProblemDetail>(HttpStatus.CREATED)
-            }
-        }
-    }
-
 
     /**
      * `GET  /activate` : activate the signed-up user.
