@@ -6,7 +6,7 @@ import school.base.http.ProblemsModel
 import java.net.URI
 import java.net.URI.create
 
-object Constants{
+object Constants {
     const val ROLE_FIELD = "role"
     const val SPA_NEGATED_REGEX = "[^\\\\.]*"
     const val EMPTY_STRING = ""
@@ -186,4 +186,17 @@ object Constants{
         path = "",
         status = BAD_REQUEST.value(),
     )
+
+    @JvmStatic
+    val SIGNUP_AVAILABLE = Triple(true, true, true)
+
+    @JvmStatic
+    val SIGNUP_LOGIN_NOT_AVAILABLE = Triple(false, true, false)
+
+    @JvmStatic
+    val SIGNUP_EMAIL_NOT_AVAILABLE = Triple(false, false, true)
+
+    @JvmStatic
+    val SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE = Triple(false, false, false)
+
 }
