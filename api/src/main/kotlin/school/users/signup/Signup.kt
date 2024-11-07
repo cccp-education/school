@@ -4,17 +4,19 @@ package school.users.signup
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.awaitSingle
-import school.users.User
 import school.users.User.UserDao
-import school.users.User.UserDao.Fields.EMAIL_FIELD
+import school.users.User.UserDao.Constraints.LOGIN_REGEX
+import school.users.User.UserDao.Constraints.PASSWORD_MAX
+import school.users.User.UserDao.Constraints.PASSWORD_MIN
 import school.users.User.UserDao.Fields.ID_FIELD
-import school.users.User.UserDao.Fields.LOGIN_FIELD
-import school.users.User.UserDao.Relations
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
@@ -25,11 +27,32 @@ import java.util.*
 
 @JvmRecord
 data class Signup(
+    @field:NotNull
+    @field:Pattern(regexp = LOGIN_REGEX)
+    @field:Size(min = 1, max = 50)
     val login: String,
+    @field:NotNull
+    @Size(
+        min = PASSWORD_MIN,
+        max = PASSWORD_MAX
+    )
     val password: String,
     val repassword: String,
+    @field:Email
+    @field:Size(min = 5, max = 254)
     val email: String,
 ) {
+    companion object {
+        val SIGNUPCLASS = Signup::class.java
+
+        @JvmStatic
+        val objectName: String = SIGNUPCLASS.simpleName.run {
+            replaceFirst(
+                first(),
+                first().lowercaseChar()
+            )
+        }
+    }
     @JvmRecord
     data class UserActivation(
         val id: UUID,

@@ -3,12 +3,19 @@ package school.users.signup
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Validator
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
+import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
+import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.base.model.EntityModel.Members.withId
 import school.users.User
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Dao.signupToUser
+import school.users.signup.Signup.Companion.objectName
 import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
 
 
@@ -34,6 +41,24 @@ class SignupService(private val context: ApplicationContext) {
     } catch (ex: Throwable) {
         ex.left()
     }
+
+//    fun validate(signup: Signup): Set<Map<String, String?>> = context.getBean<Validator>().let {
+//        setOf(
+//            User.UserDao.Attributes.PASSWORD_ATTR,
+//            User.UserDao.Attributes.EMAIL_ATTR,
+//            User.UserDao.Attributes.LOGIN_ATTR,
+//        ).map { field -> field to it.validateProperty(signup, field) }
+//            .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
+//                violatedField.second.map {
+//                    mapOf<String, String?>(
+//                        MODEL_FIELD_OBJECTNAME to objectName,
+//                        MODEL_FIELD_FIELD to violatedField.first,
+//                        MODEL_FIELD_MESSAGE to it.message
+//                    )
+//                }
+//            }.toSet()
+//    }
+
 //    @Transactional(readOnly = true)
 //    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
 //    @Transactional

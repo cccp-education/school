@@ -24,11 +24,13 @@ import school.base.utils.Constants.SIGNUP_LOGIN_NOT_AVAILABLE
 import school.base.utils.Constants.defaultProblems
 import school.base.utils.Log.i
 import school.users.User
+import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
+import school.users.signup.Signup.Companion.objectName
 
 @RestController
 @RequestMapping(API_USERS)
@@ -51,21 +53,19 @@ class SignupController(private val signupService: SignupService) {
         i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
         if (isNotEmpty()) return signupProblems.badResponse(this)
     }.run {
-        var result: ResponseEntity<ProblemDetail> = EXPECTATION_FAILED.run(::ResponseEntity)
         signupService.signupAvailability(signup).map {
-            when (it) {
-                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> result = signupProblems.badResponseLoginAndEmailIsNotAvailable
-                SIGNUP_LOGIN_NOT_AVAILABLE -> result = signupProblems.badResponseLoginIsNotAvailable
-                SIGNUP_EMAIL_NOT_AVAILABLE -> result = signupProblems.badResponseEmailIsNotAvailable
+           return when (it) {
+                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseLoginAndEmailIsNotAvailable
+                SIGNUP_LOGIN_NOT_AVAILABLE -> signupProblems.badResponseLoginIsNotAvailable
+                SIGNUP_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseEmailIsNotAvailable
                 else -> {
                     signupService.signup(signup)
-                    result = CREATED.run(::ResponseEntity)
+                    CREATED.run(::ResponseEntity)
                 }
             }
         }
-        result
+        EXPECTATION_FAILED.run(::ResponseEntity)
     }
-
 
     companion object {
 
@@ -73,20 +73,19 @@ class SignupController(private val signupService: SignupService) {
             exchange: ServerWebExchange
         ): Set<Map<String, String?>> = exchange.validator.run {
             setOf(
-                PASSWORD_FIELD,
-                EMAIL_FIELD,
-                LOGIN_FIELD,
-            ).map { field: String ->
-                field to validateProperty(this@validate, field)
-            }.flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
-                violatedField.second.map {
-                    mapOf<String, String?>(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
-                        MODEL_FIELD_FIELD to violatedField.first,
-                        MODEL_FIELD_MESSAGE to it.message
-                    )
-                }
-            }.toSet()
+                User.UserDao.Attributes.PASSWORD_ATTR,
+                User.UserDao.Attributes.EMAIL_ATTR,
+                User.UserDao.Attributes.LOGIN_ATTR,
+            ).map { it -> it to validateProperty(this@validate, it) }
+                .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
+                    violatedField.second.map {
+                        mapOf<String, String?>(
+                            MODEL_FIELD_OBJECTNAME to objectName,
+                            MODEL_FIELD_FIELD to violatedField.first,
+                            MODEL_FIELD_MESSAGE to it.message
+                        )
+                    }
+                }.toSet()
         }
 
         @JvmStatic

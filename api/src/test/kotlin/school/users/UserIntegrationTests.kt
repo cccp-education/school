@@ -5,6 +5,8 @@ package school.users
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,19 +20,24 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
+import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
+import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
+import school.base.utils.Log.i
 import school.tdd.TestTools.logBody
 import school.tdd.TestTools.requestToString
 import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
-import school.tdd.TestUtils.Data.user
-import school.base.utils.Log.i
 import school.tdd.TestUtils.Data.signup
+import school.tdd.TestUtils.Data.user
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserRestApiRoutes.API_SIGNUP_PATH
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import school.users.signup.Signup
+import school.users.signup.Signup.Companion.objectName
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -110,17 +117,22 @@ class UserIntegrationTests {
             .logBody()
             .isEmpty()
             .let(::assertTrue)
-        assertEquals(countUserBefore , context.countUsers())
-        assertEquals(countUserAuthBefore , context.countUserAuthority())
+        assertEquals(countUserBefore, context.countUsers())
+        assertEquals(countUserAuthBefore, context.countUserAuthority())
         context.findOneByEmail<User>(user.email).run {
             when (this) {
-                is Left -> assertEquals(EmptyResultDataAccessException::class.java, value::class.java)
+                is Left -> assertEquals(
+                    EmptyResultDataAccessException::class.java,
+                    value::class.java
+                )
+
                 is Right -> assertEquals(user.id, value)
             }
         }
     }
 
-    @Test //TODO: mock sendmail
+
+    @Test //TODO: mock(intercept) sendmail
     fun `SignupController - test signup avec un account valide`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         val countUserAuthBefore = context.countUserAuthority()
