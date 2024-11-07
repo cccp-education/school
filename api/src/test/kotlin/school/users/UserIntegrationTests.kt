@@ -148,7 +148,6 @@ class UserIntegrationTests {
             .isCreated
             .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
-            .logBody()
             .isEmpty()
             .let(::assertTrue)
         assertEquals(countUserBefore + 1, context.countUsers())
