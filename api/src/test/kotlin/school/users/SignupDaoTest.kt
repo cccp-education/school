@@ -1,17 +1,9 @@
 package school.users
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.anyString
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.whenever
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
-import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.test.context.ActiveProfiles
-import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.SIGNUP_AVAILABLE
 import school.base.utils.Constants.SIGNUP_EMAIL_NOT_AVAILABLE
 import school.base.utils.Constants.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE

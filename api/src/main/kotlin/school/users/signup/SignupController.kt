@@ -1,7 +1,9 @@
 package school.users.signup
 
 import jakarta.validation.ConstraintViolation
+import kotlinx.coroutines.reactor.mono
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.EXPECTATION_FAILED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -10,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
-import school.base.http.ProblemsModel
 import school.base.http.HttpUtils.badResponse
 import school.base.http.HttpUtils.validator
+import school.base.http.ProblemsModel
 import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
+import school.base.utils.Constants.SIGNUP_EMAIL_NOT_AVAILABLE
+import school.base.utils.Constants.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
+import school.base.utils.Constants.SIGNUP_LOGIN_NOT_AVAILABLE
 import school.base.utils.Constants.defaultProblems
 import school.base.utils.Log.i
 import school.users.User
@@ -31,9 +36,9 @@ class SignupController(private val signupService: SignupService) {
     internal class SignupException(message: String) : RuntimeException(message)
 
     /**
-     * {@code POST  /signup} : register the user.
+     * {@code POST  /signup} : Signup the user.
      *
-     * @param signup the managed user View Model.
+     * @param signup the managed signup View Model.
      */
     @PostMapping(
         API_SIGNUP,
@@ -42,32 +47,29 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody signup: Signup,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> =
-//        CREATED.run(::ResponseEntity)
-        signup.validate(exchange).run {
-            i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
-            if (isNotEmpty()) return signupProblems.badResponse(this)
-        }.run {
-//            Triple(true/*OK*/, true/*email*/, true/*login*/).run {
-//                when {
-//                    /*email & login not available*/
-//                    !first && !second && !third -> EXPECTATION_FAILED.run(::ResponseEntity)
-//                    /*login not available*/
-//                    !first && second && !third -> EXPECTATION_FAILED.run(::ResponseEntity)
-//                    /*email not available*/
-//                    !first && !second && third -> EXPECTATION_FAILED.run(::ResponseEntity)
-//                    //TODO : pass it on one request with differents responses Pair<Boolean,Boolean> (isLoginAvailable to isEmailAvailable)
-////                signup.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-////                signup.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
-//                    else -> {
-//                        signupService.signup(signup)
-                        CREATED.run(::ResponseEntity)
-//                    }
-//                }
-//            }
+    ): ResponseEntity<ProblemDetail> = signup.validate(exchange).run {
+        i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+        if (isNotEmpty()) return signupProblems.badResponse(this)
+    }.run {
+        var result: ResponseEntity<ProblemDetail> = EXPECTATION_FAILED.run(::ResponseEntity)
+        signupService.signupAvailability(signup).map {
+            when (it) {
+                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> result = signupProblems.badResponseLoginAndEmailIsNotAvailable
+                SIGNUP_LOGIN_NOT_AVAILABLE -> result = signupProblems.badResponseLoginIsNotAvailable
+                SIGNUP_EMAIL_NOT_AVAILABLE -> result = signupProblems.badResponseEmailIsNotAvailable
+                else -> {
+                    signupService.signup(signup)
+                    // TODO: Send activation mail
+                    result = CREATED.run(::ResponseEntity)
+                }
+            }
         }
+        result
+    }
+
 
     companion object {
+
         fun Signup.validate(
             exchange: ServerWebExchange
         ): Set<Map<String, String?>> = exchange.validator.run {
@@ -125,36 +127,7 @@ class SignupController(private val signupService: SignupService) {
                     )
                 )
             )
-
-
-//        suspend fun Signup.loginIsNotAvailable(signupService: SignupService) =
-//            signupService.accountById(login!!).run {
-//                if (this == null) return@run false
-//                return when {
-//                    !activated -> {
-//                        signupService.deleteAccount(toAccount())
-//                        false
-//                    }
-//
-//                    else -> true
-//                }
-//            }
-//
-//        suspend fun Signup.emailIsNotAvailable(signupService: SignupService) =
-//            signupService.accountById(email!!).run {
-//                if (this == null) return@run false
-//                return when {
-//                    !activated -> {
-//                        signupService.deleteAccount(toAccount())
-//                        false
-//                    }
-//
-//                    else -> true
-//                }
-//            }
-
     }
-
 }
 
 

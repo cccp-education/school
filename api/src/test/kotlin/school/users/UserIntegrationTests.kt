@@ -50,7 +50,7 @@ class UserIntegrationTests {
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
     @Test
-    fun `DataTestsChecks - affiche moi du json`() = run {
+    fun `DataTestsChecks - display some json`() = run {
         assertDoesNotThrow {
             context.getBean<ObjectMapper>().run {
                 writeValueAsString(TestUtils.Data.users).run(::i)
@@ -139,17 +139,8 @@ class UserIntegrationTests {
             .logBody()
             .isEmpty()
             .let(::assertTrue)
-//        assertEquals(countUserBefore, context.countUsers())
-//        assertEquals(countUserBefore + 1, context.countUsers())
-//        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-//        context.findOneByEmail<User>(user.email).run {
-//            when (this) {
-//                is Left -> assertEquals(value::class.java, NullPointerException::class.java)
-//                is Right -> {
-//                    assertEquals(user.id, value)
-//                }
-//            }
-//        }
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
 //    @Test

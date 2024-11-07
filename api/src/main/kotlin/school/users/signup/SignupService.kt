@@ -9,6 +9,7 @@ import school.base.model.EntityModel.Members.withId
 import school.users.User
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Dao.signupToUser
+import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
 
 
 @Service
@@ -23,6 +24,19 @@ class SignupService(private val context: ApplicationContext) {
     } catch (t: Throwable) {
         t.left()
     }
+
+
+    suspend fun signupAvailability(signup: Signup)
+            : Either<Throwable, Triple<Boolean, Boolean, Boolean>> = try {
+        (signup to context)
+            .signupAvailability()
+            .onRight { it.right() }
+            .onLeft { it.left() }
+    } catch (ex: Throwable) {
+        ex.left()
+    }
+
+
 //    @Transactional(readOnly = true)
 //    suspend fun accountById(emailOrLogin: String) = accountRepository.findOne(emailOrLogin)
 //    @Transactional(readOnly = true)
