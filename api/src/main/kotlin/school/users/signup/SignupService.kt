@@ -100,7 +100,7 @@ class UserService(
     @Transactional
     suspend fun deleteAccount(account: Account) = accountRepository.delete(account)
 }
-
+*/
 /*
 package community.accounts.signup
 
@@ -173,5 +173,4 @@ class SignupServiceImpl(
     override suspend fun deleteAccount(account: Account) = accountRepository.delete(account)
 
 }
- */
 */
