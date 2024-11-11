@@ -16,6 +16,7 @@ import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
 import school.base.utils.Log.i
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import javax.inject.Inject
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,7 +26,7 @@ import kotlin.test.assertEquals
 @ActiveProfiles("test")
 class UserTests {
 
-    @Autowired
+    @Inject
     lateinit var context: ApplicationContext
     val mapper: ObjectMapper by lazy { context.getBean() }
     val validator: Validator by lazy { context.getBean() }

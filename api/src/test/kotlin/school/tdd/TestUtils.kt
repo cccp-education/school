@@ -24,7 +24,7 @@ object TestUtils {
     fun main(args: Array<String>): Unit = displayInsertUserScript()
 
     object Data {
-        const val OFFICIAL_SITE = "https://cheroliv.github.io/"
+        const val OFFICIAL_SITE = "https://cccp-education.github.io/"
         const val DEFAULT_IMAGE_URL = "https://placehold.it/50x50"
         val admin: User by lazy { userFactory(ADMIN) }
         val user: User by lazy { userFactory(USER) }

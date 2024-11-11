@@ -8,19 +8,99 @@ import jakarta.validation.Validator
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ServerWebExchange
+import school.base.http.HttpUtils.badResponse
+import school.base.http.HttpUtils.validator
+import school.base.http.ProblemsModel
 import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.base.model.EntityModel.Members.withId
+import school.base.utils.Constants.defaultProblems
 import school.users.User
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Dao.signupToUser
+import school.users.User.UserDao.Fields.EMAIL_FIELD
+import school.users.User.UserDao.Fields.LOGIN_FIELD
+import school.users.User.UserRestApiRoutes.API_SIGNUP
+import school.users.User.UserRestApiRoutes.API_USERS
 import school.users.signup.Signup.Companion.objectName
 import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
 
 
 @Service
 class SignupService(private val context: ApplicationContext) {
+    companion object {
+        @JvmStatic
+        val SIGNUP_AVAILABLE = Triple(true, true, true)
+
+        @JvmStatic
+        val SIGNUP_LOGIN_NOT_AVAILABLE = Triple(false, true, false)
+
+        @JvmStatic
+        val SIGNUP_EMAIL_NOT_AVAILABLE = Triple(false, false, true)
+
+        @JvmStatic
+        val SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE = Triple(false, false, false)
+        fun Signup.validate(
+            exchange: ServerWebExchange
+        ): Set<Map<String, String?>> = exchange.validator.run {
+            setOf(
+                User.UserDao.Attributes.PASSWORD_ATTR,
+                User.UserDao.Attributes.EMAIL_ATTR,
+                User.UserDao.Attributes.LOGIN_ATTR,
+            ).map { it -> it to validateProperty(this@validate, it) }
+                .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
+                    violatedField.second.map {
+                        mapOf<String, String?>(
+                            MODEL_FIELD_OBJECTNAME to objectName,
+                            MODEL_FIELD_FIELD to violatedField.first,
+                            MODEL_FIELD_MESSAGE to it.message
+                        )
+                    }
+                }.toSet()
+        }
+
+        @JvmStatic
+        val signupProblems = defaultProblems.copy(path = "$API_USERS$API_SIGNUP")
+
+        @JvmStatic
+        val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to LOGIN_FIELD,
+                        MODEL_FIELD_FIELD to EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
+                    )
+                )
+            )
+
+        @JvmStatic
+        val ProblemsModel.badResponseLoginIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to LOGIN_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used!"
+                    )
+                )
+            )
+
+        @JvmStatic
+        val ProblemsModel.badResponseEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Email is already in use!"
+                    )
+                )
+            )
+    }
 
     suspend fun signup(signup: Signup): Either<Throwable, User> = try {
         context.signupToUser(signup).run {

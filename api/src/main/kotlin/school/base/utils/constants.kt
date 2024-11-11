@@ -1,7 +1,7 @@
 package school.base.utils
 
 import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import school.base.http.ProblemsModel
 import java.net.URI
 import java.net.URI.create
@@ -38,7 +38,7 @@ object Constants {
     }
     const val NORMAL_TERMINATION = 0
     const val DOMAIN_DEV_URL = "acme.com"
-    private const val DOMAIN_URL = "https://cheroliv.github.io"
+    private const val DOMAIN_URL = "https://cccp-education.github.io"
     const val STARTUP_HOST_WARN_LOG_MSG = "The host name could not be determined, using `localhost` as fallback"
     const val SPRING_APPLICATION_NAME = "spring.application.name"
     const val SERVER_SSL_KEY_STORE = "server.ssl.key-store"
@@ -157,7 +157,7 @@ object Constants {
 
     val validationProblems by lazy {
         ProblemsModel(
-            type = "https://cheroliv.github.io/problem/constraint-violation",
+            type = "https://cccp-education.github.io/problem/constraint-violation",
             title = "Data binding and validation failure",
             message = "error.validation",
             status = BAD_REQUEST.value(),
@@ -166,10 +166,10 @@ object Constants {
 
     val serverErrorProblems by lazy {
         ProblemsModel(
-            type = "https://cheroliv.github.io/problem/internal-server-error",
-            title = "Internal Server Error",
+            type = "https://cccp-education.github.io/problem/internal-server-error",
+            title = "Service Unavailable Error",
             message = "error.server",
-            status = INTERNAL_SERVER_ERROR.value(),
+            status = SERVICE_UNAVAILABLE.value(),
         )
     }
 
@@ -178,25 +178,15 @@ object Constants {
     const val PASSWORD_MAX: Int = 24
     const val IMAGE_URL_DEFAULT = "http://placehold.it/50x50"
 
-
+    @JvmField
     val defaultProblems = ProblemsModel(
-        type = "https://cheroliv.github.io/problem/constraint-violation",
+        type = "https://cccp-education.github.io/problem/constraint-violation",
         title = "Data binding and validation failure",
         message = "error.validation",
         path = "",
         status = BAD_REQUEST.value(),
     )
 
-    @JvmStatic
-    val SIGNUP_AVAILABLE = Triple(true, true, true)
 
-    @JvmStatic
-    val SIGNUP_LOGIN_NOT_AVAILABLE = Triple(false, true, false)
-
-    @JvmStatic
-    val SIGNUP_EMAIL_NOT_AVAILABLE = Triple(false, false, true)
-
-    @JvmStatic
-    val SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE = Triple(false, false, false)
 
 }

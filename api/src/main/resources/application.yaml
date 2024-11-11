@@ -1,7 +1,7 @@
 school:
   message: hello
   item: item
-  go-visit-message: https://cheroliv.github.io/
+  go-visit-message: https://cccp-education.github.io/
   clientApp:
     name: 'server'
   mail:

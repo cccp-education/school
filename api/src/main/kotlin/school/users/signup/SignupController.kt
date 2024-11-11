@@ -1,9 +1,8 @@
 package school.users.signup
 
 import jakarta.validation.ConstraintViolation
-import kotlinx.coroutines.reactor.mono
 import org.springframework.http.HttpStatus.CREATED
-import org.springframework.http.HttpStatus.EXPECTATION_FAILED
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
@@ -18,19 +17,22 @@ import school.base.http.ProblemsModel
 import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
 import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
 import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
-import school.base.utils.Constants.SIGNUP_EMAIL_NOT_AVAILABLE
-import school.base.utils.Constants.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
-import school.base.utils.Constants.SIGNUP_LOGIN_NOT_AVAILABLE
 import school.base.utils.Constants.defaultProblems
 import school.base.utils.Log.i
 import school.users.User
-import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
-import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
 import school.users.signup.Signup.Companion.objectName
+import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
+import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
+import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
+import school.users.signup.SignupService.Companion.badResponseEmailIsNotAvailable
+import school.users.signup.SignupService.Companion.badResponseLoginAndEmailIsNotAvailable
+import school.users.signup.SignupService.Companion.badResponseLoginIsNotAvailable
+import school.users.signup.SignupService.Companion.signupProblems
+import school.users.signup.SignupService.Companion.validate
 
 @RestController
 @RequestMapping(API_USERS)
@@ -54,7 +56,7 @@ class SignupController(private val signupService: SignupService) {
         if (isNotEmpty()) return signupProblems.badResponse(this)
     }.run {
         signupService.signupAvailability(signup).map {
-           return when (it) {
+            return when (it) {
                 SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseLoginAndEmailIsNotAvailable
                 SIGNUP_LOGIN_NOT_AVAILABLE -> signupProblems.badResponseLoginIsNotAvailable
                 SIGNUP_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseEmailIsNotAvailable
@@ -64,69 +66,7 @@ class SignupController(private val signupService: SignupService) {
                 }
             }
         }
-        EXPECTATION_FAILED.run(::ResponseEntity)
-    }
-
-    companion object {
-
-        fun Signup.validate(
-            exchange: ServerWebExchange
-        ): Set<Map<String, String?>> = exchange.validator.run {
-            setOf(
-                User.UserDao.Attributes.PASSWORD_ATTR,
-                User.UserDao.Attributes.EMAIL_ATTR,
-                User.UserDao.Attributes.LOGIN_ATTR,
-            ).map { it -> it to validateProperty(this@validate, it) }
-                .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
-                    violatedField.second.map {
-                        mapOf<String, String?>(
-                            MODEL_FIELD_OBJECTNAME to objectName,
-                            MODEL_FIELD_FIELD to violatedField.first,
-                            MODEL_FIELD_MESSAGE to it.message
-                        )
-                    }
-                }.toSet()
-        }
-
-        @JvmStatic
-        val signupProblems = defaultProblems.copy(path = "$API_USERS$API_SIGNUP")
-
-        @JvmStatic
-        val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
-            get() = badResponse(
-                setOf(
-                    mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
-                        MODEL_FIELD_FIELD to LOGIN_FIELD,
-                        MODEL_FIELD_FIELD to EMAIL_FIELD,
-                        MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
-                    )
-                )
-            )
-
-        @JvmStatic
-        val ProblemsModel.badResponseLoginIsNotAvailable
-            get() = badResponse(
-                setOf(
-                    mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
-                        MODEL_FIELD_FIELD to LOGIN_FIELD,
-                        MODEL_FIELD_MESSAGE to "Login name already used!"
-                    )
-                )
-            )
-
-        @JvmStatic
-        val ProblemsModel.badResponseEmailIsNotAvailable
-            get() = badResponse(
-                setOf(
-                    mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
-                        MODEL_FIELD_FIELD to EMAIL_FIELD,
-                        MODEL_FIELD_MESSAGE to "Email is already in use!"
-                    )
-                )
-            )
+        SERVICE_UNAVAILABLE.run(::ResponseEntity)
     }
 }
 

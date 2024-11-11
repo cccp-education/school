@@ -5,24 +5,21 @@ package school.users
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.ConstraintViolation
-import jakarta.validation.Validator
+import jakarta.validation.constraints.Pattern
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
-import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
-import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
+import org.springframework.web.server.ServerWebExchange
+import school.base.http.HttpUtils.validator
 import school.base.utils.Log.i
 import school.tdd.TestTools.logBody
 import school.tdd.TestTools.requestToString
@@ -31,18 +28,17 @@ import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.signup
 import school.tdd.TestUtils.Data.user
 import school.users.User.UserDao
+import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserRestApiRoutes.API_SIGNUP_PATH
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
-import school.users.signup.Signup
-import school.users.signup.Signup.Companion.objectName
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
-class UserIntegrationTests {
+class SignupWebClientTests {
 
     @Autowired
     lateinit var context: ApplicationContext
@@ -76,7 +72,7 @@ class UserIntegrationTests {
             .contentType(APPLICATION_JSON)
             .bodyValue(user)
             .exchange()
-            .returnResult<Unit>()
+            .returnResult<Any>()
             .requestBodyContent!!
             .logBody()
             .requestToString()
@@ -112,11 +108,10 @@ class UserIntegrationTests {
             .exchange()
             .expectStatus()
             .isUnauthorized
-            .returnResult<ResponseEntity<ProblemDetail>>()
+            .expectBody()
+            .isEmpty
             .responseBodyContent!!
             .logBody()
-            .isEmpty()
-            .let(::assertTrue)
         assertEquals(countUserBefore, context.countUsers())
         assertEquals(countUserAuthBefore, context.countUserAuthority())
         context.findOneByEmail<User>(user.email).run {
@@ -146,29 +141,27 @@ class UserIntegrationTests {
             .exchange()
             .expectStatus()
             .isCreated
-            .returnResult<ResponseEntity<ProblemDetail>>()
-            .responseBodyContent!!
-            .isEmpty()
-            .let(::assertTrue)
+            .expectBody()
+            .isEmpty
         assertEquals(countUserBefore + 1, context.countUsers())
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
-//    @Test
-//    fun `UserController - test signup account validator avec login invalid`() {
-//        validator
-//            .validateProperty(AccountCredentials(login = "funky-log(n"), LOGIN_FIELD)
-//            .run viol@{
-//                assertTrue(isNotEmpty())
-//                first().run {
-//                    assertEquals(
-//                        "{${Pattern::class.java.name}.message}",
-//                        messageTemplate
-//                    )
-//                }
-//            }
-//    }
-//
+    @Test
+    fun `test signup account validator with invalid login`() {
+        (mock() as ServerWebExchange).validator
+            .validateProperty(signup.copy(login = "funky-log(n"), LOGIN_ATTR)
+            .run {
+                assertTrue(isNotEmpty())
+                first().run {
+                    assertEquals(
+                        "{${Pattern::class.java.name}.message}",
+                        messageTemplate
+                    )
+                }
+            }
+    }
+
 //    @Test
 //    fun `UserController - test signup account avec login invalid`() {
 //        assertEquals(0, countAccount(dao))

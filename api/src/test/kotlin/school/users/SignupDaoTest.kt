@@ -4,10 +4,6 @@ import kotlinx.coroutines.runBlocking
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.base.utils.Constants.SIGNUP_AVAILABLE
-import school.base.utils.Constants.SIGNUP_EMAIL_NOT_AVAILABLE
-import school.base.utils.Constants.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
-import school.base.utils.Constants.SIGNUP_LOGIN_NOT_AVAILABLE
 import school.tdd.TestUtils.Data.signup
 import school.tdd.TestUtils.Data.user
 import school.users.User.UserDao.Dao.countUsers
@@ -15,6 +11,10 @@ import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
 import school.users.signup.Signup
 import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
+import school.users.signup.SignupService.Companion.SIGNUP_AVAILABLE
+import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
+import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
+import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
 import javax.inject.Inject
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -39,7 +39,7 @@ class SignupDaoTest {
             "password",
             "testuser@example.com"
         ) to context).signupAvailability().run {
-            assertTrue(isRight())
+            isRight().run(::assertTrue)
             assertEquals(SIGNUP_AVAILABLE, getOrNull()!!)
         }
     }
