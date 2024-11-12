@@ -109,7 +109,7 @@ data class User(
         fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
     }
 
-    /** Account REST API URIs */
+    /** User REST API URIs */
     object UserRestApiRoutes {
         const val API_AUTHORITY = "/api/authorities"
         const val API_USERS = "/api/users"

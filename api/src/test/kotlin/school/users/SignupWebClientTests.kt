@@ -27,6 +27,7 @@ import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.signup
 import school.tdd.TestUtils.Data.user
+import school.tdd.TestUtils.Data.users
 import school.users.User.UserDao
 import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Dao.countUsers
@@ -34,13 +35,14 @@ import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserRestApiRoutes.API_SIGNUP_PATH
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import javax.inject.Inject
 import kotlin.test.*
 
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
 class SignupWebClientTests {
 
-    @Autowired
+    @Inject
     lateinit var context: ApplicationContext
     lateinit var client: WebTestClient
 
@@ -56,7 +58,7 @@ class SignupWebClientTests {
     fun `DataTestsChecks - display some json`() = run {
         assertDoesNotThrow {
             context.getBean<ObjectMapper>().run {
-                writeValueAsString(TestUtils.Data.users).run(::i)
+                writeValueAsString(users).run(::i)
                 writeValueAsString(user).run(::i)
             }
             DEFAULT_USER_JSON.run(::i)

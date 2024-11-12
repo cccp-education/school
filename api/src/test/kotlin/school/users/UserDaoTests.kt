@@ -14,7 +14,6 @@ import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -45,6 +44,7 @@ import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import java.util.*
 import java.util.UUID.fromString
+import javax.inject.Inject
 import kotlin.test.*
 
 
@@ -52,7 +52,7 @@ import kotlin.test.*
 @ActiveProfiles("test")
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 class UserDaoTests {
-    @Autowired
+    @Inject
     lateinit var context: ApplicationContext
 
     @AfterTest
