@@ -155,6 +155,9 @@ dependencies {
     //    // OpenAI
     //    implementation("org.springframework.ai:spring-ai-openai")
     //    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
+    // Langchain4j
+    implementation("dev.langchain4j:langchain4j-ollama-spring-boot-starter:0.35.0")
+
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")

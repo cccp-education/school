@@ -85,7 +85,7 @@ object AssistantManager {
 
     fun Project.runChat(model: String) {
         createOllamaChatModel(model = model)
-            .run { generate(userMessageFr).let(::println) }
+            .run { userMessageFr.run(::generate).let(::println) }
     }
 
     fun Project.runStreamChat(model: String) {

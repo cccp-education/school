@@ -8,6 +8,9 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.*
+import javax.swing.BorderFactory.createTitledBorder
+import javax.swing.JOptionPane.ERROR_MESSAGE
+import javax.swing.JOptionPane.showMessageDialog
 
 /**
  * @author cheroliv
@@ -30,16 +33,14 @@ class Setup(
     internal val workspacePathLabel: JLabel = JLabel("Path"),
     internal val workspacePathTextField: JTextField = JTextField(),
     internal val workspaceTypePanel: JPanel = JPanel().apply {
-        border =
-            BorderFactory.createTitledBorder("Installation type")
+        border = createTitledBorder("Installation type")
     },
     internal val workspaceTypeSelectorPanel: JPanel = JPanel(),
     internal val workspaceTopPanel: JPanel = JPanel(),
-    internal val workspacePathPanel: JPanel = JPanel().apply { border = BorderFactory.createTitledBorder("Workspace") },
+    internal val workspacePathPanel: JPanel = JPanel().apply { border = createTitledBorder("Workspace") },
     internal val workspaceEntriesPanel: JPanel = JPanel(),
-    internal val splitWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders").apply {
-        isSelected = false
-    },
+    internal val splitWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders")
+        .apply { isSelected = false },
     internal val allInOneWorkspaceRadioButton: JRadioButton = JRadioButton("All-in-one").apply { isSelected = true },
     internal val browseCommunicationPathButton: JButton = JButton(),
     internal val browseConfigurationPathButton: JButton = JButton(),
@@ -128,11 +129,11 @@ class Setup(
     private fun Setup.handleCreateWorkspace() {
         when {
             workspacePathTextField.text.isEmpty() -> {
-                JOptionPane.showMessageDialog(
+                showMessageDialog(
                     this,
                     "Please select a workspace directory",
                     "Validation Error",
-                    JOptionPane.ERROR_MESSAGE
+                    ERROR_MESSAGE
                 )
                 return
             }
@@ -144,18 +145,18 @@ class Setup(
                     else -> createAllInOneWorkspace()
                 }
 
-                JOptionPane.showMessageDialog(
+                showMessageDialog(
                     this,
                     "Workspace created successfully!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
                 )
             } catch (e: Exception) {
-                JOptionPane.showMessageDialog(
+                showMessageDialog(
                     this,
                     "Error creating workspace: " + e.message,
                     "Error",
-                    JOptionPane.ERROR_MESSAGE
+                    ERROR_MESSAGE
                 )
             }
         }
@@ -447,7 +448,7 @@ class Setup(
             }
         }
         workspacePathPanel.apply panel@{
-            border = BorderFactory.createTitledBorder("Workspace")
+            border = createTitledBorder("Workspace")
             run(::GroupLayout).run {
                 this@panel.layout = this
                 setHorizontalGroup(
