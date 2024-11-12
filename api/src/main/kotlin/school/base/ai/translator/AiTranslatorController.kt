@@ -1,37 +1,29 @@
 package school.base.ai.translator
 
-import dev.langchain4j.data.message.AiMessage
-import org.eclipse.angus.mail.iap.Response
-import org.springframework.context.ApplicationContext
-import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatus.OK
-import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ServerWebExchange
-import school.users.User.UserRestApiRoutes.API_USERS
-
 import arrow.core.Either
 import arrow.core.Either.Companion.catch
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.getOrElse
+import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.model.StreamingResponseHandler
 import dev.langchain4j.model.chat.StreamingChatLanguageModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.ollama.OllamaStreamingChatModel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.springframework.context.ApplicationContext
+import org.springframework.http.HttpStatus.OK
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ServerWebExchange
 import school.base.ai.translator.AiTranslatorController.AssistantManager.PromptManager.userMessageEn
 import school.base.ai.translator.AiTranslatorController.AssistantManager.PromptManager.userMessageFr
-import java.time.Duration.ofSeconds
 import kotlin.coroutines.resume
 
 @RestController
@@ -45,17 +37,18 @@ class AiTranslatorController(service: ChatModelService) {
     ): ResponseEntity<ProblemDetail> = OK.run(::ResponseEntity)
 
     @Service
-    class ChatModelService(context: ApplicationContext){
-        suspend fun answer(question:String){
+    class ChatModelService(context: ApplicationContext) {
+        suspend fun answer(question: String) {
 //            val answer=dev.langchain4j.model.output.Response<AiMessage>()
         }
     }
+
     object AssistantManager {
         @JvmStatic
         fun main(args: Array<String>) {
-            userMessageFr.run{"userMessageFr : $this"}.run(::println)
+            userMessageFr.run { "userMessageFr : $this" }.run(::println)
             println()
-            userMessageEn.run{"userMessageEn : $this"}.run(::println)
+            userMessageEn.run { "userMessageEn : $this" }.run(::println)
         }
 
         @JvmStatic
@@ -104,7 +97,8 @@ class AiTranslatorController(service: ChatModelService) {
                 model.generate(promptMessage, object : StreamingResponseHandler<AiMessage> {
                     override fun onNext(token: String) = print(token)
 
-                    override fun onComplete(response: dev.langchain4j.model.output.Response<AiMessage>) = continuation.resume(response)
+                    override fun onComplete(response: dev.langchain4j.model.output.Response<AiMessage>) =
+                        continuation.resume(response)
 
                     override fun onError(error: Throwable) = continuation.resume(Left(error).getOrElse { throw it })
                 })
