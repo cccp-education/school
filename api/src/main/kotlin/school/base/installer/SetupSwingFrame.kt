@@ -1,6 +1,7 @@
 package school.base.installer
 
 import org.springframework.context.ApplicationContext
+import school.base.installer.WorkspaceService.InstallationType
 import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
 import school.base.installer.WorkspaceService.InstallationType.SEPARATED_FOLDERS
 import school.base.utils.Log
@@ -22,10 +23,10 @@ import kotlin.Short.Companion.MAX_VALUE
 /**
  * @author cheroliv
  */
-class Setup(
+class SetupSwingFrame(
     private val context: ApplicationContext,
     val selectedPaths: MutableMap<String, Path?> = HashMap(),
-    internal var currentInstallationType: WorkspaceService.InstallationType = ALL_IN_ONE,
+    internal var currentInstallationType: InstallationType = ALL_IN_ONE,
     internal val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
     internal val communicationPathTextField: JTextField = JTextField(),
     internal val configurationPathLabel: JLabel = JLabel("Configuration").apply { toolTipText = "" },
@@ -60,16 +61,16 @@ class Setup(
         add(allInOneWorkspaceRadioButton)
         add(splitWorkspaceRadioButton)
     },
-) : JFrame("School Project Setup") {
+) : JFrame("School Project SetupSwingFrame") {
 
     // Service pour gérer les opérations sur le workspace
-    private val workspaceService = WorkspaceService()
+    private val workspaceService by lazy { context.run(::WorkspaceService) }
 
     init {
         initUI().let { "Init, currentInstallationType : $currentInstallationType".run(Log::i) }
     }
 
-    private fun Setup.clearSpecificPaths() {
+    private fun SetupSwingFrame.clearSpecificPaths() {
         officePathTextField.text = ""
         educationPathTextField.text = ""
         communicationPathTextField.text = ""
@@ -83,7 +84,7 @@ class Setup(
         selectedPaths.remove("job")
     }
 
-    private fun Setup.handleCreateWorkspace() {
+    private fun SetupSwingFrame.handleCreateWorkspace() {
         when {
             workspacePathTextField.text.isEmpty() -> {
                 showMessageDialog(
@@ -119,7 +120,7 @@ class Setup(
         }
     }
 
-    private fun Setup.createSeparatedFoldersWorkspace() {
+    private fun SetupSwingFrame.createSeparatedFoldersWorkspace() {
         // Validate all required paths are selected
         val requiredPaths = arrayOf("office", "education", "communication", "configuration", "job")
         for (path in requiredPaths) {
@@ -130,7 +131,7 @@ class Setup(
         // You can access the paths using selectedPaths.get("office") etc.
     }
 
-    private fun Setup.selectDirectory(
+    private fun SetupSwingFrame.selectDirectory(
         pathKey: String,
         textField: JTextField
     ) = JFileChooser().run {
@@ -144,7 +145,7 @@ class Setup(
         }
     }
 
-    private fun Setup.handleInstallationTypeChange(type: WorkspaceService.InstallationType) {
+    private fun SetupSwingFrame.handleInstallationTypeChange(type: InstallationType) {
         "currentInstallationType : $currentInstallationType".run(Log::i)
         currentInstallationType = type
         "Installation type changed to $type".run(Log::i)
@@ -155,26 +156,20 @@ class Setup(
         }
     }
 
-    private fun Setup.createAllInOneWorkspace() {
+    private fun SetupSwingFrame.createAllInOneWorkspace() {
         val workspacePath = Paths.get(workspacePathTextField.text)
         // TODO: Implement the creation of an all-in-one workspace
         // This would typically involve creating subdirectories in the main workspace
     }
 
-    private fun Setup.addListeners(): Setup {
+    private fun SetupSwingFrame.addListeners(): SetupSwingFrame {
         splitWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(SEPARATED_FOLDERS) }
         allInOneWorkspaceRadioButton.addActionListener { handleInstallationTypeChange(ALL_IN_ONE) }
         browseCommunicationPathButton.addActionListener {
-            selectDirectory(
-                "communication",
-                communicationPathTextField
-            )
+            selectDirectory("communication", communicationPathTextField)
         }
         browseConfigurationPathButton.addActionListener {
-            selectDirectory(
-                "configuration",
-                configurationPathTextField
-            )
+            selectDirectory("configuration", configurationPathTextField)
         }
         browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
         browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
@@ -189,7 +184,9 @@ class Setup(
         return this
     }
 
-    private fun Setup.setWorkspaceEntriesVisibility(visible: Boolean): Setup = setOf(
+    private fun SetupSwingFrame.setWorkspaceEntriesVisibility(
+        visible: Boolean
+    ): SetupSwingFrame = setOf(
         officePathLabel,
         officePathTextField,
         browseOfficePathButton,
@@ -208,7 +205,7 @@ class Setup(
     ).map { it.isVisible = visible }
         .run { this@setWorkspaceEntriesVisibility }
 
-    internal fun Setup.initUI() {
+    internal fun SetupSwingFrame.initUI() {
         name = "setupFrame" // NOI18N
         defaultCloseOperation = EXIT_ON_CLOSE
         setWorkspaceEntriesVisibility(false)

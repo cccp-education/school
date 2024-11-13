@@ -93,7 +93,7 @@ class CommandLine : CommandLineRunner {
 //                try {
 //                    // Utiliser invokeAndWait pour s'assurer que l'UI est initialisée
 //                    SwingUtilities.invokeAndWait {
-//                        val setupFrame = Setup()
+//                        val setupFrame = SetupSwingFrame()
 //                        setupFrame.isVisible = true
 //
 //                        // Maintenir l'application active tant que la fenêtre est ouverte
@@ -164,7 +164,7 @@ class CommandLine : CommandLineRunner {
 ////                try {
 ////                    // Utiliser invokeAndWait pour s'assurer que l'UI est initialisée
 ////                    SwingUtilities.invokeAndWait {
-////                        val setupFrame = Setup()
+////                        val setupFrame = SetupSwingFrame()
 ////                        setupFrame.isVisible = true
 ////
 ////                        // Maintenir l'application active tant que la fenêtre est ouverte
@@ -242,7 +242,7 @@ class CommandLine : CommandLineRunner {
 ////    private fun handleGuiMode() {
 ////        try {
 ////            SwingUtilities.invokeAndWait {
-////                val setupFrame = Setup()
+////                val setupFrame = SetupSwingFrame()
 ////                setupFrame.isVisible = true
 ////
 ////                // Maintenir l'application active tant que la fenêtre est ouverte
@@ -305,7 +305,7 @@ class CommandLine : CommandLineRunner {
 ////            try {
 ////                // Utiliser invokeAndWait pour s'assurer que l'UI est initialisée
 ////                SwingUtilities.invokeAndWait {
-////                    val setupFrame = Setup()
+////                    val setupFrame = SetupSwingFrame()
 ////                    setupFrame.isVisible = true
 ////
 ////
@@ -353,7 +353,7 @@ class CommandLine : CommandLineRunner {
 ////        if (args.contains("--gui")) {
 ////            i("Lancement de l'interface graphique...")
 ////            SwingUtilities.invokeLater {
-////                val setupFrame = Setup()
+////                val setupFrame = SetupSwingFrame()
 ////                setupFrame.isVisible = true
 ////            }
 ////        } else {

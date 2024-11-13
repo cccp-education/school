@@ -1,7 +1,7 @@
 package school
 
 import org.springframework.boot.SpringApplication.run
-import school.base.installer.Setup
+import school.base.installer.SetupSwingFrame
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Log.w
 import java.awt.EventQueue.invokeLater
@@ -27,7 +27,7 @@ object Installer {
     }.run {
         invokeLater {
             run(Application::class.java, *args)
-                .run(::Setup)
+                .run(::SetupSwingFrame)
                 .run { isVisible = true }
         }
     }
