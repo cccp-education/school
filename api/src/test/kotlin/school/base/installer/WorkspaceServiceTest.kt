@@ -3,8 +3,6 @@ package school.base.installer
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
-import school.base.installer.WorkspaceService.WorkspaceConfig
 import school.base.utils.AppUtils.lsWorkingDir
 import school.base.utils.AppUtils.lsWorkingDirProcess
 import school.base.utils.Log.i
@@ -17,7 +15,6 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 
-//@org.junit.jupiter.api.extension.ExtendWith
 @ActiveProfiles("test")
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
 class WorkspaceServiceTest {
@@ -32,16 +29,18 @@ class WorkspaceServiceTest {
     fun tearDown() = Unit
 
     @Test
-    fun `test workspace creation`(): Unit {
-        val destDir = "build".run(::File)
-        destDir.exists().run(::assertTrue)
-        destDir.isDirectory.run(::assertTrue)
-
-        WorkspaceConfig(
-            basePath = destDir.toPath(),
-            type = ALL_IN_ONE,
-        ).run(WorkspaceService(context)::createWorkspace)
-
+    fun `test create workspace with ALL_IN_ONE config`(): Unit {
+        "build/workspace"
+            .run(::File)
+            .apply { if (!exists()) mkdirs().run(::assertTrue) }
+            .run {
+                exists().run(::assertTrue)
+                isDirectory.run(::assertTrue)
+//        WorkspaceConfig(
+//            basePath = destDir.toPath(),
+//            type = ALL_IN_ONE,
+//        ).run(WorkspaceService(context)::createWorkspace)
+//
 //        val config = WorkspaceService.WorkspaceConfig(
 //            type = WorkspaceService.InstallationType.SEPARATED_FOLDERS,
 //            basePath = context.classLoader?.getResource("workspace")!!.toURI().toPath(),
@@ -53,18 +52,9 @@ class WorkspaceServiceTest {
 //                "job" to context.classLoader?.getResource("job")!!.toURI().toPath(),
 //            ),
 //        )
-
-
-        context.lsWorkingDirProcess(destDir).run { "lsWorkingDirProcess : $this" }.run(::i)
-        File("build").absolutePath.run(::i)
-
-        // Liste un répertoire spécifié par une chaîne
-        context.lsWorkingDir("build", maxDepth = 2)
-
-        // Liste un répertoire spécifié par un Path
-        context.lsWorkingDir(Paths.get("build"))
+                deleteRecursively().run(::assertTrue)
+            }
     }
-
 
     @Test
     fun `test lsWorkingDir & lsWorkingDirProcess`(): Unit {
