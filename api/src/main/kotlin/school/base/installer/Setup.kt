@@ -8,10 +8,11 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.*
 import javax.swing.BorderFactory.createTitledBorder
-import javax.swing.GroupLayout.Alignment.BASELINE
-import javax.swing.GroupLayout.Alignment.LEADING
+import javax.swing.GroupLayout.Alignment.*
 import javax.swing.GroupLayout.DEFAULT_SIZE
 import javax.swing.GroupLayout.PREFERRED_SIZE
+import javax.swing.JFileChooser.APPROVE_OPTION
+import javax.swing.JFileChooser.DIRECTORIES_ONLY
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.JOptionPane.showMessageDialog
 import javax.swing.LayoutStyle.ComponentPlacement.RELATED
@@ -133,9 +134,9 @@ class Setup(
         pathKey: String,
         textField: JTextField
     ) = JFileChooser().run {
-        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+        fileSelectionMode = DIRECTORIES_ONLY
         dialogTitle = "Select Directory"
-        when (JFileChooser.APPROVE_OPTION) {
+        when (APPROVE_OPTION) {
             showOpenDialog(this) -> selectedFile.toPath().run {
                 selectedPaths[pathKey] = this
                 textField.text = toString()
@@ -179,6 +180,9 @@ class Setup(
         browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
         browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
         browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
+        /*
+            action sur bouton create workspace
+         */
         createWorkspaceButton.addActionListener { handleCreateWorkspace() }
         installationTypeGroup.selection.addActionListener {
         }
@@ -225,7 +229,7 @@ class Setup(
                         .addGroup(
                             createParallelGroup(LEADING)
                                 .addGroup(
-                                    GroupLayout.Alignment.TRAILING, createSequentialGroup()
+                                    TRAILING, createSequentialGroup()
                                         .addContainerGap()
                                         .addComponent(
                                             workspaceTypeSelectorPanel,
@@ -271,7 +275,7 @@ class Setup(
                         .addGroup(
                             createParallelGroup(LEADING)
                                 .addGroup(
-                                    GroupLayout.Alignment.TRAILING, createSequentialGroup()
+                                    TRAILING, createSequentialGroup()
                                         .addContainerGap(69, MAX_VALUE.toInt())
                                         .addComponent(
                                             workspaceEntriesPanel,
@@ -393,7 +397,8 @@ class Setup(
                                     createParallelGroup(BASELINE)
                                         .addComponent(
                                             titleLabel,
-                                            PREFERRED_SIZE, 43,
+                                            PREFERRED_SIZE,
+                                            43,
                                             PREFERRED_SIZE
                                         )
                                         .addComponent(createWorkspaceButton)
@@ -466,28 +471,28 @@ class Setup(
                                                 )
                                                 .addComponent(
                                                     educationPathLabel,
-                                                    GroupLayout.Alignment.TRAILING,
+                                                    TRAILING,
                                                     DEFAULT_SIZE,
                                                     DEFAULT_SIZE,
                                                     MAX_VALUE.toInt()
                                                 )
                                                 .addComponent(
                                                     communicationPathLabel,
-                                                    GroupLayout.Alignment.TRAILING,
+                                                    TRAILING,
                                                     DEFAULT_SIZE,
                                                     DEFAULT_SIZE,
                                                     MAX_VALUE.toInt()
                                                 )
                                                 .addComponent(
                                                     configurationPathLabel,
-                                                    GroupLayout.Alignment.TRAILING,
+                                                    TRAILING,
                                                     DEFAULT_SIZE,
                                                     DEFAULT_SIZE,
                                                     MAX_VALUE.toInt()
                                                 )
                                                 .addComponent(
                                                     jobPathLabel,
-                                                    GroupLayout.Alignment.TRAILING,
+                                                    TRAILING,
                                                     PREFERRED_SIZE,
                                                     190,
                                                     PREFERRED_SIZE
@@ -498,7 +503,7 @@ class Setup(
                                             createParallelGroup(LEADING)
                                                 .addComponent(
                                                     officePathTextField,
-                                                    GroupLayout.Alignment.TRAILING,
+                                                    TRAILING,
                                                     DEFAULT_SIZE,
                                                     475,
                                                     MAX_VALUE.toInt()
@@ -512,7 +517,7 @@ class Setup(
                                         .addGroup(
                                             createParallelGroup(LEADING)
                                                 .addComponent(browseEducationPathButton)
-                                                .addComponent(browseOfficePathButton, GroupLayout.Alignment.TRAILING)
+                                                .addComponent(browseOfficePathButton, TRAILING)
                                                 .addComponent(browseCommunicationPathButton)
                                                 .addComponent(browseConfigurationPathButton)
                                                 .addComponent(browsejobPathButton)

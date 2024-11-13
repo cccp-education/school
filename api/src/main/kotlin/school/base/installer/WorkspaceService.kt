@@ -1,5 +1,7 @@
 package school.base.installer
 
+import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
+import school.base.installer.WorkspaceService.InstallationType.SEPARATED_FOLDERS
 import java.io.File
 import java.nio.file.Path
 
@@ -7,8 +9,8 @@ import java.nio.file.Path
 class WorkspaceService {
     fun createWorkspace(config: WorkspaceConfig) {
         when (config.type) {
-            InstallationType.ALL_IN_ONE -> createAllInOneWorkspace(config.basePath)
-            InstallationType.SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace(config.basePath, config.subPaths)
+            ALL_IN_ONE -> createAllInOneWorkspace(config.basePath)
+            SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace(config.basePath, config.subPaths)
         }
     }
 
