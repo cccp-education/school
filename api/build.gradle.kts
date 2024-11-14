@@ -53,7 +53,6 @@ data class DockerHub(
 )
 
 
-
 val Pair<String, String>.artifactVersion: String
     get() = first.run(
         Properties().apply {
@@ -82,7 +81,9 @@ dependencyManagement {
 }
 
 
+
 dependencies {
+    files("../workspace-model/lib/build/libs/lib.jar".run(::File).path).run(::implementation)
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -149,12 +150,6 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-fx-coroutines:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
-    // Spring AI
-    //    implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
-    //
-    //    // OpenAI
-    //    implementation("org.springframework.ai:spring-ai-openai")
-    //    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
     // Langchain4j
     implementation("dev.langchain4j:langchain4j-ollama-spring-boot-starter:0.35.0")
 
@@ -246,7 +241,7 @@ tasks.register<Delete>("cleanResources") {
 }
 
 tasks.jacocoTestReport {
-    // Give jacoco the file generated with the cucumber tests for the coverage.
+// Give jacoco the file generated with the cucumber tests for the coverage.
     executionData(
         files(
             "$buildDir/jacoco/test.exec",
@@ -301,7 +296,12 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
     )
 }
 
-tasks.register<Exec>("buildWorkspaceModel") { commandLine("./gradlew", "-p", "../workspace-model/lib", "build") }
+//tasks.register<Exec>("buildWorkspaceModel") { commandLine("./gradlew", "-p", "../workspace-model/lib", "build") }
+//tasks["build"].dependsOn(tasks["buildWorkspaceModel"])
 
-tasks["build"].dependsOn(tasks["buildWorkspaceModel"])
-
+val buildWorkspaceModel by tasks.registering(GradleBuild::class) {
+    dir = "../workspace-model/lib".run(::File)
+    tasks = listOf("build") // Or whatever tasks produce the lib.jar
+}
+// Add a dependency on the buildWorkspaceModel task
+tasks.named("compileKotlin") { dependsOn(buildWorkspaceModel) }

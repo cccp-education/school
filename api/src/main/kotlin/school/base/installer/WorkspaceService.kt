@@ -23,7 +23,7 @@ class WorkspaceService(val context: ApplicationContext) {
         "configuration",
         "job"
     ).forEach { dir -> createDirectory(basePath.resolve(dir)) }
-        .also { createDirectory(basePath) }
+//        .also { createDirectory(basePath) }
 
     private fun createSeparatedFoldersWorkspace(
         basePath: Path,
@@ -34,7 +34,11 @@ class WorkspaceService(val context: ApplicationContext) {
     }
 
 
-    private fun createDirectory(path: Path) = path.toFile().mkdirs()
+    private fun createDirectory(path: Path) = path.toFile().apply {
+        when {
+            !exists() -> mkdirs()
+        }
+    }
 
 
     private fun createConfigFiles(basePath: Path) =
