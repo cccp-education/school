@@ -150,8 +150,22 @@ dependencies {
     implementation("io.arrow-kt:arrow-core:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-fx-coroutines:${properties["arrow-kt.version"]}")
     implementation("io.arrow-kt:arrow-integrations-jackson-module:${properties["arrow-kt_jackson.version"]}")
+
+
     // Langchain4j
-    implementation("dev.langchain4j:langchain4j-ollama-spring-boot-starter:0.35.0")
+    implementation("dev.langchain4j:langchain4j-easy-rag:0.36.0")
+    implementation("dev.langchain4j:langchain4j-pgvector:0.36.0")
+    implementation("dev.langchain4j:langchain4j-document-parser-apache-pdfbox:0.36.0")
+    implementation("dev.langchain4j:langchain4j-web-search-engine-google-custom:0.36.0")
+    implementation("dev.langchain4j:langchain4j-hugging-face:0.36.0")
+    implementation("dev.langchain4j:langchain4j-spring-boot-starter:0.36.0")
+    implementation("dev.langchain4j:langchain4j-ollama-spring-boot-starter:0.36.0")
+    implementation("dev.langchain4j:langchain4j-vertex-ai-gemini-spring-boot-starter:0.36.0")
+    testImplementation("dev.langchain4j:langchain4j-spring-boot-tests:0.36.0")
+//    implementation("dev.langchain4j:langchain4j-vertex-ai:0.36.0")
+//    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.0")
+//    implementation("dev.langchain4j:langchain4j-vertex-ai-gemini:0.36.0")
+
 
     // misc
     implementation("org.apache.commons:commons-lang3")

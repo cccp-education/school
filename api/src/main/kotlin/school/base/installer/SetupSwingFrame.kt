@@ -4,7 +4,9 @@ import org.springframework.context.ApplicationContext
 import school.base.installer.WorkspaceService.InstallationType
 import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
 import school.base.installer.WorkspaceService.InstallationType.SEPARATED_FOLDERS
+import school.base.installer.WorkspaceService.WorkspaceConfig
 import school.base.utils.Log
+import school.base.utils.Log.i
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.swing.*
@@ -19,9 +21,6 @@ import javax.swing.LayoutStyle.ComponentPlacement.RELATED
 import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
 import kotlin.Short.Companion.MAX_VALUE
 
-/**
- * @author cheroliv
- */
 class SetupSwingFrame(
     private val context: ApplicationContext,
     val selectedPaths: MutableMap<String, Path?> = HashMap(),
@@ -96,7 +95,7 @@ class SetupSwingFrame(
             }
 
             else -> try {
-                Log.i("Creating workspace... : $currentInstallationType")
+                i("Creating workspace... : $currentInstallationType")
                 when {
                     currentInstallationType == SEPARATED_FOLDERS -> createSeparatedFoldersWorkspace()
                     else -> createAllInOneWorkspace()
@@ -125,9 +124,15 @@ class SetupSwingFrame(
         for (path in requiredPaths) {
             check(!(!selectedPaths.containsKey(path) || selectedPaths[path] == null)) { "All paths must be selected for separated folders installation" }
         }
-
         // TODO: Implement the actual creation of separated folders
         // You can access the paths using selectedPaths.get("office") etc.
+//        workspaceService.createWorkspace(
+////            WorkspaceConfig(
+////                basePath = "workspace",
+////                type = currentInstallationType,
+////            subPaths = selectedPaths)
+//
+//        )
     }
 
     private fun SetupSwingFrame.selectDirectory(
