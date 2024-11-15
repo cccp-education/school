@@ -70,8 +70,21 @@ dependencies {
         // Use the Kotlin JUnit 5 integration.
         "org.jetbrains.kotlin:kotlin-test-junit5",
         // Use the JUnit 5 integration.
-        libs.junit.jupiter.engine
+        libs.junit.jupiter.engine,
+        // Swing test
+        "org.assertj:assertj-swing:3.17.1",
+        // Kotlin-JUnit5
+        "org.jetbrains.kotlin:kotlin-test",
+        "org.jetbrains.kotlin:kotlin-test-junit5",
+//        "io.projectreactor:reactor-test",
+        // Mock
+        "org.mockito.kotlin:mockito-kotlin:${properties["mockito_kotlin_version"]}",
+        "org.mockito:mockito-junit-jupiter:${properties["mockito_jupiter.version"]}",
+        "io.mockk:mockk:${properties["mockk.version"]}",
     ).forEach(::testImplementation)
+    testImplementation("org.wiremock:wiremock:${properties["wiremock.version"]}") {
+        exclude(module = "commons-fileupload")
+    }
     setOf("org.junit.platform:junit-platform-launcher")
         .forEach(::testRuntimeOnly)
     setOf("com.sun.xml.bind:jaxb-impl:4.0.5")

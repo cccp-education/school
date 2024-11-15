@@ -1,15 +1,13 @@
-package school
+package workspace
 
-import org.springframework.boot.SpringApplication.run
-import school.base.installer.SetupSwingFrame
-import school.base.utils.Constants.EMPTY_STRING
-import school.base.utils.Log.w
+//import school.base.utils.Log.w
 import java.awt.EventQueue.invokeLater
 import javax.swing.UIManager.getInstalledLookAndFeels
 import javax.swing.UIManager.setLookAndFeel
 import javax.swing.UnsupportedLookAndFeelException
 
 object Installer {
+//    const val EMPTY_STRING = ""
     @JvmStatic
     fun main(args: Array<String>) = try {
         getInstalledLookAndFeels()
@@ -20,14 +18,13 @@ object Installer {
             is ClassNotFoundException,
             is InstantiationException,
             is IllegalAccessException,
-            is UnsupportedLookAndFeelException -> w(EMPTY_STRING, ex)
+            is UnsupportedLookAndFeelException -> /*w(EMPTY_STRING, ex)*/println(ex)
             // Rethrow unknown exceptions
             else -> throw ex
         }
     }.run {
         invokeLater {
-            run(Application::class.java, *args)
-                .run(::SetupSwingFrame)
+                run(::SetupSwingFrame)
                 .run { isVisible = true }
         }
     }

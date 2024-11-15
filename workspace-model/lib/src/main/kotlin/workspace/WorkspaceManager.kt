@@ -1,14 +1,15 @@
-package school.base.installer
+@file:Suppress("unused")
 
-import org.springframework.context.ApplicationContext
-import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
-import school.base.installer.WorkspaceService.InstallationType.SEPARATED_FOLDERS
-import school.base.utils.Log.i
+package workspace
+
+import workspace.Workspace.InstallationType.ALL_IN_ONE
+import workspace.Workspace.InstallationType.SEPARATED_FOLDERS
+import workspace.Workspace.WorkspaceConfig
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.pathString
 
-class WorkspaceService(val context: ApplicationContext) {
+object WorkspaceManager {
     /**
     user scenarios :
      * ALL_IN_ONE
@@ -20,20 +21,21 @@ class WorkspaceService(val context: ApplicationContext) {
         SEPARATED_FOLDERS -> config.createSeparatedFolders(config.basePath)
     }.also { createConfigFiles(config.basePath) }
 
-
     private fun WorkspaceConfig.createAllInOneFolder(basePath: Path): WorkspaceConfig = listOf(
         "office",
         "education",
         "communication",
         "configuration",
         "job"
-    ).forEach { dir -> basePath.resolve(dir).run(::createDirectory) }
+    ).forEach { dir -> basePath.resolve(dir).run(WorkspaceManager::createDirectory) }
         .let { this@createAllInOneFolder }
 
     private fun WorkspaceConfig.createSeparatedFolders(
         basePath: Path,
     ): WorkspaceConfig = /*TODO: va chercher les valeurs des fileChoosers*/
-        i("basePath.pathString : ${basePath.pathString}")
+//        school.base.utils.Log.i("basePath.pathString : ${basePath.pathString}")
+        println("basePath.pathString : ${basePath.pathString}")
+
             .let { this@createSeparatedFolders }
 
 
@@ -51,17 +53,7 @@ class WorkspaceService(val context: ApplicationContext) {
             school.workspace.path=${basePath}
             # Add other configuration properties here
         """.trimIndent()
-        )
+        ).apply {
 
-
-    enum class InstallationType {
-        ALL_IN_ONE,
-        SEPARATED_FOLDERS
-    }
-
-    data class WorkspaceConfig(
-        val basePath: Path,
-        val type: InstallationType,
-        val subPaths: Map<String, Path> = emptyMap()
-    )
+        }
 }

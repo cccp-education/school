@@ -3,6 +3,7 @@
 launch4j-3.50-linux-x64.tgz
 cli_springboot_conversation.adoc
 config.yml
+config_initial.yml
 .hypothesis
 demo.zip
 .kotlin

@@ -9,10 +9,7 @@ import Build_gradle.Constants.schoolVersion
 //import org.gradle.api.logging.LogLevel.ERROR
 //import org.gradle.api.logging.LogLevel.INFO
 
-plugins {
-    `kotlin-dsl`
-    application
-}
+plugins { `kotlin-dsl` }
 
 repositories {
     google()
@@ -77,9 +74,8 @@ dependencies {
             files("../api/build/libs/api-$schoolVersion.jar".run(::File).path),
         ).forEach(::implementation)
     } catch (_: Exception) {
-        // si workspace-model lib n'existe pas alors lancer une exception qui demande de lancer son build avant
+        // si api lib n'existe pas alors lancer une exception qui demande de lancer son build avant
     }
-
     setOf("org.jetbrains.kotlin:kotlin-test-junit5")
         .forEach(::testImplementation)
     setOf("org.junit.platform:junit-platform-launcher")

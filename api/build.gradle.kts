@@ -22,17 +22,16 @@ buildscript {
 }
 
 plugins {
-    java
     idea
     jacoco
-    kotlin("jvm")//.version("2.0.21")
-    kotlin("plugin.spring")//.version("2.0.21")
-    kotlin("plugin.allopen")//.version("2.0.21")
-    kotlin("plugin.noarg")//.version("2.0.21")
-    kotlin("plugin.serialization")//.version("2.0.21")
+    application
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.allopen")
+    kotlin("plugin.noarg")
+    kotlin("plugin.serialization")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
-    application
 }
 
 extra["springShellVersion"] = "3.3.3"
@@ -79,8 +78,6 @@ dependencyManagement {
         mavenBom("org.springframework.shell:spring-shell-dependencies:${property("springShellVersion")}")
     }
 }
-
-
 
 dependencies {
     files("../workspace-model/lib/build/libs/lib.jar".run(::File).path).run(::implementation)
@@ -170,8 +167,6 @@ dependencies {
     // misc
     implementation("org.apache.commons:commons-lang3")
     testImplementation("org.apache.commons:commons-collections4:4.5.0-M1")
-    testImplementation("org.assertj:assertj-swing:3.17.1")
-
 }
 
 configurations {
@@ -193,7 +188,7 @@ configurations {
 tasks.register("runInstallerGui") {
     group = "application"
     description = "Run workspace installer : ./gradlew -p api :installerGui"
-    application.mainClass.set("school.Installer")
+    application.mainClass.set("workspace.Installer")
     finalizedBy("run")
 }
 
@@ -224,9 +219,9 @@ tasks.register("api") {
 }
 
 
-tasks.withType<JavaCompile>() {
-    options.compilerArgs.add("-parameters")
-}
+//tasks.withType<JavaCompile>() {
+//    options.compilerArgs.add("-parameters")
+//}
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {

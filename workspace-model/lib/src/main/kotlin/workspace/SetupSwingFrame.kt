@@ -1,14 +1,11 @@
-package school.base.installer
+package workspace
 
-import org.springframework.context.ApplicationContext
-import school.base.installer.WorkspaceService.InstallationType
-import school.base.installer.WorkspaceService.InstallationType.ALL_IN_ONE
-import school.base.installer.WorkspaceService.InstallationType.SEPARATED_FOLDERS
-import school.base.installer.WorkspaceService.WorkspaceConfig
-import school.base.utils.Log
-import school.base.utils.Log.i
+//import school.base.utils.Log
+//import school.base.utils.Log.i
+import workspace.Workspace.*
+import workspace.Workspace.InstallationType.ALL_IN_ONE
+import workspace.Workspace.InstallationType.SEPARATED_FOLDERS
 import java.nio.file.Path
-import java.nio.file.Paths
 import javax.swing.*
 import javax.swing.BorderFactory.createTitledBorder
 import javax.swing.GroupLayout.Alignment.*
@@ -22,7 +19,6 @@ import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
 import kotlin.Short.Companion.MAX_VALUE
 
 class SetupSwingFrame(
-    private val context: ApplicationContext,
     val selectedPaths: MutableMap<String, Path?> = HashMap(),
     internal var currentInstallationType: InstallationType = ALL_IN_ONE,
     internal val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
@@ -60,11 +56,8 @@ class SetupSwingFrame(
         add(splitWorkspaceRadioButton)
     },
 ) : JFrame("School Project SetupSwingFrame") {
-
-    private val service by lazy { context.run(::WorkspaceService) }
-
     init {
-        initUI().let { "Init, currentInstallationType : $currentInstallationType".run(Log::i) }
+        initUI().let { "Init, currentInstallationType : $currentInstallationType"/*.run(Log::i)*/ }
     }
 
     private fun SetupSwingFrame.clearSpecificPaths() {
@@ -94,7 +87,7 @@ class SetupSwingFrame(
             }
 
             else -> try {
-                i("Creating workspace... : $currentInstallationType")
+                "Creating workspace... : $currentInstallationType"/*.run(::i)*/
                 if (currentInstallationType == SEPARATED_FOLDERS) arrayOf(
                     "office",
                     "education",
@@ -106,7 +99,11 @@ class SetupSwingFrame(
                         "All paths must be selected for separated folders installation"
                     }
                 }
-                service.createWorkspace(toWorkspaceConfig)
+                WorkspaceConfig(
+                    basePath = selectedPaths["workspace"]!!,
+                    type = currentInstallationType,
+                    subPaths = selectedPaths.map { (key, value) -> key to value!! }.toMap()
+                ).run(WorkspaceManager::createWorkspace)
                 showMessageDialog(
                     this,
                     "Workspace created successfully!",
@@ -124,13 +121,6 @@ class SetupSwingFrame(
         }
     }
 
-    private val SetupSwingFrame.toWorkspaceConfig: WorkspaceConfig
-        get() = WorkspaceConfig(
-            basePath = selectedPaths["workspace"]!!,
-            type = currentInstallationType,
-            subPaths = selectedPaths.map { (key, value) -> key to value!! }.toMap()
-        )
-
     private fun SetupSwingFrame.selectDirectory(
         pathKey: String,
         textField: JTextField
@@ -146,9 +136,9 @@ class SetupSwingFrame(
     }
 
     private fun SetupSwingFrame.handleInstallationTypeChange(type: InstallationType) {
-        "currentInstallationType : $currentInstallationType".run(Log::i)
+        "currentInstallationType : $currentInstallationType"/*.run(Log::i)*/
         currentInstallationType = type
-        "Installation type changed to $type".run(Log::i)
+//        "Installation type changed to $type".run(Log::i)
         setWorkspaceEntriesVisibility(type == SEPARATED_FOLDERS)
         if (type == ALL_IN_ONE) clearSpecificPaths()
     }
