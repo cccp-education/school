@@ -58,6 +58,8 @@ class WorkspaceServiceTest {
     @Ignore
     @Test
     fun `test create workspace with SEPARATED_FOLDERS config`(): Unit {
+    //check if mapPath from WorkspaceConfig exists
+        //must provide existing folders
         "build/workspace"
             .run(::File)
             .apply { if (!exists()) mkdirs().run(::assertTrue) }
