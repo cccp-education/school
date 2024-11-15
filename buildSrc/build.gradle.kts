@@ -75,7 +75,6 @@ dependencies {
             "org.testcontainers:ollama:$testcontainersVersion",
             "org.gradle:gradle-tooling-api:8.6",
             files("../api/build/libs/api-$schoolVersion.jar".run(::File).path),
-//                .let(::fileTree)
         ).forEach(::implementation)
     } catch (_: Exception) {
         // si workspace-model lib n'existe pas alors lancer une exception qui demande de lancer son build avant
