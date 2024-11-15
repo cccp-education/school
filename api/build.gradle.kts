@@ -263,8 +263,6 @@ tasks.register<TestReport>("testReport") {
     reportOn("test")
 }
 
-
-
 tasks.register<Exec>("startLocalPostgresql") {
     dependsOn(tasks.register<Exec>("pullPostgresImage") {
         commandLine(
@@ -295,9 +293,6 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
             .toAbsolutePath()
     )
 }
-
-//tasks.register<Exec>("buildWorkspaceModel") { commandLine("./gradlew", "-p", "../workspace-model/lib", "build") }
-//tasks["build"].dependsOn(tasks["buildWorkspaceModel"])
 
 val buildWorkspaceModel by tasks.registering(GradleBuild::class) {
     dir = "../workspace-model/lib".run(::File)

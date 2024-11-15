@@ -4,10 +4,10 @@ import Build_gradle.Constants.commonsIoVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
 import Build_gradle.Constants.langchain4jVersion
-import Build_gradle.Constants.schoolVersion
 import Build_gradle.Constants.testcontainersVersion
-import org.gradle.api.logging.LogLevel.ERROR
-import org.gradle.api.logging.LogLevel.INFO
+import Build_gradle.Constants.schoolVersion
+//import org.gradle.api.logging.LogLevel.ERROR
+//import org.gradle.api.logging.LogLevel.INFO
 
 plugins {
     `kotlin-dsl`
@@ -74,14 +74,8 @@ dependencies {
             "org.testcontainers:testcontainers:$testcontainersVersion",
             "org.testcontainers:ollama:$testcontainersVersion",
             "org.gradle:gradle-tooling-api:8.6",
-            rootDir
-                .parentFile
-                .listFiles()!!.find { it.name == "workspace-model" }!!
-                .listFiles()!!.find { it.name == "lib" }!!
-                .listFiles()!!.find { it.name == "build" }!!
-                .listFiles()!!.find { it.name == "libs" }!!
-                .listFiles()!!.first { it.name == "lib.jar" }!!
-                .let(::fileTree)
+            files("../api/build/libs/api-$schoolVersion.jar".run(::File).path),
+//                .let(::fileTree)
         ).forEach(::implementation)
     } catch (_: Exception) {
         // si workspace-model lib n'existe pas alors lancer une exception qui demande de lancer son build avant
@@ -94,83 +88,13 @@ dependencies {
     setOf("com.sun.xml.bind:jaxb-impl:4.0.5")
         .forEach(::runtimeOnly)
 }
-//tasks.named("build") {
-//    // Avant de lancer la tâche "build", assure-toi que le JAR du projet 'base' est à jour
-//    dependsOn(":buildBaseJar")
-//}
-//
-//gradle.beforeProject {
-//    if (name == "buildSrc") {
-//        tasks.named("build") {
-//            logger.log(LogLevel.INFO, "gradle.beforeProject call.")
-////            dependsOn(":buildBaseJar")
-//        }
-//    }
-//}
-//
-//tasks.register("logbuildApiJar") {
-//    group = "build"
-//    description = "Builds the api project and generates the JAR file."
-//    doLast {
-//        exec {
-//            commandLine("./gradlew", "-p", "../api", "build")
-//        }
-//    }
-//}
-//tasks["build"].dependsOn(":logbuildApiJar")
 
-//tasks["build"].dependsOn(project.project(rootDir
-//    .parentFile
-//    .listFiles()!!
-//    .find { it.name == "api" }!!.absolutePath)
-//    .tasks.build)
-
-//tasks["build"].dependsOn(":buildApiJar")
-
-tasks.register/*<Exec>*/("buildApiJar") {
-    group = "application"
-    description = "Build the base project to generate the updated JAR."
-//    workingDir = rootDir
-//        .parentFile
-//        .listFiles()!!
-//        .find { it.name == "api" }!!
-    // Lancer la commande gradle pour construire le projet api
-
-//    commandLine("./gradlew", "-p","../api",":build")
-    doFirst {
-//load gradle project not relative in multimodule, from given path, not using exec
-        tasks.build.invoke {
-            project("../api").tasks.build
-        }
-    }
-    doLast {
-        // Vérifie que le fichier JAR est bien mis à jour
-        file("../api/build/libs/api-$schoolVersion.jar").run {
-            when {
-                !exists() -> {
-                    val messageError = "The api JAR was not built successfully."
-                    logger.log(ERROR, messageError)
-                    throw GradleException(messageError)
-                }
-
-                else -> {
-                    logger.log(INFO, "The api JAR was built successfully.")
-                    project.dependencies.add(name, this).also {
-                        logger.log(INFO, "Add $name dependency to classpath successfully.")
-                    }
-                }
-            }
-
-        }
-    }
+val buildApi by tasks.registering(GradleBuild::class) {
+    dir = "../api".run(::File)
+    tasks = listOf("build") // Or whatever tasks produce the lib.jar
 }
-
-tasks.register("installerGui") {
-    group = "application"
-    description = "Run workspace installer : ./gradlew -p api :installerGui"
-    application.mainClass.set("school.base.installer.Setup")
-    finalizedBy("run")
-}
+// Add a dependency on the buildWorkspaceModel task
+tasks.named("compileKotlin") { dependsOn(buildApi) }
 
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")
 
