@@ -14,8 +14,7 @@ import javax.swing.GroupLayout.DEFAULT_SIZE
 import javax.swing.GroupLayout.PREFERRED_SIZE
 import javax.swing.JFileChooser.APPROVE_OPTION
 import javax.swing.JFileChooser.DIRECTORIES_ONLY
-import javax.swing.JOptionPane.ERROR_MESSAGE
-import javax.swing.JOptionPane.showMessageDialog
+import javax.swing.JOptionPane.*
 import javax.swing.LayoutStyle.ComponentPlacement.RELATED
 import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
 import kotlin.Short.Companion.MAX_VALUE
@@ -107,7 +106,7 @@ class SetupSwingFrame(
                     this,
                     "Workspace created successfully!",
                     "Success",
-                    JOptionPane.INFORMATION_MESSAGE
+                    INFORMATION_MESSAGE
                 )
             } catch (e: Exception) {
                 showMessageDialog(
