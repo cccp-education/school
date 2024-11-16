@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
+import java.nio.file.Files.*
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.reflect.KClass
@@ -105,14 +106,14 @@ object AppUtils {
         pattern: String? = null
     ): String {
         require(Files.exists(directory)) { "Le répertoire $directory n'existe pas" }
-        require(Files.isDirectory(directory)) { "$directory n'est pas un répertoire" }
+        require(isDirectory(directory)) { "$directory n'est pas un répertoire" }
 
         return try {
             val matcher = pattern?.let {
                 directory.fileSystem.getPathMatcher("glob:$it")
             }
 
-            Files.walk(directory, maxDepth)
+            walk(directory, maxDepth)
                 .use { stream ->
                     stream.asSequence()
                         .drop(1) // On ignore le répertoire racine
@@ -123,9 +124,9 @@ object AppUtils {
                             buildString {
                                 append(path.fileName)
                                 when {
-                                    Files.isDirectory(path) -> append("/")
-                                    Files.isSymbolicLink(path) -> append("@")
-                                    Files.isExecutable(path) -> append("*")
+                                    isDirectory(path) -> append("/")
+                                    isSymbolicLink(path) -> append("@")
+                                    isExecutable(path) -> append("*")
                                 }
                             }
                         }
