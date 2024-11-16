@@ -3,7 +3,6 @@
 package workspace
 
 import workspace.Workspace.InstallationType.ALL_IN_ONE
-import workspace.Workspace.InstallationType.SEPARATED_FOLDERS
 import workspace.Workspace.WorkspaceConfig
 import workspace.Workspace.WorkspaceEntry
 import workspace.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
@@ -21,56 +20,56 @@ import workspace.Workspace.WorkspaceEntry.OrganisationEntry.Organisation
 import workspace.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio
 import workspace.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject
 import workspace.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject.ProjectBuild
+import workspace.WorkspaceManager.WorkspaceConstants.entries
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.pathString
 
 object WorkspaceManager {
-    /**
-    user scenarios :
-     * ALL_IN_ONE
-     * SEPARATED_FOLDERS
-     */
-    fun createWorkspace(config: WorkspaceConfig)
-            : WorkspaceConfig = when (config.type) {
-        ALL_IN_ONE -> config.createAllInOneFolder(config.basePath)
-        SEPARATED_FOLDERS -> config.createSeparatedFolders(config.basePath)
-    }.also { config.createConfigFiles() }
 
-    private fun WorkspaceConfig.createAllInOneFolder(basePath: Path): WorkspaceConfig = listOf(
-        "office",
-        "education",
-        "communication",
-        "configuration",
-        "job"
-    ).forEach { dir -> basePath.resolve(dir).run(WorkspaceManager::createDirectory) }
+    object WorkspaceConstants {
+        val entries = listOf(
+            "office",
+            "education",
+            "communication",
+            "configuration",
+            "job"
+        )
+    }
+
+
+    fun createWorkspace(config: WorkspaceConfig): WorkspaceConfig = config.createConfigFiles("config.yaml").run {
+        if (config.type == ALL_IN_ONE) {
+            config.createAllInOneFolder(config.basePath)
+        }
+        return config
+    }
+
+    fun WorkspaceConfig.createAllInOneFolder(basePath: Path)
+            : WorkspaceConfig = entries.forEach { dir -> basePath.resolve(dir).run(WorkspaceManager::createDirectory) }
         .let { this@createAllInOneFolder }
 
-    private fun WorkspaceConfig.createSeparatedFolders(
-        basePath: Path,
-    ): WorkspaceConfig = /*TODO: va chercher les valeurs des fileChoosers*/
-//        school.base.utils.Log.i("basePath.pathString : ${basePath.pathString}")
-        println("basePath.pathString : ${basePath.pathString}")
-            .let { this@createSeparatedFolders }
-
-
-    private fun createDirectory(path: Path) = path.toFile().apply {
-        when {
-            !exists() -> mkdirs()
+    fun createDirectory(path: Path) = path
+        .toFile()
+        .apply {
+            when {
+                !exists() -> mkdirs()
+            }
         }
-    }
 
 
-    private fun WorkspaceConfig.createConfigFiles() = File(
+    fun WorkspaceConfig.createConfigFiles(configFileName: String) = File(
         basePath.toFile(),
-        "config.yaml"
+        configFileName
     ).apply {
-        fromWorkspaceConfig.toYaml.trimIndent().run(::writeText)
-        if (exists()) delete()
+        when {
+            exists() -> delete()
+        }
         createNewFile()
+        workspace.toYaml.trimIndent().run(::writeText)
     }
 
-    private val WorkspaceConfig.fromWorkspaceConfig: Workspace
+    val WorkspaceConfig.workspace: Workspace
         get() = Workspace(
             workspace = WorkspaceEntry(
                 name = "workspace",
@@ -88,10 +87,12 @@ object WorkspaceManager {
                             System.getProperty("user.home")
                         }/workspace/bibliotheque/slides"
                     ),
-                    sites = Sites(name = "sites")
+                    sites = Sites(name = "sites"),
+                    path = subPaths["office"]?.pathString ?: "office"
                 ),
                 cores = mapOf(
                     "education" to Education(
+                        path = subPaths["education"]?.pathString ?: "education",
                         school = School(name = "talaria"),
                         student = Student(name = "olivier"),
                         teacher = Teacher(name = "cheroliv"),
@@ -99,11 +100,14 @@ object WorkspaceManager {
                     ),
                 ),
                 job = Job(
+                    path = subPaths["job"]?.pathString ?: "job",
                     position = Position("Teacher"),
                     resume = Resume(name = "CV")
                 ),
-                configuration = Configuration(configuration = "school-configuration"),
-                communication = Communication(site = "static-website"),
+                configuration = Configuration(
+                    path = subPaths["configuration"]?.pathString ?: "configuration",
+                    configuration = "school-configuration"),
+                communication = Communication(path = subPaths["communication"]?.pathString ?: "communication", site = "static-website"),
                 organisation = Organisation(organisation = "organisation"),
                 collaboration = Collaboration(collaboration = "collaboration"),
                 dashboard = Dashboard(dashboard = "dashboard"),
@@ -119,5 +123,3 @@ object WorkspaceManager {
             )
         )
 }
-
-

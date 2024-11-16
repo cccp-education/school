@@ -3,6 +3,7 @@
 package workspace
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
+import workspace.Log.i
 import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office
 import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Slides
 import java.nio.file.Path
@@ -35,6 +36,7 @@ data class Workspace(val workspace: WorkspaceEntry) {
 
         sealed interface CoreEntry {
             data class Education(
+                val path: String = "education",
                 val school: EducationEntry,
                 val student: EducationEntry,
                 val teacher: EducationEntry,
@@ -51,6 +53,7 @@ data class Workspace(val workspace: WorkspaceEntry) {
 
         sealed interface OfficeEntry {
             data class Office(
+                val path: String = "office",
                 val books: LibraryEntry,
                 val datas: LibraryEntry,
                 val formations: LibraryEntry,
@@ -77,6 +80,7 @@ data class Workspace(val workspace: WorkspaceEntry) {
 
         sealed interface JobEntry {
             data class Job(
+                val path: String = "job",
                 val position: HumanResourcesEntry,
                 val resume: HumanResourcesEntry
             ) : JobEntry {
@@ -88,11 +92,12 @@ data class Workspace(val workspace: WorkspaceEntry) {
         }
 
         sealed interface ConfigurationEntry {
-            data class Configuration(val configuration: String) : ConfigurationEntry
+            data class Configuration(val path: String = "configuration", val configuration: String) : ConfigurationEntry
         }
 
         sealed interface CommunicationEntry {
-            data class Communication(val site: String) : CommunicationEntry
+
+            data class Communication(val path: String = "communication", val site: String) : CommunicationEntry
         }
 
         sealed interface OrganisationEntry {
@@ -117,18 +122,17 @@ data class Workspace(val workspace: WorkspaceEntry) {
     data class WorkspaceConfig(
         val basePath: Path,
         val type: InstallationType,
-        val subPaths: Map<String, Path> = emptyMap()
+        val subPaths: Map<String, Path> = emptyMap(),
+        val configFileName: String = "config.yaml"
     )
-
-    fun someLibraryMethod(): Boolean = true
 
     companion object {
         @JvmStatic
-        fun install(path: String) = println("Installing workspace on path : $path")
+        fun install(path: String) = i("Installing workspace on path : $path")
     }
 }
 
-fun Workspace.displayWorkspaceStructure(): Unit = toYaml.run(::println)
+fun Workspace.displayWorkspaceStructure(): Unit = toYaml.run(::i)
 
 val Workspace.toYaml: String
     get() = run(YAMLMapper()::writeValueAsString)
