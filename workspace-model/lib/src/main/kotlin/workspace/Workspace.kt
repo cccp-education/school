@@ -7,19 +7,7 @@ import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office
 import workspace.Workspace.WorkspaceEntry.OfficeEntry.Office.LibraryEntry.Slides
 import java.nio.file.Path
 
-
 data class Workspace(val workspace: WorkspaceEntry) {
-    enum class InstallationType {
-        ALL_IN_ONE,
-        SEPARATED_FOLDERS
-    }
-
-    data class WorkspaceConfig(
-        val basePath: Path,
-        val type: InstallationType,
-        val subPaths: Map<String, Path> = emptyMap()
-    )
-
     data class WorkspaceEntry(
         val name: String,
         val path: String,
@@ -120,6 +108,18 @@ data class Workspace(val workspace: WorkspaceEntry) {
         }
     }
 
+
+    enum class InstallationType {
+        ALL_IN_ONE,
+        SEPARATED_FOLDERS
+    }
+
+    data class WorkspaceConfig(
+        val basePath: Path,
+        val type: InstallationType,
+        val subPaths: Map<String, Path> = emptyMap()
+    )
+
     fun someLibraryMethod(): Boolean = true
 
     companion object {
@@ -131,4 +131,4 @@ data class Workspace(val workspace: WorkspaceEntry) {
 fun Workspace.displayWorkspaceStructure(): Unit = toYaml.run(::println)
 
 val Workspace.toYaml: String
-    get() = YAMLMapper().writeValueAsString(this)
+    get() = run(YAMLMapper()::writeValueAsString)

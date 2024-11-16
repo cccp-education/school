@@ -1,6 +1,7 @@
 package workspace
 
 import workspace.Workspace.InstallationType.ALL_IN_ONE
+import workspace.Workspace.WorkspaceConfig
 import workspace.Workspace.WorkspaceEntry
 import workspace.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
 import workspace.Workspace.WorkspaceEntry.CommunicationEntry.Communication
@@ -122,8 +123,10 @@ class WorkspaceTest {
 
     @Test
     fun `test create workspace with ALL_IN_ONE config`(): Unit {
-        "build/workspace"
-            .run(::File)
+        val path = "build/workspace"
+        val configFileName = "config.yaml"
+
+        path.run(::File)
             .apply {
                 when {
                     !exists() -> mkdirs().run(::assertTrue)
@@ -132,19 +135,18 @@ class WorkspaceTest {
             .run {
                 exists().run(::assertTrue)
                 isDirectory.run(::assertTrue)
-                Workspace.WorkspaceConfig(
+                WorkspaceConfig(
                     basePath = toPath(),
                     type = ALL_IN_ONE,
                 ).run(WorkspaceManager::createWorkspace)
-                listOf(
-                    "office",
-                    "education",
-                    "communication",
-                    "configuration",
-                    "job",
-                ).forEach { "$this/$it".run(::File).exists().run(::assertTrue) }
-                //Test config file creation
-//                "config.yaml".run(::File).exists().run(::assertTrue)
+//                listOf(
+//                    "office",
+//                    "education",
+//                    "communication",
+//                    "configuration",
+//                    "job",
+//                ).forEach { "$this/$it".run(::File).exists().run(::assertTrue) }
+                "$path/$configFileName".run(::File).exists().run(::assertTrue)
                 deleteRecursively().run(::assertTrue)
             }
     }
@@ -160,7 +162,7 @@ class WorkspaceTest {
             .run {
                 exists().run(::assertTrue)
                 isDirectory.run(::assertTrue)
-                Workspace.WorkspaceConfig(
+                WorkspaceConfig(
                     basePath = toPath(),
                     type = ALL_IN_ONE,
                 ).run(WorkspaceManager::createWorkspace)

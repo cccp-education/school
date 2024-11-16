@@ -1,6 +1,5 @@
 package school.base.utils
 
-
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
@@ -25,7 +24,6 @@ import workspace.Log.w
 import java.net.InetAddress.getLocalHost
 import java.net.UnknownHostException
 import java.util.Locale.getDefault
-
 
 object LoggerUtils {
 
