@@ -1,13 +1,13 @@
 package workspace
 
-//import school.base.utils.Log.w
+import workspace.Log.w
 import java.awt.EventQueue.invokeLater
 import javax.swing.UIManager.getInstalledLookAndFeels
 import javax.swing.UIManager.setLookAndFeel
 import javax.swing.UnsupportedLookAndFeelException
 
 object Installer {
-//    const val EMPTY_STRING = ""
+    private const val EMPTY_STRING = ""
     @JvmStatic
     fun main(args: Array<String>) = try {
         getInstalledLookAndFeels()
@@ -18,7 +18,7 @@ object Installer {
             is ClassNotFoundException,
             is InstantiationException,
             is IllegalAccessException,
-            is UnsupportedLookAndFeelException -> /*w(EMPTY_STRING, ex)*/println(ex)
+            is UnsupportedLookAndFeelException -> w(EMPTY_STRING, ex)
             // Rethrow unknown exceptions
             else -> throw ex
         }
