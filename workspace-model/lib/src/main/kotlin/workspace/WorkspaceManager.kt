@@ -19,7 +19,7 @@ object WorkspaceManager {
             : WorkspaceConfig = when (config.type) {
         ALL_IN_ONE -> config.createAllInOneFolder(config.basePath)
         SEPARATED_FOLDERS -> config.createSeparatedFolders(config.basePath)
-    }.also { createConfigFiles(config.basePath) }
+    }.also { config.createConfigFiles() }
 
     private fun WorkspaceConfig.createAllInOneFolder(basePath: Path): WorkspaceConfig = listOf(
         "office",
@@ -35,7 +35,6 @@ object WorkspaceManager {
     ): WorkspaceConfig = /*TODO: va chercher les valeurs des fileChoosers*/
 //        school.base.utils.Log.i("basePath.pathString : ${basePath.pathString}")
         println("basePath.pathString : ${basePath.pathString}")
-
             .let { this@createSeparatedFolders }
 
 
@@ -46,11 +45,11 @@ object WorkspaceManager {
     }
 
 
-    private fun createConfigFiles(basePath: Path) =
+    private fun WorkspaceConfig.createConfigFiles() =
         // Création des fichiers de configuration nécessaires
         File(basePath.toFile(), "application.properties").writeText(
             """
-            school.workspace.path=${basePath}
+            school.workspace.path=${this}
             # Add other configuration properties here
         """.trimIndent()
         ).apply {

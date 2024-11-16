@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -14,8 +13,8 @@ import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.user
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
-import school.base.utils.Log.i
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import workspace.Log.i
 import javax.inject.Inject
 import kotlin.test.AfterTest
 import kotlin.test.Test

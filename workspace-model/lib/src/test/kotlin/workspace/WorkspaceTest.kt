@@ -1,5 +1,6 @@
 package workspace
 
+import workspace.Workspace.InstallationType.ALL_IN_ONE
 import workspace.Workspace.WorkspaceEntry
 import workspace.Workspace.WorkspaceEntry.CollaborationEntry.Collaboration
 import workspace.Workspace.WorkspaceEntry.CommunicationEntry.Communication
@@ -133,7 +134,7 @@ class WorkspaceTest {
                 isDirectory.run(::assertTrue)
                 Workspace.WorkspaceConfig(
                     basePath = toPath(),
-                    type = Workspace.InstallationType.ALL_IN_ONE,
+                    type = ALL_IN_ONE,
                 ).run(WorkspaceManager::createWorkspace)
                 listOf(
                     "office",
@@ -142,6 +143,8 @@ class WorkspaceTest {
                     "configuration",
                     "job",
                 ).forEach { "$this/$it".run(::File).exists().run(::assertTrue) }
+                //Test config file creation
+//                "config.yaml".run(::File).exists().run(::assertTrue)
                 deleteRecursively().run(::assertTrue)
             }
     }
@@ -159,7 +162,7 @@ class WorkspaceTest {
                 isDirectory.run(::assertTrue)
                 Workspace.WorkspaceConfig(
                     basePath = toPath(),
-                    type = Workspace.InstallationType.ALL_IN_ONE,
+                    type = ALL_IN_ONE,
                 ).run(WorkspaceManager::createWorkspace)
                 listOf(
                     "office",

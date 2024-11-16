@@ -25,7 +25,6 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
-import school.base.utils.Log.i
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserDao
@@ -42,6 +41,7 @@ import school.users.security.UserRole.Role
 import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import workspace.Log.i
 import java.util.*
 import java.util.UUID.fromString
 import javax.inject.Inject

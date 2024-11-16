@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Pattern
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.mock
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -20,10 +19,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.server.ServerWebExchange
 import school.base.http.HttpUtils.validator
-import school.base.utils.Log.i
 import school.tdd.TestTools.logBody
 import school.tdd.TestTools.requestToString
-import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.DEFAULT_USER_JSON
 import school.tdd.TestUtils.Data.signup
 import school.tdd.TestUtils.Data.user
@@ -35,6 +32,7 @@ import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOneByEmail
 import school.users.User.UserRestApiRoutes.API_SIGNUP_PATH
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import workspace.Log.i
 import javax.inject.Inject
 import kotlin.test.*
 

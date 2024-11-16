@@ -18,11 +18,12 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import school.base.utils.Constants.AUTHORITIES_KEY
 import school.base.utils.Constants.INVALID_TOKEN
-import school.base.utils.Log.d
-import school.base.utils.Log.i
-import school.base.utils.Log.t
 import school.base.utils.Properties
 import school.base.utils.Constants.VALID_TOKEN
+import workspace.Log.d
+import workspace.Log.i
+import workspace.Log.t
+import workspace.Log.w
 import java.security.Key
 import java.time.ZonedDateTime.now
 import java.util.*
@@ -54,7 +55,7 @@ class SecurityManager(
                                     append("We recommend using the `school.security.authentication.jwt.base64-secret`")
                                     append(" key for optimum security.")
                                 }
-                                ).run(_root_ide_package_.school.base.utils.Log::w)
+                                ).run(::w)
                             .run { toByteArray() }
 
                         else -> d("Using a Base64-encoded Jwt secret key").run {

@@ -1,12 +1,9 @@
 package school.base.utils
 
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
-import school.Application
 import school.base.utils.Constants.CLOUD
 import school.base.utils.Constants.DEVELOPMENT
 import school.base.utils.Constants.DEV_HOST
@@ -22,23 +19,15 @@ import school.base.utils.Constants.SERVER_SSL_KEY_STORE
 import school.base.utils.Constants.SPRING_APPLICATION_NAME
 import school.base.utils.Constants.STARTUP_HOST_WARN_LOG_MSG
 import school.base.utils.Constants.STARTUP_LOG_MSG_KEY
+import workspace.Log.e
+import workspace.Log.i
+import workspace.Log.w
 import java.net.InetAddress.getLocalHost
 import java.net.UnknownHostException
 import java.util.Locale.getDefault
 
 
-object Log {
-    
-    private val log: Logger by lazy { getLogger(Application::class.java) }
-
-    fun i(message: String): Unit = log.info(message)
-    fun d(message: String): Unit = log.debug(message)
-    fun w(message: String): Unit = log.warn(message)
-    fun t(message: String): Unit = log.trace(message)
-    fun e(message: String): Unit = log.error(message)
-    fun e(message: String, defaultMessage: String?): Unit = log.error(message, defaultMessage)
-    fun e(message: String, e: Exception?): Unit = log.error(message, e)
-    fun w(message: String, e: Exception?): Unit = log.warn(message, e)
+object LoggerUtils {
 
     @JvmStatic
     fun ApplicationContext.startupLog() = logProfiles.run {

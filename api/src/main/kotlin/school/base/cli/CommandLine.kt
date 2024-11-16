@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import school.base.utils.Constants.CLI
 import school.base.utils.Constants.CLI_PROPS
 import school.base.utils.Constants.NORMAL_TERMINATION
-import school.base.utils.Log.i
+import workspace.Log.i
 import kotlin.system.exitProcess
 
 @Component

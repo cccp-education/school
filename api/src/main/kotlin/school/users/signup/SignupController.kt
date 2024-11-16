@@ -1,6 +1,5 @@
 package school.users.signup
 
-import jakarta.validation.ConstraintViolation
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
@@ -12,19 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 import school.base.http.HttpUtils.badResponse
-import school.base.http.HttpUtils.validator
-import school.base.http.ProblemsModel
-import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
-import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
-import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
-import school.base.utils.Constants.defaultProblems
-import school.base.utils.Log.i
-import school.users.User
-import school.users.User.UserDao.Fields.EMAIL_FIELD
-import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
-import school.users.signup.Signup.Companion.objectName
 import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
@@ -33,6 +21,7 @@ import school.users.signup.SignupService.Companion.badResponseLoginAndEmailIsNot
 import school.users.signup.SignupService.Companion.badResponseLoginIsNotAvailable
 import school.users.signup.SignupService.Companion.signupProblems
 import school.users.signup.SignupService.Companion.validate
+import workspace.Log.i
 
 @RestController
 @RequestMapping(API_USERS)
