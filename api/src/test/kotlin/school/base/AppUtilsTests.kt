@@ -12,8 +12,12 @@ import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.user
 import school.Application
 import school.base.utils.AppUtils.cleanField
+import school.base.utils.AppUtils.lsWorkingDir
+import school.base.utils.AppUtils.lsWorkingDirProcess
 import school.base.utils.AppUtils.toJson
 import workspace.Log.i
+import java.io.File
+import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,4 +48,18 @@ class AppUtilsTests {
         "`login`".cleanField(),
         "Backtick should be removed"
     )
+
+    @Test
+    fun `test lsWorkingDir & lsWorkingDiringDirProcess`(): Unit {
+        val destDir: File = "build".run(::File)
+        context.lsWorkingDirProcess(destDir).run { "lsWorkingDirProcess : $this" }.run(::i)
+        File("build").absolutePath.run(::i)
+
+        // Liste un répertoire spécifié par une chaîne
+        context.lsWorkingDir("build", maxDepth = 2)
+
+        // Liste un répertoire spécifié par un Path
+        context.lsWorkingDir(Paths.get("build"))
+    }
+
 }
