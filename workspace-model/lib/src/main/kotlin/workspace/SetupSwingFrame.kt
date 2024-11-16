@@ -2,6 +2,7 @@ package workspace
 
 //import school.base.utils.Log
 //import school.base.utils.Log.i
+import workspace.Log.i
 import workspace.Workspace.*
 import workspace.Workspace.InstallationType.ALL_IN_ONE
 import workspace.Workspace.InstallationType.SEPARATED_FOLDERS
@@ -19,45 +20,45 @@ import javax.swing.LayoutStyle.ComponentPlacement.UNRELATED
 import kotlin.Short.Companion.MAX_VALUE
 
 class SetupSwingFrame(
-    val selectedPaths: MutableMap<String, Path?> = HashMap(),
-    internal var currentInstallationType: InstallationType = ALL_IN_ONE,
-    internal val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
-    internal val communicationPathTextField: JTextField = JTextField(),
-    internal val configurationPathLabel: JLabel = JLabel("Configuration").apply { toolTipText = "" },
-    internal val configurationPathTextField: JTextField = JTextField(),
-    internal val educationPathLabel: JLabel = JLabel("Education").apply { toolTipText = "" },
-    internal val educationPathTextField: JTextField = JTextField(),
-    internal val jobPathLabel: JLabel = JLabel("Job").apply { toolTipText = "" },
-    internal val jobPathTextField: JTextField = JTextField(),
-    internal val officePathLabel: JLabel = JLabel("Office").apply { toolTipText = "" },
-    internal val officePathTextField: JTextField = JTextField(),
-    internal val titleLabel: JLabel = JLabel("School installer"),
-    internal val workspacePathLabel: JLabel = JLabel("Path"),
-    internal val workspacePathTextField: JTextField = JTextField(),
-    internal val workspaceTypePanel: JPanel = JPanel().apply {
+    private val selectedPaths: MutableMap<String, Path?> = HashMap(),
+    private var currentInstallationType: InstallationType = ALL_IN_ONE,
+    private val communicationPathLabel: JLabel = JLabel("Communication").apply { toolTipText = "" },
+    private val communicationPathTextField: JTextField = JTextField(),
+    private val configurationPathLabel: JLabel = JLabel("Configuration").apply { toolTipText = "" },
+    private val configurationPathTextField: JTextField = JTextField(),
+    private val educationPathLabel: JLabel = JLabel("Education").apply { toolTipText = "" },
+    private val educationPathTextField: JTextField = JTextField(),
+    private val jobPathLabel: JLabel = JLabel("Job").apply { toolTipText = "" },
+    private val jobPathTextField: JTextField = JTextField(),
+    private val officePathLabel: JLabel = JLabel("Office").apply { toolTipText = "" },
+    private val officePathTextField: JTextField = JTextField(),
+    private val titleLabel: JLabel = JLabel("School installer"),
+    private val workspacePathLabel: JLabel = JLabel("Path"),
+    private val workspacePathTextField: JTextField = JTextField(),
+    private val workspaceTypePanel: JPanel = JPanel().apply {
         border = createTitledBorder("Installation type")
     },
-    internal val workspaceTypeSelectorPanel: JPanel = JPanel(),
-    internal val workspaceTopPanel: JPanel = JPanel(),
-    internal val workspacePathPanel: JPanel = JPanel().apply { border = createTitledBorder("Workspace") },
-    internal val workspaceEntriesPanel: JPanel = JPanel(),
-    internal val splitWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders")
+    private val workspaceTypeSelectorPanel: JPanel = JPanel(),
+    private val workspaceTopPanel: JPanel = JPanel(),
+    private val workspacePathPanel: JPanel = JPanel().apply { border = createTitledBorder("Workspace") },
+    private val workspaceEntriesPanel: JPanel = JPanel(),
+    private val splitWorkspaceRadioButton: JRadioButton = JRadioButton("Separated folders")
         .apply { isSelected = false },
-    internal val allInOneWorkspaceRadioButton: JRadioButton = JRadioButton("All-in-one").apply { isSelected = true },
-    internal val browseCommunicationPathButton: JButton = JButton(),
-    internal val browseConfigurationPathButton: JButton = JButton(),
-    internal val browseEducationPathButton: JButton = JButton(),
-    internal val browseOfficePathButton: JButton = JButton(),
-    internal val browseWorkspacePathButton: JButton = JButton(),
-    internal val browsejobPathButton: JButton = JButton(),
-    internal val createWorkspaceButton: JButton = JButton("Create"),
-    internal val installationTypeGroup: ButtonGroup = ButtonGroup().apply {
+    private val allInOneWorkspaceRadioButton: JRadioButton = JRadioButton("All-in-one").apply { isSelected = true },
+    private val browseCommunicationPathButton: JButton = JButton(),
+    private val browseConfigurationPathButton: JButton = JButton(),
+    private val browseEducationPathButton: JButton = JButton(),
+    private val browseOfficePathButton: JButton = JButton(),
+    private val browseWorkspacePathButton: JButton = JButton(),
+    private val browseJobPathButton: JButton = JButton(),
+    private val createWorkspaceButton: JButton = JButton("Create"),
+    private val installationTypeGroup: ButtonGroup = ButtonGroup().apply {
         add(allInOneWorkspaceRadioButton)
         add(splitWorkspaceRadioButton)
     },
 ) : JFrame("School Project SetupSwingFrame") {
     init {
-        initUI().let { "Init, currentInstallationType : $currentInstallationType"/*.run(Log::i)*/ }
+        initUI().let { "Init, currentInstallationType : $currentInstallationType".run(Log::i) }
     }
 
     private fun SetupSwingFrame.clearSpecificPaths() {
@@ -87,7 +88,7 @@ class SetupSwingFrame(
             }
 
             else -> try {
-                "Creating workspace... : $currentInstallationType"/*.run(::i)*/
+                "Creating workspace... : $currentInstallationType".run(::i)
                 if (currentInstallationType == SEPARATED_FOLDERS) arrayOf(
                     "office",
                     "education",
@@ -136,9 +137,9 @@ class SetupSwingFrame(
     }
 
     private fun SetupSwingFrame.handleInstallationTypeChange(type: InstallationType) {
-        "currentInstallationType : $currentInstallationType"/*.run(Log::i)*/
+        "currentInstallationType : $currentInstallationType".run(Log::i)
         currentInstallationType = type
-//        "Installation type changed to $type".run(Log::i)
+        "Installation type changed to $type".run(::i)
         setWorkspaceEntriesVisibility(type == SEPARATED_FOLDERS)
         if (type == ALL_IN_ONE) clearSpecificPaths()
     }
@@ -156,7 +157,7 @@ class SetupSwingFrame(
         browseEducationPathButton.addActionListener { selectDirectory("education", educationPathTextField) }
         browseOfficePathButton.addActionListener { selectDirectory("office", officePathTextField) }
         browseWorkspacePathButton.addActionListener { selectDirectory("workspace", workspacePathTextField) }
-        browsejobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
+        browseJobPathButton.addActionListener { selectDirectory("job", jobPathTextField) }
         /*
             action sur bouton create workspace
          */
@@ -183,7 +184,7 @@ class SetupSwingFrame(
         browseConfigurationPathButton,
         jobPathLabel,
         jobPathTextField,
-        browsejobPathButton
+        browseJobPathButton
     ).map { it.isVisible = visible }
         .run { this@setWorkspaceEntriesVisibility }
 
@@ -197,7 +198,7 @@ class SetupSwingFrame(
             browseCommunicationPathButton,
             browseWorkspacePathButton,
             browseConfigurationPathButton,
-            browsejobPathButton,
+            browseJobPathButton,
         ).onEach { "Select directory".run(it::setText) }
         workspaceTypePanel.apply panel@{
             run(::GroupLayout).run {
@@ -499,7 +500,7 @@ class SetupSwingFrame(
                                                 .addComponent(browseOfficePathButton, TRAILING)
                                                 .addComponent(browseCommunicationPathButton)
                                                 .addComponent(browseConfigurationPathButton)
-                                                .addComponent(browsejobPathButton)
+                                                .addComponent(browseJobPathButton)
                                         )
                                         .addContainerGap()
                                 )
@@ -603,7 +604,7 @@ class SetupSwingFrame(
                                         .addGroup(
                                             createParallelGroup(BASELINE)
                                                 .addComponent(
-                                                    browsejobPathButton,
+                                                    browseJobPathButton,
                                                     DEFAULT_SIZE,
                                                     DEFAULT_SIZE,
                                                     MAX_VALUE.toInt()
