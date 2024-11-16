@@ -25,9 +25,9 @@ import kotlin.coroutines.resume
 object AssistantManager {
     @JvmStatic
     fun main(args: Array<String>) {
-        userMessageFr.run{"userMessageFr : $this"}.run(::println)
+        userMessageFr.run { "userMessageFr : $this" }.run(::println)
         println()
-        userMessageEn.run{"userMessageEn : $this"}.run(::println)
+        userMessageEn.run { "userMessageEn : $this" }.run(::println)
     }
 
     @JvmStatic
