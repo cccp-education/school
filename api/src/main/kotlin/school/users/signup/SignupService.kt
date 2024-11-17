@@ -40,6 +40,7 @@ class SignupService(private val context: ApplicationContext) {
 
         @JvmStatic
         val SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE = Triple(false, false, false)
+        
         fun Signup.validate(
             exchange: ServerWebExchange
         ): Set<Map<String, String?>> = exchange.validator.run {
@@ -120,27 +121,6 @@ class SignupService(private val context: ApplicationContext) {
         ex.left()
     }
 
-//    fun validate(signup: Signup): Set<Map<String, String?>> = context.getBean<Validator>().let {
-//        setOf(
-//            User.UserDao.Attributes.PASSWORD_ATTR,
-//            User.UserDao.Attributes.EMAIL_ATTR,
-//            User.UserDao.Attributes.LOGIN_ATTR,
-//        ).map { field -> field to it.validateProperty(signup, field) }
-//            .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
-//                violatedField.second.map {
-//                    mapOf<String, String?>(
-//                        MODEL_FIELD_OBJECTNAME to objectName,
-//                        MODEL_FIELD_FIELD to violatedField.first,
-//                        MODEL_FIELD_MESSAGE to it.message
-//                    )
-//                }
-//            }.toSet()
-//    }
-
-//    @Transactional(readOnly = true)
-//    suspend fun accountByActivationKey(key: String) = accountRepository.findOneByActivationKey(key)
-//    @Transactional
-//    suspend fun deleteExpired(account: Account) = accountRepository.delete(account)
 }
 
 
