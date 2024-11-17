@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package school.users.signup
 
 import arrow.core.Either
@@ -9,7 +11,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.awaitRowsUpdated
-import school.users.User
+import school.users.User.UserDao
 import school.users.signup.UserActivation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
 import school.users.signup.UserActivation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import school.users.signup.UserActivation.UserActivationDao.Attributes.CREATED_DATE_ATTR
@@ -58,7 +60,7 @@ data class UserActivation(
                     $ACTIVATION_KEY_FIELD         VARCHAR,
                     $CREATED_DATE_FIELD           datetime,
                     $ACTIVATION_DATE_FIELD        datetime,
-                FOREIGN KEY ($ID_FIELD) REFERENCES ${User.UserDao.Relations.TABLE_NAME} (${User.UserDao.Fields.ID_FIELD})
+                FOREIGN KEY ($ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
                     ON DELETE CASCADE
                     ON UPDATE CASCADE);
                 CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_activation_key`
@@ -92,6 +94,10 @@ data class UserActivation(
             } catch (e: Throwable) {
                 e.left()
             }
+
+            //Find userActivation by key
+            //Update userActivation
+            //activate user from key (Find userActivation then Update userActivation)  one query select+update
         }
     }
 }
