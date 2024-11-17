@@ -56,10 +56,14 @@ class AiTranslatorController(service: ChatModelService) {
             get() = setOf(
                 "llama3.2:3b" to "LlamaTiny",
                 "llama3.1:8b" to "LlamaSmall",
-                "mistral:7b" to "Mistral",
-                "aya:8b" to "Aya",
+                "mistral:7b" to "MistralSmall",
+                "aya:8b" to "AyaSmall",
                 "phi3.5:3.8b" to "Phi",
-                "smollm:135m" to "SmollM"
+                "smollm:135m" to "SmollM",
+                "granite-code:3b" to "GraniteCodeTiny",
+                "codegemma:2b" to "CodeGemmaTiny",
+                "yi-coder:1.5b" to "YiCoderTiny",
+                "yi-coder:9b" to "YiCoderSmall"
             )
 
         // Creating tasks for each model
@@ -70,7 +74,7 @@ class AiTranslatorController(service: ChatModelService) {
         }
 
         fun ApplicationContext.createOllamaChatModel(model: String = "smollm:135m"): OllamaChatModel =
-            dev.langchain4j.model.ollama.OllamaChatModel.builder().apply {
+            OllamaChatModel.builder().apply {
                 baseUrl(environment.getProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
 //                modelName(findProperty("ollama.modelName") as? String ?: model)
 //                temperature(findProperty("ollama.temperature") as? Double ?: 0.8)
@@ -80,7 +84,7 @@ class AiTranslatorController(service: ChatModelService) {
             }.build()
 
         fun ApplicationContext.createOllamaStreamingChatModel(model: String = "smollm:135m"): OllamaStreamingChatModel =
-            dev.langchain4j.model.ollama.OllamaStreamingChatModel.builder().apply {
+            OllamaStreamingChatModel.builder().apply {
 //                baseUrl(findProperty("ollama.baseUrl") as? String ?: "http://localhost:11434")
 //                modelName(findProperty("ollama.modelName") as? String ?: model)
 //                temperature(findProperty("ollama.temperature") as? Double ?: 0.8)

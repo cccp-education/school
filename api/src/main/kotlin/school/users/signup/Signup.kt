@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.awaitOne
+import org.springframework.r2dbc.core.awaitRowsUpdated
 import school.users.User.UserDao
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
 import school.users.User.UserDao.Constraints.PASSWORD_MAX
@@ -118,7 +119,7 @@ data class Signup(
 
             object Dao {
                 @Throws(EmptyResultDataAccessException::class)
-                suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, UUID> = try {
+                suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, Long> = try {
                     second.getBean<R2dbcEntityTemplate>()
                         .databaseClient
                         .sql(INSERT.trimIndent())
@@ -127,9 +128,7 @@ data class Signup(
                         .bind(CREATED_DATE_ATTR, first.createdDate)
                         .bind(ACTIVATION_DATE_ATTR, first.activationDate)
                         .fetch()
-                        .awaitOne()[ID_ATTR.uppercase()]
-                        .toString()
-                        .run(UUID::fromString)
+                        .awaitRowsUpdated()
                         .right()
                 } catch (e: Throwable) {
                     e.left()
