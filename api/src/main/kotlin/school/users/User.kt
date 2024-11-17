@@ -5,6 +5,7 @@
 )
 
 package school.users
+
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.left
@@ -15,29 +16,29 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
-import org.springframework.r2dbc.core.awaitRowsUpdated
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
+import reactor.core.publisher.Mono
 import school.base.model.EntityModel
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
 import school.users.User.UserActivation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
 import school.users.User.UserActivation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import school.users.User.UserActivation.UserActivationDao.Attributes.CREATED_DATE_ATTR
-import school.users.User.UserActivation.UserActivationDao.Attributes.ID_ATTR
 import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.User.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
-import school.users.User.UserActivation.UserActivationDao.Fields.ID_FIELD
-import school.users.User.UserActivation.UserActivationDao.Relations.INSERT
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
-import school.users.User.UserDao.Attributes.ID_ATTR
 import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.User.UserDao.Attributes.LOGIN_ATTR
 import school.users.User.UserDao.Attributes.PASSWORD_ATTR
@@ -47,15 +48,14 @@ import school.users.User.UserDao.Attributes.isLogin
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
 import school.users.User.UserDao.Constraints.PASSWORD_MAX
 import school.users.User.UserDao.Constraints.PASSWORD_MIN
+import school.users.User.UserDao.Dao.findOneWithAuths
 import school.users.User.UserDao.Fields.EMAIL_FIELD
-import school.users.User.UserDao.Fields.ID_FIELD
 import school.users.User.UserDao.Fields.LANG_KEY_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserDao.Fields.PASSWORD_FIELD
 import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.FIND_USER_BY_ID
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
-import school.users.User.UserDao.Relations.INSERT
 import school.users.User.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
 import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
@@ -67,6 +67,7 @@ import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
 import jakarta.validation.constraints.Email as EmailConstraint
+import org.springframework.security.core.userdetails.User as UserSecurity
 
 data class User(
     override val id: UUID? = null,
@@ -198,7 +199,7 @@ data class User(
 
                 //Find userActivation by key
                 //Update userActivation
-                //activate user from key (Find userActivation then Update userActivation)  one query select+update
+                //TODO: activate user from key (Find userActivation then Update userActivation)  one query select+update
             }
         }
     }
@@ -598,6 +599,29 @@ data class User(
                 e.left()
             }
         }
+
+        fun ApplicationContext.userDetailsMono(emailOrLogin: String): Mono<UserDetails> =
+            getBean<Validator>()
+                .run {
+                    when {
+                        validateProperty(
+                            User(email = emailOrLogin),
+                            EMAIL_FIELD
+                        ).isNotEmpty() && validateProperty(
+                            User(login = emailOrLogin),
+                            LOGIN_FIELD
+                        ).isNotEmpty() -> throw UsernameNotFoundException("User $emailOrLogin was not found")
+
+                        else -> mono {
+                            findOneWithAuths<User>(emailOrLogin).map { user ->
+                                return@mono UserSecurity(
+                                    user.login,
+                                    user.password,
+                                    user.roles.map { SimpleGrantedAuthority(it.id) })
+                            }.getOrNull() ?: throw UsernameNotFoundException("User $emailOrLogin was not found")
+                        }
+                    }
+                }
     }
 }
 //            suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
