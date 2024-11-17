@@ -35,10 +35,14 @@ object AssistantManager {
         get() = setOf(
             "llama3.2:3b" to "LlamaTiny",
             "llama3.1:8b" to "LlamaSmall",
-            "mistral:7b" to "Mistral",
-            "aya:8b" to "Aya",
+            "mistral:7b" to "MistralSmall",
+            "aya:8b" to "AyaSmall",
             "phi3.5:3.8b" to "Phi",
-            "smollm:135m" to "SmollM"
+            "smollm:135m" to "SmollM",
+            "granite-code:3b" to "GraniteCodeTiny",
+            "codegemma:2b" to "CodeGemmaTiny",
+            "yi-coder:1.5b" to "YiCoderTiny",
+            "yi-coder:9b" to "YiCoderSmall"
         )
 
     // Creating tasks for each model

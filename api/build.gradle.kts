@@ -185,7 +185,8 @@ configurations {
     }
 }
 
-val buildWorkspaceModel by tasks.registering(GradleBuild::class) {
+val buildWorkspaceModel: TaskProvider<GradleBuild> by tasks.registering(GradleBuild::class) {
+    group = "api"
     dir = "../workspace-model/lib".run(::File)
     tasks = listOf("build") // Or whatever tasks produce the lib.jar
 }
@@ -194,7 +195,7 @@ tasks.named("compileKotlin") { dependsOn(buildWorkspaceModel) }
 
 
 tasks.register("cli") {
-    group = "application"
+    group = "api"
     description = "Run school cli : ./gradlew -p api :cli -Pargs=--gui"
     doFirst {
         with(springBoot) {
@@ -213,7 +214,7 @@ tasks.register("cli") {
 }
 
 tasks.register("api") {
-    group = "application"
+    group = "api"
     description = "Run school api"
     doFirst { springBoot.mainClass.set("school.Application") }
     finalizedBy("bootRun")
@@ -268,6 +269,7 @@ tasks.register<TestReport>("testReport") {
 }
 
 tasks.register<Exec>("startLocalPostgresql") {
+    group = "api"
     dependsOn(tasks.register<Exec>("pullPostgresImage") {
         commandLine(
             "docker",
@@ -279,11 +281,12 @@ tasks.register<Exec>("startLocalPostgresql") {
 }
 
 tasks.register<Exec>("stopLocalPostgresql") {
+    group = "api"
     commandLine("docker", "stop", "postgres")
 }
 
 tasks.register<Exec>("springbootCheckOpenFirefox") {
-    group = "tests"
+    group = "verification"
     description = "Check springboot project then show report in firefox"
     dependsOn("check")
     commandLine(

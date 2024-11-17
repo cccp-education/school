@@ -4,8 +4,6 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import jakarta.validation.ConstraintViolation
-import jakarta.validation.Validator
-import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
@@ -19,13 +17,13 @@ import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.defaultProblems
 import school.users.User
 import school.users.User.UserDao.Dao.signup
+import school.users.User.UserDao.Dao.signupAvailability
 import school.users.User.UserDao.Dao.signupToUser
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
 import school.users.signup.Signup.Companion.objectName
-import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
 
 
 @Service
@@ -49,7 +47,7 @@ class SignupService(private val context: ApplicationContext) {
                 User.UserDao.Attributes.PASSWORD_ATTR,
                 User.UserDao.Attributes.EMAIL_ATTR,
                 User.UserDao.Attributes.LOGIN_ATTR,
-            ).map { it -> it to validateProperty(this@validate, it) }
+            ).map { it to validateProperty(this@validate, it) }
                 .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
                     violatedField.second.map {
                         mapOf<String, String?>(

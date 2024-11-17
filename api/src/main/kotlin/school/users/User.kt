@@ -1,7 +1,7 @@
 @file:Suppress(
     "RemoveRedundantQualifierName",
     "MemberVisibilityCanBePrivate",
-    "SqlNoDataSourceInspection"
+    "SqlNoDataSourceInspection", "SqlDialectInspection"
 )
 
 package school.users
@@ -24,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
-import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
@@ -45,12 +44,14 @@ import school.users.User.UserDao.Fields.VERSION_FIELD
 import school.users.User.UserDao.Relations.FIND_USER_BY_ID
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.User.UserDao.Relations.INSERT
+import school.users.User.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
 import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import school.users.signup.Signup
 import school.users.signup.Signup.UserActivation
+import java.lang.Boolean.parseBoolean
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -151,12 +152,13 @@ data class User(
         }
 
         object Attributes {
-            val ID_ATTR = ID_FIELD.cleanField()
-            val LOGIN_ATTR = LOGIN_FIELD.cleanField()
-            val PASSWORD_ATTR = PASSWORD_FIELD.cleanField()
-            val EMAIL_ATTR = EMAIL_FIELD.cleanField()
+            const val ID_ATTR = "id"
+            const val LOGIN_ATTR = "login"
+            const val PASSWORD_ATTR = "password"
+            const val EMAIL_ATTR = "email"
             const val LANG_KEY_ATTR = "langKey"
-            val VERSION_ATTR = VERSION_FIELD.cleanField()
+            const val VERSION_ATTR = "version"
+
             fun Pair<String, ApplicationContext>.isEmail(): Boolean = second
                 .getBean<Validator>()
                 .validateValue(USERCLASS, EMAIL_ATTR, first)
@@ -194,14 +196,25 @@ data class User(
         ) values ( :login, :email, :password, :langKey, :version)"""
 
             //TODO: signup, findByEmailOrLogin,
-            val FIND_USER_BY_LOGIN =
-                "SELECT `u`.${UserDao.Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} AS `u` WHERE u.${UserDao.Fields.LOGIN_FIELD}= LOWER(:${UserDao.Attributes.LOGIN_ATTR})"
+            const val FIND_USER_BY_LOGIN =
+                "SELECT `u`.${UserDao.Fields.ID_FIELD} FROM $TABLE_NAME AS `u` WHERE u.$LOGIN_FIELD= LOWER(:$LOGIN_ATTR)"
             val FIND_USER_BY_LOGIN_OR_EMAIL =
                 "SELECT `u`.`id` FROM `user` AS `u` WHERE LOWER(`u`.`email`) = LOWER(:email) OR LOWER(`u`.`login`) = LOWER(:login)"
                     .trimIndent()
             val FIND_USER_BY_ID =
                 "SELECT * FROM `user` AS `u` WHERE `u`.`id` = :id"
                     .trimIndent()
+            const val SELECT_SIGNUP_AVAILABILITY = """
+                    SELECT
+                        CASE
+                            WHEN EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR))
+                                OR EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR))
+                                THEN FALSE
+                            ELSE TRUE
+                            END AS login_and_email_available,
+                        NOT EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)) AS email_available,
+                        NOT EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)) AS login_available;
+                """
 
             @JvmStatic
             val CREATE_TABLES: String
@@ -323,7 +336,8 @@ data class User(
                                 "not a valid login or not a valid email"
                                     .run(::Exception)
                                     .left()
-                            val h2SQLquery = """
+                            val h2SQLquery = """-- noinspection SqlDialectInspectionForFile
+
                                 SELECT 
                                     u.id,
                                     u.email,
@@ -439,6 +453,32 @@ data class User(
                     password = getBean<PasswordEncoder>().encode(password),
                     email = email,
                 )
+            }
+
+            suspend fun Pair<Signup, ApplicationContext>.signupAvailability()
+                    : Either<Throwable, Triple<Boolean/*OK*/,
+                    Boolean/*email*/,
+                    Boolean/*login*/>> = try {
+                val loginAndEmailAvailableColumn = "login_and_email_available"
+                val emailAvailableColumn = "email_available"
+                val loginAvailableColumn = "login_available"
+                second
+                    .getBean<R2dbcEntityTemplate>()
+                    .databaseClient
+                    .sql(SELECT_SIGNUP_AVAILABILITY.trimIndent())
+                    .bind(LOGIN_ATTR, first.login)
+                    .bind(EMAIL_ATTR, first.email)
+                    .fetch()
+                    .awaitSingle()
+                    .run {
+                        Triple(
+                            parseBoolean(this[loginAndEmailAvailableColumn.uppercase()].toString()),
+                            parseBoolean(this[emailAvailableColumn.uppercase()].toString()),
+                            parseBoolean(this[loginAvailableColumn.uppercase()].toString())
+                        ).right()
+                    }
+            } catch (e: Throwable) {
+                e.left()
             }
         }
     }

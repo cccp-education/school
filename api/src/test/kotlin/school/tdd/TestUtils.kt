@@ -15,9 +15,11 @@ import school.base.utils.Constants.ROLE_USER
 import school.base.utils.Constants.USER
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
+import school.users.User.UserDao.Dao.findOne
 import school.users.signup.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 object TestUtils {
     @JvmStatic
@@ -88,6 +90,16 @@ object TestUtils {
                 WHERE `login` LIKE 'user%'
             );            
         """.trimIndent()
+
+        suspend fun ApplicationContext.assertUserExists(pairLoginEmail: Pair<String, String>) = assertEquals(
+            pairLoginEmail.first,
+            findOne<User>(pairLoginEmail.second).getOrNull()?.login
+        )
+
+        suspend fun ApplicationContext.assertUserNotExists(email: String) = findOne<User>(email)
+            .isLeft()
+            .apply(::assertTrue)
+
     }
 
     val ApplicationContext.PATTERN_LOCALE_2: Pattern

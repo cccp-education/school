@@ -1,16 +1,25 @@
 package school.users
 
+import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
+import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
+import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
+import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.tdd.TestUtils.Data.signup
 import school.tdd.TestUtils.Data.user
+import school.users.User.UserDao.Attributes.EMAIL_ATTR
+import school.users.User.UserDao.Attributes.LOGIN_ATTR
+import school.users.User.UserDao.Attributes.PASSWORD_ATTR
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
+import school.users.User.UserDao.Dao.signupAvailability
 import school.users.signup.Signup
-import school.users.signup.Signup.UserActivation.UserActivationDao.Dao.signupAvailability
+import school.users.signup.Signup.Companion.objectName
 import school.users.signup.SignupService.Companion.SIGNUP_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
@@ -87,5 +96,20 @@ class SignupDaoTest {
         ) to context).signupAvailability().run {
             assertEquals(SIGNUP_LOGIN_NOT_AVAILABLE, getOrNull()!!)
         }
+    }
+    @Test
+    fun `check signup validate implementation`() {
+        setOf(PASSWORD_ATTR, EMAIL_ATTR, LOGIN_ATTR)
+            .map { it to context.getBean<Validator>().validateProperty(signup, it) }
+            .flatMap { (first, second) ->
+                second.map {
+                    mapOf<String, String?>(
+                        MODEL_FIELD_OBJECTNAME to objectName,
+                        MODEL_FIELD_FIELD to first,
+                        MODEL_FIELD_MESSAGE to it.message
+                    )
+                }
+            }.toSet()
+            .apply { run(::isEmpty).let(::assertTrue) }
     }
 }

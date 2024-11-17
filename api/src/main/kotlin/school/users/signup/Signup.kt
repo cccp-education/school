@@ -1,5 +1,9 @@
-package school.users.signup
+@file:Suppress(
+    "MemberVisibilityCanBePrivate",
+    "SqlDialectInspection"
+)
 
+package school.users.signup
 
 import arrow.core.Either
 import arrow.core.left
@@ -10,20 +14,24 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.r2dbc.core.awaitSingle
+import org.springframework.r2dbc.core.awaitOne
 import school.users.User.UserDao
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
 import school.users.User.UserDao.Constraints.PASSWORD_MAX
 import school.users.User.UserDao.Constraints.PASSWORD_MIN
-import school.users.User.UserDao.Fields.ID_FIELD
+import school.users.signup.Signup.UserActivation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
+import school.users.signup.Signup.UserActivation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import school.users.signup.Signup.UserActivation.UserActivationDao.Attributes.CREATED_DATE_ATTR
+import school.users.signup.Signup.UserActivation.UserActivationDao.Attributes.ID_ATTR
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
-import java.lang.Boolean.parseBoolean
+import school.users.signup.Signup.UserActivation.UserActivationDao.Fields.ID_FIELD
+import school.users.signup.Signup.UserActivation.UserActivationDao.Relations.INSERT
 import java.time.Instant
 import java.util.*
-
 
 @JvmRecord
 data class Signup(
@@ -53,6 +61,7 @@ data class Signup(
             )
         }
     }
+
     @JvmRecord
     data class UserActivation(
         val id: UUID,
@@ -74,73 +83,62 @@ data class Signup(
                 const val CREATED_DATE_FIELD = "`created_date`"
             }
 
+            object Attributes {
+                const val ID_ATTR = "id"
+                const val ACTIVATION_KEY_ATTR = "activationKey"
+                const val CREATED_DATE_ATTR = "createdDate"
+                const val ACTIVATION_DATE_ATTR = "activationDate"
+            }
+
             object Relations {
                 const val TABLE_NAME = "`user_activation`"
                 const val SQL_SCRIPT = """
-            CREATE TABLE IF NOT EXISTS $TABLE_NAME (
-                $ID_FIELD                     UUID PRIMARY KEY,
-                $ACTIVATION_KEY_FIELD         VARCHAR,
-                $ACTIVATION_DATE_FIELD        datetime,
-                $CREATED_DATE_FIELD           datetime,
-            FOREIGN KEY ($ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
-                ON DELETE CASCADE
-                ON UPDATE CASCADE);
-            CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_activation_key`
-            ON $TABLE_NAME ($ACTIVATION_KEY_FIELD);
-            CREATE INDEX IF NOT EXISTS `idx_user_activation_date`
-            ON ${TABLE_NAME} ($CREATED_DATE_FIELD);
-            CREATE INDEX IF NOT EXISTS `idx_user_activation_creation_date`
-            ON ${TABLE_NAME} ($ACTIVATION_DATE_FIELD);
-"""
-                const val INSERT = ""
-//                """
-//            insert into $TABLE_NAME (
-//            ${Fields.LOGIN_FIELD}, ${Fields.EMAIL_FIELD}, ${Fields.PASSWORD_FIELD},
-//            ${Fields.FIRST_NAME_FIELD}, ${Fields.LAST_NAME_FIELD}, ${Fields.LANG_KEY_FIELD}, ${Fields.IMAGE_URL_FIELD},
-//            ${Fields.ENABLED_FIELD}, ${Fields.ACTIVATION_KEY_FIELD}, ${Fields.RESET_KEY_FIELD}, ${Fields.RESET_DATE_FIELD},
-//            ${Fields.CREATED_BY_FIELD}, ${Fields.CREATED_DATE_FIELD}, ${Fields.LAST_MODIFIED_BY_FIELD}, ${Fields.LAST_MODIFIED_DATE_FIELD}, ${Fields.VERSION_FIELD})
-//            values (:login, :email, :password, :firstName, :lastName,
-//            :langKey, :imageUrl, :enabled, :activationKey, :resetKey, :resetDate,
-//            :createdBy, :createdDate, :lastModifiedBy, :lastModifiedDate, :version)
-//            """
+                    CREATE TABLE IF NOT EXISTS $TABLE_NAME (
+                        $ID_FIELD                     UUID PRIMARY KEY,
+                        $ACTIVATION_KEY_FIELD         VARCHAR,
+                        $CREATED_DATE_FIELD           datetime,
+                        $ACTIVATION_DATE_FIELD        datetime,
+                    FOREIGN KEY ($ID_FIELD) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
+                        ON DELETE CASCADE
+                        ON UPDATE CASCADE);
+                    CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_activation_key`
+                    ON $TABLE_NAME ($ACTIVATION_KEY_FIELD);
+                    CREATE INDEX IF NOT EXISTS `idx_user_activation_date`
+                    ON $TABLE_NAME ($CREATED_DATE_FIELD);
+                    CREATE INDEX IF NOT EXISTS `idx_user_activation_creation_date`
+                    ON $TABLE_NAME ($ACTIVATION_DATE_FIELD);
+                """
+
+                const val INSERT = """
+                    insert into $TABLE_NAME (
+                    $ID_FIELD, $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
+                    values (:$ID_ATTR, :$ACTIVATION_KEY_ATTR, :$ACTIVATION_DATE_ATTR, :$CREATED_DATE_ATTR)
+                """
             }
 
             object Dao {
-
-                suspend fun Pair<Signup, ApplicationContext>.signupAvailability()
-                        : Either<Throwable, Triple<Boolean/*OK*/,
-                        Boolean/*email*/,
-                        Boolean/*login*/>> = try {
-                    second
-                        .getBean<R2dbcEntityTemplate>()
+                @Throws(EmptyResultDataAccessException::class)
+                suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, UUID> = try {
+                    second.getBean<R2dbcEntityTemplate>()
                         .databaseClient
-                        .sql(
-                            """
-                        SELECT
-                          CASE
-                            WHEN EXISTS(SELECT 1 FROM `user` WHERE LOWER(`login`) = LOWER(:login))
-                            OR EXISTS(SELECT 1 FROM `user` WHERE LOWER(`email`) = LOWER(:email))
-                            THEN FALSE
-                            ELSE TRUE
-                          END AS login_and_email_available,
-                          NOT EXISTS(SELECT 1 FROM `user` WHERE LOWER(`email`) = LOWER(:email)) AS email_available,
-                          NOT EXISTS(SELECT 1 FROM `user` WHERE LOWER(`login`) = LOWER(:login)) AS login_available;                    
-                        """.trimIndent()
-                        )
-                        .bind("login", first.login)
-                        .bind("email", first.email)
+                        .sql(INSERT.trimIndent())
+                        .bind(ID_ATTR, first.id)
+                        .bind(ACTIVATION_KEY_ATTR, first.activationKey)
+                        .bind(CREATED_DATE_ATTR, first.createdDate)
+                        .bind(ACTIVATION_DATE_ATTR, first.activationDate)
                         .fetch()
-                        .awaitSingle()
-                        .run {
-                            Triple(
-                                parseBoolean(this["login_and_email_available".uppercase()].toString()),
-                                parseBoolean(this["email_available".uppercase()].toString()),
-                                parseBoolean(this["login_available".uppercase()].toString())
-                            ).right()
-                        }
+                        .awaitOne()[ID_ATTR.uppercase()]
+                        .toString()
+                        .run(UUID::fromString)
+                        .right()
                 } catch (e: Throwable) {
                     e.left()
                 }
+            }
+        }
+    }
+}
+
 
 //            suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
 //                second
@@ -169,7 +167,3 @@ data class Signup(
 //            } catch (e: Throwable) {
 //                e.left()
 //            }
-            }
-        }
-    }
-}

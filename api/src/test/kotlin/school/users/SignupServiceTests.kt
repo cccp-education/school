@@ -2,30 +2,22 @@
 
 package school.users
 
-import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.base.model.EntityModel.Companion.MODEL_FIELD_FIELD
-import school.base.model.EntityModel.Companion.MODEL_FIELD_MESSAGE
-import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
-import school.tdd.TestUtils.Data.signup
-import school.users.User.UserDao.Attributes.EMAIL_ATTR
-import school.users.User.UserDao.Attributes.LOGIN_ATTR
-import school.users.User.UserDao.Attributes.PASSWORD_ATTR
+import school.tdd.TestUtils.Data.assertUserExists
+import school.tdd.TestUtils.Data.assertUserNotExists
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
-import school.users.signup.SignupService
 import school.users.signup.Signup
-import school.users.signup.Signup.Companion.objectName
+import school.users.signup.SignupService
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = ["spring.main.web-application-type=reactive"])
@@ -37,12 +29,14 @@ class SignupServiceTests {
     @AfterTest
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
+
     @Test
     fun `signupService save user and role_user`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
         assertEquals(0, countUserAuthBefore)
+//        context.assertUserNotExists("jdoe@acme.com")
         context.getBean<SignupService>().signup(
             Signup(
                 login = "jdoe",
@@ -53,22 +47,7 @@ class SignupServiceTests {
         )
         assertEquals(countUserBefore + 1, context.countUsers())
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-    }
-
-    @Test
-    fun `check signup validate implementation`() {
-        setOf(PASSWORD_ATTR, EMAIL_ATTR, LOGIN_ATTR)
-            .map { it to context.getBean<Validator>().validateProperty(signup, it) }
-            .flatMap { (first, second) ->
-                second.map {
-                    mapOf<String, String?>(
-                        MODEL_FIELD_OBJECTNAME to objectName,
-                        MODEL_FIELD_FIELD to first,
-                        MODEL_FIELD_MESSAGE to it.message
-                    )
-                }
-            }.toSet()
-            .apply { run(::isEmpty).let(::assertTrue) }
+//        context.assertUserExists("jdoe" to "jdoe@acme.com")
     }
 
 //TODO test phase book Spath P., Cosmina I., Harrop R., Schaefer C. - Pro Spring 6 with Kotlin - 2023.pdf p 456

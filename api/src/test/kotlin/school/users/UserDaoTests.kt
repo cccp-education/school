@@ -1,6 +1,6 @@
 @file:Suppress(
 //    "JUnitMalformedDeclaration",
-    "SqlNoDataSourceInspection"
+    "SqlNoDataSourceInspection", "SqlDialectInspection"
 )
 
 package school.users
