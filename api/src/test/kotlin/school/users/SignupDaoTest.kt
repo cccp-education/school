@@ -18,8 +18,8 @@ import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signupAvailability
-import school.users.signup.Signup
-import school.users.signup.Signup.Companion.objectName
+import school.users.User.Signup
+import school.users.User.Signup.Companion.objectName
 import school.users.signup.SignupService.Companion.SIGNUP_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE

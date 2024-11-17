@@ -16,6 +16,8 @@ import school.base.model.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.defaultProblems
 import school.users.User
+import school.users.User.Companion.objectName
+import school.users.User.Signup
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Dao.signupAvailability
 import school.users.User.UserDao.Dao.signupToUser
@@ -23,7 +25,6 @@ import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.LOGIN_FIELD
 import school.users.User.UserRestApiRoutes.API_SIGNUP
 import school.users.User.UserRestApiRoutes.API_USERS
-import school.users.signup.Signup.Companion.objectName
 
 
 @Service
@@ -68,7 +69,7 @@ class SignupService(private val context: ApplicationContext) {
             get() = badResponse(
                 setOf(
                     mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_OBJECTNAME to objectName,
                         MODEL_FIELD_FIELD to LOGIN_FIELD,
                         MODEL_FIELD_FIELD to EMAIL_FIELD,
                         MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
@@ -81,7 +82,7 @@ class SignupService(private val context: ApplicationContext) {
             get() = badResponse(
                 setOf(
                     mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_OBJECTNAME to objectName,
                         MODEL_FIELD_FIELD to LOGIN_FIELD,
                         MODEL_FIELD_MESSAGE to "Login name already used!"
                     )
@@ -93,7 +94,7 @@ class SignupService(private val context: ApplicationContext) {
             get() = badResponse(
                 setOf(
                     mapOf(
-                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_OBJECTNAME to objectName,
                         MODEL_FIELD_FIELD to EMAIL_FIELD,
                         MODEL_FIELD_MESSAGE to "Email is already in use!"
                     )

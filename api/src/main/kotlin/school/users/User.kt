@@ -12,6 +12,7 @@ import arrow.core.left
 import arrow.core.right
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.Validator
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
@@ -35,6 +36,8 @@ import school.users.User.UserDao.Attributes.VERSION_ATTR
 import school.users.User.UserDao.Attributes.isEmail
 import school.users.User.UserDao.Attributes.isLogin
 import school.users.User.UserDao.Constraints.LOGIN_REGEX
+import school.users.User.UserDao.Constraints.PASSWORD_MAX
+import school.users.User.UserDao.Constraints.PASSWORD_MIN
 import school.users.User.UserDao.Fields.EMAIL_FIELD
 import school.users.User.UserDao.Fields.ID_FIELD
 import school.users.User.UserDao.Fields.LANG_KEY_FIELD
@@ -49,8 +52,7 @@ import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
-import school.users.signup.Signup
-import school.users.signup.Signup.UserActivation
+import school.users.signup.UserActivation
 import java.lang.Boolean.parseBoolean
 import java.util.*
 import java.util.Locale.ENGLISH
@@ -83,7 +85,36 @@ data class User(
     @JsonIgnore
     val version: Long = 0,
 ) : EntityModel<UUID>() {
+    @JvmRecord
+    data class Signup(
+        @field:NotNull
+        @field:Pattern(regexp = LOGIN_REGEX)
+        @field:Size(min = 1, max = 50)
+        val login: String,
+        @field:NotNull
+        @Size(
+            min = PASSWORD_MIN,
+            max = PASSWORD_MAX
+        )
+        val password: String,
+        val repassword: String,
+        @field:Email
+        @field:Size(min = 5, max = 254)
+        val email: String,
+    ) {
+        companion object {
+            val SIGNUPCLASS = Signup::class.java
 
+            @JvmStatic
+            val objectName: String = SIGNUPCLASS.simpleName.run {
+                replaceFirst(
+                    first(),
+                    first().lowercaseChar()
+                )
+            }
+        }
+
+    }
 
     /**
      * Représente l'account domain model minimaliste pour la view
@@ -483,3 +514,30 @@ data class User(
         }
     }
 }
+//            suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, Long> = try {
+//                second
+//                    .getBean<R2dbcEntityTemplate>()
+//                    .databaseClient
+//                    .sql(Relations.INSERT)
+//                    .bind("login", first.login)
+//                    .bind("email", first.email)
+//                    .bind("password", first.password)
+////                .bind("firstName", first.firstName)
+////                .bind("lastName", first.lastName)
+//                    .bind("langKey", first.langKey)
+////                .bind("imageUrl", first.imageUrl)
+//                    .bind("enabled", first.enabled)
+////                .bind("activationKey", first.activationKey)
+////                .bind("resetKey", first.resetKey)
+////                .bind("resetDate", first.resetDate)
+////                .bind("createdBy", first.createdBy)
+////                .bind("createdDate", first.createdDate)
+////                .bind("lastModifiedBy", first.lastModifiedBy)
+////                .bind("lastModifiedDate", first.lastModifiedDate)
+//                    .bind("version", first.version)
+//                    .fetch()
+//                    .awaitRowsUpdated()
+//                    .right()
+//            } catch (e: Throwable) {
+//                e.left()
+//            }
