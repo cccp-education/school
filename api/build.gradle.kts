@@ -3,6 +3,7 @@
     "PropertyName",
     "DEPRECATION",
     "UnstableApiUsage",
+    "VulnerableLibrariesLocal",
 )
 
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -184,13 +185,13 @@ configurations {
     }
 }
 
-//java { sourceCompatibility = VERSION_21 }
-tasks.register("runInstallerGui") {
-    group = "application"
-    description = "Run workspace installer : ./gradlew -p api :installerGui"
-    application.mainClass.set("workspace.Installer")
-    finalizedBy("run")
+val buildWorkspaceModel by tasks.registering(GradleBuild::class) {
+    dir = "../workspace-model/lib".run(::File)
+    tasks = listOf("build") // Or whatever tasks produce the lib.jar
 }
+// Add a dependency on the buildWorkspaceModel task
+tasks.named("compileKotlin") { dependsOn(buildWorkspaceModel) }
+
 
 tasks.register("cli") {
     group = "application"
@@ -218,15 +219,9 @@ tasks.register("api") {
     finalizedBy("bootRun")
 }
 
-
-//tasks.withType<JavaCompile>() {
-//    options.compilerArgs.add("-parameters")
-//}
-
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-//        jvmTarget = VERSION_21.toString()
     }
 }
 
@@ -302,10 +297,3 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
             .toAbsolutePath()
     )
 }
-
-val buildWorkspaceModel by tasks.registering(GradleBuild::class) {
-    dir = "../workspace-model/lib".run(::File)
-    tasks = listOf("build") // Or whatever tasks produce the lib.jar
-}
-// Add a dependency on the buildWorkspaceModel task
-tasks.named("compileKotlin") { dependsOn(buildWorkspaceModel) }

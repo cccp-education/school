@@ -11,6 +11,8 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+
+    application
 }
 
 repositories {
@@ -96,3 +98,5 @@ dependencies {
 }
 
 tasks.named<Test>("test") { useJUnitPlatform() }
+
+application.mainClass.set("workspace.Installer")
