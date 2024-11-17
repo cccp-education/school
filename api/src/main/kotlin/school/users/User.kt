@@ -1,11 +1,10 @@
 @file:Suppress(
     "RemoveRedundantQualifierName",
     "MemberVisibilityCanBePrivate",
-    "SqlNoDataSourceInspection", "SqlDialectInspection"
+    "SqlNoDataSourceInspection", "SqlDialectInspection", "SqlSourceToSinkFlow"
 )
 
 package school.users
-
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.left
@@ -21,12 +20,22 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
+import org.springframework.r2dbc.core.awaitRowsUpdated
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import school.base.model.EntityModel
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
+import school.users.User.UserActivation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
+import school.users.User.UserActivation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import school.users.User.UserActivation.UserActivationDao.Attributes.CREATED_DATE_ATTR
+import school.users.User.UserActivation.UserActivationDao.Attributes.ID_ATTR
+import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import school.users.User.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
+import school.users.User.UserActivation.UserActivationDao.Fields.ID_FIELD
+import school.users.User.UserActivation.UserActivationDao.Relations.INSERT
 import school.users.User.UserDao.Attributes.EMAIL_ATTR
 import school.users.User.UserDao.Attributes.ID_ATTR
 import school.users.User.UserDao.Attributes.LANG_KEY_ATTR
@@ -52,8 +61,8 @@ import school.users.User.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
-import school.users.signup.UserActivation
 import java.lang.Boolean.parseBoolean
+import java.time.Instant
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -114,6 +123,84 @@ data class User(
             }
         }
 
+    }
+
+    @JvmRecord
+    data class UserActivation(
+        val id: UUID,
+        @field:Size(max = 20)
+        val activationKey: String,
+        val activationDate: Instant,
+        val createdDate: Instant,
+    ) {
+        companion object {
+            @JvmStatic
+            fun main(args: Array<String>): Unit = println(UserActivationDao.Relations.SQL_SCRIPT)
+        }
+
+        object UserActivationDao {
+            object Fields {
+                const val ID_FIELD = "`id`"
+                const val ACTIVATION_KEY_FIELD = "`activation_key`"
+                const val ACTIVATION_DATE_FIELD = "`activation_date`"
+                const val CREATED_DATE_FIELD = "`created_date`"
+            }
+
+            object Attributes {
+                const val ID_ATTR = "id"
+                const val ACTIVATION_KEY_ATTR = "activationKey"
+                const val CREATED_DATE_ATTR = "createdDate"
+                const val ACTIVATION_DATE_ATTR = "activationDate"
+            }
+
+            object Relations {
+                const val TABLE_NAME = "`user_activation`"
+                const val SQL_SCRIPT = """
+                CREATE TABLE IF NOT EXISTS $TABLE_NAME (
+                    ${Fields.ID_FIELD}            UUID PRIMARY KEY,
+                    $ACTIVATION_KEY_FIELD         VARCHAR,
+                    $CREATED_DATE_FIELD           datetime,
+                    $ACTIVATION_DATE_FIELD        datetime,
+                FOREIGN KEY (${Fields.ID_FIELD}) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE);
+                CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_activation_key`
+                ON $TABLE_NAME ($ACTIVATION_KEY_FIELD);
+                CREATE INDEX IF NOT EXISTS `idx_user_activation_date`
+                ON $TABLE_NAME ($CREATED_DATE_FIELD);
+                CREATE INDEX IF NOT EXISTS `idx_user_activation_creation_date`
+                ON $TABLE_NAME ($ACTIVATION_DATE_FIELD);
+            """
+
+                const val INSERT = """
+                insert into $TABLE_NAME (
+                ${Fields.ID_FIELD} , $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
+                values (:${Attributes.ID_ATTR}, :$ACTIVATION_KEY_ATTR, :$ACTIVATION_DATE_ATTR, :$CREATED_DATE_ATTR)
+            """
+            }
+
+            object Dao {
+                @Throws(EmptyResultDataAccessException::class)
+                suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, Long> = try {
+                    second.getBean<R2dbcEntityTemplate>()
+                        .databaseClient
+                        .sql(Relations.INSERT.trimIndent())
+                        .bind(Attributes.ID_ATTR, first.id)
+                        .bind(ACTIVATION_KEY_ATTR, first.activationKey)
+                        .bind(CREATED_DATE_ATTR, first.createdDate)
+                        .bind(ACTIVATION_DATE_ATTR, first.activationDate)
+                        .fetch()
+                        .awaitRowsUpdated()
+                        .right()
+                } catch (e: Throwable) {
+                    e.left()
+                }
+
+                //Find userActivation by key
+                //Update userActivation
+                //activate user from key (Find userActivation then Update userActivation)  one query select+update
+            }
+        }
     }
 
     /**
@@ -205,7 +292,7 @@ data class User(
             const val TABLE_NAME = "`user`"
             const val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS $TABLE_NAME (
-            $ID_FIELD                     UUID default random_uuid() PRIMARY KEY,
+            ${Fields.ID_FIELD}            UUID default random_uuid() PRIMARY KEY,
             $LOGIN_FIELD                  VARCHAR,
             $PASSWORD_FIELD               VARCHAR,
             $EMAIL_FIELD                  VARCHAR,
@@ -280,14 +367,14 @@ data class User(
             suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
                 second.getBean<R2dbcEntityTemplate>()
                     .databaseClient
-                    .sql(INSERT)
+                    .sql(User.UserDao.Relations.INSERT)
                     .bind(LOGIN_ATTR, first.login)
                     .bind(EMAIL_ATTR, first.email)
                     .bind(PASSWORD_ATTR, first.password)
                     .bind(LANG_KEY_ATTR, first.langKey)
                     .bind(VERSION_ATTR, first.version)
                     .fetch()
-                    .awaitOne()[ID_ATTR.uppercase()]
+                    .awaitOne()[Attributes.ID_ATTR.uppercase()]
                     .toString()
                     .run(UUID::fromString)
                     .right()
@@ -311,7 +398,7 @@ data class User(
                             .awaitSingle()
                             .let {
                                 User(
-                                    id = it[ID_FIELD] as UUID,
+                                    id = it[Fields.ID_FIELD] as UUID,
                                     email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
                                     login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
                                     password = it[PASSWORD_FIELD] as String,
@@ -340,7 +427,7 @@ data class User(
                             .awaitSingle()
                             .let {
                                 User(
-                                    id = it[ID_FIELD] as UUID,
+                                    id = it[Fields.ID_FIELD] as UUID,
                                     email = it[EMAIL_FIELD] as String,
                                     login = it[LOGIN_FIELD] as String,
                                     password = it[PASSWORD_FIELD] as String,
@@ -367,8 +454,7 @@ data class User(
                                 "not a valid login or not a valid email"
                                     .run(::Exception)
                                     .left()
-                            val h2SQLquery = """-- noinspection SqlDialectInspectionForFile
-
+                            val h2SQLquery = """
                                 SELECT 
                                     u.id,
                                     u.email,
@@ -426,7 +512,7 @@ data class User(
                     User::class -> {
                         try {
                             (getBean<DatabaseClient>()
-                                .sql("SELECT `u`.$ID_FIELD FROM $TABLE_NAME `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)")
+                                .sql("SELECT `u`.${Fields.ID_FIELD} FROM $TABLE_NAME `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)".trimIndent())
                                 .bind(LOGIN_ATTR, login)
                                 .fetch()
                                 .awaitOne()
