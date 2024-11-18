@@ -29,6 +29,8 @@ import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.Data.users
 import school.tdd.TestUtils.defaultRoles
+import school.users.User.UserActivation
+import school.users.User.UserActivation.UserActivationDao.Dao.save
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.delete
@@ -40,6 +42,7 @@ import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
 import school.users.UserDaoTests.Queries.h2SQLquery
+import school.users.security.SecurityUtils.generateActivationKey
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
@@ -580,5 +583,17 @@ class UserDaoTests {
         ids.forEach { context.delete(it) }
         assertEquals(countUserBefore, context.countUsers())
         assertEquals(countUserAuthBefore, context.countUserAuthority())
+    }
+
+    @Test
+    fun `test create userActivation by key`(): Unit = runBlocking {
+        (UserActivation(id = (user to context).signup().getOrNull()!!) to context).save().apply {
+            assertTrue(isRight())
+            assertFalse(isLeft())
+        }
+    }
+
+    @Test
+    fun `test find userActivation by key`(): Unit = runBlocking {
     }
 }

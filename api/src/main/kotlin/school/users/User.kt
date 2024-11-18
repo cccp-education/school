@@ -58,11 +58,13 @@ import school.users.User.UserDao.Relations.FIND_USER_BY_ID
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.User.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
 import school.users.User.UserDao.Relations.TABLE_NAME
+import school.users.security.SecurityUtils.generateActivationKey
 import school.users.security.UserRole
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.lang.Boolean.parseBoolean
 import java.time.Instant
+import java.time.Instant.now
 import java.util.*
 import java.util.Locale.ENGLISH
 import java.util.UUID.fromString
@@ -130,9 +132,9 @@ data class User(
     data class UserActivation(
         val id: UUID,
         @field:Size(max = 20)
-        val activationKey: String,
-        val activationDate: Instant,
-        val createdDate: Instant,
+        val activationKey: String = generateActivationKey,
+        val createdDate: Instant = now(),
+        val activationDate: Instant? = null,
     ) {
         companion object {
             @JvmStatic
@@ -200,6 +202,29 @@ data class User(
                 //Find userActivation by key
                 //Update userActivation
                 //TODO: activate user from key (Find userActivation then Update userActivation)  one query select+update
+                @Throws(EmptyResultDataAccessException::class)
+                suspend fun Pair<UserActivation, ApplicationContext>.findByKey()
+                        : Either<Throwable, UserActivation> = try {
+                    second.getBean<R2dbcEntityTemplate>()
+                        .databaseClient
+                        .sql(
+                            """                            
+                        """.trimIndent()
+                        )
+                        .bind(ACTIVATION_KEY_ATTR, first.activationKey)
+                        .fetch()
+                        .awaitSingle()
+                        .let {
+                            UserActivation(
+                                id = it[Fields.ID_FIELD] as UUID,
+                                activationKey = it[ACTIVATION_KEY_FIELD] as String,
+                                activationDate = it[ACTIVATION_DATE_FIELD] as Instant,
+                                createdDate = it[CREATED_DATE_FIELD] as Instant,
+                            )
+                        }.right()
+                } catch (e: Throwable) {
+                    e.left()
+                }
             }
         }
     }

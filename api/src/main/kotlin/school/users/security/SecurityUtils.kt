@@ -3,6 +3,7 @@ package school.users.security
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils.random
 import org.springframework.http.HttpMethod.OPTIONS
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -20,11 +21,13 @@ import java.security.SecureRandom
 object SecurityUtils {
 
     private const val DEF_COUNT = 20
+
     private val SECURE_RANDOM: SecureRandom by lazy {
-        SecureRandom().apply { nextBytes(ByteArray(size = 64)) }
+        SecureRandom().apply { 64.run(::ByteArray).run(::nextBytes) }
     }
+
     private val generateRandomAlphanumericString: String
-        get() = RandomStringUtils.random(
+        get() = random(
             DEF_COUNT,
             0,
             0,
