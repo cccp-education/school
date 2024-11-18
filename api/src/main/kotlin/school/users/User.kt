@@ -183,6 +183,16 @@ data class User(
             }
 
             object Dao {
+                suspend fun ApplicationContext.countUserActivation(): Int =
+                    "SELECT COUNT(*) FROM `user_activation`"
+                        .let(getBean<DatabaseClient>()::sql)
+                        .fetch()
+                        .awaitSingle()
+                        .values
+                        .first()
+                        .toString()
+                        .toInt()
+
                 @Throws(EmptyResultDataAccessException::class)
                 suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, Long> = try {
                     second.getBean<R2dbcEntityTemplate>()
@@ -203,15 +213,15 @@ data class User(
                 //Update userActivation
                 //TODO: activate user from key (Find userActivation then Update userActivation)  one query select+update
                 @Throws(EmptyResultDataAccessException::class)
-                suspend fun Pair<UserActivation, ApplicationContext>.findByKey()
+                suspend fun ApplicationContext.findByKey(key:String)
                         : Either<Throwable, UserActivation> = try {
-                    second.getBean<R2dbcEntityTemplate>()
+                    getBean<R2dbcEntityTemplate>()
                         .databaseClient
-                        .sql(
-                            """                            
+                        .sql("""
+                            SELECT `ua` FROM `user_activation` AS `ua` WHERE `ua`.$ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR
                         """.trimIndent()
                         )
-                        .bind(ACTIVATION_KEY_ATTR, first.activationKey)
+                        .bind(ACTIVATION_KEY_ATTR, key)
                         .fetch()
                         .awaitSingle()
                         .let {

@@ -8,11 +8,7 @@ import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.repositories
 import school.slides.SlidesManager.deckFile
-import school.slides.SlidesManager.slideSrcPath
-import school.workspace.Office
 import school.workspace.WorkspaceManager.localConf
-import school.workspace.WorkspaceManager.printConf
-import school.workspace.WorkspaceManager.workspaceEither
 import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 

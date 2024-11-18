@@ -5,10 +5,7 @@
 
 package school.users
 
-import arrow.core.Either
-import arrow.core.getOrElse
-import arrow.core.left
-import arrow.core.right
+import arrow.core.*
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -25,11 +22,12 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
-import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.Data.users
 import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserActivation
+import school.users.User.UserActivation.UserActivationDao.Dao.countUserActivation
+import school.users.User.UserActivation.UserActivationDao.Dao.findByKey
 import school.users.User.UserActivation.UserActivationDao.Dao.save
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
@@ -42,7 +40,6 @@ import school.users.User.UserDao.Dao.save
 import school.users.User.UserDao.Dao.signup
 import school.users.User.UserDao.Relations.FIND_USER_BY_LOGIN
 import school.users.UserDaoTests.Queries.h2SQLquery
-import school.users.security.SecurityUtils.generateActivationKey
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
@@ -382,7 +379,7 @@ class UserDaoTests {
             assertFalse(isLeft())
         }.onRight { uuid ->
             context.getBean<DatabaseClient>()
-                .sql("SELECT ur.`role` FROM `user_authority` ur WHERE ur.`user_id` = :userId")
+                .sql("SELECT `ur`.`role` FROM `user_authority` AS `ur` WHERE `ur`.`user_id` = :userId")
                 .bind("userId", uuid)
                 .fetch()
                 .all()
@@ -395,7 +392,7 @@ class UserDaoTests {
                 user.withId(uuid).copy(
                     roles =
                         resultRoles
-                            .map { Role(it.id) }
+                            .map { it.id.run(::Role) }
                             .toMutableSet())
                     .roles.first().id
             )
@@ -493,6 +490,7 @@ class UserDaoTests {
             context.countUsers(),
             "context should have only one user recorded in database"
         )
+
         context.findOneByEmail<User>(user.email).apply {
             assertTrue(isRight())
             assertFalse(isLeft())
@@ -595,5 +593,23 @@ class UserDaoTests {
 
     @Test
     fun `test find userActivation by key`(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        val countUserAuthBefore = context.countUserAuthority()
+        val countUserActivationBefore = context.countUserActivation()
+
+        val userActivation: UserActivation = UserActivation(
+            id = (user to context).signup().getOrNull()!!
+        ).apply { (this to context).save() }
+
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+        assertEquals(countUserActivationBefore + 1, context.countUserActivation())
+//        assertEquals(
+//            userActivation,
+//            context.findByKey(userActivation.activationKey).getOrNull()
+//        )
+        context.findByKey(userActivation.activationKey).getOrNull().run(::println)
     }
 }
+
+
