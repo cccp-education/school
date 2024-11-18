@@ -1,7 +1,7 @@
 @file:Suppress(
     "IdentifierGrammar",
     "MemberVisibilityCanBePrivate",
-    "unused", "UNUSED_VARIABLE"
+    "unused",
 )
 
 package school.tdd

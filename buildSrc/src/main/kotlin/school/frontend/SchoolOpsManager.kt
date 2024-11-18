@@ -47,7 +47,8 @@ object SchoolOpsManager {
 
     fun NodeExtension.schoolFrontendDir(
         workspace: Office
-    ): Unit = workspace.let(SchoolOpsManager::schoolFrontendPath)
+    ): Unit = workspace
+        .let(SchoolOpsManager::schoolFrontendPath)
         .let(::File)
         .let(nodeProjectDir::set)
 

@@ -1,6 +1,6 @@
 @file:Suppress(
 //    "JUnitMalformedDeclaration",
-    "SqlNoDataSourceInspection", "SqlDialectInspection"
+    "SqlNoDataSourceInspection", "SqlDialectInspection", "SqlSourceToSinkFlow"
 )
 
 package school.users
@@ -25,10 +25,13 @@ import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
+import school.tdd.TestUtils
 import school.tdd.TestUtils.Data.user
+import school.tdd.TestUtils.Data.users
 import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
+import school.users.User.UserDao.Dao.delete
 import school.users.User.UserDao.Dao.deleteAllUsersOnly
 import school.users.User.UserDao.Dao.findOne
 import school.users.User.UserDao.Dao.findOneByEmail
@@ -386,10 +389,11 @@ class UserDaoTests {
                 }
             assertEquals(
                 ROLE_USER,
-                user.withId(uuid).copy(roles =
-                resultRoles
-                    .map { Role(it.id) }
-                    .toMutableSet())
+                user.withId(uuid).copy(
+                    roles =
+                        resultRoles
+                            .map { Role(it.id) }
+                            .toMutableSet())
                     .roles.first().id
             )
             resultUserId = uuid
@@ -553,197 +557,28 @@ class UserDaoTests {
             )
         }
     }
+
+    @Test
+    fun test_deleteAllUsersOnly(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        val countUserAuthBefore = context.countUserAuthority()
+        users.forEach { (it to context).signup() }
+        assertEquals(countUserBefore + 2, context.countUsers())
+        assertEquals(countUserAuthBefore + 2, context.countUserAuthority())
+        context.deleteAllUsersOnly()
+        assertEquals(countUserBefore, context.countUsers())
+        assertEquals(countUserAuthBefore, context.countUserAuthority())
+    }
+
+    @Test
+    fun test_delete(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        val countUserAuthBefore = context.countUserAuthority()
+        val ids = users.map { (it to context).signup().getOrNull()!! }
+        assertEquals(countUserBefore + 2, context.countUsers())
+        assertEquals(countUserAuthBefore + 2, context.countUserAuthority())
+        ids.forEach { context.delete(it) }
+        assertEquals(countUserBefore, context.countUsers())
+        assertEquals(countUserAuthBefore, context.countUserAuthority())
+    }
 }
-
-
-//            suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.__findOneWithAuths__(emailOrLogin: String): Either<Throwable, User> =
-//                when (T::class) {
-//                    User::class -> {
-//                        try {
-//                            if (!((emailOrLogin to this).isThisEmail() || (emailOrLogin to this).isThisLogin()))
-//                                "not a valid login or not a valid email"
-//                                    .run(::Exception)
-//                                    .left()
-//                            //TODO: refactor à partir d'ici pour utiliser la requete avec jointures
-//                            val user = findOne<User>(emailOrLogin).getOrNull()
-//                            val roles: Set<Role>? = findAuthsByEmail(emailOrLogin).getOrNull()
-//                            // No need for that test, let catch intercept throwable.
-//                            when {
-//                                user != null && roles != null -> user.copy(roles = roles).right()
-//
-//                                else -> Exception("not able to retrieve user id and roles").left()
-//                            }
-//                        } catch (e: Throwable) {
-//                            e.left()
-//                        }
-//                    }
-//
-//                    else -> (T::class.simpleName)
-//                        .run { "Unsupported type: $this" }
-//                        .run(::IllegalArgumentException)
-//                        .left()
-//                }
-
-//            //TODO: return the complete user from db with roles
-//            suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
-//                mutableSetOf<Role>().apply {
-//                    getBean<DatabaseClient>()
-//                        .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
-//                        .bind("email", email)
-//                        .fetch()
-//                        .all()
-//                        .collect { add(Role(it["ROLE"].toString())) }
-//                }.toSet().right()
-//            } catch (e: Throwable) {
-//                e.left()
-//            }
-
-////@file:Suppress("NonAsciiCharacters")
-//package school.users
-////package school.repository
-////
-////import kotlinx.coroutines.runBlocking
-////import org.junit.jupiter.api.AfterAll
-////import org.junit.jupiter.api.AfterEach
-////import org.junit.jupiter.api.BeforeAll
-////import org.springframework.beans.factory.getBean
-////import org.springframework.context.ConfigurableApplicationContext
-////import org.springframework.data.r2dbc.base.R2dbcEntityTemplate
-////import school.*
-////import school.DataTests.accounts
-////import school.DataTests.defaultAccount
-////import school.accounts.models.AccountUtils.generateActivationKey
-////import school.accounts.models.toAccount
-////import school.accounts.repository.AccountRepository
-////import school.accounts.repository.AccountRepositoryR2dbc
-////import school.base.property.DEFAULT_LANGUAGE
-////import school.base.property.ROLE_USER
-////import school.base.property.SYSTEM_USER
-////import java.time.Instant
-////import kotlin.test.Test
-////import kotlin.test.assertEquals
-////import kotlin.test.assertNotNull
-////
-////
-////internal class AccountRepositoryR2dbcTest {
-////    private lateinit var context: ConfigurableApplicationContext
-////
-////    private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
-////    private val accountRepository: AccountRepository by lazy { context.getBean<AccountRepositoryR2dbc>() }
-////
-////    //    @BeforeAll
-//////    fun `lance le server en profile test`() = runApplication<Application> {
-//////        testLoader(this)
-//////    }.run { context = this }
-////    @BeforeAll
-////    fun `lance le server en profile test`() {
-////        context = launcher()
-////    }
-////
-////    @AfterAll
-////    fun `arrête le serveur`() = context.close()
-////
-////
-////    @AfterEach
-////    fun tearDown() = deleteAllAccounts(dao)
-////
-////
-////    @Test
-////    fun test_save() = runBlocking {
-////            val countBefore = countAccount(dao)
-////            assertEquals(0, countBefore)
-////            accountRepository.save(defaultAccount)
-////            assertEquals(countBefore + 1, countAccount(dao))
-////    }
-////
-////    @Test
-////    fun test_delete() = runBlocking {
-////        assertEquals(0, countAccount(dao))
-////        createDataAccounts(accounts, dao)
-////        assertEquals(accounts.size, countAccount(dao))
-////        assertEquals(accounts.size + 1, countAccountAuthority(dao))
-////        accountRepository.delete(defaultAccount.toAccount())
-////        assertEquals(accounts.size - 1, countAccount(dao))
-////        assertEquals(accounts.size, countAccountAuthority(dao))
-////    }
-////
-////    @Test
-////    fun test_findOne_with_Email() = runBlocking {
-////        assertEquals(0, countAccount(dao))
-////        createDataAccounts(accounts, dao)
-////        assertEquals(accounts.size, countAccount(dao))
-////        assertEquals(
-////            defaultAccount.login,
-////            accountRepository.findOne(defaultAccount.email!!)!!.login
-////        )
-////    }
-////
-////    @Test
-////    fun test_findOne_with_Login() = runBlocking {
-////        assertEquals(0, countAccount(dao))
-////        createDataAccounts(accounts, dao)
-////        assertEquals(accounts.size, countAccount(dao))
-////        assertEquals(
-////            defaultAccount.email,
-////            accountRepository.findOne(defaultAccount.login!!)!!.email
-////        )
-////    }
-////
-////    @Test
-////    fun test_signup() {
-////        assertEquals(0, countAccount(dao))
-////        assertEquals(0, countAccountAuthority(dao))
-////        runBlocking {
-////            accountRepository.signup(
-////                defaultAccount.copy(
-////                    activationKey = generateActivationKey,
-////                    langKey = DEFAULT_LANGUAGE,
-////                    createdBy = SYSTEM_USER,
-////                    createdDate = Instant.now(),
-////                    lastModifiedBy = SYSTEM_USER,
-////                    lastModifiedDate = Instant.now(),
-////                    authorities = mutableSetOf(ROLE_USER)
-////                )
-////            )
-////        }
-////        assertEquals(1, countAccount(dao))
-////        assertEquals(1, countAccountAuthority(dao))
-////    }
-////
-////    @Test
-////    fun test_findActivationKeyByLogin() {
-////        assertEquals(0, countAccount(dao))
-////        createDataAccounts(accounts, dao)
-////        assertEquals(accounts.size, countAccount(dao))
-////        assertEquals(accounts.size + 1, countAccountAuthority(dao))
-////        runBlocking {
-////            assertEquals(
-////                findOneByEmail(defaultAccount.email!!, dao)!!.activationKey,
-////                accountRepository.findActivationKeyByLogin(defaultAccount.login!!)
-////            )
-////        }
-////    }
-////
-////    @Test
-////    fun test_findOneByActivationKey() {
-////        assertEquals(0, countAccount(dao))
-////        createDataAccounts(accounts, dao)
-////        assertEquals(accounts.size, countAccount(dao))
-////        assertEquals(accounts.size + 1, countAccountAuthority(dao))
-////        findOneByLogin(defaultAccount.login!!, dao).run findOneByLogin@{
-////            assertNotNull(this@findOneByLogin)
-////            assertNotNull(this@findOneByLogin.activationKey)
-////            runBlocking {
-////                accountRepository.findOneByActivationKey(this@findOneByLogin.activationKey!!)
-////                    .run findOneByActivationKey@{
-////                        assertNotNull(this@findOneByActivationKey)
-////                        assertNotNull(this@findOneByActivationKey.id)
-////                        assertEquals(
-////                            this@findOneByLogin.id,
-////                            this@findOneByActivationKey.id
-////                        )
-////                    }
-////            }
-////        }
-////    }
-////}

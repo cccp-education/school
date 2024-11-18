@@ -388,6 +388,12 @@ data class User(
                     .let(getBean<DatabaseClient>()::sql)
                     .await()
 
+            suspend fun ApplicationContext.delete(id: UUID): Unit =
+                "DELETE FROM `user` AS `u` WHERE `id` = :id"
+                    .let(getBean<DatabaseClient>()::sql)
+                    .bind(UserDao.Attributes.ID_ATTR, id)
+                    .await()
+
             suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, User> =
                 when (T::class) {
                     User::class -> try {

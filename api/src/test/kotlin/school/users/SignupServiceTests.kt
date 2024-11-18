@@ -29,7 +29,7 @@ class SignupServiceTests {
 
 
     @Test
-    fun `signupService save user and role_user`(): Unit = runBlocking {
+    fun `test signupService signup saves user and role_user`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         assertEquals(0, countUserBefore)
         val countUserAuthBefore = context.countUserAuthority()
@@ -47,7 +47,44 @@ class SignupServiceTests {
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
 //        context.assertUserExists("jdoe" to "jdoe@acme.com")
     }
-
+////
+////    @Test
+////    fun test_findActivationKeyByLogin() {
+////        assertEquals(0, countAccount(dao))
+////        createDataAccounts(accounts, dao)
+////        assertEquals(accounts.size, countAccount(dao))
+////        assertEquals(accounts.size + 1, countAccountAuthority(dao))
+////        runBlocking {
+////            assertEquals(
+////                findOneByEmail(defaultAccount.email!!, dao)!!.activationKey,
+////                accountRepository.findActivationKeyByLogin(defaultAccount.login!!)
+////            )
+////        }
+////    }
+////
+////    @Test
+////    fun test_findOneByActivationKey() {
+////        assertEquals(0, countAccount(dao))
+////        createDataAccounts(accounts, dao)
+////        assertEquals(accounts.size, countAccount(dao))
+////        assertEquals(accounts.size + 1, countAccountAuthority(dao))
+////        findOneByLogin(defaultAccount.login!!, dao).run findOneByLogin@{
+////            assertNotNull(this@findOneByLogin)
+////            assertNotNull(this@findOneByLogin.activationKey)
+////            runBlocking {
+////                accountRepository.findOneByActivationKey(this@findOneByLogin.activationKey!!)
+////                    .run findOneByActivationKey@{
+////                        assertNotNull(this@findOneByActivationKey)
+////                        assertNotNull(this@findOneByActivationKey.id)
+////                        assertEquals(
+////                            this@findOneByLogin.id,
+////                            this@findOneByActivationKey.id
+////                        )
+////                    }
+////            }
+////        }
+////    }
+////}
 //TODO test phase book Spath P., Cosmina I., Harrop R., Schaefer C. - Pro Spring 6 with Kotlin - 2023.pdf p 456
 
 //    @Test
