@@ -26,7 +26,8 @@ import workspace.Log.i
 import java.io.File
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.LocalDateTime.ofInstant
+import java.time.ZoneOffset.UTC
 import kotlin.text.Charsets.UTF_8
 
 @Configuration
@@ -65,12 +66,12 @@ class Database(private val properties: Properties) {
 
     @WritingConverter
     class InstantWriteConverter : Converter<Instant, LocalDateTime> {
-        override fun convert(source: Instant): LocalDateTime? = LocalDateTime.ofInstant(source, ZoneOffset.UTC)!!
+        override fun convert(source: Instant): LocalDateTime? = ofInstant(source, UTC)
     }
 
     @ReadingConverter
     class InstantReadConverter : Converter<LocalDateTime, Instant> {
-        override fun convert(localDateTime: LocalDateTime): Instant = localDateTime.toInstant(ZoneOffset.UTC)!!
+        override fun convert(localDateTime: LocalDateTime): Instant = localDateTime.toInstant(UTC)!!
     }
 
     @Bean

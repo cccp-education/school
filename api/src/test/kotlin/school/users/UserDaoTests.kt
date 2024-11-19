@@ -5,7 +5,10 @@
 
 package school.users
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.right
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -17,18 +20,25 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
+import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.Data.users
 import school.tdd.TestUtils.defaultRoles
 import school.users.User.UserActivation
+import school.users.User.UserActivation.UserActivationDao
+import school.users.User.UserActivation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import school.users.User.UserActivation.UserActivationDao.Dao.countUserActivation
 import school.users.User.UserActivation.UserActivationDao.Dao.findByKey
 import school.users.User.UserActivation.UserActivationDao.Dao.save
+import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import school.users.User.UserActivation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import school.users.User.UserActivation.UserActivationDao.Fields.CREATED_DATE_FIELD
 import school.users.User.UserDao
 import school.users.User.UserDao.Dao.countUsers
 import school.users.User.UserDao.Dao.delete
@@ -45,8 +55,12 @@ import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import workspace.Log.i
+import java.time.Instant
+import java.time.Instant.now
+import java.time.Instant.parse
 import java.util.*
 import java.util.UUID.fromString
+import java.util.UUID.randomUUID
 import javax.inject.Inject
 import kotlin.test.*
 
@@ -599,7 +613,11 @@ class UserDaoTests {
 
         val userActivation: UserActivation = UserActivation(
             id = (user to context).signup().getOrNull()!!
-        ).apply { (this to context).save() }
+        ).apply {
+            activationKey.run(String::isNotBlank).run(::assertTrue)
+            (this to context).save()
+        }
+
 
         assertEquals(countUserBefore + 1, context.countUsers())
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
@@ -608,7 +626,36 @@ class UserDaoTests {
 //            userActivation,
 //            context.findByKey(userActivation.activationKey).getOrNull()
 //        )
-        context.findByKey(userActivation.activationKey).getOrNull().run(::println)
+//        context.findByKey(userActivation.activationKey).getOrNull().run(::println)
+
+
+        """SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR"""
+            .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+            .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
+            .fetch()
+            .awaitSingle()
+//            .let {
+//                UserActivation(
+//                    id = it[UserActivationDao.Fields.ID_FIELD.cleanField().uppercase()].toString().run(UUID::fromString),
+//                    activationKey = it[ACTIVATION_KEY_FIELD.cleanField().uppercase()].toString(),
+//                    createdDate = parse(it[CREATED_DATE_FIELD.cleanField().uppercase()].toString()),
+//                    activationDate = parse(it[ACTIVATION_DATE_FIELD.cleanField().uppercase()].toString()),
+//                )
+//            }
+            .apply { run(::println) }
+
+        parse(now().toString()).run(::println)
+//        parse("2024-11-19T01:44:27.416672").run(::println)
+
+
+//        context.getBean<R2dbcEntityTemplate>()
+//            .databaseClient
+//            .sql("""SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR""".trimIndent())
+//            .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
+//            .fetch()
+//            .awaitSingle()
+//            .toString()
+//            .run(::println)
     }
 }
 

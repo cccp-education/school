@@ -178,7 +178,7 @@ data class User(
                 const val INSERT = """
                 insert into $TABLE_NAME (
                 ${Fields.ID_FIELD} , $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
-                values (:${Attributes.ID_ATTR}, :$ACTIVATION_KEY_ATTR, :$ACTIVATION_DATE_ATTR, :$CREATED_DATE_ATTR)
+                values (:${Attributes.ID_ATTR}, :$ACTIVATION_KEY_ATTR, :$CREATED_DATE_ATTR, :$ACTIVATION_DATE_ATTR)
             """
             }
 
@@ -217,16 +217,13 @@ data class User(
                         : Either<Throwable, UserActivation> = try {
                     getBean<R2dbcEntityTemplate>()
                         .databaseClient
-                        .sql("""
-                            SELECT `ua` FROM `user_activation` AS `ua` WHERE `ua`.$ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR
-                        """.trimIndent()
-                        )
+                        .sql("SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR")
                         .bind(ACTIVATION_KEY_ATTR, key)
                         .fetch()
-                        .awaitSingle()
+                        .awaitSingleOrNull()
                         .let {
                             UserActivation(
-                                id = it[Fields.ID_FIELD] as UUID,
+                                id = it?.get(Fields.ID_FIELD) as UUID,
                                 activationKey = it[ACTIVATION_KEY_FIELD] as String,
                                 activationDate = it[ACTIVATION_DATE_FIELD] as Instant,
                                 createdDate = it[CREATED_DATE_FIELD] as Instant,
