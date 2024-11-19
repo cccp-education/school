@@ -24,6 +24,8 @@ import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants
 import school.users.Signup
 import school.users.User
+import school.users.UserActivation
+import school.users.dao.UserActivationDao.Dao.save
 import school.users.dao.UserActivationDao.Fields
 import school.users.dao.UserDao.Attributes.EMAIL_ATTR
 import school.users.dao.UserDao.Attributes.ID_ATTR
@@ -399,12 +401,13 @@ object UserDao {
             second.getBean<TransactionalOperator>().executeAndAwait {
                 (first to second).save()
             }
-            second.findOneByEmail<User>(first.email)
-                .mapLeft { return Exception("Unable to find user by email").left() }
-                .map {
-                    (UserRole(userId = it, role = Constants.ROLE_USER) to second).signup()
-                    return it.right()
-                }
+            second.findOneByEmail<User>(first.email).mapLeft {
+                return Exception("Unable to find user by email").left()
+            }.map {
+                (UserRole(userId = it, role = Constants.ROLE_USER) to second).signup()
+                (UserActivation(id = it) to second).save()
+                return it.right()
+            }
         } catch (e: Throwable) {
             e.left()
         }
