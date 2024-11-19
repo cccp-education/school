@@ -36,6 +36,9 @@ import school.users.dao.UserDao.Fields.LANG_KEY_FIELD
 import school.users.dao.UserDao.Fields.LOGIN_FIELD
 import school.users.dao.UserDao.Fields.PASSWORD_FIELD
 import school.users.dao.UserDao.Fields.VERSION_FIELD
+import school.users.dao.UserDao.Fields.EMAIL_AVAILABLE_COLUMN
+import school.users.dao.UserDao.Fields.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
+import school.users.dao.UserDao.Fields.LOGIN_AVAILABLE_COLUMN
 import school.users.dao.UserDao.Relations.FIND_USER_BY_ID
 import school.users.dao.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
 import school.users.dao.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
@@ -43,6 +46,7 @@ import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
 import java.lang.Long.getLong
 import java.util.*
+import java.util.UUID.fromString
 
 object UserDao {
     object Constraints {
@@ -67,6 +71,9 @@ object UserDao {
         const val EMAIL_FIELD = "`email`"
         const val LANG_KEY_FIELD = "`lang_key`"
         const val VERSION_FIELD = "`version`"
+        const val LOGIN_AND_EMAIL_AVAILABLE_COLUMN = "login_and_email_available"
+        const val EMAIL_AVAILABLE_COLUMN = "email_available"
+        const val LOGIN_AVAILABLE_COLUMN = "login_available"
     }
 
     object Attributes {
@@ -125,13 +132,21 @@ object UserDao {
         const val SELECT_SIGNUP_AVAILABILITY = """
                 SELECT
                     CASE
-                        WHEN EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR))
-                            OR EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR))
+                        WHEN EXISTS(
+                            SELECT 1 FROM $TABLE_NAME 
+                            WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR))
+                            OR EXISTS(
+                                SELECT 1 FROM $TABLE_NAME 
+                                WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR))
                             THEN FALSE
                         ELSE TRUE
-                        END AS login_and_email_available,
-                    NOT EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)) AS email_available,
-                    NOT EXISTS(SELECT 1 FROM $TABLE_NAME WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)) AS login_available;
+                        END AS $LOGIN_AND_EMAIL_AVAILABLE_COLUMN,
+                    NOT EXISTS(
+                        SELECT 1 FROM $TABLE_NAME 
+                        WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)) AS $EMAIL_AVAILABLE_COLUMN,
+                    NOT EXISTS(
+                        SELECT 1 FROM $TABLE_NAME 
+                        WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)) AS $LOGIN_AVAILABLE_COLUMN;
             """
 
         @JvmStatic
@@ -289,7 +304,7 @@ object UserDao {
                                 when {
                                     this == null -> Exception("not able to retrieve user id and roles").left()
                                     else -> User(
-                                        id = UUID.fromString(get("id".uppercase()).toString()),
+                                        id = fromString(get("id".uppercase()).toString()),
                                         email = get("email".uppercase()).toString(),
                                         login = get("login".uppercase()).toString(),
                                         roles = get("user_roles".uppercase())
@@ -383,9 +398,6 @@ object UserDao {
                 : Either<Throwable, Triple<Boolean/*OK*/,
                 Boolean/*email*/,
                 Boolean/*login*/>> = try {
-            val loginAndEmailAvailableColumn = "login_and_email_available"
-            val emailAvailableColumn = "email_available"
-            val loginAvailableColumn = "login_available"
             second
                 .getBean<R2dbcEntityTemplate>()
                 .databaseClient
@@ -396,9 +408,9 @@ object UserDao {
                 .awaitSingle()
                 .run {
                     Triple(
-                        java.lang.Boolean.parseBoolean(this[loginAndEmailAvailableColumn.uppercase()].toString()),
-                        java.lang.Boolean.parseBoolean(this[emailAvailableColumn.uppercase()].toString()),
-                        java.lang.Boolean.parseBoolean(this[loginAvailableColumn.uppercase()].toString())
+                        java.lang.Boolean.parseBoolean(this[LOGIN_AND_EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
+                        java.lang.Boolean.parseBoolean(this[EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
+                        java.lang.Boolean.parseBoolean(this[LOGIN_AVAILABLE_COLUMN.uppercase()].toString())
                     ).right()
                 }
         } catch (e: Throwable) {
