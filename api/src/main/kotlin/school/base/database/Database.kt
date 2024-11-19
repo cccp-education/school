@@ -21,7 +21,7 @@ import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
 import school.base.utils.Properties
-import school.users.User.UserDao
+import school.users.dao.UserDao
 import workspace.Log.i
 import java.io.File
 import java.time.Instant

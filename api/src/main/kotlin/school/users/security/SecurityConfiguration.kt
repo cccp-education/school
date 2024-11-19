@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono
 import school.base.http.Web.SpaWebFilter
 import school.base.utils.Constants.ROLE_ADMIN
 import school.base.utils.Properties
-import school.users.User.UserDao.userDetailsMono
+import school.users.dao.UserDao.userDetailsMono
 import workspace.Log.d
 
 

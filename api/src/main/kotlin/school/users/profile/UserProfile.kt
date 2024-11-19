@@ -5,8 +5,8 @@ package school.users.profile
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import school.base.utils.Constants.EMPTY_STRING
-import school.users.User.UserDao
-import school.users.User.UserDao.Fields.ID_FIELD
+import school.users.dao.UserDao
+import school.users.dao.UserDao.Fields.ID_FIELD
 import school.users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD
 import school.users.profile.UserProfile.UserProfileDao.Fields.IMAGE_URL_FIELD
 import school.users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD

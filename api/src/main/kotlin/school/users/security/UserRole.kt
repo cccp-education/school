@@ -17,7 +17,7 @@ import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants.ROLE_ADMIN
 import school.base.utils.Constants.ROLE_ANONYMOUS
 import school.base.utils.Constants.ROLE_USER
-import school.users.User.UserDao
+import school.users.dao.UserDao
 import school.users.security.UserRole.Role.RoleDao
 import school.users.security.UserRole.UserRoleDao.Fields.ROLE_FIELD
 import school.users.security.UserRole.UserRoleDao.Fields.USER_ID_FIELD

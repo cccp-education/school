@@ -15,8 +15,8 @@ import school.base.utils.Constants.ROLE_USER
 import school.base.utils.Constants.USER
 import school.tdd.TestUtils.Data.displayInsertUserScript
 import school.users.User
-import school.users.User.UserDao.Dao.findOne
-import school.users.User.Signup
+import school.users.dao.UserDao.Dao.findOne
+import school.users.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

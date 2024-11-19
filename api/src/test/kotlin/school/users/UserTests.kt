@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles
 import school.tdd.TestUtils.Data.user
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.AppUtils.toJson
-import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.dao.UserDao.Dao.deleteAllUsersOnly
 import workspace.Log.i
 import javax.inject.Inject
 import kotlin.test.AfterTest

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 import school.base.http.HttpUtils.badResponse
-import school.users.User.Signup
-import school.users.User.UserRestApiRoutes.API_SIGNUP
-import school.users.User.UserRestApiRoutes.API_USERS
+import school.users.Signup
+import school.users.dao.UserDao.UserRestApiRoutes.API_SIGNUP
+import school.users.dao.UserDao.UserRestApiRoutes.API_USERS
 import school.users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
 import school.users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE

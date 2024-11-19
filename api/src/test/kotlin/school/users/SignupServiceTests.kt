@@ -8,9 +8,8 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import school.users.User.Signup
-import school.users.User.UserDao.Dao.countUsers
-import school.users.User.UserDao.Dao.deleteAllUsersOnly
+import school.users.dao.UserDao.Dao.countUsers
+import school.users.dao.UserDao.Dao.deleteAllUsersOnly
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import school.users.signup.SignupService
 import kotlin.test.AfterTest

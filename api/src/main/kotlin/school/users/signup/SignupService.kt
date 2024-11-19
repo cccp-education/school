@@ -17,14 +17,15 @@ import school.base.model.EntityModel.Members.withId
 import school.base.utils.Constants.defaultProblems
 import school.users.User
 import school.users.User.Companion.objectName
-import school.users.User.Signup
-import school.users.User.UserDao.Dao.signup
-import school.users.User.UserDao.Dao.signupAvailability
-import school.users.User.UserDao.Dao.signupToUser
-import school.users.User.UserDao.Fields.EMAIL_FIELD
-import school.users.User.UserDao.Fields.LOGIN_FIELD
-import school.users.User.UserRestApiRoutes.API_SIGNUP
-import school.users.User.UserRestApiRoutes.API_USERS
+import school.users.Signup
+import school.users.dao.UserDao.Dao.signup
+import school.users.dao.UserDao.Dao.signupAvailability
+import school.users.dao.UserDao.Dao.signupToUser
+import school.users.dao.UserDao.Fields.EMAIL_FIELD
+import school.users.dao.UserDao.Fields.LOGIN_FIELD
+import school.users.dao.UserDao.UserRestApiRoutes.API_SIGNUP
+import school.users.dao.UserDao.UserRestApiRoutes.API_USERS
+import school.users.dao.UserDao
 
 
 @Service
@@ -46,9 +47,9 @@ class SignupService(private val context: ApplicationContext) {
             exchange: ServerWebExchange
         ): Set<Map<String, String?>> = exchange.validator.run {
             setOf(
-                User.UserDao.Attributes.PASSWORD_ATTR,
-                User.UserDao.Attributes.EMAIL_ATTR,
-                User.UserDao.Attributes.LOGIN_ATTR,
+                UserDao.Attributes.PASSWORD_ATTR,
+                UserDao.Attributes.EMAIL_ATTR,
+                UserDao.Attributes.LOGIN_ATTR,
             ).map { it to validateProperty(this@validate, it) }
                 .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
                     violatedField.second.map {
