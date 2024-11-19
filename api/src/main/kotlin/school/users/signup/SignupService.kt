@@ -122,7 +122,6 @@ class SignupService(private val context: ApplicationContext) {
     } catch (ex: Throwable) {
         ex.left()
     }
-
 }
 
 

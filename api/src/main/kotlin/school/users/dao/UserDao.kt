@@ -1,3 +1,5 @@
+@file:Suppress("SqlDialectInspection")
+
 package school.users.dao
 
 import arrow.core.Either

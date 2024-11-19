@@ -1,7 +1,7 @@
-import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
+import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
 
 import school.workspace.WorkspaceUtils.purchaseArtifact
-
+//TODO: rename school to forge
 plugins { idea }
 apply<school.frontend.SchoolPlugin>()
 apply<school.forms.FormPlugin>()
@@ -14,7 +14,7 @@ purchaseArtifact()
 //TODO: add some tasks from detached projects, and python run, tests, deployment
 tasks.wrapper {
     gradleVersion = "8.6"
-    distributionType = ALL
+    distributionType = BIN
 }
 
 tasks.withType<JavaExec> {

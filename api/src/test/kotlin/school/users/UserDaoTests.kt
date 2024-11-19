@@ -1,6 +1,8 @@
 @file:Suppress(
-//    "JUnitMalformedDeclaration",
-    "SqlNoDataSourceInspection", "SqlDialectInspection", "SqlSourceToSinkFlow"
+    "JUnitMalformedDeclaration",
+    "SqlNoDataSourceInspection",
+    "SqlDialectInspection",
+    "SqlSourceToSinkFlow"
 )
 
 package school.users
@@ -24,15 +26,22 @@ import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
 import school.base.model.EntityModel.Members.withId
+import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants.EMPTY_STRING
 import school.base.utils.Constants.ROLE_USER
 import school.tdd.TestUtils.Data.user
 import school.tdd.TestUtils.Data.users
 import school.tdd.TestUtils.defaultRoles
+import school.users.UserDaoTests.Queries.h2SQLquery
+import school.users.dao.UserActivationDao
 import school.users.dao.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import school.users.dao.UserActivationDao.Dao.countUserActivation
+import school.users.dao.UserActivationDao.Dao.findUserActivationByKey
 import school.users.dao.UserActivationDao.Dao.save
+import school.users.dao.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import school.users.dao.UserActivationDao.Fields.CREATED_DATE_FIELD
+import school.users.dao.UserDao
 import school.users.dao.UserDao.Dao.countUsers
 import school.users.dao.UserDao.Dao.delete
 import school.users.dao.UserDao.Dao.deleteAllUsersOnly
@@ -42,15 +51,13 @@ import school.users.dao.UserDao.Dao.findOneWithAuths
 import school.users.dao.UserDao.Dao.save
 import school.users.dao.UserDao.Dao.signup
 import school.users.dao.UserDao.Relations.FIND_USER_BY_LOGIN
-import school.users.UserDaoTests.Queries.h2SQLquery
-import school.users.dao.UserDao
 import school.users.security.UserRole.Role
 import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import workspace.Log.i
-import java.time.Instant.now
-import java.time.Instant.parse
+import java.time.LocalDateTime.parse
+import java.time.ZoneOffset.UTC
 import java.util.*
 import java.util.UUID.fromString
 import javax.inject.Inject
@@ -610,45 +617,55 @@ class UserDaoTests {
             (this to context).save()
         }
 
-
         assertEquals(countUserBefore + 1, context.countUsers())
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
         assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-//        assertEquals(
-//            userActivation,
-//            context.findByKey(userActivation.activationKey).getOrNull()
-//        )
-//        context.findByKey(userActivation.activationKey).getOrNull().run(::println)
+        assertEquals(
+            userActivation.id,
+            context.findUserActivationByKey(userActivation.activationKey).getOrNull()!!.id
+        )
 
-
-        """SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR"""
-            .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-            .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
-            .fetch()
-            .awaitSingle()
-//            .let {
-//                UserActivation(
-//                    id = it[UserActivationDao.Fields.ID_FIELD.cleanField().uppercase()].toString().run(UUID::fromString),
-//                    activationKey = it[ACTIVATION_KEY_FIELD.cleanField().uppercase()].toString(),
-//                    createdDate = parse(it[CREATED_DATE_FIELD.cleanField().uppercase()].toString()),
-//                    activationDate = parse(it[ACTIVATION_DATE_FIELD.cleanField().uppercase()].toString()),
-//                )
-//            }
-            .apply { run(::println) }
-
-        parse(now().toString()).run(::println)
-//        parse("2024-11-19T01:44:27.416672").run(::println)
-
-
-//        context.getBean<R2dbcEntityTemplate>()
-//            .databaseClient
-//            .sql("""SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR""".trimIndent())
-//            .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
-//            .fetch()
-//            .awaitSingle()
-//            .toString()
-//            .run(::println)
+        // BabyStepping to find an implementation and debugging
+        assertDoesNotThrow {
+            """SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR"""
+                .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
+                .fetch()
+                .awaitSingle()
+                .let {
+                    UserActivation(
+                        id = UserActivationDao.Fields.ID_FIELD
+                            .cleanField()
+                            .uppercase()
+                            .run(it::get)
+                            .toString()
+                            .run(UUID::fromString),
+                        activationKey = ACTIVATION_KEY_FIELD
+                            .cleanField()
+                            .uppercase()
+                            .run(it::get)
+                            .toString(),
+                        createdDate = CREATED_DATE_FIELD
+                            .cleanField()
+                            .uppercase()
+                            .run(it::get)
+                            .toString()
+                            .run(::parse)
+                            .toInstant(UTC),
+                        activationDate = ACTIVATION_DATE_FIELD
+                            .cleanField()
+                            .uppercase()
+                            .run(it::get)
+                            .run {
+                                when {
+                                    this == null || toString().lowercase() == "null" -> null
+                                    else -> toString().run(::parse).toInstant(UTC)
+                                }
+                            },
+                    )
+                }
+                .apply { run(::println) }
+        }
     }
 }
-
 

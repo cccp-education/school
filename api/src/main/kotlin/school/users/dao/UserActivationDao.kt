@@ -1,3 +1,8 @@
+@file:Suppress(
+    "MemberVisibilityCanBePrivate",
+    "SqlDialectInspection"
+)
+
 package school.users.dao
 
 import arrow.core.Either
@@ -8,6 +13,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
+import school.base.utils.AppUtils.cleanField
 import school.users.UserActivation
 import school.users.dao.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
 import school.users.dao.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
@@ -15,7 +21,8 @@ import school.users.dao.UserActivationDao.Attributes.CREATED_DATE_ATTR
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.dao.UserActivationDao.Fields.CREATED_DATE_FIELD
-import java.time.Instant
+import java.time.LocalDateTime.*
+import java.time.ZoneOffset.UTC
 import java.util.*
 
 object UserActivationDao {
@@ -39,8 +46,8 @@ object UserActivationDao {
         CREATE TABLE IF NOT EXISTS $TABLE_NAME (
             ${Fields.ID_FIELD}            UUID PRIMARY KEY,
             $ACTIVATION_KEY_FIELD         VARCHAR,
-            $CREATED_DATE_FIELD           datetime,
-            $ACTIVATION_DATE_FIELD        datetime,
+            $CREATED_DATE_FIELD           TIMESTAMP,
+            $ACTIVATION_DATE_FIELD        TIMESTAMP,
         FOREIGN KEY (${Fields.ID_FIELD}) REFERENCES ${UserDao.Relations.TABLE_NAME} (${UserDao.Fields.ID_FIELD})
             ON DELETE CASCADE
             ON UPDATE CASCADE);
@@ -90,7 +97,7 @@ object UserActivationDao {
         //Update userActivation
         //TODO: activate user from key (Find userActivation then Update userActivation)  one query select+update
         @Throws(EmptyResultDataAccessException::class)
-        suspend fun ApplicationContext.findByKey(key:String)
+        suspend fun ApplicationContext.findUserActivationByKey(key: String)
                 : Either<Throwable, UserActivation> = try {
             getBean<R2dbcEntityTemplate>()
                 .databaseClient
@@ -100,10 +107,15 @@ object UserActivationDao {
                 .awaitSingleOrNull()
                 .let {
                     UserActivation(
-                        id = it?.get(Fields.ID_FIELD) as UUID,
-                        activationKey = it[ACTIVATION_KEY_FIELD] as String,
-                        activationDate = it[ACTIVATION_DATE_FIELD] as Instant,
-                        createdDate = it[CREATED_DATE_FIELD] as Instant,
+                        id = it?.get(Fields.ID_FIELD.cleanField().uppercase()).toString().run(UUID::fromString),
+                        activationKey = it?.get(ACTIVATION_KEY_FIELD.cleanField().uppercase()).toString(),
+                        createdDate = parse(it?.get(CREATED_DATE_FIELD.cleanField().uppercase()).toString()).toInstant(UTC),
+                        activationDate = it?.get(ACTIVATION_DATE_FIELD.cleanField().uppercase()).run {
+                            when {
+                                this == null || toString().lowercase() == "null" -> null
+                                else -> toString().run(::parse).toInstant(UTC)
+                            }
+                        },
                     )
                 }.right()
         } catch (e: Throwable) {
