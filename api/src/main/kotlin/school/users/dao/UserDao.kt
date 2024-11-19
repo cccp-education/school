@@ -1,4 +1,4 @@
-@file:Suppress("SqlDialectInspection")
+@file:Suppress("SqlDialectInspection", "MemberVisibilityCanBePrivate")
 
 package school.users.dao
 
@@ -20,10 +20,13 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
 import reactor.core.publisher.Mono
 import school.base.model.EntityModel
+import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants
 import school.users.Signup
 import school.users.User
+import school.users.dao.UserActivationDao.Fields
 import school.users.dao.UserDao.Attributes.EMAIL_ATTR
+import school.users.dao.UserDao.Attributes.ID_ATTR
 import school.users.dao.UserDao.Attributes.LANG_KEY_ATTR
 import school.users.dao.UserDao.Attributes.LOGIN_ATTR
 import school.users.dao.UserDao.Attributes.PASSWORD_ATTR
@@ -32,18 +35,23 @@ import school.users.dao.UserDao.Attributes.isEmail
 import school.users.dao.UserDao.Attributes.isLogin
 import school.users.dao.UserDao.Dao.findOneWithAuths
 import school.users.dao.UserDao.Fields.EMAIL_FIELD
+import school.users.dao.UserDao.Fields.ID_FIELD
 import school.users.dao.UserDao.Fields.LANG_KEY_FIELD
 import school.users.dao.UserDao.Fields.LOGIN_FIELD
 import school.users.dao.UserDao.Fields.PASSWORD_FIELD
 import school.users.dao.UserDao.Fields.VERSION_FIELD
-import school.users.dao.UserDao.Fields.EMAIL_AVAILABLE_COLUMN
-import school.users.dao.UserDao.Fields.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
-import school.users.dao.UserDao.Fields.LOGIN_AVAILABLE_COLUMN
+import school.users.dao.UserDao.Relations.DELETE_USER
+import school.users.dao.UserDao.Relations.DELETE_USER_BY_ID
+import school.users.dao.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
 import school.users.dao.UserDao.Relations.FIND_USER_BY_ID
 import school.users.dao.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
+import school.users.dao.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
+import school.users.dao.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
 import school.users.dao.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
+import school.users.dao.UserDao.Relations.TABLE_NAME
 import school.users.security.UserRole
 import school.users.security.UserRole.UserRoleDao.Dao.signup
+import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
 import java.util.UUID.fromString
@@ -71,9 +79,6 @@ object UserDao {
         const val EMAIL_FIELD = "`email`"
         const val LANG_KEY_FIELD = "`lang_key`"
         const val VERSION_FIELD = "`version`"
-        const val LOGIN_AND_EMAIL_AVAILABLE_COLUMN = "login_and_email_available"
-        const val EMAIL_AVAILABLE_COLUMN = "email_available"
-        const val LOGIN_AVAILABLE_COLUMN = "login_available"
     }
 
     object Attributes {
@@ -118,36 +123,55 @@ object UserDao {
         $LOGIN_FIELD, $EMAIL_FIELD,
         $PASSWORD_FIELD, $LANG_KEY_FIELD,
         $VERSION_FIELD
-    ) values ( :login, :email, :password, :langKey, :version)"""
+    ) values ( :$LOGIN_ATTR, :$EMAIL_ATTR, :$PASSWORD_ATTR, :$LANG_KEY_ATTR, :$VERSION_ATTR)"""
 
         //TODO: signup, findByEmailOrLogin,
         const val FIND_USER_BY_LOGIN =
-            "SELECT `u`.${UserDao.Fields.ID_FIELD} FROM $TABLE_NAME AS `u` WHERE u.$LOGIN_FIELD= LOWER(:$LOGIN_ATTR)"
-        val FIND_USER_BY_LOGIN_OR_EMAIL =
-            "SELECT `u`.`id` FROM `user` AS `u` WHERE LOWER(`u`.`email`) = LOWER(:email) OR LOWER(`u`.`login`) = LOWER(:login)"
-                .trimIndent()
-        val FIND_USER_BY_ID =
-            "SELECT * FROM `user` AS `u` WHERE `u`.`id` = :id"
-                .trimIndent()
+            """
+                SELECT `u`.${UserDao.Fields.ID_FIELD} 
+                FROM $TABLE_NAME AS `u` 
+                WHERE u.$LOGIN_FIELD= LOWER(:$LOGIN_ATTR)
+                """
+        const val FIND_USER_BY_LOGIN_OR_EMAIL =
+            """
+                SELECT `u`.$LOGIN_FIELD 
+                FROM $TABLE_NAME AS `u` 
+                WHERE LOWER(`u`.$EMAIL_FIELD) = LOWER(:$EMAIL_ATTR) OR 
+                LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
+                """
+
+        const val FIND_USER_BY_ID =
+            "SELECT * FROM $TABLE_NAME AS `u` WHERE `u`.$ID_FIELD = :id"
+
+        const val LOGIN_AND_EMAIL_AVAILABLE_COLUMN = "login_and_email_available"
+        const val EMAIL_AVAILABLE_COLUMN = "email_available"
+        const val LOGIN_AVAILABLE_COLUMN = "login_available"
+
         const val SELECT_SIGNUP_AVAILABILITY = """
                 SELECT
                     CASE
                         WHEN EXISTS(
-                            SELECT 1 FROM $TABLE_NAME 
-                            WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR))
-                            OR EXISTS(
                                 SELECT 1 FROM $TABLE_NAME 
-                                WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR))
+                                WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
+                             ) OR 
+                             EXISTS(
+                                SELECT 1 FROM $TABLE_NAME 
+                                WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)
+                             )
                             THEN FALSE
                         ELSE TRUE
                         END AS $LOGIN_AND_EMAIL_AVAILABLE_COLUMN,
                     NOT EXISTS(
-                        SELECT 1 FROM $TABLE_NAME 
-                        WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)) AS $EMAIL_AVAILABLE_COLUMN,
+                            SELECT 1 FROM $TABLE_NAME 
+                            WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)
+                        ) AS $EMAIL_AVAILABLE_COLUMN,
                     NOT EXISTS(
-                        SELECT 1 FROM $TABLE_NAME 
-                        WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)) AS $LOGIN_AVAILABLE_COLUMN;
+                            SELECT 1 FROM $TABLE_NAME 
+                            WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
+                        ) AS $LOGIN_AVAILABLE_COLUMN;
             """
+        const val DELETE_USER_BY_ID = "DELETE FROM $TABLE_NAME AS `u` WHERE $ID_FIELD = :$ID_ATTR"
+        const val DELETE_USER = "DELETE FROM $TABLE_NAME"
 
         @JvmStatic
         val CREATE_TABLES: String
@@ -168,7 +192,7 @@ object UserDao {
 
     object Dao {
         suspend fun ApplicationContext.countUsers(): Int =
-            "SELECT COUNT(*) FROM `user`"
+            "SELECT COUNT(*) FROM $TABLE_NAME"
                 .let(getBean<DatabaseClient>()::sql)
                 .fetch()
                 .awaitSingle()
@@ -197,75 +221,78 @@ object UserDao {
             e.left()
         }
 
-        suspend fun ApplicationContext.deleteAllUsersOnly(): Unit =
-            "DELETE FROM `user`"
-                .let(getBean<DatabaseClient>()::sql)
-                .await()
+        suspend fun ApplicationContext.deleteAllUsersOnly(): Unit = DELETE_USER
+            .trimIndent()
+            .let(getBean<DatabaseClient>()::sql)
+            .await()
 
-        suspend fun ApplicationContext.delete(id: UUID): Unit =
-            "DELETE FROM `user` AS `u` WHERE `id` = :id"
-                .let(getBean<DatabaseClient>()::sql)
-                .bind(UserDao.Attributes.ID_ATTR, id)
-                .await()
+        suspend fun ApplicationContext.delete(id: UUID): Unit = DELETE_USER_BY_ID
+            .trimIndent()
+            .let(getBean<DatabaseClient>()::sql)
+            .bind(UserDao.Attributes.ID_ATTR, id)
+            .await()
 
-        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(emailOrLogin: String): Either<Throwable, User> =
-            when (T::class) {
-                User::class -> try {
-                    FIND_USER_BY_LOGIN_OR_EMAIL
-                        .run(getBean<DatabaseClient>()::sql)
-                        .bind(EMAIL_ATTR, emailOrLogin)
-                        .bind(LOGIN_ATTR, emailOrLogin)
-                        .fetch()
-                        .awaitSingle()
-                        .let {
-                            User(
-                                id = it[Fields.ID_FIELD] as UUID,
-                                email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD] as String,
-                                login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD] as String,
-                                password = it[PASSWORD_FIELD] as String,
-                                langKey = it[LANG_KEY_FIELD] as String,
-                                version = it[VERSION_FIELD] as Long,
-                            )
-                        }.right()
-                } catch (e: Throwable) {
-                    e.left()
-                }
-
-                else -> (T::class.simpleName)
-                    .run { "Unsupported type: $this" }
-                    .run(::IllegalArgumentException)
-                    .left()
+        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(
+            emailOrLogin: String
+        ): Either<Throwable, User> = when (T::class) {
+            User::class -> try {
+                FIND_USER_BY_LOGIN_OR_EMAIL.trimIndent()
+                    .run(getBean<DatabaseClient>()::sql)
+                    .bind(EMAIL_ATTR, emailOrLogin)
+                    .bind(LOGIN_ATTR, emailOrLogin)
+                    .fetch()
+                    .awaitSingle()
+                    .let {
+                        User(
+                            id = it[Fields.ID_FIELD] as UUID,
+                            email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD].toString(),
+                            login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD].toString(),
+                            password = it[PASSWORD_FIELD].toString(),
+                            langKey = it[LANG_KEY_FIELD].toString(),
+                            version = it[VERSION_FIELD].toString().run(::getLong),
+                        )
+                    }.right()
+            } catch (e: Throwable) {
+                e.left()
             }
 
-        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(id: UUID): Either<Throwable, User> =
-            when (T::class) {
-                User::class -> try {
-                    FIND_USER_BY_ID
-                        .run(getBean<DatabaseClient>()::sql)
-                        .bind(EMAIL_ATTR, id)
-                        .bind(LOGIN_ATTR, id)
-                        .fetch()
-                        .awaitSingle()
-                        .let {
-                            User(
-                                //TODO : fix with fromString and test nullability
-                                id = it[Fields.ID_FIELD] as UUID,
-                                email = it[EMAIL_FIELD].toString(),
-                                login = it[LOGIN_FIELD].toString(),
-                                password = it[PASSWORD_FIELD].toString(),
-                                langKey = it[LANG_KEY_FIELD].toString(),
-                                version = getLong(it[VERSION_FIELD].toString()),
-                            )
-                        }.right()
-                } catch (e: Throwable) {
-                    e.left()
-                }
+            else -> (T::class.simpleName)
+                .run { "Unsupported type: $this" }
+                .run(::IllegalArgumentException)
+                .left()
+        }
 
-                else -> (T::class.simpleName)
-                    .run { "Unsupported type: $this" }
-                    .run(::IllegalArgumentException)
-                    .left()
+        suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOne(
+            id: UUID
+        ): Either<Throwable, User> = when (T::class) {
+            User::class -> try {
+                FIND_USER_BY_ID.trimIndent()
+                    .run(getBean<DatabaseClient>()::sql)
+                    .bind(EMAIL_ATTR, id)
+                    .bind(LOGIN_ATTR, id)
+                    .fetch()
+                    .awaitSingleOrNull()
+                    .let {
+                        User(
+                            id = it?.get(ID_FIELD.cleanField().uppercase())
+                                .toString()
+                                .run(UUID::fromString),
+                            email = it?.get(EMAIL_FIELD).toString(),
+                            login = it?.get(LOGIN_FIELD).toString(),
+                            password = it?.get(PASSWORD_FIELD).toString(),
+                            langKey = it?.get(LANG_KEY_FIELD).toString(),
+                            version = getLong(it?.get(VERSION_FIELD).toString()),
+                        )
+                    }.right()
+            } catch (e: Throwable) {
+                e.left()
             }
+
+            else -> (T::class.simpleName)
+                .run { "Unsupported type: $this" }
+                .run(::IllegalArgumentException)
+                .left()
+        }
 
 
         suspend inline fun <reified T : EntityModel<UUID>> ApplicationContext.findOneWithAuths(emailOrLogin: String): Either<Throwable, User> =
@@ -408,9 +435,9 @@ object UserDao {
                 .awaitSingle()
                 .run {
                     Triple(
-                        java.lang.Boolean.parseBoolean(this[LOGIN_AND_EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
-                        java.lang.Boolean.parseBoolean(this[EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
-                        java.lang.Boolean.parseBoolean(this[LOGIN_AVAILABLE_COLUMN.uppercase()].toString())
+                        parseBoolean(this[LOGIN_AND_EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
+                        parseBoolean(this[EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
+                        parseBoolean(this[LOGIN_AVAILABLE_COLUMN.uppercase()].toString())
                     ).right()
                 }
         } catch (e: Throwable) {
