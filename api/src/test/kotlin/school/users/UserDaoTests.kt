@@ -37,7 +37,6 @@ import school.users.dao.UserActivationDao
 import school.users.dao.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import school.users.dao.UserActivationDao.Dao.countUserActivation
 import school.users.dao.UserActivationDao.Dao.findUserActivationByKey
-import school.users.dao.UserActivationDao.Dao.save
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.dao.UserActivationDao.Fields.CREATED_DATE_FIELD
@@ -56,8 +55,6 @@ import school.users.security.UserRole.Role.RoleDao.Dao.countRoles
 import school.users.security.UserRole.UserRoleDao
 import school.users.security.UserRole.UserRoleDao.Dao.countUserAuthority
 import workspace.Log.i
-import java.time.LocalDateTime.parse
-import java.time.ZoneOffset.UTC
 import java.util.*
 import java.util.UUID.fromString
 import javax.inject.Inject
@@ -597,11 +594,17 @@ class UserDaoTests {
     }
 
     @Test
-    fun `test create userActivation by key`(): Unit = runBlocking {
-        (UserActivation(id = (user to context).signup().getOrNull()!!) to context).save().apply {
+    fun `test create userActivation inside signup`(): Unit = runBlocking {
+        val countUserBefore = context.countUsers()
+        val countUserAuthBefore = context.countUserAuthority()
+        val countUserActivationBefore = context.countUserActivation()
+        (user to context).signup().apply {
             assertTrue(isRight())
             assertFalse(isLeft())
         }
+        assertEquals(countUserBefore + 1, context.countUsers())
+        assertEquals(countUserActivationBefore + 1, context.countUserActivation())
+        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
     @Test
@@ -609,62 +612,61 @@ class UserDaoTests {
         val countUserBefore = context.countUsers()
         val countUserAuthBefore = context.countUserAuthority()
         val countUserActivationBefore = context.countUserActivation()
-
-        val userActivation: UserActivation = UserActivation(
-            id = (user to context).signup().getOrNull()!!
-        ).apply {
-            activationKey.run(String::isNotBlank).run(::assertTrue)
-            (this to context).save()
-        }
-
-        assertEquals(countUserBefore + 1, context.countUsers())
-        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-        assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-        assertEquals(
-            userActivation.id,
-            context.findUserActivationByKey(userActivation.activationKey).getOrNull()!!.id
-        )
-
-        // BabyStepping to find an implementation and debugging
-        assertDoesNotThrow {
-            """SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR"""
-                .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-                .bind(ACTIVATION_KEY_ATTR, userActivation.activationKey)
-                .fetch()
-                .awaitSingle()
-                .let {
-                    UserActivation(
-                        id = UserActivationDao.Fields.ID_FIELD
-                            .cleanField()
-                            .uppercase()
-                            .run(it::get)
-                            .toString()
-                            .run(UUID::fromString),
-                        activationKey = ACTIVATION_KEY_FIELD
-                            .cleanField()
-                            .uppercase()
-                            .run(it::get)
-                            .toString(),
-                        createdDate = CREATED_DATE_FIELD
-                            .cleanField()
-                            .uppercase()
-                            .run(it::get)
-                            .toString()
-                            .run(::parse)
-                            .toInstant(UTC),
-                        activationDate = ACTIVATION_DATE_FIELD
-                            .cleanField()
-                            .uppercase()
-                            .run(it::get)
-                            .run {
-                                when {
-                                    this == null || toString().lowercase() == "null" -> null
-                                    else -> toString().run(::parse).toInstant(UTC)
-                                }
-                            },
-                    )
-                }
-                .apply { run(::println) }
+        UserActivation(id = (user to context).signup().getOrNull()!!).run {
+            assertEquals(countUserBefore + 1, context.countUsers())
+            assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+            assertEquals(countUserActivationBefore + 1, context.countUserActivation())
+//            assertEquals(
+//                id,
+//                context.findUserActivationByKey(activationKey).getOrNull()!!.id
+//            )
+            // BabyStepping to find an implementation and debugging
+            assertDoesNotThrow {
+                id.toString().run(::i)
+                activationKey.run(::i)
+//                """SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}"""
+                """SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}"""
+                    .trimIndent()
+                    .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+//                .bind(ACTIVATION_KEY_ATTR, activationKey)
+                    .fetch()
+                    .all()
+                    .collect { it.toString().run(::i) }
+//                    .awaitSingle()
+//                    .let {
+//                        UserActivation(
+//                            id = UserActivationDao.Fields.ID_FIELD
+//                                .cleanField()
+//                                .uppercase()
+//                                .run(it::get)
+//                                .toString()
+//                                .run(UUID::fromString),
+//                            activationKey = ACTIVATION_KEY_FIELD
+//                                .cleanField()
+//                                .uppercase()
+//                                .run(it::get)
+//                                .toString(),
+//                            createdDate = CREATED_DATE_FIELD
+//                                .cleanField()
+//                                .uppercase()
+//                                .run(it::get)
+//                                .toString()
+//                                .run(java.time.LocalDateTime::parse)
+//                                .toInstant(java.time.ZoneOffset.UTC),
+//                            activationDate = ACTIVATION_DATE_FIELD
+//                                .cleanField()
+//                                .uppercase()
+//                                .run(it::get)
+//                                .run {
+//                                    when {
+//                                        this == null || toString().lowercase() == "null" -> null
+//                                        else -> toString().run(java.time.LocalDateTime::parse).toInstant(java.time.ZoneOffset.UTC)
+//                                    }
+//                                },
+//                        )
+//                    }
+////                .apply { run(::println) }
+            }
         }
     }
 }

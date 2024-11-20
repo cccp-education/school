@@ -6,19 +6,14 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import jakarta.validation.Validator
-import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import reactor.core.publisher.Mono
 import school.base.model.EntityModel
 import school.base.utils.AppUtils.cleanField
 import school.base.utils.Constants
@@ -26,7 +21,6 @@ import school.users.Signup
 import school.users.User
 import school.users.UserActivation
 import school.users.dao.UserActivationDao.Dao.save
-import school.users.dao.UserActivationDao.Fields
 import school.users.dao.UserDao.Attributes.EMAIL_ATTR
 import school.users.dao.UserDao.Attributes.ID_ATTR
 import school.users.dao.UserDao.Attributes.LANG_KEY_ATTR
@@ -35,7 +29,6 @@ import school.users.dao.UserDao.Attributes.PASSWORD_ATTR
 import school.users.dao.UserDao.Attributes.VERSION_ATTR
 import school.users.dao.UserDao.Attributes.isEmail
 import school.users.dao.UserDao.Attributes.isLogin
-import school.users.dao.UserDao.Dao.findOneWithAuths
 import school.users.dao.UserDao.Fields.EMAIL_FIELD
 import school.users.dao.UserDao.Fields.ID_FIELD
 import school.users.dao.UserDao.Fields.LANG_KEY_FIELD
@@ -106,7 +99,7 @@ object UserDao {
         const val TABLE_NAME = "`user`"
         const val SQL_SCRIPT = """
     CREATE TABLE IF NOT EXISTS $TABLE_NAME (
-        ${Fields.ID_FIELD}            UUID default random_uuid() PRIMARY KEY,
+        $ID_FIELD            UUID default random_uuid() PRIMARY KEY,
         $LOGIN_FIELD                  VARCHAR,
         $PASSWORD_FIELD               VARCHAR,
         $EMAIL_FIELD                  VARCHAR,
@@ -127,10 +120,9 @@ object UserDao {
         $VERSION_FIELD
     ) values ( :$LOGIN_ATTR, :$EMAIL_ATTR, :$PASSWORD_ATTR, :$LANG_KEY_ATTR, :$VERSION_ATTR)"""
 
-        //TODO: signup, findByEmailOrLogin,
         const val FIND_USER_BY_LOGIN =
             """
-                SELECT `u`.${UserDao.Fields.ID_FIELD} 
+                SELECT `u`.$ID_FIELD 
                 FROM $TABLE_NAME AS `u` 
                 WHERE u.$LOGIN_FIELD= LOWER(:$LOGIN_ATTR)
                 """
@@ -175,6 +167,7 @@ object UserDao {
         const val DELETE_USER_BY_ID = "DELETE FROM $TABLE_NAME AS `u` WHERE $ID_FIELD = :$ID_ATTR"
         const val DELETE_USER = "DELETE FROM $TABLE_NAME"
 
+        @Suppress("RemoveRedundantQualifierName")
         @JvmStatic
         val CREATE_TABLES: String
             get() = setOf(
@@ -203,12 +196,11 @@ object UserDao {
                 .toString()
                 .toInt()
 
-        //TODO: return the complete user from db without roles
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
-            second.getBean<R2dbcEntityTemplate>()
-                .databaseClient
-                .sql(UserDao.Relations.INSERT)
+            @Suppress("RemoveRedundantQualifierName")
+            UserDao.Relations.INSERT
+                .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)
                 .bind(PASSWORD_ATTR, first.password)
@@ -246,7 +238,7 @@ object UserDao {
                     .awaitSingle()
                     .let {
                         User(
-                            id = it[Fields.ID_FIELD] as UUID,
+                            id = it[ID_FIELD] as UUID,
                             email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD].toString(),
                             login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD].toString(),
                             password = it[PASSWORD_FIELD].toString(),
@@ -363,7 +355,7 @@ object UserDao {
                 User::class -> {
                     try {
                         (getBean<DatabaseClient>()
-                            .sql("SELECT `u`.${Fields.ID_FIELD} FROM ${UserDao.Relations.TABLE_NAME} `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)".trimIndent())
+                            .sql("SELECT `u`.$ID_FIELD FROM ${UserDao.Relations.TABLE_NAME} `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)".trimIndent())
                             .bind(LOGIN_ATTR, login)
                             .fetch()
                             .awaitOne()
@@ -447,29 +439,6 @@ object UserDao {
             e.left()
         }
     }
-
-    fun ApplicationContext.userDetailsMono(emailOrLogin: String): Mono<UserDetails> =
-        getBean<Validator>()
-            .run {
-                when {
-                    validateProperty(
-                        User(email = emailOrLogin),
-                        EMAIL_FIELD
-                    ).isNotEmpty() && validateProperty(
-                        User(login = emailOrLogin),
-                        LOGIN_FIELD
-                    ).isNotEmpty() -> throw UsernameNotFoundException("User $emailOrLogin was not found")
-
-                    else -> mono {
-                        findOneWithAuths<User>(emailOrLogin).map { user ->
-                            return@mono org.springframework.security.core.userdetails.User(
-                                user.login,
-                                user.password,
-                                user.roles.map { SimpleGrantedAuthority(it.id) })
-                        }.getOrNull() ?: throw UsernameNotFoundException("User $emailOrLogin was not found")
-                    }
-                }
-            }
 
     /** User REST API URIs */
     object UserRestApiRoutes {

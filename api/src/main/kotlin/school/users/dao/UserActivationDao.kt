@@ -21,6 +21,7 @@ import school.users.dao.UserActivationDao.Attributes.CREATED_DATE_ATTR
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import school.users.dao.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import school.users.dao.UserActivationDao.Fields.CREATED_DATE_FIELD
+import school.users.dao.UserActivationDao.Relations.TABLE_NAME
 import java.time.LocalDateTime.*
 import java.time.ZoneOffset.UTC
 import java.util.*
@@ -68,7 +69,7 @@ object UserActivationDao {
 
     object Dao {
         suspend fun ApplicationContext.countUserActivation(): Int =
-            "SELECT COUNT(*) FROM `user_activation`"
+            "SELECT COUNT(*) FROM $TABLE_NAME"
                 .let(getBean<DatabaseClient>()::sql)
                 .fetch()
                 .awaitSingle()
@@ -79,9 +80,9 @@ object UserActivationDao {
 
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, Long> = try {
-            second.getBean<R2dbcEntityTemplate>()
-                .databaseClient
-                .sql(Relations.INSERT.trimIndent())
+            Relations.INSERT
+                .trimIndent()
+                .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(Attributes.ID_ATTR, first.id)
                 .bind(ACTIVATION_KEY_ATTR, first.activationKey)
                 .bind(CREATED_DATE_ATTR, first.createdDate)
@@ -99,25 +100,30 @@ object UserActivationDao {
         @Throws(EmptyResultDataAccessException::class)
         suspend fun ApplicationContext.findUserActivationByKey(key: String)
                 : Either<Throwable, UserActivation> = try {
-            getBean<R2dbcEntityTemplate>()
-                .databaseClient
-                .sql("SELECT * FROM `user_activation` WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR")
+            "SELECT * FROM $TABLE_NAME WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR"
+                .trimIndent()
+                .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(ACTIVATION_KEY_ATTR, key)
                 .fetch()
                 .awaitSingleOrNull()
                 .let {
-                    UserActivation(
-                        id = it?.get(Fields.ID_FIELD.cleanField().uppercase()).toString().run(UUID::fromString),
-                        activationKey = it?.get(ACTIVATION_KEY_FIELD.cleanField().uppercase()).toString(),
-                        createdDate = parse(it?.get(CREATED_DATE_FIELD.cleanField().uppercase()).toString()).toInstant(UTC),
-                        activationDate = it?.get(ACTIVATION_DATE_FIELD.cleanField().uppercase()).run {
-                            when {
-                                this == null || toString().lowercase() == "null" -> null
-                                else -> toString().run(::parse).toInstant(UTC)
-                            }
-                        },
-                    )
-                }.right()
+                    return when (it) {
+                        null -> EmptyResultDataAccessException(1).left()
+                        else -> UserActivation(
+                            id = it[Fields.ID_FIELD.cleanField().uppercase()].toString().run(UUID::fromString),
+                            activationKey = it[ACTIVATION_KEY_FIELD.cleanField().uppercase()].toString(),
+                            createdDate = parse(it[CREATED_DATE_FIELD.cleanField().uppercase()].toString()).toInstant(
+                                UTC
+                            ),
+                            activationDate = it[ACTIVATION_DATE_FIELD.cleanField().uppercase()].run {
+                                when {
+                                    this == null || toString().lowercase() == "null" -> null
+                                    else -> toString().run(::parse).toInstant(UTC)
+                                }
+                            },
+                        ).right()
+                    }
+                }
         } catch (e: Throwable) {
             e.left()
         }

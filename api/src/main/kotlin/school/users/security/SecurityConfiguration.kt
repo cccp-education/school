@@ -1,5 +1,7 @@
 package school.users.security
 
+import jakarta.validation.Validator
+import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
@@ -12,6 +14,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder.AUTHENTICATION
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder.HTTP_BASIC
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -33,7 +36,10 @@ import reactor.core.publisher.Mono
 import school.base.http.Web.SpaWebFilter
 import school.base.utils.Constants.ROLE_ADMIN
 import school.base.utils.Properties
-import school.users.dao.UserDao.userDetailsMono
+import school.users.User
+import school.users.dao.UserDao.Dao.findOneWithAuths
+import school.users.dao.UserDao.Fields.EMAIL_FIELD
+import school.users.dao.UserDao.Fields.LOGIN_FIELD
 import workspace.Log.d
 
 
@@ -82,6 +88,29 @@ class SecurityConfiguration(private val context: ApplicationContext) {
             "/swagger",
             "/v2/api-docs",
         )
+
+        fun ApplicationContext.userDetailsMono(
+            emailOrLogin: String
+        ): Mono<UserDetails> = getBean<Validator>().run {
+            when {
+                validateProperty(
+                    User(email = emailOrLogin),
+                    EMAIL_FIELD
+                ).isNotEmpty() && validateProperty(
+                    User(login = emailOrLogin),
+                    LOGIN_FIELD
+                ).isNotEmpty() -> throw UsernameNotFoundException("User $emailOrLogin was not found")
+
+                else -> mono {
+                    findOneWithAuths<User>(emailOrLogin).map { user ->
+                        return@mono org.springframework.security.core.userdetails.User(
+                            user.login,
+                            user.password,
+                            user.roles.map { SimpleGrantedAuthority(it.id) })
+                    }.getOrNull() ?: throw UsernameNotFoundException("User $emailOrLogin was not found")
+                }
+            }
+        }
     }
 
     @Component("userDetailsService")
