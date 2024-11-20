@@ -1,6 +1,5 @@
 package users.security
 
-import app.utils.Constants
 import app.utils.Constants.AUTHORIZATION_HEADER
 import app.utils.Constants.BEARER_START_WITH
 import org.springframework.beans.factory.getBean
@@ -44,6 +43,7 @@ class JwtFilter(private val context: ApplicationContext) : WebFilter {
             return when {
                 !isNullOrBlank() &&
                         startsWith(BEARER_START_WITH) -> substring(startIndex = 7)
+
                 else -> null
             }
         }
