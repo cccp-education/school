@@ -40,7 +40,7 @@ group = properties["artifact.group"].toString()
 version = "0.0.1"
 //version = ("artifact.version" to "artifact.version.key").artifactVersion
 idea.module.excludeDirs.plusAssign(files("node_modules"))
-springBoot.mainClass.set("school.Application")
+springBoot.mainClass.set("app.Application")
 val BLANK = ""
 val sep: String get() = FileSystems.getDefault().separator
 
@@ -207,7 +207,7 @@ tasks.register("cli") {
                     ?.also { println("Passing args to Spring Boot: $it") }
                     ?: emptyList()
             }
-            mainClass.set("school.base.cli.CommandLine")
+            mainClass.set("app.cli.CommandLine")
         }
     }
     finalizedBy(tasks.bootRun)
@@ -216,7 +216,7 @@ tasks.register("cli") {
 tasks.register("api") {
     group = "api"
     description = "Run school api"
-    doFirst { springBoot.mainClass.set("school.Application") }
+    doFirst { springBoot.mainClass.set("app.Application") }
     finalizedBy("bootRun")
 }
 

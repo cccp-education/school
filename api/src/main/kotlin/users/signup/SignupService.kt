@@ -1,0 +1,117 @@
+package users.signup
+
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import jakarta.validation.ConstraintViolation
+import org.springframework.context.ApplicationContext
+import org.springframework.stereotype.Service
+import org.springframework.web.server.ServerWebExchange
+import app.http.HttpUtils.badResponse
+import app.http.HttpUtils.validator
+import app.http.ProblemsModel
+import app.database.EntityModel
+import app.database.EntityModel.Members.withId
+import app.utils.Constants
+import users.Signup
+import users.User
+import users.dao.UserDao
+import users.dao.UserDao.Dao.signup
+import users.dao.UserDao.Dao.signupAvailability
+import users.dao.UserDao.Dao.signupToUser
+
+@Service
+class SignupService(private val context: ApplicationContext) {
+    companion object {
+        @JvmStatic
+        val SIGNUP_AVAILABLE = Triple(true, true, true)
+
+        @JvmStatic
+        val SIGNUP_LOGIN_NOT_AVAILABLE = Triple(false, true, false)
+
+        @JvmStatic
+        val SIGNUP_EMAIL_NOT_AVAILABLE = Triple(false, false, true)
+
+        @JvmStatic
+        val SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE = Triple(false, false, false)
+
+        fun Signup.validate(
+            exchange: ServerWebExchange
+        ): Set<Map<String, String?>> = exchange.validator.run {
+            setOf(
+                UserDao.Attributes.PASSWORD_ATTR,
+                UserDao.Attributes.EMAIL_ATTR,
+                UserDao.Attributes.LOGIN_ATTR,
+            ).map { it to validateProperty(this@validate, it) }
+                .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
+                    violatedField.second.map {
+                        mapOf<String, String?>(
+                            EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
+                            EntityModel.MODEL_FIELD_FIELD to violatedField.first,
+                            EntityModel.MODEL_FIELD_MESSAGE to it.message
+                        )
+                    }
+                }.toSet()
+        }
+
+        @JvmStatic
+        val signupProblems = Constants.defaultProblems.copy(path = "${UserDao.UserRestApiRoutes.API_USERS}${UserDao.UserRestApiRoutes.API_SIGNUP}")
+
+        @JvmStatic
+        val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
+                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
+                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
+                        EntityModel.MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
+                    )
+                )
+            )
+
+        @JvmStatic
+        val ProblemsModel.badResponseLoginIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
+                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
+                        EntityModel.MODEL_FIELD_MESSAGE to "Login name already used!"
+                    )
+                )
+            )
+
+        @JvmStatic
+        val ProblemsModel.badResponseEmailIsNotAvailable
+            get() = badResponse(
+                setOf(
+                    mapOf(
+                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
+                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
+                        EntityModel.MODEL_FIELD_MESSAGE to "Email is already in use!"
+                    )
+                )
+            )
+    }
+
+    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+        context.signupToUser(signup).run {
+            (this to context).signup()
+                .mapLeft { return Exception("Unable to save user with id").left() }
+                .map { return withId(it).right() }
+        }
+    } catch (t: Throwable) {
+        t.left()
+    }
+
+    suspend fun signupAvailability(signup: Signup)
+            : Either<Throwable, Triple<Boolean, Boolean, Boolean>> = try {
+        (signup to context)
+            .signupAvailability()
+            .onRight { it.right() }
+            .onLeft { it.left() }
+    } catch (ex: Throwable) {
+        ex.left()
+    }
+}
