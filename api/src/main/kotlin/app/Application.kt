@@ -1,6 +1,6 @@
 package app
 
-import ai.translator.AiTranslatorController
+import ai.translator.AiTranslatorController.AssistantManager
 import app.utils.LoggerUtils.startupLog
 import app.utils.Properties
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,8 +11,8 @@ import users.User
 @SpringBootApplication(
     scanBasePackageClasses = [
         Application::class,
-        AiTranslatorController::class,
         User::class,
+        AssistantManager::class,
     ],
 )
 @EnableConfigurationProperties(Properties::class)
