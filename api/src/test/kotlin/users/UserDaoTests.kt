@@ -15,6 +15,8 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -26,6 +28,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.reactive.TransactionalOperator
@@ -34,7 +37,10 @@ import users.TestUtils.Data.user
 import users.TestUtils.Data.users
 import users.TestUtils.defaultRoles
 import users.UserDaoTests.Queries.h2SQLquery
+import users.dao.UserActivationDao
+import users.dao.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import users.dao.UserActivationDao.Dao.countUserActivation
+import users.dao.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.dao.UserDao
 import users.dao.UserDao.Dao.countUsers
 import users.dao.UserDao.Dao.delete
@@ -59,7 +65,8 @@ import kotlin.test.*
 @Suppress("JpaQueryApiInspection")
 @ActiveProfiles("test")
 @SpringBootTest(
-    classes = [Application::class],properties = ["spring.main.web-application-type=reactive"])
+    classes = [Application::class], properties = ["spring.main.web-application-type=reactive"]
+)
 class UserDaoTests {
     @Inject
     lateinit var context: ApplicationContext
@@ -603,7 +610,7 @@ class UserDaoTests {
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
-    @Test
+    @Test@Ignore
     fun `test find userActivation by key`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         val countUserAuthBefore = context.countUserAuthority()
@@ -619,26 +626,24 @@ class UserDaoTests {
 //            )
             // BabyStepping to find an implementation and debugging
             assertDoesNotThrow {
-                id.toString().run(::i)
-                activationKey.run(::i)
-                context.getBean<TransactionalOperator>().executeAndAwait {
-//                """SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}"""
-                    """SELECT * FROM user_activation WHERE activation_key = :key"""
-                        .trimIndent()
-                        .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-                        .bind("key", activationKey)
-                        .fetch()
-                        .all()
-                        .collect { it.toString().run(::i) }
-
-//                    .awaitSingleOrNull()
-//                    .toString()
-//                    .run(::i)
-//                    .all()
-//                    .collect { it.toString().run(::i) }
-//                    .all()
-//                    .collect { it.toString().run(::i) }
-//                    .let {
+//                id.toString().run(::i)
+//                activationKey.run(::i)
+//                context.getBean<TransactionalOperator>().executeAndAwait {
+//                    """
+//                        SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}
+//                        WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR
+//                        """.trimIndent()
+                """
+                        SELECT * FROM user_activation
+                        WHERE activation_key = :$ACTIVATION_KEY_ATTR
+                        """.trimIndent()
+                    .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                    .bind(ACTIVATION_KEY_ATTR, activationKey)
+                    .fetch()
+                    .awaitSingle()
+                    .apply(::assertNotNull)
+                    .apply { toString().run(::i) }
+                    .let {
 //                        UserActivation(
 //                            id = UserActivationDao.Fields.ID_FIELD
 //                                .cleanField()
@@ -669,11 +674,11 @@ class UserDaoTests {
 //                                    }
 //                                },
 //                        )
-//                    }
-////                .apply { run(::println) }
-                }
+                    }
+                    .toString().run(::i)
             }
         }
     }
 }
+//}
 

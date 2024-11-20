@@ -261,7 +261,6 @@ class PluginTests {
     }
 
     @Test
-    @Ignore
     fun `From FormPlugin, check 'form' task render expected message`(): Unit {
         val outputStreamCaptor = captureOutput
         projectInstance.run {
