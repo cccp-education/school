@@ -7,12 +7,16 @@ import app.database.EntityModel.Members.withId
 import app.http.HttpUtils.badResponse
 import app.http.HttpUtils.validator
 import app.http.ProblemsModel
-import app.utils.Constants
+import app.utils.Constants.defaultProblems
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import jakarta.validation.ConstraintViolation
 import org.springframework.context.ApplicationContext
+import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
 import users.Signup
@@ -21,9 +25,55 @@ import users.dao.UserDao
 import users.dao.UserDao.Dao.signup
 import users.dao.UserDao.Dao.signupAvailability
 import users.dao.UserDao.Dao.signupToUser
+import users.dao.UserDao.UserRestApiRoutes.API_SIGNUP
+import users.dao.UserDao.UserRestApiRoutes.API_USERS
+import workspace.Log.i
 
 @Service
 class SignupService(private val context: ApplicationContext) {
+
+
+    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+        context.signupToUser(signup).run {
+            (this to context).signup()
+                .mapLeft { return Exception("Unable to save user with id").left() }
+                .map { return withId(it).right() }
+        }
+    } catch (t: Throwable) {
+        t.left()
+    }
+
+    suspend fun signupAvailability(signup: Signup)
+            : Either<Throwable, Triple<Boolean, Boolean, Boolean>> = try {
+        (signup to context)
+            .signupAvailability()
+            .onRight { it.right() }
+            .onLeft { it.left() }
+    } catch (ex: Throwable) {
+        ex.left()
+    }
+
+    suspend fun signupRequest(
+        signup: Signup,
+        exchange: ServerWebExchange
+    ): ResponseEntity<ProblemDetail> = signup.validate(exchange).run {
+        i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+        if (isNotEmpty()) return signupProblems.badResponse(this)
+    }.run {
+        signupAvailability(signup).map {
+            return when (it) {
+                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseLoginAndEmailIsNotAvailable
+                SIGNUP_LOGIN_NOT_AVAILABLE -> signupProblems.badResponseLoginIsNotAvailable
+                SIGNUP_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseEmailIsNotAvailable
+                else -> {
+                    signup(signup)
+                    CREATED.run(::ResponseEntity)
+                }
+            }
+        }
+        SERVICE_UNAVAILABLE.run(::ResponseEntity)
+    }
+
     companion object {
         @JvmStatic
         val SIGNUP_AVAILABLE = Triple(true, true, true)
@@ -57,8 +107,7 @@ class SignupService(private val context: ApplicationContext) {
         }
 
         @JvmStatic
-        val signupProblems =
-            Constants.defaultProblems.copy(path = "${UserDao.UserRestApiRoutes.API_USERS}${UserDao.UserRestApiRoutes.API_SIGNUP}")
+        val signupProblems = defaultProblems.copy(path = "$API_USERS$API_SIGNUP")
 
         @JvmStatic
         val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
@@ -96,25 +145,5 @@ class SignupService(private val context: ApplicationContext) {
                     )
                 )
             )
-    }
-
-    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
-        context.signupToUser(signup).run {
-            (this to context).signup()
-                .mapLeft { return Exception("Unable to save user with id").left() }
-                .map { return withId(it).right() }
-        }
-    } catch (t: Throwable) {
-        t.left()
-    }
-
-    suspend fun signupAvailability(signup: Signup)
-            : Either<Throwable, Triple<Boolean, Boolean, Boolean>> = try {
-        (signup to context)
-            .signupAvailability()
-            .onRight { it.right() }
-            .onLeft { it.left() }
-    } catch (ex: Throwable) {
-        ex.left()
     }
 }
