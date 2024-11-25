@@ -1,10 +1,11 @@
 package users.dao
 
+import app.database.EntityModel
+import app.utils.AppUtils.cleanField
+import app.utils.Constants
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import users.security.UserRole
-import users.security.UserRole.UserRoleDao.Dao.signup
 import jakarta.validation.Validator
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
@@ -14,9 +15,6 @@ import org.springframework.r2dbc.core.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import app.database.EntityModel
-import app.utils.AppUtils.cleanField
-import app.utils.Constants
 import users.Signup
 import users.User
 import users.UserActivation
@@ -44,6 +42,8 @@ import users.dao.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
 import users.dao.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
 import users.dao.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
 import users.dao.UserDao.Relations.TABLE_NAME
+import users.security.UserRole
+import users.security.UserRole.UserRoleDao.Dao.signup
 import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
@@ -297,6 +297,7 @@ object UserDao {
                             "not a valid login or not a valid email"
                                 .run(::Exception)
                                 .left()
+                        @Suppress("SqlDialectInspection")
                         val h2SQLquery = """
                             SELECT 
                                 u.id,

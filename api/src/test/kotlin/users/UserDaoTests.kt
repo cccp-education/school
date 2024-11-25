@@ -539,8 +539,8 @@ class UserDaoTests {
         (user to context).save()
         assertEquals(countUserBefore + 1, context.countUsers())
         assertDoesNotThrow {
-            context.getBean<DatabaseClient>()
-                .sql(FIND_USER_BY_LOGIN)
+            FIND_USER_BY_LOGIN
+                .run(context.getBean<DatabaseClient>()::sql)
                 .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
                 .fetch()
                 .one()

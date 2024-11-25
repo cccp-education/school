@@ -1,5 +1,13 @@
 package users.signup
 
+import app.database.EntityModel.Companion.MODEL_FIELD_FIELD
+import app.database.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import app.database.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
+import app.database.EntityModel.Members.withId
+import app.http.HttpUtils.badResponse
+import app.http.HttpUtils.validator
+import app.http.ProblemsModel
+import app.utils.Constants
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -7,12 +15,6 @@ import jakarta.validation.ConstraintViolation
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
-import app.http.HttpUtils.badResponse
-import app.http.HttpUtils.validator
-import app.http.ProblemsModel
-import app.database.EntityModel
-import app.database.EntityModel.Members.withId
-import app.utils.Constants
 import users.Signup
 import users.User
 import users.dao.UserDao
@@ -46,26 +48,27 @@ class SignupService(private val context: ApplicationContext) {
                 .flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<Signup>>> ->
                     violatedField.second.map {
                         mapOf<String, String?>(
-                            EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
-                            EntityModel.MODEL_FIELD_FIELD to violatedField.first,
-                            EntityModel.MODEL_FIELD_MESSAGE to it.message
+                            MODEL_FIELD_OBJECTNAME to User.objectName,
+                            MODEL_FIELD_FIELD to violatedField.first,
+                            MODEL_FIELD_MESSAGE to it.message
                         )
                     }
                 }.toSet()
         }
 
         @JvmStatic
-        val signupProblems = Constants.defaultProblems.copy(path = "${UserDao.UserRestApiRoutes.API_USERS}${UserDao.UserRestApiRoutes.API_SIGNUP}")
+        val signupProblems =
+            Constants.defaultProblems.copy(path = "${UserDao.UserRestApiRoutes.API_USERS}${UserDao.UserRestApiRoutes.API_SIGNUP}")
 
         @JvmStatic
         val ProblemsModel.badResponseLoginAndEmailIsNotAvailable
             get() = badResponse(
                 setOf(
                     mapOf(
-                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
-                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
-                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
-                        EntityModel.MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
+                        MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used and email is already in use!!"
                     )
                 )
             )
@@ -75,9 +78,9 @@ class SignupService(private val context: ApplicationContext) {
             get() = badResponse(
                 setOf(
                     mapOf(
-                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
-                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
-                        EntityModel.MODEL_FIELD_MESSAGE to "Login name already used!"
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to UserDao.Fields.LOGIN_FIELD,
+                        MODEL_FIELD_MESSAGE to "Login name already used!"
                     )
                 )
             )
@@ -87,9 +90,9 @@ class SignupService(private val context: ApplicationContext) {
             get() = badResponse(
                 setOf(
                     mapOf(
-                        EntityModel.MODEL_FIELD_OBJECTNAME to User.objectName,
-                        EntityModel.MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
-                        EntityModel.MODEL_FIELD_MESSAGE to "Email is already in use!"
+                        MODEL_FIELD_OBJECTNAME to User.objectName,
+                        MODEL_FIELD_FIELD to UserDao.Fields.EMAIL_FIELD,
+                        MODEL_FIELD_MESSAGE to "Email is already in use!"
                     )
                 )
             )
