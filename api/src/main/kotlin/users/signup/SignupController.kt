@@ -1,19 +1,16 @@
 package users.signup
 
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
-import org.springframework.http.ProblemDetail
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
-import users.Signup
-import users.dao.UserDao
-import users.dao.UserDao.UserRestApiRoutes.API_SIGNUP
+import users.User.UserRestApiRoutes.API_SIGNUP
+import users.User.UserRestApiRoutes.API_USERS
 
 @RestController
-@RequestMapping(UserDao.UserRestApiRoutes.API_USERS)
+@RequestMapping(API_USERS)
 class SignupController(private val service: SignupService) {
     internal class SignupException(message: String) : RuntimeException(message)
 
@@ -29,5 +26,5 @@ class SignupController(private val service: SignupService) {
     suspend fun signup(
         @RequestBody signup: Signup,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = service.signupRequest(signup, exchange)
+    ) = service.signupRequest(signup, exchange)
 }

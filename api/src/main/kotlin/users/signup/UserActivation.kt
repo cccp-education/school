@@ -1,6 +1,5 @@
-package users
+package users.signup
 
-import users.dao.UserActivationDao
 import users.security.SecurityUtils
 import jakarta.validation.constraints.Size
 import java.time.Instant
@@ -18,5 +17,4 @@ data class UserActivation(
         @JvmStatic
         fun main(args: Array<String>): Unit = println(UserActivationDao.Relations.SQL_SCRIPT)
     }
-
 }

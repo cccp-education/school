@@ -3,7 +3,8 @@ package users
 import app.utils.Constants
 import org.springframework.context.ApplicationContext
 import users.TestUtils.Data.displayInsertUserScript
-import users.dao.UserDao.Dao.findOne
+import users.UserDao.Dao.findOne
+import users.signup.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

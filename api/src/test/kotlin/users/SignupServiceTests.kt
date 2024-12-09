@@ -3,9 +3,9 @@
 package users
 
 import app.Application
-import users.dao.UserDao.Dao.countUsers
-import users.dao.UserDao.Dao.deleteAllUsersOnly
-import users.security.UserRole.UserRoleDao.Dao.countUserAuthority
+import users.UserDao.Dao.countUsers
+import users.UserDao.Dao.deleteAllUsersOnly
+import users.security.UserRoleDao.Dao.countUserAuthority
 import users.signup.SignupService
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
+import users.signup.Signup
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

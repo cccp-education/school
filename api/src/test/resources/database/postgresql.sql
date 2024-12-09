@@ -38,3 +38,4 @@ CREATE TABLE IF NOT EXISTS "user_authority"
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS "uniq_idx_user_authority" ON "user_authority" ("role", "user_id");
+

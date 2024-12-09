@@ -3,7 +3,7 @@ package users.profile
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import app.utils.Constants
-import users.dao.UserDao
+import users.UserDao
 import users.profile.UserProfile.UserProfileDao.Fields.FIRST_NAME_FIELD
 import users.profile.UserProfile.UserProfileDao.Fields.IMAGE_URL_FIELD
 import users.profile.UserProfile.UserProfileDao.Fields.LAST_NAME_FIELD

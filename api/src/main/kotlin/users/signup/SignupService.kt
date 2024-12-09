@@ -19,14 +19,13 @@ import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
-import users.Signup
 import users.User
-import users.dao.UserDao
-import users.dao.UserDao.Dao.signup
-import users.dao.UserDao.Dao.signupAvailability
-import users.dao.UserDao.Dao.signupToUser
-import users.dao.UserDao.UserRestApiRoutes.API_SIGNUP
-import users.dao.UserDao.UserRestApiRoutes.API_USERS
+import users.UserDao
+import users.UserDao.Dao.signup
+import users.UserDao.Dao.signupAvailability
+import users.UserDao.Dao.signupToUser
+import users.User.UserRestApiRoutes.API_SIGNUP
+import users.User.UserRestApiRoutes.API_USERS
 import workspace.Log.i
 
 @Service
@@ -57,17 +56,17 @@ class SignupService(private val context: ApplicationContext) {
         signup: Signup,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> = signup.validate(exchange).run {
-        i("signup attempt: ${this@run} ${signup.login} ${signup.email}")
+        "signup attempt: ${this@run} ${signup.login} ${signup.email}".run(::i)
         if (isNotEmpty()) return signupProblems.badResponse(this)
     }.run {
         signupAvailability(signup).map {
-            return when (it) {
-                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseLoginAndEmailIsNotAvailable
-                SIGNUP_LOGIN_NOT_AVAILABLE -> signupProblems.badResponseLoginIsNotAvailable
-                SIGNUP_EMAIL_NOT_AVAILABLE -> signupProblems.badResponseEmailIsNotAvailable
+            when (it) {
+                SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE -> return signupProblems.badResponseLoginAndEmailIsNotAvailable
+                SIGNUP_LOGIN_NOT_AVAILABLE -> return signupProblems.badResponseLoginIsNotAvailable
+                SIGNUP_EMAIL_NOT_AVAILABLE -> return signupProblems.badResponseEmailIsNotAvailable
                 else -> {
                     signup(signup)
-                    CREATED.run(::ResponseEntity)
+                    return CREATED.run(::ResponseEntity)
                 }
             }
         }

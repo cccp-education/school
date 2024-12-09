@@ -125,8 +125,8 @@ dependencies {
     // SSL
     implementation("io.netty:netty-tcnative-boringssl-static:${properties["boring_ssl.version"]}")
     // Database
-    runtimeOnly("com.h2database:h2")
-    runtimeOnly("io.r2dbc:r2dbc-h2")
+//    runtimeOnly("com.h2database:h2")
+//    runtimeOnly("io.r2dbc:r2dbc-h2")
     runtimeOnly("org.postgresql:r2dbc-postgresql:${properties["r2dbc-postgresql.version"]}")
     // Kotlin-JUnit5
     testImplementation("org.jetbrains.kotlin:kotlin-test")

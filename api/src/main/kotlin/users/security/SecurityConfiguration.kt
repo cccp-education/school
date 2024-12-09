@@ -36,8 +36,8 @@ import app.http.Web
 import app.utils.Constants
 import app.utils.Properties
 import users.User
-import users.dao.UserDao
-import users.dao.UserDao.Dao.findOneWithAuths
+import users.UserDao
+import users.UserDao.Dao.findOneWithAuths
 import workspace.Log
 
 @Configuration

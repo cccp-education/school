@@ -16,6 +16,7 @@ import org.springframework.security.web.server.util.matcher.ServerWebExchangeMat
 import users.security.SecurityConfiguration.Companion.negated
 import java.security.SecureRandom
 
+
 object SecurityUtils {
 
     private const val DEF_COUNT = 20
@@ -75,7 +76,9 @@ object SecurityUtils {
         }.awaitSingleOrNull()!!
 
 
-    suspend fun isCurrentUserInRole(authority: String) = getContext()
+    suspend fun isCurrentUserInRole(authority: String) =
+        @Suppress("ReactiveStreamsTooLongSameOperatorsChain")
+        getContext()
         .map(SecurityContext::getAuthentication)
         .map(Authentication::getAuthorities)
         .map { roles: Collection<GrantedAuthority> ->

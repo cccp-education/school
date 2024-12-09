@@ -1,4 +1,4 @@
-package users.dao
+package users
 
 import app.database.EntityModel
 import app.utils.AppUtils.cleanField
@@ -15,40 +15,46 @@ import org.springframework.r2dbc.core.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import users.Signup
-import users.User
-import users.UserActivation
-import users.dao.UserActivationDao.Dao.save
-import users.dao.UserDao.Attributes.EMAIL_ATTR
-import users.dao.UserDao.Attributes.ID_ATTR
-import users.dao.UserDao.Attributes.LANG_KEY_ATTR
-import users.dao.UserDao.Attributes.LOGIN_ATTR
-import users.dao.UserDao.Attributes.PASSWORD_ATTR
-import users.dao.UserDao.Attributes.VERSION_ATTR
-import users.dao.UserDao.Attributes.isEmail
-import users.dao.UserDao.Attributes.isLogin
-import users.dao.UserDao.Fields.EMAIL_FIELD
-import users.dao.UserDao.Fields.ID_FIELD
-import users.dao.UserDao.Fields.LANG_KEY_FIELD
-import users.dao.UserDao.Fields.LOGIN_FIELD
-import users.dao.UserDao.Fields.PASSWORD_FIELD
-import users.dao.UserDao.Fields.VERSION_FIELD
-import users.dao.UserDao.Relations.DELETE_USER
-import users.dao.UserDao.Relations.DELETE_USER_BY_ID
-import users.dao.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
-import users.dao.UserDao.Relations.FIND_USER_BY_ID
-import users.dao.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
-import users.dao.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
-import users.dao.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
-import users.dao.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
-import users.dao.UserDao.Relations.TABLE_NAME
+import users.signup.UserActivationDao.Dao.save
+import users.UserDao.Attributes.EMAIL_ATTR
+import users.UserDao.Attributes.ID_ATTR
+import users.UserDao.Attributes.LANG_KEY_ATTR
+import users.UserDao.Attributes.LOGIN_ATTR
+import users.UserDao.Attributes.PASSWORD_ATTR
+import users.UserDao.Attributes.VERSION_ATTR
+import users.UserDao.Attributes.isEmail
+import users.UserDao.Attributes.isLogin
+import users.UserDao.Fields.EMAIL_FIELD
+import users.UserDao.Fields.ID_FIELD
+import users.UserDao.Fields.LANG_KEY_FIELD
+import users.UserDao.Fields.LOGIN_FIELD
+import users.UserDao.Fields.PASSWORD_FIELD
+import users.UserDao.Fields.VERSION_FIELD
+import users.UserDao.Relations.DELETE_USER
+import users.UserDao.Relations.DELETE_USER_BY_ID
+import users.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
+import users.UserDao.Relations.FIND_USER_BY_ID
+import users.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
+import users.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
+import users.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
+import users.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
+import users.UserDao.Relations.TABLE_NAME
+import users.security.Role
+import users.security.RoleDao
 import users.security.UserRole
-import users.security.UserRole.UserRoleDao.Dao.signup
+import users.security.UserRoleDao
+import users.security.UserRoleDao.Dao.signup
+import users.signup.Signup
+import users.signup.UserActivation
+import users.signup.UserActivationDao
 import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
 
 object UserDao {
+    @JvmStatic
+    fun main(args: Array<String>): Unit = println(SELECT_SIGNUP_AVAILABILITY)
+
     object Constraints {
         // Regex for acceptable logins
         const val LOGIN_REGEX =
@@ -65,12 +71,12 @@ object UserDao {
     }
 
     object Fields {
-        const val ID_FIELD = "`id`"
-        const val LOGIN_FIELD = "`login`"
-        const val PASSWORD_FIELD = "`password`"
-        const val EMAIL_FIELD = "`email`"
-        const val LANG_KEY_FIELD = "`lang_key`"
-        const val VERSION_FIELD = "`version`"
+        const val ID_FIELD = "id"
+        const val LOGIN_FIELD = "login"
+        const val PASSWORD_FIELD = "password"
+        const val EMAIL_FIELD = "email"
+        const val LANG_KEY_FIELD = "lang_key"
+        const val VERSION_FIELD = "version"
     }
 
     object Attributes {
@@ -94,100 +100,90 @@ object UserDao {
 
     object Relations {
 
-        @JvmStatic
-        fun main(args: Array<String>): Unit = println(UserDao.Relations.CREATE_TABLES)
-        const val TABLE_NAME = "`user`"
+        const val TABLE_NAME = "user"
+
+        @Suppress("MemberVisibilityCanBePrivate")
         const val SQL_SCRIPT = """
-    CREATE TABLE IF NOT EXISTS $TABLE_NAME (
-        $ID_FIELD            UUID default random_uuid() PRIMARY KEY,
-        $LOGIN_FIELD                  VARCHAR,
-        $PASSWORD_FIELD               VARCHAR,
-        $EMAIL_FIELD                  VARCHAR,
-        $LANG_KEY_FIELD               VARCHAR,
-        $VERSION_FIELD                bigint
-    );
-    CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_login`
-    ON $TABLE_NAME ($LOGIN_FIELD);
-    CREATE UNIQUE INDEX IF NOT EXISTS `uniq_idx_user_email`
-    ON $TABLE_NAME ($EMAIL_FIELD);
-"""
+        CREATE TABLE IF NOT EXISTS "$TABLE_NAME"
+        (
+        $ID_FIELD         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        "$LOGIN_FIELD"    TEXT,
+        "$PASSWORD_FIELD" TEXT,
+        "$EMAIL_FIELD"    TEXT,
+        "$LANG_KEY_FIELD" VARCHAR,
+        "$VERSION_FIELD"  BIGINT
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS "uniq_idx_user_login" ON "$TABLE_NAME" ("$LOGIN_FIELD");
+        CREATE UNIQUE INDEX IF NOT EXISTS "uniq_idx_user_email" ON "$TABLE_NAME" ("$EMAIL_FIELD");
+        """
 
         @Suppress("SqlDialectInspection")
         const val INSERT = """
     insert into $TABLE_NAME (
-        $LOGIN_FIELD, $EMAIL_FIELD,
-        $PASSWORD_FIELD, $LANG_KEY_FIELD,
+        "$LOGIN_FIELD", "$EMAIL_FIELD",
+        "$PASSWORD_FIELD", $LANG_KEY_FIELD,
         $VERSION_FIELD
-    ) values ( :$LOGIN_ATTR, :$EMAIL_ATTR, :$PASSWORD_ATTR, :$LANG_KEY_ATTR, :$VERSION_ATTR)"""
+    ) values ( :$LOGIN_ATTR, :$EMAIL_ATTR, :$PASSWORD_ATTR, :$LANG_KEY_ATTR, :$VERSION_ATTR);"""
 
-        const val FIND_USER_BY_LOGIN =
-            """
-                SELECT `u`.$ID_FIELD 
-                FROM $TABLE_NAME AS `u` 
-                WHERE u.$LOGIN_FIELD= LOWER(:$LOGIN_ATTR)
+        const val FIND_USER_BY_LOGIN = """
+                SELECT u.$ID_FIELD 
+                FROM "$TABLE_NAME" AS u 
+                WHERE u."$LOGIN_FIELD" = LOWER(:$LOGIN_ATTR);
                 """
-        const val FIND_USER_BY_LOGIN_OR_EMAIL =
-            """
-                SELECT `u`.$LOGIN_FIELD 
-                FROM $TABLE_NAME AS `u` 
-                WHERE LOWER(`u`.$EMAIL_FIELD) = LOWER(:$EMAIL_ATTR) OR 
-                LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
+        const val FIND_USER_BY_LOGIN_OR_EMAIL = """
+                SELECT u."$LOGIN_FIELD" 
+                FROM "$TABLE_NAME" AS u 
+                WHERE LOWER(u."$EMAIL_FIELD") = LOWER(:$EMAIL_ATTR) OR 
+                LOWER(u."$LOGIN_FIELD") = LOWER(:$LOGIN_ATTR);
                 """
 
-        const val FIND_USER_BY_ID =
-            "SELECT * FROM $TABLE_NAME AS `u` WHERE `u`.$ID_FIELD = :id"
+        const val FIND_USER_BY_ID = """SELECT * FROM "$TABLE_NAME" AS u WHERE u.$ID_FIELD = :id;"""
 
         const val LOGIN_AND_EMAIL_AVAILABLE_COLUMN = "login_and_email_available"
         const val EMAIL_AVAILABLE_COLUMN = "email_available"
         const val LOGIN_AVAILABLE_COLUMN = "login_available"
-
         const val SELECT_SIGNUP_AVAILABILITY = """
                 SELECT
                     CASE
                         WHEN EXISTS(
-                                SELECT 1 FROM $TABLE_NAME 
-                                WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
+                                SELECT 1 FROM "$TABLE_NAME" 
+                                WHERE LOWER("$LOGIN_FIELD") = LOWER(:login)
                              ) OR 
                              EXISTS(
-                                SELECT 1 FROM $TABLE_NAME 
-                                WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)
+                                SELECT 1 FROM "$TABLE_NAME" 
+                                WHERE LOWER("$EMAIL_FIELD") = LOWER(:email)
                              )
                             THEN FALSE
                         ELSE TRUE
-                        END AS $LOGIN_AND_EMAIL_AVAILABLE_COLUMN,
+                    END AS login_and_email_available,
                     NOT EXISTS(
-                            SELECT 1 FROM $TABLE_NAME 
-                            WHERE LOWER($EMAIL_FIELD) = LOWER(:$EMAIL_ATTR)
-                        ) AS $EMAIL_AVAILABLE_COLUMN,
+                            SELECT 1 FROM "$TABLE_NAME" 
+                            WHERE LOWER("$EMAIL_FIELD") = LOWER(:email)
+                        ) AS email_available,
                     NOT EXISTS(
-                            SELECT 1 FROM $TABLE_NAME 
-                            WHERE LOWER($LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)
-                        ) AS $LOGIN_AVAILABLE_COLUMN;
-            """
-        const val DELETE_USER_BY_ID = "DELETE FROM $TABLE_NAME AS `u` WHERE $ID_FIELD = :$ID_ATTR"
-        const val DELETE_USER = "DELETE FROM $TABLE_NAME"
+                            SELECT 1 FROM "$TABLE_NAME" 
+                            WHERE LOWER("$LOGIN_FIELD") = LOWER(:login)
+                        ) AS login_available;
+        """
+        const val DELETE_USER_BY_ID = """DELETE FROM "$TABLE_NAME" AS u WHERE $ID_FIELD = :$ID_ATTR;"""
+        const val DELETE_USER = """DELETE FROM "$TABLE_NAME";"""
 
-        @Suppress("RemoveRedundantQualifierName")
         @JvmStatic
         val CREATE_TABLES: String
             get() = setOf(
-                UserDao.Relations.SQL_SCRIPT,
-                UserRole.Role.RoleDao.Relations.SQL_SCRIPT,
-                UserRole.UserRoleDao.Relations.SQL_SCRIPT,
+                SQL_SCRIPT,
+                RoleDao.Relations.SQL_SCRIPT,
+                UserRoleDao.Relations.SQL_SCRIPT,
                 UserActivationDao.Relations.SQL_SCRIPT,
             ).joinToString("")
                 .trimMargin()
 
-        @Suppress("unused")
-        object Rdbms {
-            object Pg {}
-            object H2 {}
-        }
     }
 
     object Dao {
         suspend fun ApplicationContext.countUsers(): Int =
-            "SELECT COUNT(*) FROM $TABLE_NAME"
+            """SELECT COUNT(*) FROM "$TABLE_NAME";"""
                 .let(getBean<DatabaseClient>()::sql)
                 .fetch()
                 .awaitSingle()
@@ -198,8 +194,7 @@ object UserDao {
 
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
-            @Suppress("RemoveRedundantQualifierName")
-            UserDao.Relations.INSERT
+            Relations.INSERT
                 .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)
@@ -297,28 +292,32 @@ object UserDao {
                             "not a valid login or not a valid email"
                                 .run(::Exception)
                                 .left()
-                        @Suppress("SqlDialectInspection")
-                        val h2SQLquery = """
+
+                        @Suppress("SqlResolve")
+                        val query = """
                             SELECT 
                                 u.id,
-                                u.email,
-                                u.login,
-                                u.password,
+                                u."$EMAIL_FIELD",
+                                u."$LOGIN_FIELD",
+                                u."$PASSWORD_FIELD",
                                 u.lang_key,
                                 u.version,
-                                `GROUP_CONCAT`(DISTINCT `a`.`role`) AS `user_roles`
-                            FROM `user` as `u`
+                                STRING_AGG(DISTINCT a."role", ', ') AS user_roles
+                            FROM "user" as u
                             LEFT JOIN 
-                                `user_authority` ua ON u.id = ua.user_id
+                                user_authority ua ON u.id = ua.user_id
                             LEFT JOIN 
-                                `authority` as a ON ua.role = a.role
+                                authority as a ON UPPER(ua."${UserRoleDao.Fields.ROLE_FIELD}") = UPPER(a."${UserRoleDao.Fields.ROLE_FIELD}")
                             WHERE 
-                                lower(u.email) = lower(:emailOrLogin) OR lower(u.login) = lower(:emailOrLogin)
+                                lower(u."$EMAIL_FIELD") = lower(:emailOrLogin) 
+                                OR 
+                                lower(u."$LOGIN_FIELD") = lower(:emailOrLogin)
                             GROUP BY 
-                                u.id, u.email, u.login;
-        """
+                                u.id, u."$EMAIL_FIELD", u."$LOGIN_FIELD";
+                        """.trimIndent()
+
                         getBean<DatabaseClient>()
-                            .sql(h2SQLquery)
+                            .sql(query)
                             .bind("emailOrLogin", emailOrLogin)
                             .fetch()
                             .awaitSingleOrNull()
@@ -332,7 +331,7 @@ object UserDao {
                                         roles = get("user_roles".uppercase())
                                             .toString()
                                             .split(",")
-                                            .map { UserRole.Role(it) }
+                                            .map { Role(it) }
                                             .toSet(),
                                         password = get("password".uppercase()).toString(),
                                         langKey = get("lang_key".uppercase()).toString(),
@@ -355,12 +354,13 @@ object UserDao {
             when (T::class) {
                 User::class -> {
                     try {
-                        (getBean<DatabaseClient>()
-                            .sql("SELECT `u`.$ID_FIELD FROM ${UserDao.Relations.TABLE_NAME} `u` WHERE LOWER(`u`.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)".trimIndent())
+                        @Suppress("SqlResolve")
+                        getBean<DatabaseClient>()
+                            .sql("""SELECT u.$ID_FIELD FROM "$TABLE_NAME" AS u WHERE LOWER(u.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)""".trimIndent())
                             .bind(LOGIN_ATTR, login)
                             .fetch()
                             .awaitOne()
-                            .let { it["`id`"] as UUID }).right()
+                            .let { it["`id`"] as UUID }.right()
                     } catch (e: Throwable) {
                         e.left()
                     }
@@ -374,8 +374,9 @@ object UserDao {
             when (T::class) {
                 User::class -> {
                     try {
+                        @Suppress("SqlResolve")
                         getBean<DatabaseClient>()
-                            .sql("SELECT `u`.`id` FROM `user` `u` WHERE LOWER(`u`.`email`) = LOWER(:$EMAIL_ATTR)")
+                            .sql("""SELECT u.id FROM "user" u WHERE LOWER(u."email") = LOWER(:$EMAIL_ATTR)""")
                             .bind(EMAIL_ATTR, email)
                             .fetch()
                             .awaitOne()
@@ -439,19 +440,4 @@ object UserDao {
         }
     }
 
-    /** User REST API URIs */
-    object UserRestApiRoutes {
-        const val API_AUTHORITY = "/api/authorities"
-        const val API_USERS = "/api/users"
-        const val API_SIGNUP = "/signup"
-        const val API_SIGNUP_PATH = "$API_USERS$API_SIGNUP"
-        const val API_ACTIVATE = "/activate"
-        const val API_ACTIVATE_PATH = "$API_USERS$API_ACTIVATE?key="
-        const val API_ACTIVATE_PARAM = "{activationKey}"
-        const val API_ACTIVATE_KEY = "key"
-        const val API_RESET_INIT = "/reset-password/init"
-        const val API_RESET_FINISH = "/reset-password/finish"
-        const val API_CHANGE = "/change-password"
-        const val API_CHANGE_PATH = "$API_USERS$API_CHANGE"
-    }
 }

@@ -3,7 +3,7 @@
 package users
 
 import app.Application
-import users.dao.UserDao.Dao.deleteAllUsersOnly
+import users.UserDao.Dao.deleteAllUsersOnly
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import kotlinx.coroutines.runBlocking

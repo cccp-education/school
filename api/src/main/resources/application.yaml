@@ -43,11 +43,17 @@ spring:
     default: dev
   application:
     name: server
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: r2dbc:h2:file:///build/testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-    username: sa
-    password: sa
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/dba
+    username: dba
+    password:
+
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: r2dbc:postgresql://localhost:5432/dev
+#    username: dev
+#    password: secret
+
   devtools:
     restart:
       enabled: true
