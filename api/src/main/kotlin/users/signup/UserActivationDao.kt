@@ -27,9 +27,6 @@ import users.UserDao.Relations.TABLE_NAME as USER
 
 object UserActivationDao {
 
-    @JvmStatic
-    fun main(args: Array<String>): Unit = println(INSERT)
-
     object Fields {
         //SQL
         const val ID_FIELD = UserDao.Fields.ID_FIELD

@@ -12,9 +12,4 @@ data class UserActivation(
     val activationKey: String = SecurityUtils.generateActivationKey,
     val createdDate: Instant = Instant.now(),
     val activationDate: Instant? = null,
-) {
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>): Unit = println(UserActivationDao.Relations.SQL_SCRIPT)
-    }
-}
+)
