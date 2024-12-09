@@ -13,7 +13,7 @@ import users.User
         Application::class,
         User::class,
         AssistantManager::class,
-    ],
+    ]
 )
 @EnableConfigurationProperties(Properties::class)
 class Application {

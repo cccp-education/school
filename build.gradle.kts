@@ -1,6 +1,7 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
 
 import school.workspace.WorkspaceUtils.purchaseArtifact
+
 //TODO: rename school to forge
 plugins { idea }
 apply<school.frontend.SchoolPlugin>()
@@ -11,7 +12,7 @@ apply<school.translate.TranslatorPlugin>()
 
 
 purchaseArtifact()
-//TODO: add some tasks from detached projects, and python run, tests, deployment
+
 tasks.wrapper {
     gradleVersion = "8.6"
     distributionType = BIN
@@ -24,8 +25,21 @@ tasks.withType<JavaExec> {
         "--enable-preview"
     )
 }
-//ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
-tasks.register<Exec>("buildSchool") { commandLine("./gradlew", "-p", "api", "build") }
+tasks.register<Exec>("runWorkspaceInstaller") {
+    commandLine(
+        "./gradlew",
+        "-p",
+        "workspace-model",
+        ":lib:run"
+    )
+}
 
-//tasks["build"].dependsOn(tasks["buildApi"])
+tasks.register<Exec>("runApi") {
+    commandLine(
+        "./gradlew",
+        "-p",
+        "api",
+        ":api"
+    )
+}
