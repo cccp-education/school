@@ -301,7 +301,7 @@ object UserDao {
                                 u."$PASSWORD_FIELD",
                                 u.lang_key,
                                 u.version,
-                                STRING_AGG(DISTINCT a."role", ', ') AS user_roles
+                                STRING_AGG(DISTINCT a."role", ', ') AS roles
                             FROM "user" as u
                             LEFT JOIN 
                                 user_authority ua ON u.id = ua.user_id
@@ -324,17 +324,17 @@ object UserDao {
                                 when {
                                     this == null -> Exception("not able to retrieve user id and roles").left()
                                     else -> User(
-                                        id = UUID.fromString(get("id".uppercase()).toString()),
-                                        email = get("email".uppercase()).toString(),
-                                        login = get("login".uppercase()).toString(),
-                                        roles = get("user_roles".uppercase())
+                                        id = UUID.fromString(get("id").toString()),
+                                        email = get("email").toString(),
+                                        login = get("login").toString(),
+                                        roles = get("roles")
                                             .toString()
                                             .split(",")
                                             .map { Role(it) }
                                             .toSet(),
-                                        password = get("password".uppercase()).toString(),
-                                        langKey = get("lang_key".uppercase()).toString(),
-                                        version = get("version".uppercase()).toString().toLong(),
+                                        password = get("password").toString(),
+                                        langKey = get("lang_key").toString(),
+                                        version = get("version").toString().toLong(),
                                     ).right()
                                 }
                             }

@@ -32,7 +32,6 @@ import org.springframework.test.context.ActiveProfiles
 import users.TestUtils.Data.user
 import users.TestUtils.Data.users
 import users.TestUtils.defaultRoles
-import users.UserDaoTests.Queries.h2SQLquery
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import users.signup.UserActivationDao.Dao.countUserActivation
 import users.UserDao.Dao.countUsers
@@ -66,46 +65,6 @@ class UserDaoTests {
 
     @AfterTest
     fun cleanUp() = runBlocking { context.deleteAllUsersOnly() }
-
-    object Queries {
-        const val pgSQLquery = """
-        SELECT 
-            u.id AS user_id,
-            u.email AS user_email,
-            u.login AS user_login,
-            array_agg(DISTINCT a.role) AS user_roles
-        FROM 
-            "user" u
-        LEFT JOIN 
-            "user_authority" ua ON u.id = ua.user_id
-        LEFT JOIN 
-            "authority" a ON ua.role = a.role
-        WHERE 
-            LOWER(u.email) = LOWER(:email) OR LOWER(u.login) = LOWER(:login)
-        GROUP BY 
-            u.id, u.email, u.login;
-        """
-
-        const val h2SQLquery = """
-        SELECT 
-            u.id,
-            u.email,
-            u.login,
-            u.password,
-            u.lang_key,
-            u.version,
-            `GROUP_CONCAT`(DISTINCT `a`.`role`) AS `user_roles`
-        FROM `user` as `u`
-        LEFT JOIN 
-            `user_authority` ua ON u.id = ua.user_id
-        LEFT JOIN 
-            `authority` as a ON ua.role = a.role
-        WHERE 
-            lower(u.email) = lower(:emailOrLogin) OR lower(u.login) = lower(:emailOrLogin)
-        GROUP BY 
-            u.id, u.email, u.login;
-            """
-    }
 
     suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
@@ -159,55 +118,72 @@ class UserDaoTests {
 
 
     @Test
-    fun `test findOneWithAuths with one query using h2 database`(): Unit = runBlocking {
+    fun `test findOneWithAuths using one query`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
         (user to context).signup()
         assertEquals(1, context.countUsers())
         assertEquals(1, context.countUserAuthority())
-
-        val userWithAuths: MutableMap<String, Any>? = context
-            .getBean<DatabaseClient>()
-            .sql(h2SQLquery)
+        """
+            SELECT 
+               u.id,
+               u."email",
+               u."login",
+               u."password",
+               u.lang_key,
+               u.version,
+               STRING_AGG(DISTINCT a."role", ',') AS roles
+            FROM "user" AS u
+            LEFT JOIN 
+               user_authority ua ON u.id = ua.user_id
+            LEFT JOIN 
+               authority AS a ON ua."role" = a."role"
+            WHERE 
+               LOWER(u."email") = LOWER(:emailOrLogin) 
+               OR 
+               LOWER(u."login") = LOWER(:emailOrLogin)
+            GROUP BY 
+               u.id, u."email", u."login";
+        """.run(context.getBean<DatabaseClient>()::sql)
             .bind("emailOrLogin", user.email)
             .fetch()
             .awaitSingleOrNull()
-
-        userWithAuths?.run {
-            val expectedUserResult = User(
-                id = fromString(get("id".uppercase()).toString()),
-                email = get("email".uppercase()).toString(),
-                login = get("login".uppercase()).toString(),
-                roles = get("user_roles".uppercase())
-                    .toString()
-                    .split(",")
-                    .map { Role(it) }
-                    .toSet(),
-                password = get("password".uppercase()).toString(),
-                langKey = get("lang_key".uppercase()).toString(),
-                version = get("version".uppercase()).toString().toLong(),
-            )
-            val userResult = context
-                .findOneWithAuths<User>(user.login)
-                .getOrNull()
-            assertNotNull(expectedUserResult)
-            assertNotNull(expectedUserResult.id)
-            assertTrue(expectedUserResult.roles.isNotEmpty())
-            assertEquals(
-                expectedUserResult.roles.first().id,
-                ROLE_USER
-            )
-            assertEquals(
-                1,
-                expectedUserResult.roles.size
-            )
-            assertEquals(expectedUserResult, userResult)
-            assertEquals(
-                user.withId(expectedUserResult.id!!)
-                    .copy(roles = setOf(Role(ROLE_USER))),
-                userResult
-            )
-        }
+            ?.run {
+                toString().run(::i)
+                val expectedUserResult = User(
+                    id = fromString(get("id").toString()),
+                    email = get("email").toString(),
+                    login = get("login").toString(),
+                    roles = get("roles")
+                        .toString()
+                        .split(",")
+                        .map { Role(it) }
+                        .toSet(),
+                    password = get("password").toString(),
+                    langKey = get("lang_key").toString(),
+                    version = get("version").toString().toLong(),
+                )
+                val userResult = context
+                    .findOneWithAuths<User>(user.login)
+                    .getOrNull()
+                assertNotNull(expectedUserResult)
+                assertNotNull(expectedUserResult.id)
+                assertTrue(expectedUserResult.roles.isNotEmpty())
+                assertEquals(
+                    expectedUserResult.roles.first().id,
+                    ROLE_USER
+                )
+                assertEquals(
+                    1,
+                    expectedUserResult.roles.size
+                )
+                assertEquals(expectedUserResult, userResult)
+                assertEquals(
+                    user.withId(expectedUserResult.id!!)
+                        .copy(roles = setOf(Role(ROLE_USER))),
+                    userResult
+                )
+            }
     }
 
     @Test
@@ -463,7 +439,7 @@ class UserDaoTests {
             .bind("role", ROLE_USER)
             .fetch()
             .one()
-            .awaitSingle()["ID"]
+            .awaitSingle()["id"]
             .toString()
             .let { "user_role_id : $it" }
             .run(::i)
@@ -603,7 +579,8 @@ class UserDaoTests {
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
-    @Test@Ignore
+    @Test
+    @Ignore
     fun `test find userActivation by key`(): Unit = runBlocking {
         val countUserBefore = context.countUsers()
         val countUserAuthBefore = context.countUserAuthority()
