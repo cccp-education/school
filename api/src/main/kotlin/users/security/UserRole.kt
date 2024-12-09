@@ -10,6 +10,4 @@ data class UserRole(
     val userId: UUID,
     @field:NotNull
     val role: String
-) {
-
-}
+)

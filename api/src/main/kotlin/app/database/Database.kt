@@ -20,13 +20,14 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.TransactionalOperator.create
 import users.UserDao.Relations.CREATE_TABLES
-import workspace.Log
+import workspace.Log.i
 import java.io.File.createTempFile
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneOffset
-import kotlin.text.Charsets.UTF_8
+import java.time.LocalDateTime.ofInstant
+import java.time.ZoneOffset.UTC
 
 @Configuration
 @EnableTransactionManagement
@@ -34,7 +35,7 @@ import kotlin.text.Charsets.UTF_8
 class Database(private val properties: Properties) {
 
     //TODO: https://reflectoring.io/spring-bean-lifecycle/
-    fun createSystemUser(): Unit = Log.i("Creating system user")
+    fun createSystemUser(): Unit = i("Creating system user")
 
     @Bean
     fun connectionFactoryInitializer(
@@ -60,16 +61,16 @@ class Database(private val properties: Properties) {
     @Bean
     fun transactionalOperator(
         reactiveTransactionManager: ReactiveTransactionManager
-    ): TransactionalOperator = TransactionalOperator.create(reactiveTransactionManager)
+    ): TransactionalOperator = create(reactiveTransactionManager)
 
     @WritingConverter
     class InstantWriteConverter : Converter<Instant, LocalDateTime> {
-        override fun convert(source: Instant): LocalDateTime? = LocalDateTime.ofInstant(source, ZoneOffset.UTC)
+        override fun convert(source: Instant): LocalDateTime? = ofInstant(source, UTC)
     }
 
     @ReadingConverter
     class InstantReadConverter : Converter<LocalDateTime, Instant> {
-        override fun convert(localDateTime: LocalDateTime): Instant = localDateTime.toInstant(ZoneOffset.UTC)!!
+        override fun convert(localDateTime: LocalDateTime): Instant = localDateTime.toInstant(UTC)!!
     }
 
     @Bean

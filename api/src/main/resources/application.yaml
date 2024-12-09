@@ -46,7 +46,7 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/dba
     username: dba
-    password:
+    password: secret
 
 #  datasource:
 #    driver-class-name: org.h2.Driver

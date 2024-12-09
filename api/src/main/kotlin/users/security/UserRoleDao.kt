@@ -18,7 +18,8 @@ import java.util.*
 
 @Suppress("unused")
 object UserRoleDao {
-    object Fields {
+
+   object Fields {
         const val ID_FIELD = "id"
         const val USER_ID_FIELD = "user_id"
         const val ROLE_FIELD = RoleDao.Fields.ID_FIELD
@@ -33,6 +34,7 @@ object UserRoleDao {
     object Relations {
         const val TABLE_NAME = "user_authority"
         const val SQL_SCRIPT = """
+    CREATE SEQUENCE IF NOT EXISTS user_authority_seq;
     CREATE TABLE IF NOT EXISTS $TABLE_NAME(
         ${Fields.ID_FIELD}  BIGINT DEFAULT nextval('user_authority_seq') PRIMARY KEY,
         $USER_ID_FIELD      UUID,
