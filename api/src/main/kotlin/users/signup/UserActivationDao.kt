@@ -1,6 +1,5 @@
 package users.signup
 
-import app.utils.AppUtils.cleanField
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -120,11 +119,11 @@ object UserActivationDao {
                     return when (it) {
                         null -> EmptyResultDataAccessException(1).left()
                         else -> UserActivation(
-                            id = it[ID_FIELD.cleanField().uppercase()].toString().run(UUID::fromString),
-                            activationKey = it[ACTIVATION_KEY_FIELD.cleanField().uppercase()].toString(),
-                            createdDate = parse(it[CREATED_DATE_FIELD.cleanField().uppercase()].toString())
+                            id = it[ID_FIELD.uppercase()].toString().run(UUID::fromString),
+                            activationKey = it[ACTIVATION_KEY_FIELD.uppercase()].toString(),
+                            createdDate = parse(it[CREATED_DATE_FIELD.uppercase()].toString())
                                 .toInstant(UTC),
-                            activationDate = it[ACTIVATION_DATE_FIELD.cleanField().uppercase()].run {
+                            activationDate = it[ACTIVATION_DATE_FIELD.uppercase()].run {
                                 when {
                                     this == null || toString().lowercase() == "null" -> null
                                     else -> toString().run(LocalDateTime::parse).toInstant(UTC)

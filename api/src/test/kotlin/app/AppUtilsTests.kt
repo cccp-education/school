@@ -1,6 +1,5 @@
 package app
 
-import app.utils.AppUtils.cleanField
 import app.utils.AppUtils.lsWorkingDir
 import app.utils.AppUtils.lsWorkingDirProcess
 import app.utils.AppUtils.toJson
@@ -16,7 +15,6 @@ import workspace.Log
 import java.io.File
 import java.nio.file.Paths
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @ActiveProfiles("test")
 @SpringBootTest(
@@ -38,13 +36,6 @@ class AppUtilsTests {
     fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
         (TestUtils.Data.user to context).toJson.let(mapper::readTree)
     }
-
-    @Test
-    fun `test cleanField extension function`() = assertEquals(
-        "login",
-        "`login`".cleanField(),
-        "Backtick should be removed"
-    )
 
     @Test
     fun `test lsWorkingDir & lsWorkingDiringDirProcess`(): Unit {

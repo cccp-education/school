@@ -1,7 +1,6 @@
 package users
 
 import app.database.EntityModel
-import app.utils.AppUtils.cleanField
 import app.utils.Constants
 import arrow.core.Either
 import arrow.core.left
@@ -120,7 +119,7 @@ object UserDao {
 
         @Suppress("SqlDialectInspection")
         const val INSERT = """
-    insert into $TABLE_NAME (
+    insert into "$TABLE_NAME" (
         "$LOGIN_FIELD", "$EMAIL_FIELD",
         "$PASSWORD_FIELD", $LANG_KEY_FIELD,
         $VERSION_FIELD
@@ -263,7 +262,7 @@ object UserDao {
                     .awaitSingleOrNull()
                     .let {
                         User(
-                            id = it?.get(ID_FIELD.cleanField().uppercase())
+                            id = it?.get(ID_FIELD.uppercase())
                                 .toString()
                                 .run(UUID::fromString),
                             email = it?.get(EMAIL_FIELD).toString(),
@@ -356,11 +355,11 @@ object UserDao {
                     try {
                         @Suppress("SqlResolve")
                         getBean<DatabaseClient>()
-                            .sql("""SELECT u.$ID_FIELD FROM "$TABLE_NAME" AS u WHERE LOWER(u.$LOGIN_FIELD) = LOWER(:$LOGIN_ATTR)""".trimIndent())
+                            .sql("""SELECT u.$ID_FIELD FROM "$TABLE_NAME" AS u WHERE LOWER(u."$LOGIN_FIELD") = LOWER(:$LOGIN_ATTR)""".trimIndent())
                             .bind(LOGIN_ATTR, login)
                             .fetch()
                             .awaitOne()
-                            .let { it["`id`"] as UUID }.right()
+                            .let { it["id"] as UUID }.right()
                     } catch (e: Throwable) {
                         e.left()
                     }
@@ -376,7 +375,7 @@ object UserDao {
                     try {
                         @Suppress("SqlResolve")
                         getBean<DatabaseClient>()
-                            .sql("""SELECT u.id FROM "user" u WHERE LOWER(u."email") = LOWER(:$EMAIL_ATTR)""")
+                            .sql("""SELECT u.id FROM "user" as u WHERE LOWER(u."$EMAIL_FIELD") = LOWER(:$EMAIL_ATTR)""")
                             .bind(EMAIL_ATTR, email)
                             .fetch()
                             .awaitOne()

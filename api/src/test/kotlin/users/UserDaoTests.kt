@@ -56,7 +56,6 @@ import javax.inject.Inject
 import kotlin.test.*
 
 
-@Suppress("JpaQueryApiInspection")
 @ActiveProfiles("test")
 @SpringBootTest(
     classes = [Application::class], properties = ["spring.main.web-application-type=reactive"]

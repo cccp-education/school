@@ -12,7 +12,6 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ActiveProfiles
-import app.utils.AppUtils.cleanField
 import app.utils.AppUtils.toJson
 import users.TestUtils.Data.user
 import workspace.Log.i
@@ -45,12 +44,5 @@ class UserTests {
     fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
         (user to context).toJson.let(mapper::readTree)
     }
-
-    @Test
-    fun `test cleanField extension function`() = assertEquals(
-        "login",
-        "`login`".cleanField(),
-        "Backtick should be removed"
-    )
-    //TODO : Write and/or Test toMap, toUser
+//TODO : Write and/or Test toMap, toUser
 }

@@ -28,10 +28,10 @@ object AppUtils {
 
     fun List<String>.nameToLogin(): List<String> = map { StringUtils.stripAccents(it.lowercase().replace(' ', '.')) }
 
-    fun String.cleanField(): String = StringBuilder(this)
-        .deleteCharAt(0)
-        .deleteCharAt(length - 2)
-        .toString()
+//    fun String.cleanField(): String = StringBuilder(this)
+//        .deleteCharAt(0)
+//        .deleteCharAt(length - 2)
+//        .toString()
 
     @JvmStatic
     val String.upperFirstLetter

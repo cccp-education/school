@@ -1,6 +1,5 @@
 package users.security
 
-import app.utils.AppUtils.cleanField
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -26,15 +25,16 @@ object UserRoleDao {
     }
 
     object Attributes {
-        val ID_ATTR = Fields.ID_FIELD.cleanField()
+        val ID_ATTR = Fields.ID_FIELD
         const val USER_ID_ATTR = "userId"
-        val ROLE_ATTR = ROLE_FIELD.cleanField()
+        val ROLE_ATTR = ROLE_FIELD
     }
 
     object Relations {
         const val TABLE_NAME = "user_authority"
         const val SQL_SCRIPT = """
-    CREATE SEQUENCE IF NOT EXISTS user_authority_seq;
+    CREATE SEQUENCE IF NOT EXISTS user_authority_seq
+    START WITH 1 INCREMENT BY 1;
     CREATE TABLE IF NOT EXISTS $TABLE_NAME(
         ${Fields.ID_FIELD}  BIGINT DEFAULT nextval('user_authority_seq') PRIMARY KEY,
         $USER_ID_FIELD      UUID,
