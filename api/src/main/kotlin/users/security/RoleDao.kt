@@ -4,6 +4,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingle
+import users.security.RoleDao.Fields.ID_FIELD
 
 object RoleDao {
 
@@ -20,14 +21,14 @@ object RoleDao {
         const val TABLE_NAME = "authority"
         const val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS authority (
-            "role" VARCHAR(50) PRIMARY KEY
+            "$ID_FIELD" VARCHAR(50) PRIMARY KEY
         );
         
-        INSERT INTO authority ("role")
+        INSERT INTO authority ("$ID_FIELD")
         VALUES ('ADMIN'), 
                ('USER'), 
                ('ANONYMOUS')
-        ON CONFLICT ("role") DO NOTHING;
+        ON CONFLICT ("$ID_FIELD") DO NOTHING;
         """
     }
 

@@ -20,12 +20,13 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.reactive.TransactionalOperator
-import users.UserDao
+import users.UserDao.Relations.CREATE_TABLES
 import workspace.Log
 import java.io.File.createTempFile
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import kotlin.text.Charsets.UTF_8
 
 @Configuration
 @EnableTransactionManagement
@@ -45,7 +46,7 @@ class Database(private val properties: Properties) {
             setDatabasePopulator(
                 ResourceDatabasePopulator(
                     createTempFile("prefix", "suffix")
-                        .apply { writeText(UserDao.Relations.CREATE_TABLES, Charsets.UTF_8) }
+                        .apply { CREATE_TABLES.run(::writeText) }
                         .let(::FileSystemResource)
                 )
             )
