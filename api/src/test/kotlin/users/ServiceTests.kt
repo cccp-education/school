@@ -1,4 +1,4 @@
-@file:Suppress("NonAsciiCharacters", "SqlResolve")
+@file:Suppress("NonAsciiCharacters", "SqlResolve", "RedundantUnitReturnType")
 
 package users
 
@@ -6,30 +6,31 @@ import app.Application
 import app.utils.AppUtils.lsWorkingDir
 import app.utils.AppUtils.lsWorkingDirProcess
 import app.utils.AppUtils.toJson
-import app.utils.Constants
+import app.utils.Constants.DEVELOPMENT
+import app.utils.Constants.PRODUCTION
+import app.utils.Constants.STARTUP_LOG_MSG_KEY
 import app.utils.Properties
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
-import users.UserDao.Dao.countUsers
-import users.UserDao.Dao.deleteAllUsersOnly
-import users.security.UserRoleDao.Dao.countUserAuthority
-import users.signup.SignupService
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
+import users.TestUtils.Data.OFFICIAL_SITE
 import users.TestUtils.Data.user
+import users.UserDao.Dao.countUsers
+import users.UserDao.Dao.deleteAllUsersOnly
+import users.security.UserRoleDao.Dao.countUserAuthority
 import users.signup.Signup
-import workspace.Log
+import users.signup.SignupService
 import workspace.Log.i
 import java.io.File
 import java.nio.file.Paths
-import java.util.*
 import java.util.Locale.FRENCH
+import java.util.Locale.getDefault
+import javax.inject.Inject
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,45 +42,42 @@ import kotlin.test.assertEquals
 )
 class ServiceTests {
 
-    @Autowired
+    @Inject
     lateinit var context: ApplicationContext
 
     @AfterTest
     fun cleanUp(context: ApplicationContext) = runBlocking { context.deleteAllUsersOnly() }
 
-    val mapper: ObjectMapper by lazy { context.getBean() }
-    val validator: Validator by lazy { context.getBean() }
+
     @Test
-    fun `ConfigurationsTests - MessageSource test email_activation_greeting message fr`() = "artisan-logiciel".run {
-        assertEquals(
-            expected = "Cher $this",
-            actual = context
-                .getBean<MessageSource>()
-                .getMessage(
-                    "email.activation.greeting",
-                    arrayOf(this),
-                    FRENCH
-                )
-        )
-    }
+    fun `ConfigurationsTests - MessageSource test email_activation_greeting message fr`() =
+        "artisan-logiciel".run {
+            assertEquals(
+                expected = "Cher $this",
+                actual = context
+                    .getBean<MessageSource>()
+                    .getMessage(
+                        "email.activation.greeting",
+                        arrayOf(this),
+                        FRENCH
+                    )
+            )
+        }
 
 
     @Test
     fun `ConfigurationsTests - MessageSource test message startupLog`() = context
         .getBean<MessageSource>()
         .getMessage(
-            Constants.STARTUP_LOG_MSG_KEY,
-            arrayOf(
-                Constants.DEVELOPMENT,
-                Constants.PRODUCTION
-            ),
-            Locale.getDefault()
+            STARTUP_LOG_MSG_KEY,
+            arrayOf(DEVELOPMENT, PRODUCTION),
+            getDefault()
         ).run {
             i(this)
             assertEquals(buildString {
                 append("You have misconfigured your application!\n")
-                append("It should not run with both the ${Constants.DEVELOPMENT}\n")
-                append("and ${Constants.PRODUCTION} profiles at the same time.")
+                append("It should not run with both the $DEVELOPMENT\n")
+                append("and $PRODUCTION profiles at the same time.")
             }, this)
         }
 
@@ -87,14 +85,19 @@ class ServiceTests {
     @Test
     fun `ConfigurationsTests - test go visit message`() =
         assertEquals(
-            TestUtils.Data.OFFICIAL_SITE,
+            OFFICIAL_SITE,
             context.getBean<Properties>().goVisitMessage
         )
+
     @Test
-    fun `test lsWorkingDir & lsWorkingDiringDirProcess`(): Unit {
+    fun `test lsWorkingDir & lsWorkingDirProcess`(): Unit {
         val destDir: File = "build".run(::File)
-        context.lsWorkingDirProcess(destDir).run { "lsWorkingDirProcess : $this" }.run(Log::i)
-        File("build").absolutePath.run(Log::i)
+        context
+            .lsWorkingDirProcess(destDir)
+            .run { "lsWorkingDirProcess : $this" }
+            .run(::i)
+
+        destDir.absolutePath.run(::i)
 
         // Liste un répertoire spécifié par une chaîne
         context.lsWorkingDir("build", maxDepth = 2)
@@ -110,7 +113,9 @@ class ServiceTests {
 
     @Test
     fun `check toJson build a valid json format`(): Unit = assertDoesNotThrow {
-        (user to context).toJson.let(mapper::readTree)
+        (user to context)
+            .toJson
+            .let(context.getBean<ObjectMapper>()::readTree)
     }
     //TODO : Write and/or Test toMap, toUser
 

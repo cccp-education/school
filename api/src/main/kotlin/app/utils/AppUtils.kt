@@ -1,7 +1,7 @@
 package app.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.StringUtils.stripAccents
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import java.io.ByteArrayOutputStream
@@ -16,7 +16,7 @@ import kotlin.streams.asSequence
 
 object AppUtils {
     val Pair<Any, ApplicationContext>.toJson: String
-        get() = second.getBean<ObjectMapper>().writeValueAsString(first)
+        get() = first.run(second.getBean<ObjectMapper>()::writeValueAsString)
 
     val KClass<Any>.objectName
         get() = java.simpleName.run {
@@ -26,7 +26,7 @@ object AppUtils {
             )
         }
 
-    fun List<String>.nameToLogin(): List<String> = map { StringUtils.stripAccents(it.lowercase().replace(' ', '.')) }
+    fun List<String>.nameToLogin(): List<String> = map { stripAccents(it.lowercase().replace(' ', '.')) }
 
 //    fun String.cleanField(): String = StringBuilder(this)
 //        .deleteCharAt(0)

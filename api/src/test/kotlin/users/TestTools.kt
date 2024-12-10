@@ -7,20 +7,30 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironment
 import org.springframework.context.ConfigurableApplicationContext
-import workspace.Log
 import workspace.Log.i
 import java.io.IOException
 import java.lang.Byte
 import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.ByteArray
+import kotlin.Int
+import kotlin.Pair
+import kotlin.String
+import kotlin.Throws
+import kotlin.apply
+import kotlin.let
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
+import kotlin.repeat
+import kotlin.run
 
 object TestTools {
 
@@ -395,17 +405,17 @@ object TestTools {
      */
     fun <T : Any> equalsVerifier(clazz: KClass<T>) {
         clazz.createInstance().apply i@{
-            Assertions.assertThat(toString()).isNotNull
-            Assertions.assertThat(this).isEqualTo(this)
-            Assertions.assertThat(hashCode()).isEqualTo(hashCode())
+            assertThat(toString()).isNotNull
+            assertThat(this).isEqualTo(this)
+            assertThat(hashCode()).isEqualTo(hashCode())
             // Test with an instance of another class
-            Assertions.assertThat(this).isNotEqualTo(Any())
-            Assertions.assertThat(this).isNotEqualTo(null)
+            assertThat(this).isNotEqualTo(Any())
+            assertThat(this).isNotEqualTo(null)
             // Test with an instance of the same class
             clazz.createInstance().apply j@{
-                Assertions.assertThat(this@i).isNotEqualTo(this@j)
+                assertThat(this@i).isNotEqualTo(this@j)
                 // HashCodes are equals because the objects are not persisted yet
-                Assertions.assertThat(this@i.hashCode()).isEqualTo(this@j.hashCode())
+                assertThat(this@i.hashCode()).isEqualTo(this@j.hashCode())
             }
         }
     }
