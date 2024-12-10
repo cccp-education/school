@@ -2,6 +2,7 @@ package users
 
 import app.Application
 import app.utils.Constants
+import app.utils.Constants.VIRGULE
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -13,6 +14,7 @@ import org.springframework.boot.runApplication
 import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironment
 import org.springframework.context.ConfigurableApplicationContext
 import workspace.Log
+import workspace.Log.i
 import java.io.IOException
 import java.lang.Byte
 import java.time.ZonedDateTime
@@ -52,18 +54,14 @@ object TestTools {
     fun launcher(
         vararg profiles: String, userAuths: Set<Pair<String, String>> = emptySet()
     ): ConfigurableApplicationContext = runApplication<Application> {
-        /**
-         * before launching: configuration
-         */
+        /** before launching: configuration */
         setEnvironment(StandardReactiveWebEnvironment().apply {
             setDefaultProfiles(Constants.TEST)
             addActiveProfile(Constants.TEST)
             profiles.toSet().map(::addActiveProfile)
         })
     }.apply {
-        /**
-         * after launching: verification & post construct
-         */
+        /** after launching: verification & post construct */
         (when {
             environment.defaultProfiles.isNotEmpty() -> environment.defaultProfiles.reduce { acc, s -> "$acc, $s" }
 
@@ -197,16 +195,16 @@ object TestTools {
         if (isNotEmpty()) map { it.toInt().toChar().toString() }.reduce { request, s ->
                 request + buildString {
                     append(s)
-                    if (s == Constants.VIRGULE && request.last().isDigit()) append("\n\t")
+                    if (s == VIRGULE && request.last().isDigit()) append("\n\t")
                 }
             }.replace("{\"", "\n{\n\t\"").replace("\"}", "\"\n}").replace("\",\"", "\",\n\t\"")
-            .run { Log.i("\nbody:$this") }
+            .run { i("\nbody:$this") }
     }
 
     fun ByteArray.logBodyRaw(): ByteArray = apply {
         if (isNotEmpty()) map {
             it.toInt().toChar().toString()
-        }.reduce { request, s -> request + s }.run { Log.i(this) }
+        }.reduce { request, s -> request + s }.run { i(this) }
     }
 
 //fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTemplate) {
