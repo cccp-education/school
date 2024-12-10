@@ -22,6 +22,7 @@ import users.signup.UserActivationDao.Fields.ID_FIELD
 import users.signup.UserActivationDao.Relations.COUNT
 import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import users.signup.UserActivationDao.Relations.INSERT
+import users.signup.UserActivationDao.Relations.UPDATE_ACTIVATION_BY_KEY
 import java.time.LocalDateTime
 import java.time.LocalDateTime.parse
 import java.time.ZoneOffset.UTC
@@ -117,35 +118,17 @@ object UserActivationDao {
             e.left()
         }
 
-        //Find userActivation by key
-        //Update userActivation
-        //TODO: activate user from key (Find userActivation then Update userActivation)  one query select+update
+
+
         @Throws(EmptyResultDataAccessException::class)
-        suspend fun ApplicationContext.findUserActivationByKey(key: String)
-                : Either<Throwable, UserActivation> = try {
-            FIND_BY_ACTIVATION_KEY
+        suspend fun ApplicationContext.activateUser(key: String): Either<Throwable, Long> = try {
+            UPDATE_ACTIVATION_BY_KEY
                 .trimIndent()
                 .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(ACTIVATION_KEY_ATTR, key)
                 .fetch()
-                .awaitSingleOrNull()
-                .let {
-                    when (it) {
-                        null -> return EmptyResultDataAccessException(1).left()
-                        else -> return UserActivation(
-                            id = it[ID_FIELD].toString().run(UUID::fromString),
-                            activationKey = it[ACTIVATION_KEY_FIELD].toString(),
-                            createdDate = parse(it[CREATED_DATE_FIELD].toString())
-                                .toInstant(UTC),
-                            activationDate = it[ACTIVATION_DATE_FIELD].run {
-                                when {
-                                    this == null || toString().lowercase() == "null" -> null
-                                    else -> toString().run(LocalDateTime::parse).toInstant(UTC)
-                                }
-                            },
-                        ).right()
-                    }
-                }
+                .awaitRowsUpdated()
+                .right()
         } catch (e: Throwable) {
             e.left()
         }

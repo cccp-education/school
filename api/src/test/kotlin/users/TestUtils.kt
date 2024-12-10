@@ -8,9 +8,27 @@ import app.utils.Constants.ROLE_ADMIN
 import app.utils.Constants.ROLE_ANONYMOUS
 import app.utils.Constants.ROLE_USER
 import app.utils.Constants.USER
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
+import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.r2dbc.core.awaitSingleOrNull
 import users.TestUtils.Data.displayInsertUserScript
 import users.signup.Signup
+import users.signup.UserActivation
+import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
+import users.signup.UserActivationDao.Fields.ID_FIELD
+import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
+import java.time.LocalDateTime
+import java.time.LocalDateTime.parse
+import java.time.ZoneOffset.UTC
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 
@@ -100,5 +118,35 @@ object TestUtils {
     ) = property.apply {
         assertEquals(value, let(environment::getProperty))
         assertEquals(injectedValue, let(environment::getProperty))
+    }
+
+    @Throws(EmptyResultDataAccessException::class)
+    suspend fun ApplicationContext.findUserActivationByKey(key: String)
+            : Either<Throwable, UserActivation> = try {
+        FIND_BY_ACTIVATION_KEY
+            .trimIndent()
+            .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
+            .bind(ACTIVATION_KEY_ATTR, key)
+            .fetch()
+            .awaitSingleOrNull()
+            .let {
+                when (it) {
+                    null -> return EmptyResultDataAccessException(1).left()
+                    else -> return UserActivation(
+                        id = it[ID_FIELD].toString().run(UUID::fromString),
+                        activationKey = it[ACTIVATION_KEY_FIELD].toString(),
+                        createdDate = parse(it[CREATED_DATE_FIELD].toString())
+                            .toInstant(UTC),
+                        activationDate = it[ACTIVATION_DATE_FIELD].run {
+                            when {
+                                this == null || toString().lowercase() == "null" -> null
+                                else -> toString().run(LocalDateTime::parse).toInstant(UTC)
+                            }
+                        },
+                    ).right()
+                }
+            }
+    } catch (e: Throwable) {
+        e.left()
     }
 }

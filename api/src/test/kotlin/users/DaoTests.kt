@@ -39,6 +39,7 @@ import users.TestUtils.Data.signup
 import users.TestUtils.Data.user
 import users.TestUtils.Data.users
 import users.TestUtils.defaultRoles
+import users.TestUtils.findUserActivationByKey
 import users.UserDao.Attributes.EMAIL_ATTR
 import users.UserDao.Attributes.LOGIN_ATTR
 import users.UserDao.Attributes.PASSWORD_ATTR
@@ -67,7 +68,6 @@ import users.signup.UserActivation
 import users.signup.UserActivationDao
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import users.signup.UserActivationDao.Dao.countUserActivation
-import users.signup.UserActivationDao.Dao.findUserActivationByKey
 import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
@@ -643,9 +643,7 @@ class DaoTests {
 
     @Test
     fun `test find userActivation by key`(): Unit = runBlocking {
-
         val countUserBefore = context.countUsers().apply { assertEquals(0, this) }
-
         val countUserAuthBefore = context.countUserAuthority()
         val countUserActivationBefore = context.countUserActivation()
         (user to context).signup()
