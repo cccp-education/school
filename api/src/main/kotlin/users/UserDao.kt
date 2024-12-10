@@ -390,7 +390,7 @@ object UserDao {
             }
 
         @Throws(EmptyResultDataAccessException::class)
-        suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, UUID> = try {
+        suspend fun Pair<User, ApplicationContext>.signup(): Either<Throwable, Pair<UUID, String>> = try {
             second.getBean<TransactionalOperator>().executeAndAwait {
                 (first to second).save()
             }
@@ -398,8 +398,9 @@ object UserDao {
                 return Exception("Unable to find user by email").left()
             }.map {
                 (UserRole(userId = it, role = ROLE_USER) to second).signup()
-                (UserActivation(id = it) to second).save()
-                return it.right()
+                val userActivation = UserActivation(id = it)
+                (userActivation to second).save()
+                return (it to userActivation.activationKey).right()
             }
         } catch (e: Throwable) {
             e.left()

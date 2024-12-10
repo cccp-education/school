@@ -36,7 +36,7 @@ class SignupService(private val context: ApplicationContext) {
         context.signupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
-                .map { return withId(it).right() }
+                .map { return withId(it.first).right() }
         }
     } catch (t: Throwable) {
         t.left()

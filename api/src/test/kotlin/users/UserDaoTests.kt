@@ -26,7 +26,6 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
-import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
 import users.TestUtils.Data.user
@@ -46,7 +45,6 @@ import users.security.RoleDao.Dao.countRoles
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.countUserAuthority
 import users.signup.UserActivation
-import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import users.signup.UserActivationDao.Dao.countUserActivation
 import users.signup.UserActivationDao.Dao.findUserActivationByKey
 import workspace.Log.i
@@ -215,7 +213,7 @@ class UserDaoTests {
     fun `test findOneWithAuths`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         assertEquals(0, context.countUserAuthority())
-        val userId: UUID = (user to context).signup().getOrNull()!!
+        val userId: UUID = (user to context).signup().getOrNull()!!.first
         userId.apply { run(::assertNotNull) }
             .run { "(user to context).signup() : $this" }
             .run(::println)
@@ -260,7 +258,7 @@ class UserDaoTests {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
         }.map {
-            userWithAuths = user.withId(it).copy(password = EMPTY_STRING)
+            userWithAuths = user.withId(it.first).copy(password = EMPTY_STRING)
             userWithAuths.roles.isEmpty().run(::assertTrue)
         }
         userWithAuths.id.run(::assertNotNull)
@@ -292,7 +290,7 @@ class UserDaoTests {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
         }.map {
-            userWithAuths = user.withId(it).copy(password = EMPTY_STRING)
+            userWithAuths = user.withId(it.first).copy(password = EMPTY_STRING)
             userWithAuths.roles.isEmpty().run(::assertTrue)
         }
         assertEquals(1, context.countUsers())
@@ -317,7 +315,7 @@ class UserDaoTests {
             isRight().run(::assertTrue)
             isLeft().run(::assertFalse)
         }.map {
-            userWithAuths = user.withId(it).copy(password = EMPTY_STRING)
+            userWithAuths = user.withId(it.first).copy(password = EMPTY_STRING)
             userWithAuths.roles.isEmpty().run(::assertTrue)
         }
         assertEquals(1, context.countUsers())
@@ -401,7 +399,7 @@ class UserDaoTests {
                     FROM user_authority AS ur 
                     WHERE ur.user_id = :userId"""
                 )
-                .bind("userId", uuid)
+                .bind("userId", uuid.first)
                 .fetch()
                 .all()
                 .collect { rows ->
@@ -410,14 +408,14 @@ class UserDaoTests {
                 }
             assertEquals(
                 ROLE_USER,
-                user.withId(uuid).copy(
+                user.withId(uuid.first).copy(
                     roles =
                         resultRoles
                             .map { it.id.run(::Role) }
                             .toMutableSet())
                     .roles.first().id
             )
-            resultUserId = uuid
+            resultUserId = uuid.first
         }
         assertEquals(
             resultUserId.toString().length,
@@ -432,8 +430,8 @@ class UserDaoTests {
     fun `test signup and trying to retrieve the user id from databaseClient object`(): Unit = runBlocking {
         assertEquals(0, context.countUsers())
         (user to context).signup().onRight {
-            //36 is the to string length of a UUID
-            it.toString().apply { assertEquals(36, it.toString().length) }.apply(::i)
+            //Because 36 == UUID.toString().length
+            it.toString().apply { assertEquals(36, it.first.toString().length) }.apply(::i)
         }
         assertEquals(1, context.countUsers())
         assertDoesNotThrow {
@@ -605,7 +603,7 @@ class UserDaoTests {
         val ids = users.map { (it to context).signup().getOrNull()!! }
         assertEquals(countUserBefore + 2, context.countUsers())
         assertEquals(countUserAuthBefore + 2, context.countUserAuthority())
-        ids.forEach { context.delete(it) }
+        ids.forEach { context.delete(it.first) }
         assertEquals(countUserBefore, context.countUsers())
         assertEquals(countUserAuthBefore, context.countUserAuthority())
     }
@@ -631,11 +629,11 @@ class UserDaoTests {
 
         val countUserAuthBefore = context.countUserAuthority()
         val countUserActivationBefore = context.countUserActivation()
-        UserActivation(id = (user to context).signup().getOrNull()!!).run {
+        (user to context).signup().getOrNull()!!.run {
             assertEquals(countUserBefore + 1, context.countUsers())
             assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
             assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-            activationKey
+            second
                 .apply(::i)
                 .isBlank()
                 .run(::assertFalse)
@@ -643,7 +641,7 @@ class UserDaoTests {
 //                id,
 //                context.findUserActivationByKey(activationKey).getOrNull()!!.id
 //            )
-            context.findUserActivationByKey(activationKey).getOrNull().toString().run(::i)
+            context.findUserActivationByKey(second).getOrNull().toString().run(::i)
             // BabyStepping to find an implementation and debugging
 //            assertDoesNotThrow {
 //                id.toString().run(::i)
