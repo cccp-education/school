@@ -313,7 +313,7 @@ object UserDao {
                                 lower(u."$LOGIN_FIELD") = lower(:emailOrLogin)
                             GROUP BY 
                                 u.id, u."$EMAIL_FIELD", u."$LOGIN_FIELD";
-                        """.trimIndent()
+                        """
 
                         getBean<DatabaseClient>()
                             .sql(query)
@@ -438,5 +438,4 @@ object UserDao {
             e.left()
         }
     }
-
 }
