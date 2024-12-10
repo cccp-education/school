@@ -2,8 +2,10 @@
 
 package users
 
+import app.database.EntityModel.Members.withId
 import app.utils.Constants.ADMIN
 import app.utils.Constants.DOMAIN_DEV_URL
+import app.utils.Constants.EMPTY_STRING
 import app.utils.Constants.ROLE_ADMIN
 import app.utils.Constants.ROLE_ANONYMOUS
 import app.utils.Constants.ROLE_USER
@@ -11,12 +13,18 @@ import app.utils.Constants.USER
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import kotlinx.coroutines.reactive.collect
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import users.TestUtils.Data.displayInsertUserScript
+import users.UserDao.Attributes.EMAIL_ATTR
+import users.UserDao.Attributes.LOGIN_ATTR
+import users.security.Role
+import users.security.RoleDao
 import users.signup.Signup
 import users.signup.UserActivation
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
@@ -149,4 +157,76 @@ object TestUtils {
     } catch (e: Throwable) {
         e.left()
     }
+
+    suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            """
+            SELECT ua."role" 
+            FROM "user" u 
+            JOIN user_authority ua 
+            ON u.id = ua.user_id 
+            WHERE u."email" = :$EMAIL_ATTR;"""
+                .trimIndent()
+                .run(getBean<DatabaseClient>()::sql)
+                .bind(EMAIL_ATTR, email)
+                .fetch()
+                .all()
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            """
+            SELECT ua."role" 
+            FROM "user" u 
+            JOIN user_authority ua 
+            ON u.id = ua.user_id 
+            WHERE u."login" = :$LOGIN_ATTR;"""
+                .trimIndent()
+                .run(getBean<DatabaseClient>()::sql)
+                .bind(LOGIN_ATTR, login)
+                .fetch()
+                .all()
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findUserById(id: UUID): Either<Throwable, User> = try {
+        User().withId(id).copy(password = EMPTY_STRING).run user@{
+            findAuthsById(id).getOrNull().run roles@{
+                return if (isNullOrEmpty())
+                    "Unable to retrieve roles from user by id"
+                        .run(::Exception)
+                        .left()
+                else copy(roles = this@roles).right()
+            }
+        }
+    } catch (e: Throwable) {
+        e.left()
+    }
+
+    suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
+        mutableSetOf<Role>().apply {
+            """
+            SELECT ua."role" 
+            FROM "user" as u 
+            JOIN user_authority as ua 
+            ON u.id = ua.user_id 
+            WHERE u.id = :userId;"""
+                .trimIndent()
+                .run(getBean<DatabaseClient>()::sql)
+                .bind("userId", userId)
+                .fetch()
+                .all()
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
+        }.toSet().right()
+    } catch (e: Throwable) {
+        e.left()
+    }
+
 }
