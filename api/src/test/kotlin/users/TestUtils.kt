@@ -10,11 +10,9 @@ import app.utils.Constants.ROLE_USER
 import app.utils.Constants.USER
 import org.springframework.context.ApplicationContext
 import users.TestUtils.Data.displayInsertUserScript
-import users.UserDao.Dao.findOne
 import users.signup.Signup
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 object TestUtils {
     @JvmStatic
@@ -81,16 +79,6 @@ object TestUtils {
                 FROM "user"
                 WHERE "login" LIKE 'user%'
             );"""
-
-        suspend fun ApplicationContext.assertUserExists(pairLoginEmail: Pair<String, String>) = assertEquals(
-            pairLoginEmail.first,
-            findOne<User>(pairLoginEmail.second).getOrNull()?.login
-        )
-
-        suspend fun ApplicationContext.assertUserNotExists(email: String) = findOne<User>(email)
-            .isLeft()
-            .apply(::assertTrue)
-
     }
 
     val ApplicationContext.PATTERN_LOCALE_2: Pattern

@@ -25,6 +25,7 @@ import users.UserDao.Dao.deleteAllUsersOnly
 import users.security.UserRoleDao.Dao.countUserAuthority
 import users.signup.Signup
 import users.signup.SignupService
+import users.signup.UserActivationDao.Dao.countUserActivation
 import workspace.Log.i
 import java.io.File
 import java.nio.file.Paths
@@ -50,19 +51,18 @@ class ServiceTests {
 
 
     @Test
-    fun `ConfigurationsTests - MessageSource test email_activation_greeting message fr`() =
-        "artisan-logiciel".run {
-            assertEquals(
-                expected = "Cher $this",
-                actual = context
-                    .getBean<MessageSource>()
-                    .getMessage(
-                        "email.activation.greeting",
-                        arrayOf(this),
-                        FRENCH
-                    )
-            )
-        }
+    fun `ConfigurationsTests - MessageSource test email_activation_greeting message fr`() = "artisan-logiciel".run {
+        assertEquals(
+            expected = "Cher $this",
+            actual = context
+                .getBean<MessageSource>()
+                .getMessage(
+                    "email.activation.greeting",
+                    arrayOf(this),
+                    FRENCH
+                )
+        )
+    }
 
 
     @Test
@@ -83,28 +83,26 @@ class ServiceTests {
 
 
     @Test
-    fun `ConfigurationsTests - test go visit message`() =
-        assertEquals(
-            OFFICIAL_SITE,
-            context.getBean<Properties>().goVisitMessage
-        )
+    fun `ConfigurationsTests - test go visit message`() = assertEquals(
+        OFFICIAL_SITE,
+        context.getBean<Properties>().goVisitMessage
+    )
 
     @Test
-    fun `test lsWorkingDir & lsWorkingDirProcess`(): Unit {
-        val destDir: File = "build".run(::File)
-        context
-            .lsWorkingDirProcess(destDir)
-            .run { "lsWorkingDirProcess : $this" }
-            .run(::i)
-
-        destDir.absolutePath.run(::i)
-
-        // Liste un répertoire spécifié par une chaîne
-        context.lsWorkingDir("build", maxDepth = 2)
-
-        // Liste un répertoire spécifié par un Path
-        context.lsWorkingDir(Paths.get("build"))
+    fun `test lsWorkingDir & lsWorkingDirProcess`(): Unit = "build".let {
+        it.run(::File).run {
+            context
+                .lsWorkingDirProcess(this)
+                .run { "lsWorkingDirProcess : $this" }
+                .run(::i)
+            absolutePath.run(::i)
+            // Liste un répertoire spécifié par une chaîne
+            context.lsWorkingDir(it, maxDepth = 2)
+            // Liste un répertoire spécifié par un Path
+            context.lsWorkingDir(Paths.get(it))
+        }
     }
+
 
     @Test
     fun `display user formatted in JSON`() = assertDoesNotThrow {
@@ -117,29 +115,43 @@ class ServiceTests {
             .toJson
             .let(context.getBean<ObjectMapper>()::readTree)
     }
-    //TODO : Write and/or Test toMap, toUser
-
 
     @Test
-    fun `test signupService signup saves user and role_user`(): Unit = runBlocking {
-        val countUserBefore = context.countUsers()
-        assertEquals(0, countUserBefore)
-        val countUserAuthBefore = context.countUserAuthority()
-        assertEquals(0, countUserAuthBefore)
-//        context.assertUserNotExists("jdoe@acme.com")
-        context.getBean<SignupService>().signup(
-            Signup(
-                login = "jdoe",
-                email = "jdoe@acme.com",
-                password = "secr3t",
-                repassword = "secr3t"
-            )
-        )
-        assertEquals(countUserBefore + 1, context.countUsers())
-        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-//        context.assertUserExists("jdoe" to "jdoe@acme.com")
+    fun `test signupService signup saves user and role_user and user_activation`(): Unit = runBlocking {
+        Signup(
+            login = "jdoe",
+            email = "jdoe@acme.com",
+            password = "secr3t",
+            repassword = "secr3t"
+        ).run signup@{
+            Triple(
+                context.countUsers(),
+                context.countUserAuthority(),
+                context.countUserActivation()
+            ).run {
+                assertEquals(0, first)
+                assertEquals(0, second)
+                assertEquals(0, third)
+                context.getBean<SignupService>().signup(this@signup)
+                assertEquals(first + 1, context.countUsers())
+                assertEquals(second + 1, context.countUserAuthority())
+                assertEquals(third + 1, context.countUserActivation())
+            }
+
+//            val countUserBefore = context.countUsers()
+//            assertEquals(0, countUserBefore)
+//            val countUserAuthBefore = context.countUserAuthority()
+//            assertEquals(0, countUserAuthBefore)
+//            val countUserActivationBefore = context.countUserActivation()
+//            assertEquals(0, countUserActivationBefore)
+//            context.getBean<SignupService>().signup(this)
+//            assertEquals(countUserBefore + 1, context.countUsers())
+//            assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+//            assertEquals(countUserActivationBefore + 1, context.countUserActivation())
+        }
     }
-////
+
+
 ////    @Test
 ////    fun test_findActivationKeyByLogin() {
 ////        assertEquals(0, countAccount(dao))
