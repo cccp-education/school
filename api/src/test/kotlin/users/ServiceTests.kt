@@ -137,17 +137,6 @@ class ServiceTests {
                 assertEquals(second + 1, context.countUserAuthority())
                 assertEquals(third + 1, context.countUserActivation())
             }
-
-//            val countUserBefore = context.countUsers()
-//            assertEquals(0, countUserBefore)
-//            val countUserAuthBefore = context.countUserAuthority()
-//            assertEquals(0, countUserAuthBefore)
-//            val countUserActivationBefore = context.countUserActivation()
-//            assertEquals(0, countUserActivationBefore)
-//            context.getBean<SignupService>().signup(this)
-//            assertEquals(countUserBefore + 1, context.countUsers())
-//            assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-//            assertEquals(countUserActivationBefore + 1, context.countUserActivation())
         }
     }
 

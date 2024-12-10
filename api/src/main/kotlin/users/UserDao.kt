@@ -122,11 +122,16 @@ object UserDao {
 
         @Suppress("SqlDialectInspection")
         const val INSERT = """
-    insert into "$TABLE_NAME" (
-        "$LOGIN_FIELD", "$EMAIL_FIELD",
-        "$PASSWORD_FIELD", $LANG_KEY_FIELD,
-        $VERSION_FIELD
-    ) values ( :$LOGIN_ATTR, :$EMAIL_ATTR, :$PASSWORD_ATTR, :$LANG_KEY_ATTR, :$VERSION_ATTR);"""
+                insert into "$TABLE_NAME" (
+                    "$LOGIN_FIELD", "$EMAIL_FIELD",
+                    "$PASSWORD_FIELD", $LANG_KEY_FIELD,
+                    $VERSION_FIELD
+                ) values ( 
+                :$LOGIN_ATTR, 
+                :$EMAIL_ATTR, 
+                :$PASSWORD_ATTR, 
+                :$LANG_KEY_ATTR, 
+                :$VERSION_ATTR);"""
 
         const val FIND_USER_BY_LOGIN = """
                 SELECT u.$ID_FIELD 
@@ -206,13 +211,14 @@ object UserDao {
                 RoleDao.Relations.SQL_SCRIPT,
                 UserRoleDao.Relations.SQL_SCRIPT,
                 UserActivationDao.Relations.SQL_SCRIPT,
-            ).joinToString("")
+            ).joinToString("", transform = String::trimIndent)
                 .trimMargin()
 
     }
 
     object Dao {
         suspend fun ApplicationContext.countUsers(): Int = COUNT
+            .trimIndent()
             .let(getBean<DatabaseClient>()::sql)
             .fetch()
             .awaitSingle()
@@ -224,6 +230,7 @@ object UserDao {
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
             INSERT
+                .trimIndent()
                 .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)
@@ -255,6 +262,7 @@ object UserDao {
         ): Either<Throwable, User> = when (T::class) {
             User::class -> try {
                 FIND_USER_BY_LOGIN_OR_EMAIL
+                    .trimIndent()
                     .run(getBean<DatabaseClient>()::sql)
                     .bind(EMAIL_ATTR, emailOrLogin)
                     .bind(LOGIN_ATTR, emailOrLogin)
@@ -286,7 +294,8 @@ object UserDao {
             id: UUID
         ): Either<Throwable, User> = when (T::class) {
             User::class -> try {
-                FIND_USER_BY_ID.trimIndent()
+                FIND_USER_BY_ID
+                    .trimIndent()
                     .run(getBean<DatabaseClient>()::sql)
                     .bind(EMAIL_ATTR, id)
                     .bind(LOGIN_ATTR, id)
@@ -325,6 +334,7 @@ object UserDao {
                                 .left()
 
                         FIND_USER_WITH_AUTHS_BY_EMAILOGIN
+                            .trimIndent()
                             .run(getBean<DatabaseClient>()::sql)
                             .bind(EMAILORLOGIN, emailOrLogin)
                             .fetch()
@@ -363,6 +373,7 @@ object UserDao {
                 User::class -> {
                     try {
                         FIND_USER_BY_LOGIN
+                            .trimIndent()
                             .run(getBean<DatabaseClient>()::sql)
                             .bind(LOGIN_ATTR, login)
                             .fetch()
@@ -382,6 +393,7 @@ object UserDao {
                 User::class -> {
                     try {
                         FIND_USER_BY_EMAIL
+                            .trimIndent()
                             .run(getBean<DatabaseClient>()::sql)
                             .bind(EMAIL_ATTR, email)
                             .fetch()
@@ -428,6 +440,7 @@ object UserDao {
         suspend fun Pair<Signup, ApplicationContext>.signupAvailability()
                 : Either<Throwable, Triple<Boolean/*OK*/, Boolean/*email*/, Boolean/*login*/>> = try {
             SELECT_SIGNUP_AVAILABILITY
+                .trimIndent()
                 .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)

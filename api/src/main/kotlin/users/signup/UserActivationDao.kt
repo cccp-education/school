@@ -67,22 +67,31 @@ object UserActivationDao {
         CREATE INDEX IF NOT EXISTS idx_user_activation_creation_date
         ON $TABLE_NAME ($CREATED_DATE_FIELD);
         """
+        const val COUNT = "SELECT COUNT(*) FROM $TABLE_NAME;"
+
         const val INSERT = """
         INSERT INTO $TABLE_NAME (
         $ID_FIELD, $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
         VALUES (:$ID_ATTR, :$ACTIVATION_KEY_ATTR, :$CREATED_DATE_ATTR, :$ACTIVATION_DATE_ATTR);
         """
+
         const val FIND_BY_ACTIVATION_KEY = """
         SELECT * FROM "$TABLE_NAME" as ua
         WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;
         """
-        const val COUNT = "SELECT COUNT(*) FROM $TABLE_NAME;"
 
+        const val UPDATE_ACTIVATION_BY_KEY = """
+        UPDATE "$TABLE_NAME" 
+        SET activated = true, 
+            activation_date = NOW() 
+        WHERE "$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR
+        """
     }
 
     object Dao {
 
         suspend fun ApplicationContext.countUserActivation() = COUNT
+            .trimIndent()
             .let(getBean<DatabaseClient>()::sql)
             .fetch()
             .awaitSingle()
@@ -115,6 +124,7 @@ object UserActivationDao {
         suspend fun ApplicationContext.findUserActivationByKey(key: String)
                 : Either<Throwable, UserActivation> = try {
             FIND_BY_ACTIVATION_KEY
+                .trimIndent()
                 .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(ACTIVATION_KEY_ATTR, key)
                 .fetch()
