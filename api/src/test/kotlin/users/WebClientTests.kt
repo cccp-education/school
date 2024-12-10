@@ -26,8 +26,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.server.ServerWebExchange
 import app.http.HttpUtils.validator
-import app.TestTools.logBody
-import app.TestTools.requestToString
+import users.TestTools.logBody
+import users.TestTools.requestToString
 import users.TestUtils.Data.DEFAULT_USER_JSON
 import users.TestUtils.Data.signup
 import users.TestUtils.Data.user
@@ -39,7 +39,7 @@ import kotlin.test.*
 @SpringBootTest(
     classes = [Application::class],properties = ["spring.main.web-application-type=reactive"])
 @ActiveProfiles("test")
-class SignupWebClientTests {
+class WebClientTests {
 
     @Inject
     lateinit var context: ApplicationContext

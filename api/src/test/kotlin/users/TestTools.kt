@@ -1,5 +1,6 @@
-package app
+package users
 
+import app.Application
 import app.utils.Constants
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -51,30 +52,6 @@ object TestTools {
     fun launcher(
         vararg profiles: String, userAuths: Set<Pair<String, String>> = emptySet()
     ): ConfigurableApplicationContext = runApplication<Application> {
-        /**
-         * before launching: configuration
-         */
-        /**
-         * before launching: configuration
-         */
-        /**
-         * before launching: configuration
-         */
-
-        /**
-         * before launching: configuration
-         */
-        /**
-         * before launching: configuration
-         */
-        /**
-         * before launching: configuration
-         */
-
-        /**
-         * before launching: configuration
-         */
-
         /**
          * before launching: configuration
          */

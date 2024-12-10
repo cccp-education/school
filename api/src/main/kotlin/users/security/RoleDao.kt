@@ -12,6 +12,10 @@ object RoleDao {
         const val ID_FIELD = "role"
     }
 
+    object Attributes {
+        const val ID_ATTR = "role"
+    }
+
     object Constraints
 
     object Relations {
