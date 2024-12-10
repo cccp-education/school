@@ -66,13 +66,13 @@ object TestTools {
             environment.defaultProfiles.isNotEmpty() -> environment.defaultProfiles.reduce { acc, s -> "$acc, $s" }
 
             else -> ""
-        }).let { "defaultProfiles : $it" }.let(Log::i)
+        }).let { "defaultProfiles : $it" }.let(::i)
 
         (when {
             environment.activeProfiles.isNotEmpty() -> environment.activeProfiles.reduce { acc, s -> "$acc, $s" }
 
             else -> ""
-        }).let { "activeProfiles : $it" }.let(Log::i)
+        }).let { "activeProfiles : $it" }.let(::i)
 
         //TODO: ajouter des users avec leurs roles
     }
