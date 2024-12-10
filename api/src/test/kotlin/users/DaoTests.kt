@@ -73,7 +73,6 @@ import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
 import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import workspace.Log.i
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.time.ZoneOffset.UTC
 import java.util.*
 import java.util.UUID.fromString
@@ -94,16 +93,13 @@ class DaoTests {
 
     suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
-            @Suppress("SqlResolve")
-            getBean<DatabaseClient>()
-                .sql(
-                    """
-                    SELECT ua."role" 
-                    FROM "user" u 
-                    JOIN user_authority ua 
-                    ON u.id = ua.user_id 
-                    WHERE u."email" = :email;"""
-                )
+            """
+            SELECT ua."role" 
+            FROM "user" u 
+            JOIN user_authority ua 
+            ON u.id = ua.user_id 
+            WHERE u."email" = :email;"""
+                .run(getBean<DatabaseClient>()::sql)
                 .bind("email", email)
                 .fetch()
                 .all()
@@ -115,16 +111,13 @@ class DaoTests {
 
     suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
-            @Suppress("SqlResolve")
-            getBean<DatabaseClient>()
-                .sql(
-                    """
-                    SELECT ua."role" 
-                    FROM "user" u 
-                    JOIN user_authority ua 
-                    ON u.id = ua.user_id 
-                    WHERE u."login" = :login;"""
-                )
+            """
+            SELECT ua."role" 
+            FROM "user" u 
+            JOIN user_authority ua 
+            ON u.id = ua.user_id 
+            WHERE u."login" = :login;"""
+                .run(getBean<DatabaseClient>()::sql)
                 .bind("login", login)
                 .fetch()
                 .all()
@@ -147,16 +140,13 @@ class DaoTests {
 
     suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
-            @Suppress("SqlResolve")
-            getBean<DatabaseClient>()
-                .sql(
-                    """
-                    SELECT ua."role" 
-                    FROM "user" as u 
-                    JOIN user_authority as ua 
-                    ON u.id = ua.user_id 
-                    WHERE u.id = :userId;"""
-                )
+            """
+            SELECT ua."role" 
+            FROM "user" as u 
+            JOIN user_authority as ua 
+            ON u.id = ua.user_id 
+            WHERE u.id = :userId;"""
+                .run(getBean<DatabaseClient>()::sql)
                 .bind("userId", userId)
                 .fetch()
                 .all()
@@ -193,8 +183,8 @@ class DaoTests {
                OR 
                LOWER(u."login") = LOWER(:emailOrLogin)
             GROUP BY 
-               u.id, u."email", u."login";
-        """.run(context.getBean<DatabaseClient>()::sql)
+               u.id, u."email", u."login";"""
+            .run(context.getBean<DatabaseClient>()::sql)
             .bind("emailOrLogin", user.email)
             .fetch()
             .awaitSingleOrNull()
