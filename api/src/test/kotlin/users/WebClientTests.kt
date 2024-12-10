@@ -9,7 +9,7 @@ import users.UserDao.Attributes.LOGIN_ATTR
 import users.UserDao.Dao.countUsers
 import users.UserDao.Dao.deleteAllUsersOnly
 import users.UserDao.Dao.findOneByEmail
-import users.User.UserRestApiRoutes.API_SIGNUP_PATH
+import users.UserController.UserRestApiRoutes.API_SIGNUP_PATH
 import users.security.UserRoleDao.Dao.countUserAuthority
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.constraints.Pattern

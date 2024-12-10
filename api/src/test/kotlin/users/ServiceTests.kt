@@ -29,13 +29,16 @@ import workspace.Log.i
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
+import java.util.Locale.FRENCH
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ActiveProfiles("test")
 @SpringBootTest(
-    classes = [Application::class],properties = ["spring.main.web-application-type=reactive"])
+    classes = [Application::class],
+    properties = ["spring.main.web-application-type=reactive"]
+)
 class ServiceTests {
 
     @Autowired
@@ -55,7 +58,7 @@ class ServiceTests {
                 .getMessage(
                     "email.activation.greeting",
                     arrayOf(this),
-                    Locale.FRENCH
+                    FRENCH
                 )
         )
     }
@@ -72,7 +75,7 @@ class ServiceTests {
             ),
             Locale.getDefault()
         ).run {
-            Log.i(this)
+            i(this)
             assertEquals(buildString {
                 append("You have misconfigured your application!\n")
                 append("It should not run with both the ${Constants.DEVELOPMENT}\n")

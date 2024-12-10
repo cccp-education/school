@@ -1,4 +1,4 @@
-package users
+package users.profile
 
 import java.util.*
 

@@ -53,6 +53,7 @@ import users.UserDao.Dao.signup
 import users.UserDao.Dao.signupAvailability
 import users.UserDao.Relations.FIND_USER_BY_LOGIN
 import users.security.Role
+import users.security.RoleDao
 import users.security.RoleDao.Dao.countRoles
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.countUserAuthority
@@ -82,7 +83,8 @@ import kotlin.test.*
 
 @ActiveProfiles("test")
 @SpringBootTest(
-    classes = [Application::class], properties = ["spring.main.web-application-type=reactive"]
+    classes = [Application::class],
+    properties = ["spring.main.web-application-type=reactive"]
 )
 class DaoTests {
     @Inject
@@ -98,12 +100,12 @@ class DaoTests {
             FROM "user" u 
             JOIN user_authority ua 
             ON u.id = ua.user_id 
-            WHERE u."email" = :email;"""
+            WHERE u."email" = :$EMAIL_ATTR;"""
                 .run(getBean<DatabaseClient>()::sql)
-                .bind("email", email)
+                .bind(EMAIL_ATTR, email)
                 .fetch()
                 .all()
-                .collect { add(Role(it["role"].toString())) }
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()
@@ -116,12 +118,12 @@ class DaoTests {
             FROM "user" u 
             JOIN user_authority ua 
             ON u.id = ua.user_id 
-            WHERE u."login" = :login;"""
+            WHERE u."login" = :$LOGIN_ATTR;"""
                 .run(getBean<DatabaseClient>()::sql)
-                .bind("login", login)
+                .bind(LOGIN_ATTR, login)
                 .fetch()
                 .all()
-                .collect { add(Role(it["role"].toString())) }
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()
@@ -150,7 +152,7 @@ class DaoTests {
                 .bind("userId", userId)
                 .fetch()
                 .all()
-                .collect { add(Role(it["role"].toString())) }
+                .collect { add(Role(it[RoleDao.Fields.ID_FIELD].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()

@@ -24,8 +24,8 @@ import users.UserDao
 import users.UserDao.Dao.signup
 import users.UserDao.Dao.signupAvailability
 import users.UserDao.Dao.signupToUser
-import users.User.UserRestApiRoutes.API_SIGNUP
-import users.User.UserRestApiRoutes.API_USERS
+import users.UserController.UserRestApiRoutes.API_SIGNUP
+import users.UserController.UserRestApiRoutes.API_USERS
 import workspace.Log.i
 
 @Service
