@@ -16,20 +16,6 @@ import users.signup.SignupService
 class UserController(private val service: SignupService) {
     internal class SignupException(message: String) : RuntimeException(message)
 
-    /**
-     * {@code POST  /signup} : Signup the user.
-     *
-     * @param signup the managed signup View Model.
-     */
-    @PostMapping(
-        API_SIGNUP,
-        produces = [APPLICATION_PROBLEM_JSON_VALUE]
-    )
-    suspend fun signup(
-        @RequestBody signup: Signup,
-        exchange: ServerWebExchange
-    ) = service.signupRequest(signup, exchange)
-
     /** User REST API URIs */
     object UserRestApiRoutes {
         const val API_AUTHORITY = "/api/authorities"
@@ -45,4 +31,18 @@ class UserController(private val service: SignupService) {
         const val API_CHANGE = "/change-password"
         const val API_CHANGE_PATH = "$API_USERS$API_CHANGE"
     }
+
+    /**
+     * {@code POST  /signup} : Signup the user.
+     *
+     * @param signup the managed signup View Model.
+     */
+    @PostMapping(
+        API_SIGNUP,
+        produces = [APPLICATION_PROBLEM_JSON_VALUE]
+    )
+    suspend fun signup(
+        @RequestBody signup: Signup,
+        exchange: ServerWebExchange
+    ) = service.signupRequest(signup, exchange)
 }
