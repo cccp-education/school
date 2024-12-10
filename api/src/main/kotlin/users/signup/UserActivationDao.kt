@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package users.signup
 
 import arrow.core.Either
@@ -17,8 +19,9 @@ import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ID_FIELD
+import users.signup.UserActivationDao.Relations.COUNT
+import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import users.signup.UserActivationDao.Relations.INSERT
-import users.signup.UserActivationDao.Relations.TABLE_NAME
 import java.time.LocalDateTime
 import java.time.LocalDateTime.parse
 import java.time.ZoneOffset.UTC
@@ -43,7 +46,6 @@ object UserActivationDao {
     }
 
     object Relations {
-        @Suppress("MemberVisibilityCanBePrivate")
         const val TABLE_NAME = "user_activation"
         const val SQL_SCRIPT = """
         CREATE TABLE IF NOT EXISTS "$TABLE_NAME" (
@@ -70,18 +72,25 @@ object UserActivationDao {
         $ID_FIELD, $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
         VALUES (:$ID_ATTR, :$ACTIVATION_KEY_ATTR, :$CREATED_DATE_ATTR, :$ACTIVATION_DATE_ATTR);
         """
+        const val FIND_BY_ACTIVATION_KEY = """
+        SELECT * FROM "$TABLE_NAME" as ua
+        WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;
+        """
+        const val COUNT = "SELECT COUNT(*) FROM $TABLE_NAME;"
+
     }
 
     object Dao {
-        suspend fun ApplicationContext.countUserActivation(): Int =
-            "SELECT COUNT(*) FROM $TABLE_NAME;"
-                .let(getBean<DatabaseClient>()::sql)
-                .fetch()
-                .awaitSingle()
-                .values
-                .first()
-                .toString()
-                .toInt()
+
+        suspend fun ApplicationContext.countUserActivation() = COUNT
+            .let(getBean<DatabaseClient>()::sql)
+            .fetch()
+            .awaitSingle()
+            .values
+            .first()
+            .toString()
+            .toInt()
+
 
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<UserActivation, ApplicationContext>.save(): Either<Throwable, Long> = try {
@@ -105,17 +114,15 @@ object UserActivationDao {
         @Throws(EmptyResultDataAccessException::class)
         suspend fun ApplicationContext.findUserActivationByKey(key: String)
                 : Either<Throwable, UserActivation> = try {
-//            """SELECT * FROM "$TABLE_NAME" as ua
-//              WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;"""
-            """SELECT * FROM "$TABLE_NAME" as ua;"""
+            FIND_BY_ACTIVATION_KEY
                 .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
-//                .bind(ACTIVATION_KEY_ATTR, key)
+                .bind(ACTIVATION_KEY_ATTR, key)
                 .fetch()
                 .awaitSingleOrNull()
                 .let {
-                    return when (it) {
-                        null -> EmptyResultDataAccessException(1).left()
-                        else -> UserActivation(
+                    when (it) {
+                        null -> return EmptyResultDataAccessException(1).left()
+                        else -> return UserActivation(
                             id = it[ID_FIELD].toString().run(UUID::fromString),
                             activationKey = it[ACTIVATION_KEY_FIELD].toString(),
                             createdDate = parse(it[CREATED_DATE_FIELD].toString())

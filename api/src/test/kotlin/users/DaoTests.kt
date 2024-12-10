@@ -8,6 +8,9 @@
 package users
 
 import app.Application
+import app.database.EntityModel.Companion.MODEL_FIELD_FIELD
+import app.database.EntityModel.Companion.MODEL_FIELD_MESSAGE
+import app.database.EntityModel.Companion.MODEL_FIELD_OBJECTNAME
 import app.database.EntityModel.Members.withId
 import app.utils.Constants.EMPTY_STRING
 import app.utils.Constants.ROLE_USER
@@ -15,6 +18,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
+import jakarta.validation.Validator
 import kotlinx.coroutines.reactive.collect
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -26,11 +30,18 @@ import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
+import org.springframework.r2dbc.core.awaitSingle
 import org.springframework.r2dbc.core.awaitSingleOrNull
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.reactive.TransactionalOperator
+import org.springframework.transaction.reactive.executeAndAwait
+import users.TestUtils.Data.signup
 import users.TestUtils.Data.user
 import users.TestUtils.Data.users
 import users.TestUtils.defaultRoles
+import users.UserDao.Attributes.EMAIL_ATTR
+import users.UserDao.Attributes.LOGIN_ATTR
+import users.UserDao.Attributes.PASSWORD_ATTR
 import users.UserDao.Dao.countUsers
 import users.UserDao.Dao.delete
 import users.UserDao.Dao.deleteAllUsersOnly
@@ -39,15 +50,31 @@ import users.UserDao.Dao.findOneByEmail
 import users.UserDao.Dao.findOneWithAuths
 import users.UserDao.Dao.save
 import users.UserDao.Dao.signup
+import users.UserDao.Dao.signupAvailability
 import users.UserDao.Relations.FIND_USER_BY_LOGIN
 import users.security.Role
 import users.security.RoleDao.Dao.countRoles
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.countUserAuthority
+import users.signup.Signup
+import users.signup.Signup.Companion.objectName
+import users.signup.SignupService.Companion.SIGNUP_AVAILABLE
+import users.signup.SignupService.Companion.SIGNUP_EMAIL_NOT_AVAILABLE
+import users.signup.SignupService.Companion.SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE
+import users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
 import users.signup.UserActivation
+import users.signup.UserActivationDao
+import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
 import users.signup.UserActivationDao.Dao.countUserActivation
 import users.signup.UserActivationDao.Dao.findUserActivationByKey
+import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
+import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import workspace.Log.i
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZoneOffset.UTC
 import java.util.*
 import java.util.UUID.fromString
 import javax.inject.Inject
@@ -58,7 +85,7 @@ import kotlin.test.*
 @SpringBootTest(
     classes = [Application::class], properties = ["spring.main.web-application-type=reactive"]
 )
-class UserDaoTests {
+class DaoTests {
     @Inject
     lateinit var context: ApplicationContext
 
@@ -390,7 +417,7 @@ class UserDaoTests {
         (user to context).signup().apply {
             assertTrue(isRight())
             assertFalse(isLeft())
-        }.onRight { uuid ->
+        }.onRight { signupResult ->
             @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
                 .sql(
@@ -399,7 +426,7 @@ class UserDaoTests {
                     FROM user_authority AS ur 
                     WHERE ur.user_id = :userId"""
                 )
-                .bind("userId", uuid.first)
+                .bind("userId", signupResult.first)
                 .fetch()
                 .all()
                 .collect { rows ->
@@ -408,14 +435,14 @@ class UserDaoTests {
                 }
             assertEquals(
                 ROLE_USER,
-                user.withId(uuid.first).copy(
+                user.withId(signupResult.first).copy(
                     roles =
                         resultRoles
                             .map { it.id.run(::Role) }
                             .toMutableSet())
                     .roles.first().id
             )
-            resultUserId = uuid.first
+            resultUserId = signupResult.first
         }
         assertEquals(
             resultUserId.toString().length,
@@ -629,73 +656,132 @@ class UserDaoTests {
 
         val countUserAuthBefore = context.countUserAuthority()
         val countUserActivationBefore = context.countUserActivation()
-        (user to context).signup().getOrNull()!!.run {
-            assertEquals(countUserBefore + 1, context.countUsers())
-            assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-            assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-            second
-                .apply(::i)
-                .isBlank()
-                .run(::assertFalse)
-//            assertEquals(
-//                id,
-//                context.findUserActivationByKey(activationKey).getOrNull()!!.id
-//            )
-            context.findUserActivationByKey(second).getOrNull().toString().run(::i)
-            // BabyStepping to find an implementation and debugging
-//            assertDoesNotThrow {
-//                id.toString().run(::i)
-//                activationKey.run(::i)
-//                context.getBean<TransactionalOperator>().executeAndAwait {
-//                    """
-//                        SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}
-//                        WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR
-//                        """.trimIndent()
-//                """
-//                        SELECT * FROM user_activation
-//                        WHERE activation_key = :$ACTIVATION_KEY_ATTR
-//                        """.trimIndent()
-//                    .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-//                    .bind(ACTIVATION_KEY_ATTR, activationKey)
-//                    .fetch()
-//                    .awaitSingle()
-//                    .apply(::assertNotNull)
-//                    .apply { toString().run(::i) }
-//                    .let {
-////                        UserActivation(
-////                            id = UserActivationDao.Fields.ID_FIELD
-////                                .cleanField()
-////                                .uppercase()
-////                                .run(it::get)
-////                                .toString()
-////                                .run(UUID::fromString),
-////                            activationKey = ACTIVATION_KEY_FIELD
-////                                .cleanField()
-////                                .uppercase()
-////                                .run(it::get)
-////                                .toString(),
-////                            createdDate = CREATED_DATE_FIELD
-////                                .cleanField()
-////                                .uppercase()
-////                                .run(it::get)
-////                                .toString()
-////                                .run(java.time.LocalDateTime::parse)
-////                                .toInstant(java.time.ZoneOffset.UTC),
-////                            activationDate = ACTIVATION_DATE_FIELD
-////                                .cleanField()
-////                                .uppercase()
-////                                .run(it::get)
-////                                .run {
-////                                    when {
-////                                        this == null || toString().lowercase() == "null" -> null
-////                                        else -> toString().run(java.time.LocalDateTime::parse).toInstant(java.time.ZoneOffset.UTC)
-////                                    }
-////                                },
-////                        )
-//                    }
-//                    .toString().run(::i)
-//            }
+        (user to context).signup()
+            .getOrNull()!!
+            .run {
+                assertEquals(countUserBefore + 1, context.countUsers())
+                assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
+                assertEquals(countUserActivationBefore + 1, context.countUserActivation())
+                second.apply(::i)
+                    .isBlank()
+                    .run(::assertFalse)
+                assertEquals(
+                    first,
+                    context.findUserActivationByKey(second).getOrNull()!!.id
+                )
+                context.findUserActivationByKey(second).getOrNull().toString().run(::i)
+                // BabyStepping to find an implementation and debugging
+                assertDoesNotThrow {
+                    first.toString().run(::i)
+                    second.run(::i)
+                    context.getBean<TransactionalOperator>().executeAndAwait {
+                        FIND_BY_ACTIVATION_KEY
+                            .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                            .bind(ACTIVATION_KEY_ATTR, second)
+                            .fetch()
+                            .awaitSingle()
+                            .apply(::assertNotNull)
+                            .apply { toString().run(::i) }
+                            .let {
+                                UserActivation(
+                                    id = UserActivationDao.Fields.ID_FIELD
+                                        .run(it::get)
+                                        .toString()
+                                        .run(UUID::fromString),
+                                    activationKey = ACTIVATION_KEY_FIELD
+                                        .run(it::get)
+                                        .toString(),
+                                    createdDate = CREATED_DATE_FIELD
+                                        .run(it::get)
+                                        .toString()
+                                        .run(LocalDateTime::parse)
+                                        .toInstant(UTC),
+                                    activationDate = ACTIVATION_DATE_FIELD
+                                        .run(it::get)
+                                        .run {
+                                            when {
+                                                this == null || toString().lowercase() == "null" -> null
+                                                else -> toString().run(LocalDateTime::parse).toInstant(UTC)
+                                            }
+                                        },
+                                )
+                            }.toString().run(::i)
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun `signupAvailability should return SIGNUP_AVAILABLE for all when login and email are available`() = runBlocking {
+        (Signup(
+            "testuser",
+            "password",
+            "password",
+            "testuser@example.com"
+        ) to context).signupAvailability().run {
+            isRight().run(::assertTrue)
+            assertEquals(SIGNUP_AVAILABLE, getOrNull()!!)
         }
     }
+
+    @Test
+    fun `signupAvailability should return SIGNUP_NOT_AVAILABLE_AGAINST_LOGIN_AND_EMAIL for all when login and email are not available`(): Unit =
+        runBlocking {
+            assertEquals(0, context.countUsers())
+            (user to context).save()
+            assertEquals(1, context.countUsers())
+            (signup to context).signupAvailability().run {
+                assertEquals(
+                    SIGNUP_LOGIN_AND_EMAIL_NOT_AVAILABLE,
+                    getOrNull()!!
+                )
+            }
+        }
+
+    @Test
+    fun `signupAvailability should return SIGNUP_EMAIL_NOT_AVAILABLE when only email is not available`() = runBlocking {
+        assertEquals(0, context.countUsers())
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+        (Signup(
+            "testuser",
+            "password",
+            "password",
+            user.email
+        ) to context).signupAvailability().run {
+            assertEquals(SIGNUP_EMAIL_NOT_AVAILABLE, getOrNull()!!)
+        }
+    }
+
+    @Test
+    fun `signupAvailability should return SIGNUP_LOGIN_NOT_AVAILABLE when only login is not available`() = runBlocking {
+        assertEquals(0, context.countUsers())
+        (user to context).save()
+        assertEquals(1, context.countUsers())
+
+        (Signup(
+            user.login,
+            "password",
+            "password",
+            "testuser@example.com"
+        ) to context).signupAvailability().run {
+            assertEquals(SIGNUP_LOGIN_NOT_AVAILABLE, getOrNull()!!)
+        }
+    }
+
+    @Test
+    fun `check signup validate implementation`() {
+        setOf(PASSWORD_ATTR, EMAIL_ATTR, LOGIN_ATTR)
+            .map { it to context.getBean<Validator>().validateProperty(signup, it) }
+            .flatMap { (first, second) ->
+                second.map {
+                    mapOf<String, String?>(
+                        MODEL_FIELD_OBJECTNAME to objectName,
+                        MODEL_FIELD_FIELD to first,
+                        MODEL_FIELD_MESSAGE to it.message
+                    )
+                }
+            }.toSet()
+            .apply { run(::isEmpty).let(::assertTrue) }
+    }
 }
-//}
