@@ -8,9 +8,6 @@ import users.security.RoleDao.Fields.ID_FIELD
 
 object RoleDao {
 
-    @JvmStatic
-    fun main(args: Array<String>): Unit = println(RoleDao.Relations.SQL_SCRIPT)
-
     object Fields {
         const val ID_FIELD = "role"
     }

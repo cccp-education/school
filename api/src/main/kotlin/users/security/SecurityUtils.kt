@@ -3,7 +3,7 @@ package users.security
 import app.utils.Constants
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils.random
 import org.springframework.http.HttpMethod.OPTIONS
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -26,7 +26,7 @@ object SecurityUtils {
     }
 
     private val generateRandomAlphanumericString: String
-        get() = RandomStringUtils.random(
+        get() = random(
             DEF_COUNT,
             0,
             0,

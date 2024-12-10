@@ -8,5 +8,4 @@ data class Role(
     @field:NotNull
     @field:Size(max = 50)
     override val id: String
-) : EntityModel<String>() {
-}
+) : EntityModel<String>()
