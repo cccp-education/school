@@ -1,3 +1,4 @@
+##############################################################################
 app:
   message: hello
   item: item
@@ -35,9 +36,7 @@ app:
     exposed-headers: 'Authorization,Link,X-Total-Count'
     allow-credentials: true
     max-age: 1800
-
 ##############################################################################
-
 spring:
   profiles:
     default: dev
@@ -47,13 +46,6 @@ spring:
     url: r2dbc:postgresql://localhost:5432/dba
     username: dba
     password: secret
-
-#  datasource:
-#    driver-class-name: org.h2.Driver
-#    url: r2dbc:postgresql://localhost:5432/dev
-#    username: dev
-#    password: secret
-
   devtools:
     restart:
       enabled: true
@@ -68,16 +60,13 @@ spring:
   web:
     locale: fr_FR
 ##############################################################################
-
 logging:
   level:
     org:
       springframework:
         r2dbc: INFO
         org.hibernate.SQL: INFO
-
 ##############################################################################
-
 server:
   port: 8880
 ##############################################################################
