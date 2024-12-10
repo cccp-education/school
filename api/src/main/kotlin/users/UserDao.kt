@@ -28,6 +28,7 @@ import users.UserDao.Fields.LANG_KEY_FIELD
 import users.UserDao.Fields.LOGIN_FIELD
 import users.UserDao.Fields.PASSWORD_FIELD
 import users.UserDao.Fields.VERSION_FIELD
+import users.UserDao.Relations.COUNT
 import users.UserDao.Relations.DELETE_USER
 import users.UserDao.Relations.DELETE_USER_BY_ID
 import users.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
@@ -38,6 +39,7 @@ import users.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
 import users.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
 import users.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
 import users.UserDao.Relations.TABLE_NAME
+import users.UserDao.Relations.FIND_USER_WITH_AUTHS_BY_EMAILOGIN
 import users.security.Role
 import users.security.RoleDao
 import users.security.UserRole
@@ -167,6 +169,28 @@ object UserDao {
         """
         const val DELETE_USER_BY_ID = """DELETE FROM "$TABLE_NAME" AS u WHERE $ID_FIELD = :$ID_ATTR;"""
         const val DELETE_USER = """DELETE FROM "$TABLE_NAME";"""
+        const val FIND_USER_WITH_AUTHS_BY_EMAILOGIN = """
+                            SELECT 
+                                u.id,
+                                u."$EMAIL_FIELD",
+                                u."$LOGIN_FIELD",
+                                u."$PASSWORD_FIELD",
+                                u.lang_key,
+                                u.version,
+                                STRING_AGG(DISTINCT a."role", ', ') AS roles
+                            FROM "user" as u
+                            LEFT JOIN 
+                                user_authority ua ON u.id = ua.user_id
+                            LEFT JOIN 
+                                authority as a ON UPPER(ua."${UserRoleDao.Fields.ROLE_FIELD}") = UPPER(a."${UserRoleDao.Fields.ROLE_FIELD}")
+                            WHERE 
+                                lower(u."$EMAIL_FIELD") = lower(:emailOrLogin) 
+                                OR 
+                                lower(u."$LOGIN_FIELD") = lower(:emailOrLogin)
+                            GROUP BY 
+                                u.id, u."$EMAIL_FIELD", u."$LOGIN_FIELD";
+                        """
+        const val COUNT = """SELECT COUNT(*) FROM "$TABLE_NAME";"""
 
         @JvmStatic
         val CREATE_TABLES: String
@@ -181,15 +205,14 @@ object UserDao {
     }
 
     object Dao {
-        suspend fun ApplicationContext.countUsers(): Int =
-            """SELECT COUNT(*) FROM "$TABLE_NAME";"""
-                .let(getBean<DatabaseClient>()::sql)
-                .fetch()
-                .awaitSingle()
-                .values
-                .first()
-                .toString()
-                .toInt()
+        suspend fun ApplicationContext.countUsers(): Int = COUNT
+            .let(getBean<DatabaseClient>()::sql)
+            .fetch()
+            .awaitSingle()
+            .values
+            .first()
+            .toString()
+            .toInt()
 
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
@@ -292,31 +315,8 @@ object UserDao {
                                 .run(::Exception)
                                 .left()
 
-                        @Suppress("SqlResolve")
-                        val query = """
-                            SELECT 
-                                u.id,
-                                u."$EMAIL_FIELD",
-                                u."$LOGIN_FIELD",
-                                u."$PASSWORD_FIELD",
-                                u.lang_key,
-                                u.version,
-                                STRING_AGG(DISTINCT a."role", ', ') AS roles
-                            FROM "user" as u
-                            LEFT JOIN 
-                                user_authority ua ON u.id = ua.user_id
-                            LEFT JOIN 
-                                authority as a ON UPPER(ua."${UserRoleDao.Fields.ROLE_FIELD}") = UPPER(a."${UserRoleDao.Fields.ROLE_FIELD}")
-                            WHERE 
-                                lower(u."$EMAIL_FIELD") = lower(:emailOrLogin) 
-                                OR 
-                                lower(u."$LOGIN_FIELD") = lower(:emailOrLogin)
-                            GROUP BY 
-                                u.id, u."$EMAIL_FIELD", u."$LOGIN_FIELD";
-                        """
-
-                        getBean<DatabaseClient>()
-                            .sql(query)
+                        FIND_USER_WITH_AUTHS_BY_EMAILOGIN
+                            .run(getBean<DatabaseClient>()::sql)
                             .bind("emailOrLogin", emailOrLogin)
                             .fetch()
                             .awaitSingleOrNull()
