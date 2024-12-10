@@ -43,3 +43,12 @@ tasks.register<Exec>("runApi") {
         ":api"
     )
 }
+
+tasks.register<Exec>("springbootCheckOpenFirefox") {
+    commandLine(
+        "./gradlew",
+        "-p",
+        "api",
+        ":springbootCheckOpenFirefox"
+    )
+}

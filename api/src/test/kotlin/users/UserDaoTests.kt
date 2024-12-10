@@ -70,7 +70,12 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."email" = :email""")
+                .sql("""
+                    SELECT ua."role" 
+                    FROM "user" u 
+                    JOIN user_authority ua 
+                    ON u.id = ua.user_id 
+                    WHERE u."email" = :email;""")
                 .bind("email", email)
                 .fetch()
                 .all()
@@ -84,7 +89,12 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."login" = :login""")
+                .sql("""
+                    SELECT ua."role" 
+                    FROM "user" u 
+                    JOIN user_authority ua 
+                    ON u.id = ua.user_id 
+                    WHERE u."login" = :login;""")
                 .bind("login", login)
                 .fetch()
                 .all()
@@ -109,9 +119,12 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql(
-                    """SELECT ua."role" FROM "user" as u JOIN user_authority as ua ON u.id = ua.user_id WHERE u.id = :userId"""
-                )
+                .sql("""
+                    SELECT ua."role" 
+                    FROM "user" as u 
+                    JOIN user_authority as ua 
+                    ON u.id = ua.user_id 
+                    WHERE u.id = :userId;""")
                 .bind("userId", userId)
                 .fetch()
                 .all()
@@ -339,7 +352,12 @@ class UserDaoTests {
             (user to context).signup()
             @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."email" = :email""")
+                .sql("""
+                    SELECT ua."role" 
+                    FROM "user" u 
+                    JOIN user_authority ua 
+                    ON u.id = ua.user_id 
+                    WHERE u."email" = :email;""")
                 .bind("email", user.email)
                 .fetch()
                 .all()
@@ -368,7 +386,10 @@ class UserDaoTests {
         }.onRight { uuid ->
             @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("""SELECT ur."role" FROM user_authority AS ur WHERE ur.user_id = :userId""")
+                .sql("""
+                    SELECT ur."role" 
+                    FROM user_authority AS ur 
+                    WHERE ur.user_id = :userId""")
                 .bind("userId", uuid)
                 .fetch()
                 .all()
@@ -442,12 +463,10 @@ class UserDaoTests {
             .one()
             .awaitSingleOrNull()
         context.getBean<DatabaseClient>()
-            .sql(
-                """
+            .sql("""
                 SELECT ua.${UserRoleDao.Fields.ID_FIELD} 
                 FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua 
-                where ua.user_id= :userId and ua."role" = :role""".trimIndent()
-            )
+                where ua.user_id= :userId and ua."role" = :role""")
             .bind("userId", userId)
             .bind("role", ROLE_USER)
             .fetch()
@@ -664,4 +683,3 @@ class UserDaoTests {
     }
 }
 //}
-
