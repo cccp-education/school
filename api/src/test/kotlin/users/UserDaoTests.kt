@@ -32,8 +32,6 @@ import org.springframework.test.context.ActiveProfiles
 import users.TestUtils.Data.user
 import users.TestUtils.Data.users
 import users.TestUtils.defaultRoles
-import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
-import users.signup.UserActivationDao.Dao.countUserActivation
 import users.UserDao.Dao.countUsers
 import users.UserDao.Dao.delete
 import users.UserDao.Dao.deleteAllUsersOnly
@@ -47,7 +45,9 @@ import users.security.Role
 import users.security.RoleDao.Dao.countRoles
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.countUserAuthority
-import users.signup.UserActivation
+import users.signup.activation.UserActivation
+import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.activation.UserActivationDao.Dao.countUserActivation
 import workspace.Log.i
 import java.util.*
 import java.util.UUID.fromString
@@ -68,12 +68,13 @@ class UserDaoTests {
 
     suspend fun ApplicationContext.findAuthsByEmail(email: String): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
+            @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."email" = :email""")
                 .bind("email", email)
                 .fetch()
                 .all()
-                .collect { add(Role(it["ROLE"].toString())) }
+                .collect { add(Role(it["role"].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()
@@ -81,12 +82,13 @@ class UserDaoTests {
 
     suspend fun ApplicationContext.findAuthsByLogin(login: String): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
+            @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`login` = :login")
+                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."login" = :login""")
                 .bind("login", login)
                 .fetch()
                 .all()
-                .collect { add(Role(it["ROLE"].toString())) }
+                .collect { add(Role(it["role"].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()
@@ -105,12 +107,15 @@ class UserDaoTests {
 
     suspend fun ApplicationContext.findAuthsById(userId: UUID): Either<Throwable, Set<Role>> = try {
         mutableSetOf<Role>().apply {
+            @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("SELECT `ua`.`role` FROM `user` as `u` JOIN `user_authority` as `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`id` = :userId")
+                .sql(
+                    """SELECT ua."role" FROM "user" as u JOIN user_authority as ua ON u.id = ua.user_id WHERE u.id = :userId"""
+                )
                 .bind("userId", userId)
                 .fetch()
                 .all()
-                .collect { add(Role(it["ROLE"].toString())) }
+                .collect { add(Role(it["role"].toString())) }
         }.toSet().right()
     } catch (e: Throwable) {
         e.left()
@@ -332,14 +337,15 @@ class UserDaoTests {
             assertEquals(0, countUserAuthBefore)
             val resultRoles = mutableSetOf<String>()
             (user to context).signup()
+            @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("SELECT `ua`.`role` FROM `user` `u` JOIN `user_authority` `ua` ON `u`.`id` = `ua`.`user_id` WHERE `u`.`email` = :email")
+                .sql("""SELECT ua."role" FROM "user" u JOIN user_authority ua ON u.id = ua.user_id WHERE u."email" = :email""")
                 .bind("email", user.email)
                 .fetch()
                 .all()
                 .collect { rows ->
-                    assertEquals(rows["ROLE"], ROLE_USER)
-                    resultRoles.add(rows["ROLE"].toString())
+                    assertEquals(rows["role"], ROLE_USER)
+                    resultRoles.add(rows["role"].toString())
                 }
             assertEquals(ROLE_USER, resultRoles.first())
             assertEquals(ROLE_USER, resultRoles.first())
@@ -360,14 +366,15 @@ class UserDaoTests {
             assertTrue(isRight())
             assertFalse(isLeft())
         }.onRight { uuid ->
+            @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("SELECT `ur`.`role` FROM `user_authority` AS `ur` WHERE `ur`.`user_id` = :userId")
+                .sql("""SELECT ur."role" FROM user_authority AS ur WHERE ur.user_id = :userId""")
                 .bind("userId", uuid)
                 .fetch()
                 .all()
                 .collect { rows ->
-                    assertEquals(rows["ROLE"], ROLE_USER)
-                    resultRoles.add(Role(id = rows["ROLE"].toString()))
+                    assertEquals(rows["role"], ROLE_USER)
+                    resultRoles.add(Role(id = rows["role"].toString()))
                 }
             assertEquals(
                 ROLE_USER,
@@ -398,12 +405,13 @@ class UserDaoTests {
         }
         assertEquals(1, context.countUsers())
         assertDoesNotThrow {
+            @Suppress("SqlResolve")
             context.getBean<R2dbcEntityTemplate>()
                 .databaseClient
-                .sql("SELECT * FROM `user`")
+                .sql("""SELECT * FROM "user";""")
                 .fetch()
                 .all()
-                .collect { it["ID"].toString().run(UUID::fromString) }
+                .collect { it["id"].toString().run(UUID::fromString) }
         }
     }
 
@@ -423,7 +431,7 @@ class UserDaoTests {
             .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
             .fetch()
             .one()
-            .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+            .awaitSingle()[UserDao.Attributes.ID_ATTR]
             .toString()
             .run(UUID::fromString)
         context.getBean<DatabaseClient>()
@@ -434,7 +442,12 @@ class UserDaoTests {
             .one()
             .awaitSingleOrNull()
         context.getBean<DatabaseClient>()
-            .sql("SELECT ua.${UserRoleDao.Fields.ID_FIELD} FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua where ua.`user_id`= :userId and ua.`role` = :role")
+            .sql(
+                """
+                SELECT ua.${UserRoleDao.Fields.ID_FIELD} 
+                FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua 
+                where ua.user_id= :userId and ua."role" = :role""".trimIndent()
+            )
             .bind("userId", userId)
             .bind("role", ROLE_USER)
             .fetch()
@@ -513,7 +526,7 @@ class UserDaoTests {
                 .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
                 .fetch()
                 .one()
-                .awaitSingle()[UserDao.Attributes.ID_ATTR.uppercase()]
+                .awaitSingle()[UserDao.Attributes.ID_ATTR]
                 .toString()
                 .run(UUID::fromString)
                 .run { i("UserId : $this") }

@@ -18,16 +18,16 @@ import java.util.*
 @Suppress("unused")
 object UserRoleDao {
 
-   object Fields {
+    object Fields {
         const val ID_FIELD = "id"
         const val USER_ID_FIELD = "user_id"
         const val ROLE_FIELD = RoleDao.Fields.ID_FIELD
     }
 
     object Attributes {
-        val ID_ATTR = Fields.ID_FIELD
+        const val ID_ATTR = Fields.ID_FIELD
         const val USER_ID_ATTR = "userId"
-        val ROLE_ATTR = ROLE_FIELD
+        const val ROLE_ATTR = ROLE_FIELD
     }
 
     object Relations {
@@ -50,10 +50,10 @@ object UserRoleDao {
     CREATE UNIQUE INDEX IF NOT EXISTS uniq_idx_user_authority
     ON $TABLE_NAME ("$ROLE_FIELD", $USER_ID_FIELD);
 """
-        val INSERT = """
+       const val INSERT = """
             INSERT INTO $TABLE_NAME ($USER_ID_FIELD,"${RoleDao.Fields.ID_FIELD}")
             VALUES (:${Attributes.USER_ID_ATTR}, :${Attributes.ROLE_ATTR})
-            """.trimIndent()
+            """
     }
 
     object Dao {
@@ -64,7 +64,7 @@ object UserRoleDao {
                 .bind(Attributes.ROLE_ATTR, first.role)
                 .fetch()
                 .one()
-                .collect { it[Fields.ID_FIELD.uppercase()] }
+                .collect { it[Fields.ID_FIELD] }
                 .toString()
                 .toLong()
                 .right()
@@ -94,7 +94,7 @@ object UserRoleDao {
                 .await()
 
         suspend fun ApplicationContext.deleteAuthorityByRole(role: String): Unit =
-           """delete from authority as a where upper(a."${RoleDao.Fields.ID_FIELD}") = upper(:role)"""
+            """delete from authority as a where upper(a."${RoleDao.Fields.ID_FIELD}") = upper(:role)"""
                 .let(getBean<DatabaseClient>()::sql)
                 .bind("role", role)
                 .await()
@@ -105,22 +105,23 @@ object UserRoleDao {
                     .let(::sql)
                     .bind("userId", id)
                     .await()
-               """delete from "user" as u where u.${UserDao.Fields.ID_FIELD} = :userId"""
+                """delete from "user" as u where u.${UserDao.Fields.ID_FIELD} = :userId"""
                     .let(::sql)
                     .await()
             }
 
         val ApplicationContext.queryDeleteAllUserAuthorityByUserLogin
-            get() =
-              """delete from user_authority where user_id = (select u.id from "user" as u where u."login" = :login);"""
+            get() = """delete from user_authority 
+                    |where user_id = (
+                    |select u.id from "user" as u where u."login" = :login
+                    |);""".trimMargin()
 
         suspend fun ApplicationContext.deleteAllUserAuthorityByUserLogin(
             login: String
-        ): Unit =
-            getBean<DatabaseClient>()
-                .sql(queryDeleteAllUserAuthorityByUserLogin)
-                .bind("login", login)
-                .await()
+        ): Unit = getBean<DatabaseClient>()
+            .sql(queryDeleteAllUserAuthorityByUserLogin)
+            .bind("login", login)
+            .await()
 
 
 //            val Pair<User, ApplicationContext>.toJson: String

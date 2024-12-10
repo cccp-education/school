@@ -36,8 +36,6 @@ data class User(
     @JsonIgnore
     val version: Long = 0,
 ) : EntityModel<UUID>() {
-
-
     companion object {
         val USERCLASS = User::class.java
 

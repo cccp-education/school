@@ -14,7 +14,7 @@ import org.springframework.r2dbc.core.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import users.signup.UserActivationDao.Dao.save
+import users.signup.activation.UserActivationDao.Dao.save
 import users.UserDao.Attributes.EMAIL_ATTR
 import users.UserDao.Attributes.ID_ATTR
 import users.UserDao.Attributes.LANG_KEY_ATTR
@@ -44,11 +44,12 @@ import users.security.UserRole
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.signup
 import users.signup.Signup
-import users.signup.UserActivation
-import users.signup.UserActivationDao
+import users.signup.activation.UserActivation
+import users.signup.activation.UserActivationDao
 import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
+import java.util.UUID.fromString
 
 object UserDao {
     @JvmStatic
@@ -201,7 +202,7 @@ object UserDao {
                 .bind(LANG_KEY_ATTR, first.langKey)
                 .bind(VERSION_ATTR, first.version)
                 .fetch()
-                .awaitOne()[ID_ATTR.uppercase()]
+                .awaitOne()[ID_ATTR]
                 .toString()
                 .run(UUID::fromString)
                 .right()
@@ -232,7 +233,7 @@ object UserDao {
                     .awaitSingle()
                     .let {
                         User(
-                            id = it[ID_FIELD] as UUID,
+                            id = fromString(it[ID_FIELD].toString()),
                             email = if ((emailOrLogin to this).isEmail()) emailOrLogin else it[EMAIL_FIELD].toString(),
                             login = if ((emailOrLogin to this).isLogin()) emailOrLogin else it[LOGIN_FIELD].toString(),
                             password = it[PASSWORD_FIELD].toString(),
@@ -262,7 +263,7 @@ object UserDao {
                     .awaitSingleOrNull()
                     .let {
                         User(
-                            id = it?.get(ID_FIELD.uppercase())
+                            id = it?.get(ID_FIELD)
                                 .toString()
                                 .run(UUID::fromString),
                             email = it?.get(EMAIL_FIELD).toString(),
@@ -324,7 +325,7 @@ object UserDao {
                                 when {
                                     this == null -> Exception("not able to retrieve user id and roles").left()
                                     else -> User(
-                                        id = UUID.fromString(get("id").toString()),
+                                        id = fromString(get("id").toString()),
                                         email = get("email").toString(),
                                         login = get("login").toString(),
                                         roles = get("roles")
@@ -359,7 +360,7 @@ object UserDao {
                             .bind(LOGIN_ATTR, login)
                             .fetch()
                             .awaitOne()
-                            .let { it["id"] as UUID }.right()
+                            .let { fromString(it["id"].toString()) }.right()
                     } catch (e: Throwable) {
                         e.left()
                     }
@@ -379,7 +380,7 @@ object UserDao {
                             .bind(EMAIL_ATTR, email)
                             .fetch()
                             .awaitOne()
-                            .let { it["id"] as UUID }
+                            .let { fromString(it["id"].toString()) }
                             .right()
                     } catch (e: Throwable) {
                         e.left()
@@ -429,9 +430,9 @@ object UserDao {
                 .awaitSingle()
                 .run {
                     Triple(
-                        parseBoolean(this[LOGIN_AND_EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
-                        parseBoolean(this[EMAIL_AVAILABLE_COLUMN.uppercase()].toString()),
-                        parseBoolean(this[LOGIN_AVAILABLE_COLUMN.uppercase()].toString())
+                        parseBoolean(this[LOGIN_AND_EMAIL_AVAILABLE_COLUMN].toString()),
+                        parseBoolean(this[EMAIL_AVAILABLE_COLUMN].toString()),
+                        parseBoolean(this[LOGIN_AVAILABLE_COLUMN].toString())
                     ).right()
                 }
         } catch (e: Throwable) {

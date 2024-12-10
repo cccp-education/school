@@ -1,7 +1,7 @@
-package users.signup
+package users.signup.activation
 
-import users.security.SecurityUtils
 import jakarta.validation.constraints.Size
+import users.security.SecurityUtils
 import java.time.Instant
 import java.util.*
 

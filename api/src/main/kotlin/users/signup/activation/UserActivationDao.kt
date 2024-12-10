@@ -1,4 +1,4 @@
-package users.signup
+package users.signup.activation
 
 import arrow.core.Either
 import arrow.core.left
@@ -9,21 +9,19 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
 import users.UserDao
-import users.signup.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
-import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
-import users.signup.UserActivationDao.Attributes.CREATED_DATE_ATTR
-import users.signup.UserActivationDao.Attributes.ID_ATTR
-import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
-import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
-import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
-import users.signup.UserActivationDao.Fields.ID_FIELD
-import users.signup.UserActivationDao.Relations.INSERT
-import users.signup.UserActivationDao.Relations.TABLE_NAME
+import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
+import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.activation.UserActivationDao.Attributes.CREATED_DATE_ATTR
+import users.signup.activation.UserActivationDao.Attributes.ID_ATTR
+import users.signup.activation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import users.signup.activation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import users.signup.activation.UserActivationDao.Fields.CREATED_DATE_FIELD
+import users.signup.activation.UserActivationDao.Fields.ID_FIELD
+import users.signup.activation.UserActivationDao.Relations.INSERT
+import users.signup.activation.UserActivationDao.Relations.TABLE_NAME
 import java.time.LocalDateTime
-import java.time.LocalDateTime.parse
-import java.time.ZoneOffset.UTC
+import java.time.ZoneOffset
 import java.util.*
-import users.UserDao.Relations.TABLE_NAME as USER
 
 object UserActivationDao {
 
@@ -52,7 +50,7 @@ object UserActivationDao {
         $ACTIVATION_KEY_FIELD VARCHAR,
         $CREATED_DATE_FIELD TIMESTAMP,
         $ACTIVATION_DATE_FIELD TIMESTAMP,
-        FOREIGN KEY ($ID_FIELD) REFERENCES "$USER" ($ID_FIELD)
+        FOREIGN KEY ($ID_FIELD) REFERENCES "${UserDao.Relations.TABLE_NAME}" ($ID_FIELD)
         ON DELETE CASCADE
         ON UPDATE CASCADE
         );
@@ -116,14 +114,14 @@ object UserActivationDao {
                     return when (it) {
                         null -> EmptyResultDataAccessException(1).left()
                         else -> UserActivation(
-                            id = it[ID_FIELD.uppercase()].toString().run(UUID::fromString),
-                            activationKey = it[ACTIVATION_KEY_FIELD.uppercase()].toString(),
-                            createdDate = parse(it[CREATED_DATE_FIELD.uppercase()].toString())
-                                .toInstant(UTC),
-                            activationDate = it[ACTIVATION_DATE_FIELD.uppercase()].run {
+                            id = it[ID_FIELD].toString().run(UUID::fromString),
+                            activationKey = it[ACTIVATION_KEY_FIELD].toString(),
+                            createdDate = LocalDateTime.parse(it[CREATED_DATE_FIELD].toString())
+                                .toInstant(ZoneOffset.UTC),
+                            activationDate = it[ACTIVATION_DATE_FIELD].run {
                                 when {
                                     this == null || toString().lowercase() == "null" -> null
-                                    else -> toString().run(LocalDateTime::parse).toInstant(UTC)
+                                    else -> toString().run(LocalDateTime::parse).toInstant(ZoneOffset.UTC)
                                 }
                             },
                         ).right()
