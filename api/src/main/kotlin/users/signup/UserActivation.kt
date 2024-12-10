@@ -1,4 +1,4 @@
-package users.signup.activation
+package users.signup
 
 import jakarta.validation.constraints.Size
 import users.security.SecurityUtils

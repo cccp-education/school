@@ -1,7 +1,7 @@
 package users
 
 import app.database.EntityModel
-import app.utils.Constants
+import app.utils.Constants.ROLE_USER
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -14,7 +14,6 @@ import org.springframework.r2dbc.core.*
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.reactive.TransactionalOperator
 import org.springframework.transaction.reactive.executeAndAwait
-import users.signup.activation.UserActivationDao.Dao.save
 import users.UserDao.Attributes.EMAIL_ATTR
 import users.UserDao.Attributes.ID_ATTR
 import users.UserDao.Attributes.LANG_KEY_ATTR
@@ -34,6 +33,7 @@ import users.UserDao.Relations.DELETE_USER_BY_ID
 import users.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
 import users.UserDao.Relations.FIND_USER_BY_ID
 import users.UserDao.Relations.FIND_USER_BY_LOGIN_OR_EMAIL
+import users.UserDao.Relations.INSERT
 import users.UserDao.Relations.LOGIN_AND_EMAIL_AVAILABLE_COLUMN
 import users.UserDao.Relations.LOGIN_AVAILABLE_COLUMN
 import users.UserDao.Relations.SELECT_SIGNUP_AVAILABILITY
@@ -44,16 +44,15 @@ import users.security.UserRole
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.signup
 import users.signup.Signup
-import users.signup.activation.UserActivation
-import users.signup.activation.UserActivationDao
+import users.signup.UserActivation
+import users.signup.UserActivationDao
+import users.signup.UserActivationDao.Dao.save
 import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
 import java.util.UUID.fromString
 
 object UserDao {
-    @JvmStatic
-    fun main(args: Array<String>): Unit = println(SELECT_SIGNUP_AVAILABILITY)
 
     object Constraints {
         // Regex for acceptable logins
@@ -194,7 +193,7 @@ object UserDao {
 
         @Throws(EmptyResultDataAccessException::class)
         suspend fun Pair<User, ApplicationContext>.save(): Either<Throwable, UUID> = try {
-            Relations.INSERT
+            INSERT
                 .run(second.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)
@@ -398,7 +397,7 @@ object UserDao {
             second.findOneByEmail<User>(first.email).mapLeft {
                 return Exception("Unable to find user by email").left()
             }.map {
-                (UserRole(userId = it, role = Constants.ROLE_USER) to second).signup()
+                (UserRole(userId = it, role = ROLE_USER) to second).signup()
                 (UserActivation(id = it) to second).save()
                 return it.right()
             }
@@ -423,7 +422,7 @@ object UserDao {
             second
                 .getBean<R2dbcEntityTemplate>()
                 .databaseClient
-                .sql(SELECT_SIGNUP_AVAILABILITY.trimIndent())
+                .sql(SELECT_SIGNUP_AVAILABILITY)
                 .bind(LOGIN_ATTR, first.login)
                 .bind(EMAIL_ATTR, first.email)
                 .fetch()

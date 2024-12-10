@@ -45,9 +45,10 @@ import users.security.Role
 import users.security.RoleDao.Dao.countRoles
 import users.security.UserRoleDao
 import users.security.UserRoleDao.Dao.countUserAuthority
-import users.signup.activation.UserActivation
-import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
-import users.signup.activation.UserActivationDao.Dao.countUserActivation
+import users.signup.UserActivation
+import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.UserActivationDao.Dao.countUserActivation
+import users.signup.UserActivationDao.Dao.findUserActivationByKey
 import workspace.Log.i
 import java.util.*
 import java.util.UUID.fromString
@@ -70,12 +71,14 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("""
+                .sql(
+                    """
                     SELECT ua."role" 
                     FROM "user" u 
                     JOIN user_authority ua 
                     ON u.id = ua.user_id 
-                    WHERE u."email" = :email;""")
+                    WHERE u."email" = :email;"""
+                )
                 .bind("email", email)
                 .fetch()
                 .all()
@@ -89,12 +92,14 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("""
+                .sql(
+                    """
                     SELECT ua."role" 
                     FROM "user" u 
                     JOIN user_authority ua 
                     ON u.id = ua.user_id 
-                    WHERE u."login" = :login;""")
+                    WHERE u."login" = :login;"""
+                )
                 .bind("login", login)
                 .fetch()
                 .all()
@@ -119,12 +124,14 @@ class UserDaoTests {
         mutableSetOf<Role>().apply {
             @Suppress("SqlResolve")
             getBean<DatabaseClient>()
-                .sql("""
+                .sql(
+                    """
                     SELECT ua."role" 
                     FROM "user" as u 
                     JOIN user_authority as ua 
                     ON u.id = ua.user_id 
-                    WHERE u.id = :userId;""")
+                    WHERE u.id = :userId;"""
+                )
                 .bind("userId", userId)
                 .fetch()
                 .all()
@@ -352,12 +359,14 @@ class UserDaoTests {
             (user to context).signup()
             @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("""
+                .sql(
+                    """
                     SELECT ua."role" 
                     FROM "user" u 
                     JOIN user_authority ua 
                     ON u.id = ua.user_id 
-                    WHERE u."email" = :email;""")
+                    WHERE u."email" = :email;"""
+                )
                 .bind("email", user.email)
                 .fetch()
                 .all()
@@ -386,10 +395,12 @@ class UserDaoTests {
         }.onRight { uuid ->
             @Suppress("SqlResolve")
             context.getBean<DatabaseClient>()
-                .sql("""
+                .sql(
+                    """
                     SELECT ur."role" 
                     FROM user_authority AS ur 
-                    WHERE ur.user_id = :userId""")
+                    WHERE ur.user_id = :userId"""
+                )
                 .bind("userId", uuid)
                 .fetch()
                 .all()
@@ -463,10 +474,12 @@ class UserDaoTests {
             .one()
             .awaitSingleOrNull()
         context.getBean<DatabaseClient>()
-            .sql("""
+            .sql(
+                """
                 SELECT ua.${UserRoleDao.Fields.ID_FIELD} 
                 FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua 
-                where ua.user_id= :userId and ua."role" = :role""")
+                where ua.user_id= :userId and ua."role" = :role"""
+            )
             .bind("userId", userId)
             .bind("role", ROLE_USER)
             .fetch()
@@ -612,22 +625,27 @@ class UserDaoTests {
     }
 
     @Test
-    @Ignore
     fun `test find userActivation by key`(): Unit = runBlocking {
-        val countUserBefore = context.countUsers()
+
+        val countUserBefore = context.countUsers().apply { assertEquals(0, this) }
+
         val countUserAuthBefore = context.countUserAuthority()
         val countUserActivationBefore = context.countUserActivation()
         UserActivation(id = (user to context).signup().getOrNull()!!).run {
             assertEquals(countUserBefore + 1, context.countUsers())
             assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
             assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-            activationKey.isBlank().run(::assertFalse)
+            activationKey
+                .apply(::i)
+                .isBlank()
+                .run(::assertFalse)
 //            assertEquals(
 //                id,
 //                context.findUserActivationByKey(activationKey).getOrNull()!!.id
 //            )
+            context.findUserActivationByKey(activationKey).getOrNull().toString().run(::i)
             // BabyStepping to find an implementation and debugging
-            assertDoesNotThrow {
+//            assertDoesNotThrow {
 //                id.toString().run(::i)
 //                activationKey.run(::i)
 //                context.getBean<TransactionalOperator>().executeAndAwait {
@@ -635,50 +653,50 @@ class UserDaoTests {
 //                        SELECT * FROM ${UserActivationDao.Relations.TABLE_NAME}
 //                        WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR
 //                        """.trimIndent()
-                """
-                        SELECT * FROM user_activation
-                        WHERE activation_key = :$ACTIVATION_KEY_ATTR
-                        """.trimIndent()
-                    .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-                    .bind(ACTIVATION_KEY_ATTR, activationKey)
-                    .fetch()
-                    .awaitSingle()
-                    .apply(::assertNotNull)
-                    .apply { toString().run(::i) }
-                    .let {
-//                        UserActivation(
-//                            id = UserActivationDao.Fields.ID_FIELD
-//                                .cleanField()
-//                                .uppercase()
-//                                .run(it::get)
-//                                .toString()
-//                                .run(UUID::fromString),
-//                            activationKey = ACTIVATION_KEY_FIELD
-//                                .cleanField()
-//                                .uppercase()
-//                                .run(it::get)
-//                                .toString(),
-//                            createdDate = CREATED_DATE_FIELD
-//                                .cleanField()
-//                                .uppercase()
-//                                .run(it::get)
-//                                .toString()
-//                                .run(java.time.LocalDateTime::parse)
-//                                .toInstant(java.time.ZoneOffset.UTC),
-//                            activationDate = ACTIVATION_DATE_FIELD
-//                                .cleanField()
-//                                .uppercase()
-//                                .run(it::get)
-//                                .run {
-//                                    when {
-//                                        this == null || toString().lowercase() == "null" -> null
-//                                        else -> toString().run(java.time.LocalDateTime::parse).toInstant(java.time.ZoneOffset.UTC)
-//                                    }
-//                                },
-//                        )
-                    }
-                    .toString().run(::i)
-            }
+//                """
+//                        SELECT * FROM user_activation
+//                        WHERE activation_key = :$ACTIVATION_KEY_ATTR
+//                        """.trimIndent()
+//                    .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+//                    .bind(ACTIVATION_KEY_ATTR, activationKey)
+//                    .fetch()
+//                    .awaitSingle()
+//                    .apply(::assertNotNull)
+//                    .apply { toString().run(::i) }
+//                    .let {
+////                        UserActivation(
+////                            id = UserActivationDao.Fields.ID_FIELD
+////                                .cleanField()
+////                                .uppercase()
+////                                .run(it::get)
+////                                .toString()
+////                                .run(UUID::fromString),
+////                            activationKey = ACTIVATION_KEY_FIELD
+////                                .cleanField()
+////                                .uppercase()
+////                                .run(it::get)
+////                                .toString(),
+////                            createdDate = CREATED_DATE_FIELD
+////                                .cleanField()
+////                                .uppercase()
+////                                .run(it::get)
+////                                .toString()
+////                                .run(java.time.LocalDateTime::parse)
+////                                .toInstant(java.time.ZoneOffset.UTC),
+////                            activationDate = ACTIVATION_DATE_FIELD
+////                                .cleanField()
+////                                .uppercase()
+////                                .run(it::get)
+////                                .run {
+////                                    when {
+////                                        this == null || toString().lowercase() == "null" -> null
+////                                        else -> toString().run(java.time.LocalDateTime::parse).toInstant(java.time.ZoneOffset.UTC)
+////                                    }
+////                                },
+////                        )
+//                    }
+//                    .toString().run(::i)
+//            }
         }
     }
 }

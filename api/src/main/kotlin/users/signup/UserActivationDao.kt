@@ -1,4 +1,4 @@
-package users.signup.activation
+package users.signup
 
 import arrow.core.Either
 import arrow.core.left
@@ -9,18 +9,19 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.*
 import users.UserDao
-import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
-import users.signup.activation.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
-import users.signup.activation.UserActivationDao.Attributes.CREATED_DATE_ATTR
-import users.signup.activation.UserActivationDao.Attributes.ID_ATTR
-import users.signup.activation.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
-import users.signup.activation.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
-import users.signup.activation.UserActivationDao.Fields.CREATED_DATE_FIELD
-import users.signup.activation.UserActivationDao.Fields.ID_FIELD
-import users.signup.activation.UserActivationDao.Relations.INSERT
-import users.signup.activation.UserActivationDao.Relations.TABLE_NAME
+import users.signup.UserActivationDao.Attributes.ACTIVATION_DATE_ATTR
+import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.UserActivationDao.Attributes.CREATED_DATE_ATTR
+import users.signup.UserActivationDao.Attributes.ID_ATTR
+import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
+import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
+import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
+import users.signup.UserActivationDao.Fields.ID_FIELD
+import users.signup.UserActivationDao.Relations.INSERT
+import users.signup.UserActivationDao.Relations.TABLE_NAME
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.LocalDateTime.parse
+import java.time.ZoneOffset.UTC
 import java.util.*
 
 object UserActivationDao {
@@ -45,7 +46,7 @@ object UserActivationDao {
         @Suppress("MemberVisibilityCanBePrivate")
         const val TABLE_NAME = "user_activation"
         const val SQL_SCRIPT = """
-        CREATE TABLE IF NOT EXISTS $TABLE_NAME (
+        CREATE TABLE IF NOT EXISTS "$TABLE_NAME" (
         $ID_FIELD UUID PRIMARY KEY,
         $ACTIVATION_KEY_FIELD VARCHAR,
         $CREATED_DATE_FIELD TIMESTAMP,
@@ -104,10 +105,11 @@ object UserActivationDao {
         @Throws(EmptyResultDataAccessException::class)
         suspend fun ApplicationContext.findUserActivationByKey(key: String)
                 : Either<Throwable, UserActivation> = try {
-            "SELECT * FROM $TABLE_NAME WHERE $ACTIVATION_KEY_FIELD = :$ACTIVATION_KEY_ATTR;"
-                .trimIndent()
+//            """SELECT * FROM "$TABLE_NAME" as ua
+//              WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;"""
+            """SELECT * FROM "$TABLE_NAME" as ua;"""
                 .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
-                .bind(ACTIVATION_KEY_ATTR, key)
+//                .bind(ACTIVATION_KEY_ATTR, key)
                 .fetch()
                 .awaitSingleOrNull()
                 .let {
@@ -116,12 +118,12 @@ object UserActivationDao {
                         else -> UserActivation(
                             id = it[ID_FIELD].toString().run(UUID::fromString),
                             activationKey = it[ACTIVATION_KEY_FIELD].toString(),
-                            createdDate = LocalDateTime.parse(it[CREATED_DATE_FIELD].toString())
-                                .toInstant(ZoneOffset.UTC),
+                            createdDate = parse(it[CREATED_DATE_FIELD].toString())
+                                .toInstant(UTC),
                             activationDate = it[ACTIVATION_DATE_FIELD].run {
                                 when {
                                     this == null || toString().lowercase() == "null" -> null
-                                    else -> toString().run(LocalDateTime::parse).toInstant(ZoneOffset.UTC)
+                                    else -> toString().run(LocalDateTime::parse).toInstant(UTC)
                                 }
                             },
                         ).right()
