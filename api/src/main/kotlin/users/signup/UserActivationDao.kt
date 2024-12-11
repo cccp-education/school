@@ -115,8 +115,6 @@ object UserActivationDao {
             e.left()
         }
 
-
-        @Throws(EmptyResultDataAccessException::class)
         suspend fun ApplicationContext.activateUser(key: String): Either<Throwable, Long> = try {
             UPDATE_ACTIVATION_BY_KEY
                 .trimIndent()

@@ -30,9 +30,7 @@ import workspace.Log.i
 
 @Service
 class SignupService(private val context: ApplicationContext) {
-
-
-    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+   suspend fun signup(signup: Signup): Either<Throwable, User> = try {
         context.signupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
