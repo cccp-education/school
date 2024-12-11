@@ -51,8 +51,7 @@ object UserActivationDao {
         $CREATED_DATE_FIELD TIMESTAMP,
         $ACTIVATION_DATE_FIELD TIMESTAMP,
         FOREIGN KEY ($ID_FIELD) REFERENCES "${UserDao.Relations.TABLE_NAME}" ($ID_FIELD)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE
         );
 
         CREATE UNIQUE INDEX IF NOT EXISTS uniq_idx_user_activation_key
@@ -68,8 +67,11 @@ object UserActivationDao {
 
         const val INSERT = """
         INSERT INTO $TABLE_NAME (
-        $ID_FIELD, $ACTIVATION_KEY_FIELD, $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
-        VALUES (:$ID_ATTR, :$ACTIVATION_KEY_ATTR, :$CREATED_DATE_ATTR, :$ACTIVATION_DATE_ATTR);
+            $ID_FIELD, $ACTIVATION_KEY_FIELD, 
+            $CREATED_DATE_FIELD, $ACTIVATION_DATE_FIELD)
+        VALUES (
+            :$ID_ATTR, :$ACTIVATION_KEY_ATTR, 
+            :$CREATED_DATE_ATTR, :$ACTIVATION_DATE_ATTR);
         """
 
         const val FIND_BY_ACTIVATION_KEY = """
@@ -77,12 +79,13 @@ object UserActivationDao {
         WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;
         """
 
-        const val FIND_ALL_USERACTIVATION = """select * from user_activation;"""
+        const val FIND_ALL_USERACTIVATION = """SELECT * FROM "$TABLE_NAME";"""
 
         const val UPDATE_ACTIVATION_BY_KEY = """
-        UPDATE "user_activation" 
-        SET "activation_date" = NOW()  
-        WHERE "activation_key" = :activationKey            
+        UPDATE "$TABLE_NAME" 
+        SET "$ACTIVATION_DATE_FIELD" = NOW() 
+        WHERE "$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR 
+        AND "$ACTIVATION_DATE_FIELD" IS NULL;
         """
     }
 
@@ -118,6 +121,10 @@ object UserActivationDao {
             e.left()
         }
 
+        /**
+         * If the Right value (the result of the database operation) is not equal to 1,
+         * then either the key doesn't exist, or the user is already activated.
+         */
         suspend fun ApplicationContext.activateUser(key: String): Either<Throwable, Long> = try {
             UPDATE_ACTIVATION_BY_KEY
                 .trimIndent()
@@ -129,7 +136,5 @@ object UserActivationDao {
         } catch (e: Throwable) {
             e.left()
         }
-//        TODO: `test activateUser return triple isSuccess(ok) isKeyExists(keysdoesnotexistsexception 404) isAlreadyActivated(alreadyactivativatedexception already consumed)`
-
     }
 }

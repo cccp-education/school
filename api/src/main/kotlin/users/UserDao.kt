@@ -33,6 +33,7 @@ import users.UserDao.Fields.PASSWORD_FIELD
 import users.UserDao.Fields.VERSION_FIELD
 import users.UserDao.Members.ROLES_MEMBER
 import users.UserDao.Relations.COUNT
+import users.UserDao.Relations.CREATE_TABLES
 import users.UserDao.Relations.DELETE_USER
 import users.UserDao.Relations.DELETE_USER_BY_ID
 import users.UserDao.Relations.EMAIL_AVAILABLE_COLUMN
@@ -54,12 +55,18 @@ import users.signup.Signup
 import users.signup.UserActivation
 import users.signup.UserActivationDao
 import users.signup.UserActivationDao.Dao.save
+import workspace.Log.i
 import java.lang.Boolean.parseBoolean
 import java.lang.Long.getLong
 import java.util.*
 import java.util.UUID.fromString
 
 object UserDao {
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        CREATE_TABLES.run { "CREATE_TABLES: $this" }.run(::i)
+    }
 
     object Constraints {
         // Regex for acceptable logins
