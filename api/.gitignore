@@ -1,8 +1,6 @@
 .ideaDataSources
 dataSources
 server.log
-spring-cli-standalone
-spring-cli-standalone-0.9.0-SNAPSHOT-linux.x86_64.zip
 # Project exclude paths
 e3p0.yaml
 e-3po.yaml
