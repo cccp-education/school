@@ -54,6 +54,7 @@ import users.UserDao.Dao.findOneWithAuths
 import users.UserDao.Dao.save
 import users.UserDao.Dao.signup
 import users.UserDao.Dao.signupAvailability
+import users.UserDao.Relations.FIND_ALL_USERS
 import users.UserDao.Relations.FIND_USER_BY_LOGIN
 import users.security.Role
 import users.security.RoleDao
@@ -390,7 +391,7 @@ class DaoTests {
         }
         assertEquals(1, context.countUsers())
         assertDoesNotThrow {
-            """SELECT * FROM "user";"""
+            FIND_ALL_USERS
                 .trimIndent()
                 .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
                 .fetch()

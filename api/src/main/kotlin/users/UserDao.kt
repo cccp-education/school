@@ -119,6 +119,7 @@ object UserDao {
         CREATE UNIQUE INDEX IF NOT EXISTS "uniq_idx_user_login" ON "$TABLE_NAME" ("$LOGIN_FIELD");
         CREATE UNIQUE INDEX IF NOT EXISTS "uniq_idx_user_email" ON "$TABLE_NAME" ("$EMAIL_FIELD");
         """
+        const val FIND_ALL_USERS = """SELECT * FROM "user";"""
 
         @Suppress("SqlDialectInspection")
         const val INSERT = """
