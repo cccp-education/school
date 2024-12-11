@@ -41,6 +41,7 @@ import users.TestUtils.findAuthsByEmail
 import users.TestUtils.findAuthsByLogin
 import users.TestUtils.findUserActivationByKey
 import users.TestUtils.findUserById
+import users.TestUtils.tripleCounts
 import users.UserDao.Attributes.EMAIL_ATTR
 import users.UserDao.Attributes.LOGIN_ATTR
 import users.UserDao.Attributes.PASSWORD_ATTR
@@ -68,10 +69,12 @@ import users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
 import users.signup.UserActivation
 import users.signup.UserActivationDao
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.UserActivationDao.Dao.activateUser
 import users.signup.UserActivationDao.Dao.countUserActivation
 import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
+import users.signup.UserActivationDao.Relations.FIND_ALL_USERACTIVATION
 import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import workspace.Log.i
 import java.time.LocalDateTime
@@ -345,14 +348,12 @@ class DaoTests {
             assertTrue(isRight())
             assertFalse(isLeft())
         }.onRight { signupResult ->
-            @Suppress("SqlResolve")
-            context.getBean<DatabaseClient>()
-                .sql(
-                    """
-                    SELECT ur."role" 
-                    FROM user_authority AS ur 
-                    WHERE ur.user_id = :userId"""
-                )
+            """
+            SELECT ur."role" 
+            FROM user_authority AS ur 
+            WHERE ur.user_id = :userId"""
+                .trimIndent()
+                .run(context.getBean<DatabaseClient>()::sql)
                 .bind(UserRoleDao.Attributes.USER_ID_ATTR, signupResult.first)
                 .fetch()
                 .all()
@@ -409,14 +410,15 @@ class DaoTests {
         userSaveResult//TODO: Problem with the either result do not return the user id but persist it on database
             .map { i("on passe ici!") }
             .mapLeft { i("on passe par la!") }
-        @Suppress("SqlSourceToSinkFlow")
+
         val userId = context.getBean<DatabaseClient>().sql(FIND_USER_BY_LOGIN)
-            .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+            .bind(LOGIN_ATTR, user.login.lowercase())
             .fetch()
             .one()
             .awaitSingle()[UserDao.Attributes.ID_ATTR]
             .toString()
             .run(UUID::fromString)
+
         context.getBean<DatabaseClient>()
             .sql(UserRoleDao.Relations.INSERT)
             .bind(UserRoleDao.Attributes.USER_ID_ATTR, userId)
@@ -424,13 +426,13 @@ class DaoTests {
             .fetch()
             .one()
             .awaitSingleOrNull()
-        context.getBean<DatabaseClient>()
-            .sql(
-                """
-                SELECT ua.${UserRoleDao.Fields.ID_FIELD} 
-                FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua 
-                where ua.user_id= :userId and ua."role" = :role"""
-            )
+
+        """
+        SELECT ua.${UserRoleDao.Fields.ID_FIELD} 
+        FROM ${UserRoleDao.Relations.TABLE_NAME} AS ua 
+        where ua.user_id= :userId and ua."role" = :role"""
+            .trimIndent()
+            .run(context.getBean<DatabaseClient>()::sql)
             .bind("userId", userId)
             .bind("role", ROLE_USER)
             .fetch()
@@ -439,6 +441,7 @@ class DaoTests {
             .toString()
             .let { "user_role_id : $it" }
             .run(::i)
+
         assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
@@ -506,7 +509,7 @@ class DaoTests {
         assertDoesNotThrow {
             FIND_USER_BY_LOGIN
                 .run(context.getBean<DatabaseClient>()::sql)
-                .bind(UserDao.Attributes.LOGIN_ATTR, user.login.lowercase())
+                .bind(LOGIN_ATTR, user.login.lowercase())
                 .fetch()
                 .one()
                 .awaitSingle()[UserDao.Attributes.ID_ATTR]
@@ -525,7 +528,6 @@ class DaoTests {
         )
     }
 
-    //TODO: move this test RoleDaoTests
     @Test
     fun `count roles, expected 3`(): Unit = runBlocking {
         context.run {
@@ -608,7 +610,6 @@ class DaoTests {
         assertEquals(0, context.countUsers())
         (user to context).save()
         assertEquals(1, context.countUsers())
-
         (Signup(
             user.login,
             "password",
@@ -637,75 +638,111 @@ class DaoTests {
 
     @Test
     fun `test create userActivation inside signup`(): Unit = runBlocking {
-        val countUserBefore = context.countUsers()
-        val countUserAuthBefore = context.countUserAuthority()
-        val countUserActivationBefore = context.countUserActivation()
-        (user to context).signup().apply {
-            assertTrue(isRight())
-            assertFalse(isLeft())
+        context.tripleCounts().run {
+            (user to context).signup().apply {
+                assertTrue(isRight())
+                assertFalse(isLeft())
+            }
+            assertEquals(first + 1, context.countUsers())
+            assertEquals(second + 1, context.countUserActivation())
+            assertEquals(third + 1, context.countUserAuthority())
         }
-        assertEquals(countUserBefore + 1, context.countUsers())
-        assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-        assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
     }
 
     @Test
     fun `test find userActivation by key`(): Unit = runBlocking {
-        val countUserBefore = context.countUsers().apply { assertEquals(0, this) }
-        val countUserAuthBefore = context.countUserAuthority()
-        val countUserActivationBefore = context.countUserActivation()
-        (user to context).signup()
-            .getOrNull()!!
-            .run {
-                assertEquals(countUserBefore + 1, context.countUsers())
-                assertEquals(countUserAuthBefore + 1, context.countUserAuthority())
-                assertEquals(countUserActivationBefore + 1, context.countUserActivation())
-                second.apply(::i)
-                    .isBlank()
-                    .run(::assertFalse)
-                assertEquals(
-                    first,
-                    context.findUserActivationByKey(second).getOrNull()!!.id
-                )
-                context.findUserActivationByKey(second).getOrNull().toString().run(::i)
-                // BabyStepping to find an implementation and debugging
-                assertDoesNotThrow {
-                    first.toString().run(::i)
-                    second.run(::i)
-                    context.getBean<TransactionalOperator>().executeAndAwait {
-                        FIND_BY_ACTIVATION_KEY
-                            .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
-                            .bind(ACTIVATION_KEY_ATTR, second)
-                            .fetch()
-                            .awaitSingle()
-                            .apply(::assertNotNull)
-                            .apply { toString().run(::i) }
-                            .let {
-                                UserActivation(
-                                    id = UserActivationDao.Fields.ID_FIELD
-                                        .run(it::get)
-                                        .toString()
-                                        .run(UUID::fromString),
-                                    activationKey = ACTIVATION_KEY_FIELD
-                                        .run(it::get)
-                                        .toString(),
-                                    createdDate = CREATED_DATE_FIELD
-                                        .run(it::get)
-                                        .toString()
-                                        .run(LocalDateTime::parse)
-                                        .toInstant(UTC),
-                                    activationDate = ACTIVATION_DATE_FIELD
-                                        .run(it::get)
-                                        .run {
-                                            when {
-                                                this == null || toString().lowercase() == "null" -> null
-                                                else -> toString().run(LocalDateTime::parse).toInstant(UTC)
-                                            }
-                                        },
-                                )
-                            }.toString().run(::i)
+        context.tripleCounts().run counts@{
+            (user to context).signup()
+                .getOrNull()!!
+                .run {
+                    assertEquals(this@counts.first + 1, context.countUsers())
+                    assertEquals(this@counts.second + 1, context.countUserAuthority())
+                    assertEquals(third + 1, context.countUserActivation())
+                    second.apply(::i)
+                        .isBlank()
+                        .run(::assertFalse)
+                    assertEquals(
+                        first,
+                        context.findUserActivationByKey(second).getOrNull()!!.id
+                    )
+                    context.findUserActivationByKey(second).getOrNull().toString().run(::i)
+                    // BabyStepping to find an implementation and debugging
+                    assertDoesNotThrow {
+                        first.toString().run(::i)
+                        second.run(::i)
+                        context.getBean<TransactionalOperator>().executeAndAwait {
+                            FIND_BY_ACTIVATION_KEY
+                                .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                                .bind(ACTIVATION_KEY_ATTR, second)
+                                .fetch()
+                                .awaitSingle()
+                                .apply(::assertNotNull)
+                                .apply { toString().run(::i) }
+                                .let {
+                                    UserActivation(
+                                        id = UserActivationDao.Fields.ID_FIELD
+                                            .run(it::get)
+                                            .toString()
+                                            .run(UUID::fromString),
+                                        activationKey = ACTIVATION_KEY_FIELD
+                                            .run(it::get)
+                                            .toString(),
+                                        createdDate = CREATED_DATE_FIELD
+                                            .run(it::get)
+                                            .toString()
+                                            .run(LocalDateTime::parse)
+                                            .toInstant(UTC),
+                                        activationDate = ACTIVATION_DATE_FIELD
+                                            .run(it::get)
+                                            .run {
+                                                when {
+                                                    this == null || toString().lowercase() == "null" -> null
+                                                    else -> toString().run(LocalDateTime::parse).toInstant(UTC)
+                                                }
+                                            },
+                                    )
+                                }.toString().run(::i)
+                        }
                     }
                 }
+        }
+    }
+
+    @Test
+    fun `test activate user by key`(): Unit = runBlocking {
+        context.tripleCounts().run counts@{
+            (user to context).signup().getOrNull()!!.run {
+                assertEquals(
+                    "null",
+                    FIND_ALL_USERACTIVATION
+                        .trimIndent()
+                        .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                        .fetch()
+                        .awaitSingleOrNull()!![ACTIVATION_DATE_FIELD]
+                        .toString()
+                        .lowercase()
+                )
+                assertEquals(this@counts.first + 1, context.countUsers())
+                assertEquals(this@counts.second + 1, context.countUserAuthority())
+                assertEquals(third + 1, context.countUserActivation())
+                "user.id : $first".run(::i)
+                "activation key : $second".run(::i)
+                assertEquals(1, context.activateUser(second).getOrNull()!!)
+                assertEquals(this@counts.first + 1, context.countUsers())
+                assertEquals(this@counts.second + 1, context.countUserAuthority())
+                assertEquals(third + 1, context.countUserActivation())
+                assertNotEquals(
+                    "null",
+                    FIND_ALL_USERACTIVATION
+                        .trimIndent()
+                        .run(context.getBean<R2dbcEntityTemplate>().databaseClient::sql)
+                        .fetch()
+                        .awaitSingleOrNull()!!
+                        .apply { "user_activation : $this".run(::i) }[ACTIVATION_DATE_FIELD]
+                        .toString()
+                        .lowercase()
+                )
             }
+        }
     }
 }

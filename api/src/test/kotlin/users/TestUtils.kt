@@ -23,11 +23,14 @@ import org.springframework.r2dbc.core.awaitSingleOrNull
 import users.TestUtils.Data.displayInsertUserScript
 import users.UserDao.Attributes.EMAIL_ATTR
 import users.UserDao.Attributes.LOGIN_ATTR
+import users.UserDao.Dao.countUsers
 import users.security.Role
 import users.security.RoleDao
+import users.security.UserRoleDao.Dao.countUserAuthority
 import users.signup.Signup
 import users.signup.UserActivation
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
+import users.signup.UserActivationDao.Dao.countUserActivation
 import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
@@ -228,5 +231,29 @@ object TestUtils {
     } catch (e: Throwable) {
         e.left()
     }
+
+    suspend fun ApplicationContext.tripleCounts() = Triple(
+        countUsers().also {
+            assertEquals(
+                0,
+                it,
+                "I expected 0 users in database."
+            )
+        },
+        countUserAuthority().also {
+            assertEquals(
+                0,
+                it,
+                "I expected 0 userAuthority in database."
+            )
+        },
+        countUserActivation().also {
+            assertEquals(
+                0,
+                it,
+                "I expected 0 userActivation in database."
+            )
+        }
+    )
 
 }

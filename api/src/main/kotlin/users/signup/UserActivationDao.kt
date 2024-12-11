@@ -20,12 +20,8 @@ import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
 import users.signup.UserActivationDao.Fields.CREATED_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ID_FIELD
 import users.signup.UserActivationDao.Relations.COUNT
-import users.signup.UserActivationDao.Relations.FIND_BY_ACTIVATION_KEY
 import users.signup.UserActivationDao.Relations.INSERT
 import users.signup.UserActivationDao.Relations.UPDATE_ACTIVATION_BY_KEY
-import java.time.LocalDateTime
-import java.time.LocalDateTime.parse
-import java.time.ZoneOffset.UTC
 import java.util.*
 
 object UserActivationDao {
@@ -81,11 +77,12 @@ object UserActivationDao {
         WHERE ua."$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR;
         """
 
+        const val FIND_ALL_USERACTIVATION = """select * from user_activation;"""
+
         const val UPDATE_ACTIVATION_BY_KEY = """
-        UPDATE "$TABLE_NAME" 
-        SET activated = true, 
-            activation_date = NOW() 
-        WHERE "$ACTIVATION_KEY_FIELD" = :$ACTIVATION_KEY_ATTR
+        UPDATE "user_activation" 
+        SET "activation_date" = NOW()  
+        WHERE "activation_key" = :activationKey            
         """
     }
 
@@ -117,7 +114,6 @@ object UserActivationDao {
         } catch (e: Throwable) {
             e.left()
         }
-
 
 
         @Throws(EmptyResultDataAccessException::class)
