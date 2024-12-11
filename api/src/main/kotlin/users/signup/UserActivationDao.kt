@@ -107,8 +107,11 @@ object UserActivationDao {
                 .bind(ID_ATTR, first.id)
                 .bind(ACTIVATION_KEY_ATTR, first.activationKey)
                 .bind(CREATED_DATE_ATTR, first.createdDate)
-                .bind(ACTIVATION_DATE_ATTR, first.activationDate)
-                .fetch()
+                .bind(
+                    ACTIVATION_DATE_ATTR,
+                    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                    first.activationDate
+                ).fetch()
                 .awaitRowsUpdated()
                 .right()
         } catch (e: Throwable) {
@@ -126,5 +129,7 @@ object UserActivationDao {
         } catch (e: Throwable) {
             e.left()
         }
+//        TODO: `test activateUser return triple isSuccess(ok) isKeyExists(keysdoesnotexistsexception 404) isAlreadyActivated(alreadyactivativatedexception already consumed)`
+
     }
 }

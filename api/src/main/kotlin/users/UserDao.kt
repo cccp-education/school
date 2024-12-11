@@ -121,7 +121,6 @@ object UserDao {
         """
         const val FIND_ALL_USERS = """SELECT * FROM "user";"""
 
-        @Suppress("SqlDialectInspection")
         const val INSERT = """
                 insert into "$TABLE_NAME" (
                     "$LOGIN_FIELD", "$EMAIL_FIELD",
@@ -212,8 +211,10 @@ object UserDao {
                 RoleDao.Relations.SQL_SCRIPT,
                 UserRoleDao.Relations.SQL_SCRIPT,
                 UserActivationDao.Relations.SQL_SCRIPT,
-            ).joinToString("", transform = String::trimIndent)
-                .trimMargin()
+            ).joinToString(
+                "",
+                transform = String::trimIndent
+            ).trimMargin()
 
     }
 
