@@ -70,7 +70,7 @@ import users.signup.SignupService.Companion.SIGNUP_LOGIN_NOT_AVAILABLE
 import users.signup.UserActivation
 import users.signup.UserActivationDao
 import users.signup.UserActivationDao.Attributes.ACTIVATION_KEY_ATTR
-import users.signup.UserActivationDao.Dao.activateUser
+import users.signup.UserActivationDao.Dao.activate
 import users.signup.UserActivationDao.Dao.countUserActivation
 import users.signup.UserActivationDao.Fields.ACTIVATION_DATE_FIELD
 import users.signup.UserActivationDao.Fields.ACTIVATION_KEY_FIELD
@@ -730,7 +730,7 @@ class DaoTests {
                 "activation key : $second".run(::i)
 //                assertEquals(
 //                    1,
-                    context.activateUser(second).getOrNull()!!
+                    context.activate(second).getOrNull()!!
 //                )
                 assertEquals(this@counts.first + 1, context.countUsers())
                 assertEquals(this@counts.second + 1, context.countUserAuthority())

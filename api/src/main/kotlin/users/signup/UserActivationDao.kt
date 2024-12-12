@@ -125,7 +125,7 @@ object UserActivationDao {
          * If the Right value (the result of the database operation) is not equal to 1,
          * then either the key doesn't exist, or the user is already activated.
          */
-        suspend fun ApplicationContext.activateUser(key: String): Either<Throwable, Long> = try {
+        suspend fun ApplicationContext.activate(key: String): Either<Throwable, Long> = try {
             UPDATE_ACTIVATION_BY_KEY
                 .trimIndent()
                 .run(getBean<R2dbcEntityTemplate>().databaseClient::sql)
@@ -136,5 +136,8 @@ object UserActivationDao {
         } catch (e: Throwable) {
             e.left()
         }
-    }
+    }/*        context.activateUser(this)
+            .getOrElse { throw IllegalStateException("Error activating user with key: $key", it) }
+            .takeIf { it == ONE_ROW_UPADTED }
+            ?: throw IllegalArgumentException("Activation failed: No user was activated for key: $key")*/
 }

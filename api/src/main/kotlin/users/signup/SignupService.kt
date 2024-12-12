@@ -9,6 +9,7 @@ import app.http.HttpUtils.validator
 import app.http.ProblemsModel
 import app.utils.Constants.defaultProblems
 import arrow.core.Either
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import jakarta.validation.ConstraintViolation
@@ -20,17 +21,18 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ServerWebExchange
 import users.User
+import users.UserController.UserRestApiRoutes.API_SIGNUP
+import users.UserController.UserRestApiRoutes.API_USERS
 import users.UserDao
 import users.UserDao.Dao.signup
 import users.UserDao.Dao.signupAvailability
 import users.UserDao.Dao.signupToUser
-import users.UserController.UserRestApiRoutes.API_SIGNUP
-import users.UserController.UserRestApiRoutes.API_USERS
+import users.signup.UserActivationDao.Dao.activate
 import workspace.Log.i
 
 @Service
 class SignupService(private val context: ApplicationContext) {
-   suspend fun signup(signup: Signup): Either<Throwable, User> = try {
+    suspend fun signup(signup: Signup): Either<Throwable, User> = try {
         context.signupToUser(signup).run {
             (this to context).signup()
                 .mapLeft { return Exception("Unable to save user with id").left() }
@@ -63,15 +65,49 @@ class SignupService(private val context: ApplicationContext) {
                 SIGNUP_LOGIN_NOT_AVAILABLE -> return signupProblems.badResponseLoginIsNotAvailable
                 SIGNUP_EMAIL_NOT_AVAILABLE -> return signupProblems.badResponseEmailIsNotAvailable
                 else -> {
-                    signup(signup)
-                    return CREATED.run(::ResponseEntity)
+                    return signup(signup).run { CREATED.run(::ResponseEntity) }
                 }
             }
         }
         SERVICE_UNAVAILABLE.run(::ResponseEntity)
     }
 
+    suspend fun activateRequest(
+        key: String,
+        exchange: ServerWebExchange
+    ) = key.run { activate(this) }
+
+    suspend fun activate(key: String): Long = context.activate(key)
+        .getOrElse { throw IllegalStateException("Error activating user with key: $key", it) }
+        .takeIf { it == ONE_ROW_UPADTED }
+        ?: throw IllegalArgumentException("Activation failed: No user was activated for key: $key")
+
+    /*
+
+        @GetMapping(ACTIVATE_API)
+        @Throws(SignupException::class)
+        suspend fun activateAccount(@RequestParam(ACTIVATE_API_KEY) key: String) {
+            if (!signupService.accountByActivationKey(key).run no@{
+                    return@no when {
+                        this == null -> false.apply { i("no activation for key: $key") }
+                        else -> signupService
+                            .saveAccount(copy(activated = true, activationKey = null))
+                            .run yes@{
+                                return@yes when {
+                                    this != null -> true.apply { i("activation: $login") }
+                                    else -> false
+                                }
+                            }
+                    }
+                })
+            //TODO: remplacer un ResponseEntity<ProblemDetail>
+                throw SignupException(MSG_WRONG_ACTIVATION_KEY)
+        }*/
+
+
     companion object {
+        const val ONE_ROW_UPADTED = 1L
+
         @JvmStatic
         val SIGNUP_AVAILABLE = Triple(true, true, true)
 

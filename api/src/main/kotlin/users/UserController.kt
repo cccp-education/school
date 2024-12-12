@@ -1,11 +1,10 @@
 package users
 
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
+import users.UserController.UserRestApiRoutes.API_ACTIVATE
+import users.UserController.UserRestApiRoutes.API_ACTIVATE_KEY
 import users.UserController.UserRestApiRoutes.API_SIGNUP
 import users.UserController.UserRestApiRoutes.API_USERS
 import users.signup.Signup
@@ -33,16 +32,37 @@ class UserController(private val service: SignupService) {
     }
 
     /**
-     * {@code POST  /signup} : Signup the user.
+     * Handles user signup requests. This method processes the incoming signup data and
+     * initiates the signup flow using the provided service layer.
      *
-     * @param signup the managed signup View Model.
+     * @param signup The signup object containing user details such as login, email,
+     *               password, and confirmation password.
+     * @param exchange The server web exchange instance, which provides access to the
+     *                 request and response context during the signup process.
      */
     @PostMapping(
         API_SIGNUP,
         produces = [APPLICATION_PROBLEM_JSON_VALUE]
     )
     suspend fun signup(
-        @RequestBody signup: Signup,
+        @RequestBody
+        signup: Signup,
         exchange: ServerWebExchange
     ) = service.signupRequest(signup, exchange)
+
+    /**
+     * Activates a user account using a provided activation key. This method processes
+     * the activation key and ensures the associated account is marked as activated.
+     *
+     * @param key The activation key used to verify and activate the user account.
+     * @param exchange The server web exchange instance, which provides access to the
+     *                 request and response context during the activation process.
+     */
+    @GetMapping(API_ACTIVATE)
+//    @Throws(SignupException::class)
+    suspend fun activate(
+        @RequestParam(API_ACTIVATE_KEY)
+        key: String,
+        exchange: ServerWebExchange
+    ) = service.activateRequest(key, exchange)
 }
