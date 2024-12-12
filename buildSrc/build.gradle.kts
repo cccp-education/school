@@ -71,7 +71,7 @@ dependencies {
             "org.testcontainers:testcontainers:$testcontainersVersion",
             "org.testcontainers:ollama:$testcontainersVersion",
             "org.gradle:gradle-tooling-api:8.6",
-            files("../api/build/libs/api-$schoolVersion.jar".run(::File).path),
+            files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
         ).forEach(::implementation)
     } catch (_: Exception) {
         // si api lib n'existe pas alors lancer une exception qui demande de lancer son build avant
@@ -85,7 +85,7 @@ dependencies {
 }
 
 val buildApi by tasks.registering(GradleBuild::class) {
-    dir = "../api".run(::File)
+    dir = "../../api".run(::File)
     tasks = listOf("build") // Or whatever tasks produce the lib.jar
 }
 // Add a dependency on the buildWorkspaceModel task

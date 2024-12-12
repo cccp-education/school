@@ -31,7 +31,7 @@ tasks.register<Exec>("runWorkspaceInstaller") {
     commandLine(
         "./gradlew",
         "-p",
-        "workspace-model",
+        "../workspace-model",
         ":lib:run"
     )
 }
@@ -41,7 +41,7 @@ tasks.register<Exec>("runApi") {
     commandLine(
         "./gradlew",
         "-p",
-        "api",
+        "../api",
         ":api"
     )
 }
@@ -51,7 +51,7 @@ tasks.register<Exec>("springbootCheckOpenFirefox") {
     commandLine(
         "./gradlew",
         "-p",
-        "api",
+        "../api",
         ":springbootCheckOpenFirefox"
     )
 }

@@ -1,9 +1,0 @@
-formation:
-  id: UUID_formation-assu-crm
-  name: formation-assu-crm
-  description: formation-assu-crm-initiation
-  version: 0.0.1-SNAPSHOT
-  author: @cheroliv
-  forms:
-    - file: form-enroll-formation-assu-crm.yaml
-    - file: evaluation-acces-formation-assu-crm.yaml

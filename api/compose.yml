@@ -1,9 +1,0 @@
-services:
-  - postgres:
-      image: "postgres:16.3"
-      environment:
-        - "POSTGRES_DB=school_dev"
-        - "POSTGRES_PASSWORD=secret"
-        - "POSTGRES_USER=dev"
-      ports:
-        - "5432:5432"
