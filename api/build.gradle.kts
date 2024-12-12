@@ -81,7 +81,7 @@ dependencyManagement {
 }
 
 dependencies {
-    files("../workspace-model/lib/build/libs/lib.jar".run(::File).path).run(::implementation)
+    files("../../workspace-model/lib/build/libs/lib.jar".run(::File).path).run(::implementation)
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -187,7 +187,7 @@ configurations {
 
 val buildWorkspaceModel: TaskProvider<GradleBuild> by tasks.registering(GradleBuild::class) {
     group = "api"
-    dir = "../workspace-model/lib".run(::File)
+    dir = "../../workspace-model/lib".run(::File)
     tasks = listOf("build") // Or whatever tasks produce the lib.jar
 }
 // Add a dependency on the buildWorkspaceModel task
