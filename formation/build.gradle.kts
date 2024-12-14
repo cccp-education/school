@@ -51,15 +51,18 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
             setTag("3.9.1")
         }
     }
+    val OFFICE = "office"
+    val SLIDES = "slides"
+    val IMAGES = "images"
     revealjsOptions {
-        "..$sep..${sep}office${sep}slides"
+        "..$sep..$sep$OFFICE$sep$SLIDES"
             .let(::File)
             .let(::setSourceDir)
         baseDirFollowsSourceFile()
         resources {
-            from("$sourceDir${sep}images") {
+            from("$sourceDir$sep$IMAGES") {
                 include("**")
-                into("images")
+                into(IMAGES)
             }
         }
         mapOf(
