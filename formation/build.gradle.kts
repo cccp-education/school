@@ -52,7 +52,7 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
         }
     }
     revealjsOptions {
-        "..$sep..${sep}bibliotheque${sep}slides"
+        "..$sep..${sep}office${sep}slides"
             .let(::File)
             .let(::setSourceDir)
         baseDirFollowsSourceFile()
