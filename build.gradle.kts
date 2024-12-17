@@ -2,7 +2,6 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
 
 import school.workspace.WorkspaceUtils.purchaseArtifact
 
-//TODO: rename school to forge
 plugins { idea }
 apply<school.frontend.SchoolPlugin>()
 apply<school.forms.FormPlugin>()

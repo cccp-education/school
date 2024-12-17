@@ -19,7 +19,6 @@ import school.ai.AssistantManager.generateStreamingResponse
 import school.translate.TranslatorManager.PromptManager.getTranslatePromptMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
-import java.util.*
 import java.util.Locale.*
 
 object TranslatorManager {
