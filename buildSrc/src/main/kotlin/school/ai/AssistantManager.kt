@@ -129,6 +129,10 @@ object AssistantManager {
         get() = privateProps["OPENAI_API_KEY"] as String
 
     object PromptManager {
+        @JvmStatic
+        fun main(args: Array<String>){
+            userMessageFr.run(::println)
+        }
         const val ASSISTANT_NAME = "E-3PO"
         val userName = System.getProperty("user.name")!!
         val userMessageFr = """config```--lang=fr;```. 
