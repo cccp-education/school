@@ -44,7 +44,7 @@ dependencies {
             "com.github.node-gradle:gradle-node-plugin:7.0.1",
             "org.jetbrains.kotlin:kotlin-stdlib",
             "commons-io:commons-io:$commonsIoVersion",
-            "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2",
+//            "jakarta.xml.bind:jakarta.xml.bind-api",
             "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion",
             "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion",
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
@@ -76,12 +76,9 @@ dependencies {
     } catch (_: Exception) {
         // si api lib n'existe pas alors lancer une exception qui demande de lancer son build avant
     }
-    setOf("org.jetbrains.kotlin:kotlin-test-junit5")
-        .forEach(::testImplementation)
-    setOf("org.junit.platform:junit-platform-launcher")
-        .forEach(::testRuntimeOnly)
-    setOf("com.sun.xml.bind:jaxb-impl:4.0.5")
-        .forEach(::runtimeOnly)
+    setOf("org.jetbrains.kotlin:kotlin-test-junit5").forEach(::testImplementation)
+    setOf("org.junit.platform:junit-platform-launcher").forEach(::testRuntimeOnly)
+//    setOf("com.sun.xml.bind:jaxb-impl:4.0.5").forEach(::runtimeOnly)
 }
 
 val buildApi by tasks.registering(GradleBuild::class) {
