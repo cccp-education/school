@@ -23,17 +23,17 @@ tasks.withType<JavaExec> {
     )
 }
 
-tasks.register<Exec>("springbootCheckOpenFirefox") {
+tasks.register<Exec>("testApi") {
     group = "api"
     commandLine(
            "./gradlew",
         "-p",
         "../api",
-        ":springbootCheckOpenFirefox"
+        ":apiCheckFirefox"
     )
 }
 
-tasks.register<Exec>("api") {
+tasks.register<Exec>("runApi") {
     group = "api"
     commandLine(
         "./gradlew",
@@ -43,7 +43,7 @@ tasks.register<Exec>("api") {
     )
 }
 
-tasks.register<Exec>("cli") {
+tasks.register<Exec>("runCli") {
     group = "api"
     commandLine(
         "./gradlew",
@@ -53,7 +53,7 @@ tasks.register<Exec>("cli") {
     )
 }
 
-tasks.register<Exec>("installer") {
+tasks.register<Exec>("runInstaller") {
     group = "installer"
     commandLine(
         "./gradlew",
