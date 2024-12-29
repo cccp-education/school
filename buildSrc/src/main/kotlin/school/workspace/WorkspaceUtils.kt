@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import org.apache.commons.lang3.SystemUtils
 import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.FileSystems
+import java.util.*
 
 object WorkspaceUtils {
     @JvmStatic
@@ -20,6 +22,19 @@ object WorkspaceUtils {
     @JvmStatic
     val String.lowercaseFirstChar: String
         get() = replaceFirst(first(), first().lowercaseChar())
+
+
+//    val Pair<String, String>.artifactVersion
+//        get() = first.run(Properties().apply {
+//            second.run(properties::get).let {
+//                SystemUtils.USER_HOME_KEY
+//                    .run(System::getProperty)
+//                    .run { "$this$it" }
+//            }.run(_root_ide_package_.java.io::File)
+//                .inputStream()
+//                .use(::load)
+//        }::get).toString()
+
 
     fun Project.purchaseArtifact() = ("artifact.group" to "artifact.version").run {
         group = properties[first].toString()

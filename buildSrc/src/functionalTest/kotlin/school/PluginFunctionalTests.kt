@@ -5,7 +5,9 @@ package school
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
-import kotlin.test.*
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 const val BUILD_GRADLE = "build.gradle.kts"
 const val SETTINGS_GRADLE = "settings.gradle.kts"
@@ -20,7 +22,7 @@ class PluginFunctionalTests {
     private val settingsFile: File by lazy { projectDir.resolve(SETTINGS_GRADLE) }
 
 
-//    @kotlin.test.BeforeTest
+    //    @kotlin.test.BeforeTest
     fun setupBuildFiles() {
         Pair(
             "src/main/resources/build.gradle.kts",
@@ -29,7 +31,7 @@ class PluginFunctionalTests {
     }
 
 
-//    @kotlin.test.Test
+    //    @kotlin.test.Test
     fun `Given SchoolPlugin When hello task Then output expected message`() = GradleRunner
         .create()
         .withProjectDir(projectDir)
@@ -84,7 +86,7 @@ class PluginFunctionalTests {
             )
         }
 
-    fun Pair<String,String>.setupBuildFiles(){
+    fun Pair<String, String>.setupBuildFiles() {
         first
             .let(projectDir::resolve)
             .readText(Charsets.UTF_8)
