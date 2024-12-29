@@ -8,7 +8,6 @@ apply<school.jbake.JBakeGhPagesPlugin>()
 apply<school.ai.AssistantPlugin>()
 apply<school.translate.TranslatorPlugin>()
 
-
 purchaseArtifact()
 
 tasks.wrapper {
