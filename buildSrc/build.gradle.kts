@@ -4,6 +4,7 @@ import Build_gradle.Constants.commonsIoVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
 import Build_gradle.Constants.langchain4jVersion
+import Build_gradle.Constants.schoolVersion
 import Build_gradle.Constants.testcontainersVersion
 
 plugins { `kotlin-dsl` }
@@ -31,7 +32,9 @@ object Constants {
 }
 
 dependencies {
+//    setOf("com.sun.xml.bind:jaxb-impl:4.0.5").forEach(::runtimeOnly)
     setOf(
+//        files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
         "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
         "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
         "com.google.api-client:google-api-client-jackson2:2.3.0",
