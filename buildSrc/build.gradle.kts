@@ -4,10 +4,8 @@ import Build_gradle.Constants.commonsIoVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
 import Build_gradle.Constants.langchain4jVersion
-import Build_gradle.Constants.testcontainersVersion
 import Build_gradle.Constants.schoolVersion
-//import org.gradle.api.logging.LogLevel.ERROR
-//import org.gradle.api.logging.LogLevel.INFO
+import Build_gradle.Constants.testcontainersVersion
 
 plugins { `kotlin-dsl` }
 
@@ -44,7 +42,7 @@ dependencies {
             "com.github.node-gradle:gradle-node-plugin:7.0.1",
             "org.jetbrains.kotlin:kotlin-stdlib",
             "commons-io:commons-io:$commonsIoVersion",
-//            "jakarta.xml.bind:jakarta.xml.bind-api",
+            "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2",
             "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion",
             "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion",
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
@@ -71,22 +69,22 @@ dependencies {
             "org.testcontainers:testcontainers:$testcontainersVersion",
             "org.testcontainers:ollama:$testcontainersVersion",
             "org.gradle:gradle-tooling-api:8.6",
-            files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
+//            files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
         ).forEach(::implementation)
+        setOf("org.jetbrains.kotlin:kotlin-test-junit5").forEach(::testImplementation)
+        setOf("org.junit.platform:junit-platform-launcher").forEach(::testRuntimeOnly)
+//        setOf("com.sun.xml.bind:jaxb-impl:4.0.5").forEach(::runtimeOnly)
     } catch (_: Exception) {
         // si api lib n'existe pas alors lancer une exception qui demande de lancer son build avant
     }
-    setOf("org.jetbrains.kotlin:kotlin-test-junit5").forEach(::testImplementation)
-    setOf("org.junit.platform:junit-platform-launcher").forEach(::testRuntimeOnly)
-//    setOf("com.sun.xml.bind:jaxb-impl:4.0.5").forEach(::runtimeOnly)
 }
 
-val buildApi by tasks.registering(GradleBuild::class) {
-    dir = "../../api".run(::File)
-    tasks = listOf("build") // Or whatever tasks produce the lib.jar
-}
+//val buildApi by tasks.registering(GradleBuild::class) {
+//    dir = "../../api".run(::File)
+//    tasks = listOf("build") // Or whatever tasks produce the lib.jar
+//}
 // Add a dependency on the buildWorkspaceModel task
-tasks.named("compileKotlin") { dependsOn(buildApi) }
+//tasks.named("compileKotlin") { dependsOn(buildApi) }
 
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")
 

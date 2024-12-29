@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
-
 import school.workspace.WorkspaceUtils.purchaseArtifact
 
 plugins { idea }
@@ -25,13 +24,13 @@ tasks.withType<JavaExec> {
     )
 }
 
-tasks.register<Exec>("runWorkspaceInstaller") {
-    group = "installer"
+tasks.register<Exec>("springbootCheckOpenFirefox") {
+    group = "api"
     commandLine(
         "./gradlew",
         "-p",
-        "../workspace-model",
-        ":lib:run"
+        "../api",
+        ":springbootCheckOpenFirefox"
     )
 }
 
@@ -41,16 +40,16 @@ tasks.register<Exec>("runApi") {
         "./gradlew",
         "-p",
         "../api",
-        ":api"
+        ":bootRun"
     )
 }
 
-tasks.register<Exec>("springbootCheckOpenFirefox") {
-    group = "api"
+tasks.register<Exec>("runWorkspaceInstaller") {
+    group = "installer"
     commandLine(
         "./gradlew",
         "-p",
         "../api",
-        ":springbootCheckOpenFirefox"
+        ":runWorkspaceInstaller"
     )
 }
