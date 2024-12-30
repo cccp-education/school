@@ -72,7 +72,6 @@ class SlidesPlugin : Plugin<Project> {
             workingDir = project.layout.projectDirectory.asFile
         }
 
-
         project.tasks.register<DefaultTask>("deploySlides") {
             group = "slider"
             description = "Deploy sliders to remote repository"
@@ -82,7 +81,6 @@ class SlidesPlugin : Plugin<Project> {
                 project.localConf
                     .let(project.yamlMapper::writeValueAsString)
                     .let(::println)
-
 //                project.workspaceEither.fold(
 //                    { "Error: $it".run(::println) },
 //                    { it: Office ->
