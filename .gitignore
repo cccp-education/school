@@ -51,3 +51,4 @@ training-institut-2598582b592a.json
 
 *.hprof
 /school-frontend/nbproject/private/
+/.webui_secret_key
