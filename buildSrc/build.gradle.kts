@@ -1,11 +1,8 @@
 import Build_gradle.Constants.arrowKtVersion
 import Build_gradle.Constants.asciidoctorGradleVersion
-import Build_gradle.Constants.commonsIoVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
-import Build_gradle.Constants.langchain4jVersion
 import Build_gradle.Constants.schoolVersion
-import Build_gradle.Constants.testcontainersVersion
 
 plugins { `kotlin-dsl` }
 
@@ -13,11 +10,13 @@ repositories {
     google()
     mavenCentral()
     gradlePluginPortal()
-    maven("https://repo.gradle.org/gradle/libs-releases/")
-    maven("https://plugins.gradle.org/m2/")
-    maven("https://maven.xillio.com/artifactory/libs-release/")
-    maven("https://mvnrepository.com/repos/springio-plugins-release")
-    maven("https://archiva-repository.apache.org/archiva/repository/public/")
+    setOf(
+        "https://repo.gradle.org/gradle/libs-releases/",
+        "https://plugins.gradle.org/m2/",
+        "https://maven.xillio.com/artifactory/libs-release/",
+        "https://mvnrepository.com/repos/springio-plugins-release",
+        "https://archiva-repository.apache.org/archiva/repository/public/"
+    ).forEach(::maven)
 }
 
 object Constants {
@@ -32,17 +31,10 @@ object Constants {
 }
 
 dependencies {
-    setOf("com.sun.xml.bind:jaxb-impl:4.0.5").forEach(::runtimeOnly)
     setOf(
-//        files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
-        "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
-        "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
-        "com.google.api-client:google-api-client-jackson2:2.3.0",
-        "com.google.auth:google-auth-library-oauth2-http:1.23.0",
+        files("../../api/build/libs/api-$schoolVersion.jar".run(::File).path),
         "com.avast.gradle:gradle-docker-compose-plugin:0.17.6",
         "com.github.node-gradle:gradle-node-plugin:7.0.1",
-        "org.jetbrains.kotlin:kotlin-stdlib",
-        "commons-io:commons-io:$commonsIoVersion",
         "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2",
         "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion",
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion",
@@ -51,7 +43,6 @@ dependencies {
         "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion",
         "org.eclipse.jgit:org.eclipse.jgit.archive:$jgitVersion",
         "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion",
-        "org.tukaani:xz:1.9",
         "io.arrow-kt:arrow-core:$arrowKtVersion",
         "io.arrow-kt:arrow-fx-coroutines:$arrowKtVersion",
         "io.arrow-kt:arrow-integrations-jackson-module:0.14.1",
@@ -65,14 +56,22 @@ dependencies {
         "com.burgstaller:okhttp-digest:1.10",
         "org.ysb33r.gradle:grolifant:0.12.1",
         "com.avast.gradle:gradle-docker-compose-plugin:0.14.2",
-        "dev.langchain4j:langchain4j:$langchain4jVersion",
-        "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
-        "org.testcontainers:testcontainers:$testcontainersVersion",
-        "org.testcontainers:ollama:$testcontainersVersion",
         "org.gradle:gradle-tooling-api:8.6",
+//        "com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0",
+//        "com.google.apis:google-api-services-drive:v3-rev197-1.25.0",
+//        "com.google.api-client:google-api-client-jackson2:2.3.0",
+//        "com.google.auth:google-auth-library-oauth2-http:1.23.0",
+//        "org.jetbrains.kotlin:kotlin-stdlib",
+//        "commons-io:commons-io:$commonsIoVersion",
+//        "org.tukaani:xz:1.9",
+//        "dev.langchain4j:langchain4j:$langchain4jVersion",
+//        "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
+//        "org.testcontainers:testcontainers:$testcontainersVersion",
+//        "org.testcontainers:ollama:$testcontainersVersion",
     ).forEach(::implementation)
-    setOf("org.jetbrains.kotlin:kotlin-test-junit5").forEach(::testImplementation)
-    setOf("org.junit.platform:junit-platform-launcher").forEach(::testRuntimeOnly)
+    runtimeOnly("com.sun.xml.bind:jaxb-impl:4.0.5")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 val functionalTestSourceSet: SourceSet = sourceSets.create("functionalTest")
