@@ -55,7 +55,7 @@ tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
     val SLIDES = "slides"
     val IMAGES = "images"
     revealjsOptions {
-        "..$sep..$sep$OFFICE$sep$SLIDES"
+        "..$sep..$sep..$sep$OFFICE$sep$SLIDES"
             .let(::File)
             .let(::setSourceDir)
         baseDirFollowsSourceFile()
