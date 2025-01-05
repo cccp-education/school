@@ -3,6 +3,7 @@ import Build_gradle.Constants.asciidoctorGradleVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
 import Build_gradle.Constants.schoolVersion
+import Build_gradle.Constants.langchain4jVersion
 
 plugins { `kotlin-dsl` }
 
@@ -64,8 +65,13 @@ dependencies {
 //        "org.jetbrains.kotlin:kotlin-stdlib",
 //        "commons-io:commons-io:$commonsIoVersion",
 //        "org.tukaani:xz:1.9",
-//        "dev.langchain4j:langchain4j:$langchain4jVersion",
-//        "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
+        "dev.langchain4j:langchain4j:$langchain4jVersion",
+        "dev.langchain4j:langchain4j-ollama:$langchain4jVersion",
+        "dev.langchain4j:langchain4j-hugging-face:$langchain4jVersion",
+        "dev.langchain4j:langchain4j-google-ai-gemini:$langchain4jVersion",
+        "dev.langchain4j:langchain4j-mistral-ai:$langchain4jVersion",
+        "dev.langchain4j:langchain4j-pgvector:$langchain4jVersion",
+
 //        "org.testcontainers:testcontainers:$testcontainersVersion",
 //        "org.testcontainers:ollama:$testcontainersVersion",
     ).forEach(::implementation)

@@ -5,8 +5,8 @@ plugins { idea }
 apply<school.frontend.SchoolPlugin>()
 apply<school.forms.FormPlugin>()
 apply<school.jbake.JBakeGhPagesPlugin>()
-//apply<school.ai.AssistantPlugin>()
-//apply<school.translate.TranslatorPlugin>()
+apply<school.ai.AssistantPlugin>()
+apply<school.translate.TranslatorPlugin>()
 
 purchaseArtifact()
 
