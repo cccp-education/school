@@ -13,8 +13,29 @@ data class Formation(
  */
 @JvmRecord
 data class SPG(
-    val spd: SPD = SPD(),
-    val content: List<Triple<String, String, String>>? = listOf(
+    val spds: Set<SPD> = emptySet(),
+    val theme: String?,
+    val title: String?,
+    val presentation: String?,
+    val mindmap: String?,
+    val publicProspect: String?,
+    val prerequiz: String?,
+    val objs: String?,
+    val competences: String?,
+    val timing: String?,
+    val means: String?,
+    val prgm: String?,
+    val eval: String?,
+    val certif: String?,
+    val place: String?,
+    val price: String?,
+    val infra: String?,
+    val pursuit: String?,
+    val accessTime: String?,
+    val mobility: String?,
+    val testimony: String?,
+    val testimonyCustomer: String?,
+    val content: List<Triple</*json_key*/String,/*caption*/String, /*attribute*/String>>? = listOf(
         Triple("theme", "Thème", "theme"),
         Triple("title", "Titre", "titre"),
         Triple("prez", "Présentation et description", "presentation"),

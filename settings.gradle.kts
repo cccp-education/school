@@ -27,6 +27,9 @@ pluginManagement {
 
     }
 }
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
@@ -41,8 +44,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "school"
 include("formation")
+include("teacher")
 //include("school-gradle-plugin")
-
 // Inclure le projet model comme un build composite
 //includeBuild("base") {
 //    dependencySubstitution {
