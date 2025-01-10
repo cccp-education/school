@@ -1,0 +1,29 @@
+{
+  "theme": [
+    "Thème",
+    "Développement Web"
+  ],
+  "title": [
+    "Titre",
+    "Formation TypeScript et React"
+  ],
+  "presentation": "Cette formation vous permettra de maîtriser TypeScript et React pour développer des applications web modernes et robustes.",
+  "mindmap": "Lien vers la mindmap",
+  "public_prospect": "Développeurs web ayant des connaissances de base en JavaScript.",
+  "prerequiz": "Connaissance de HTML, CSS et JavaScript.",
+  "objs": "Comprendre les concepts clés de TypeScript et React. Développer des composants React réutilisables.  Mettre en place une architecture d'application robuste.  Intégrer des API REST.",
+  "competences": "Développer des applications web modernes avec TypeScript et React.  Maîtriser le cycle de vie des composants React.  Utiliser les hooks et le contexte React.  Intégrer des librairies tierces.",
+  "timing": "5 jours",
+  "means": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée.",
+  "prgm": "Introduction à TypeScript et à la programmation orientée objet.  Découverte de React et de ses concepts fondamentaux.  Création de composants fonctionnels et à base de classes.  Gestion du state et des props.  Mise en place du routage.  Consommation d'API REST.  Tests unitaires et d'intégration.  Déploiement de l'application.",
+  "eval": "Évaluation continue basée sur des exercices pratiques et un projet final.",
+  "certif": "Certificat de réussite délivré à la fin de la formation.",
+  "place": "En présentiel à Paris ou à distance.",
+  "price": "1500€",
+  "infra": "Salle de formation équipée ou accès à un environnement de développement en ligne.",
+  "pursuit": "Formations avancées sur React Native, Redux, ou Next.js.",
+  "access_time": "Inscription possible jusqu'à 2 semaines avant le début de la formation.",
+  "mobility": "Accès aux personnes à mobilité réduite, supports de cours adaptés.",
+  "testimony": "Formation très complète et bien structurée. Le formateur était excellent et très pédagogue.",
+  "testimony_customer": "Grâce à cette formation, j'ai pu acquérir les compétences nécessaires pour développer des applications web performantes avec TypeScript et React."
+}

@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "Thème": "Développement d'applications web"
+  },
+  "title": {
+    "Titre": "Formation Kotlin Avancée"
+  },
+  "presentation": {
+    "Présentation et description": "Ce cours explore les fonctionnalités avancées de Kotlin pour construire des applications robustes et performantes."
+  },
+  "mindmap": {
+    "Carte thématique":"https://example.com/mindmap.png"
+  },
+//  "public_prospect": "Développeurs Kotlin ayant une connaissance de base du langage.",
+//  "prerequiz": "Connaissance de la syntaxe Kotlin et des concepts de programmation orientée objet.",
+//  "objs": "Maîtriser les coroutines, les génériques et les DSL en Kotlin.",
+//  "competences": "Développer des applications Kotlin avec des fonctionnalités avancées.",
+//  "timing": "3 jours",
+//  "means": "Encadrement par un formateur expert, support en ligne et exercices pratiques.",
+//  "prgm": "Introduction aux coroutines, gestion des flux asynchrones, création de DSL, utilisation avancée des génériques.",
+//  "eval": "Exercices pratiques et projet final.",
+//  "certif": "Certificat de réussite délivré à la fin de la formation.",
+//  "place": "En ligne ou en présentiel.",
+//  "price": "1200€",
+//  "infra": "Salle de formation équipée, accès internet haut débit.",
+//  "pursuit": "Possibilité de suivre une formation d'expert Kotlin.",
+//  "access_time": "Inscription possible jusqu'à une semaine avant le début de la formation.",
+//  "mobility": "Accès handicapés, supports de cours adaptés.",
+//  "testimony": "Excellente formation, très complète et pratique. Le formateur est un expert passionné.",
+//  "testimony_customer": "Grâce à cette formation, j'ai pu améliorer mes compétences en Kotlin et développer des applications plus performantes."
+}

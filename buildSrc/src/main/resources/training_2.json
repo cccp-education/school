@@ -1,0 +1,29 @@
+{
+  "theme": [
+    "Thème",
+    "Spring Boot Reactive"
+  ],
+  "title": [
+    "Titre",
+    "Maîtriser Spring Boot Reactive"
+  ],
+  "presentation": "Cette formation vous permettra d'acquérir les compétences nécessaires pour développer des applications réactives performantes avec Spring Boot.",
+  "mindmap": "https://example.com/mindmap-spring-reactive.png",
+  "public_prospect": "Développeurs Java/Kotlin ayant une connaissance de base de Spring.",
+  "prerequiz": "Connaissance de Java/Kotlin et des principes de base de Spring.",
+  "objs": "Comprendre et appliquer les principes de la programmation réactive avec Spring WebFlux. Développer des API REST réactives.  Gérer les flux de données asynchrones.",
+  "competences": "Être capable de concevoir et développer des applications Spring Boot réactives. Maîtriser les concepts de WebFlux et la gestion des flux asynchrones.",
+  "timing": "2 jours",
+  "means": "Support de cours, exercices pratiques, accès à une plateforme d'apprentissage en ligne.",
+  "prgm": "Introduction à la programmation réactive.  Découverte de Spring WebFlux.  Création d'API REST réactives.  Gestion des erreurs et des exceptions.  Tests unitaires et d'intégration.  Déploiement d'applications réactives.",
+  "eval": "QCM et mise en pratique avec un projet.",
+  "certif": "Certificat de réussite délivré à la fin de la formation.",
+  "place": "À distance ou en présentiel (Paris).",
+  "price": "800€",
+  "infra": "Ordinateur portable, connexion internet stable.",
+  "pursuit": "Possibilité de poursuivre avec une formation sur Spring Cloud.",
+  "access_time": "Inscription possible jusqu'à 2 semaines avant le début de la formation.",
+  "mobility": "Formation accessible aux personnes à mobilité réduite.",
+  "testimony": "Formation très enrichissante, les concepts sont clairs et les exercices pratiques permettent de bien assimiler la matière.",
+  "testimony_customer": "J'ai pu appliquer directement les connaissances acquises lors de cette formation à mon projet professionnel.  Je recommande vivement !"
+}

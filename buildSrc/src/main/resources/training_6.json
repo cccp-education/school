@@ -1,0 +1,29 @@
+{
+  "theme": [
+    "Thème",
+    "Développement Web"
+  ],
+  "title": [
+    "Titre",
+    "TypeScript Fonctionnel"
+  ],
+  "presentation": "Cette formation explore les principes et les techniques de la programmation fonctionnelle appliqués à TypeScript, pour écrire du code plus clair, concis et maintenable.",
+  "mindmap": "Lien vers la mindmap (à compléter)",
+  "public_prospect": "Développeurs TypeScript souhaitant améliorer la qualité de leur code et découvrir les avantages de la programmation fonctionnelle.",
+  "prerequiz": "Connaissance de base de TypeScript et de JavaScript.",
+  "objs": "Comprendre les concepts clés de la programmation fonctionnelle. Appliquer les principes de la programmation fonctionnelle en TypeScript.  Utiliser des librairies fonctionnelles courantes.  Améliorer la qualité et la maintenabilité du code.",
+  "competences": "Ecrire du code TypeScript fonctionnel, plus clair, concis et maintenable.  Maîtriser les concepts d'immutabilité, de fonctions pures et de composition de fonctions.  Intégrer des librairies fonctionnelles dans des projets TypeScript.",
+  "timing": "3 jours",
+  "means": "Support de cours, exercices pratiques, assistance personnalisée.",
+  "prgm": "Introduction à la programmation fonctionnelle.  Fonctions pures, immutabilité, composition de fonctions.  Gestion des effets de bord.  Manipulation de données avec des fonctions d'ordre supérieur (map, filter, reduce).  Utilisation de librairies fonctionnelles comme fp-ts ou Ramda.  Mise en pratique avec des exemples concrets en TypeScript. ",
+  "eval": "Exercices pratiques et revue de code.",
+  "certif": "Certificat de réussite délivré à la fin de la formation.",
+  "place": "En ligne ou en présentiel (à définir)",
+  "price": "900€",
+  "infra": "Salle de formation équipée ou accès à un environnement de développement en ligne.",
+  "pursuit": "Formations avancées sur la programmation réactive fonctionnelle (RxJS).",
+  "access_time": "Inscription possible jusqu'à une semaine avant le début de la formation.",
+  "mobility": "Accès aux personnes à mobilité réduite, supports de cours adaptés.",
+  "testimony": "Formation très instructive, les concepts sont bien expliqués et les exercices permettent de mettre en pratique les notions abordées. ",
+  "testimony_customer": "Grâce à cette formation, j'ai pu améliorer la qualité de mon code TypeScript et adopter une approche plus fonctionnelle."
+}

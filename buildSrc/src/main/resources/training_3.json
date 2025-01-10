@@ -1,0 +1,29 @@
+{
+  "theme": [
+    "Thème",
+    "Gradle"
+  ],
+  "title": [
+    "Titre",
+    "Maîtriser Gradle : Automatisation de builds pour projets Java/Kotlin"
+  ],
+  "presentation": "Cette formation vous permettra de maîtriser Gradle, l'outil de build incontournable pour les projets Java/Kotlin.",
+  "mindmap": "https://example.com/mindmap-gradle.png",
+  "public_prospect": "Développeurs Java/Kotlin souhaitant automatiser leurs builds et améliorer leur productivité.",
+  "prerequiz": "Connaissance de base de Java ou Kotlin et d'un IDE comme IntelliJ IDEA ou Eclipse.",
+  "objs": "Comprendre les fondamentaux de Gradle.  Écrire et configurer des scripts Gradle.  Gérer les dépendances.  Automatiser les tâches de build, de test et de déploiement.",
+  "competences": "Configurer et utiliser Gradle pour gérer des projets Java/Kotlin.  Créer des builds robustes et reproductibles.  Intégrer Gradle avec d'autres outils de développement.",
+  "timing": "3 jours",
+  "means": "Support de cours, exercices pratiques, assistance personnalisée du formateur.",
+  "prgm": "Introduction à Gradle et à son écosystème.  Configuration de projets.  Gestion des dépendances avec des repositories.  Tâches de build personnalisées.  Tests unitaires et d'intégration avec Gradle.  Automatisation du déploiement.  Bonnes pratiques et astuces.",
+  "eval": "Évaluation continue basée sur des exercices pratiques et un projet final.",
+  "certif": "Certificat de réussite délivré à la fin de la formation.",
+  "place": "En présentiel à Paris ou à distance.",
+  "price": "900€",
+  "infra": "Salle de formation équipée ou accès à une plateforme d'apprentissage en ligne.",
+  "pursuit": "Formations avancées sur l'automatisation DevOps.",
+  "access_time": "Inscription possible jusqu'à une semaine avant le début de la formation.",
+  "mobility": "Accès aux personnes à mobilité réduite.",
+  "testimony": "Formation très pragmatique et bien structurée. Le formateur est très compétent et disponible.",
+  "testimony_customer": "Gradle n'a plus de secrets pour moi ! Cette formation m'a permis de gagner beaucoup de temps dans la gestion de mes projets."
+}
