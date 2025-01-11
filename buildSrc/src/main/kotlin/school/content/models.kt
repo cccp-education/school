@@ -7,26 +7,26 @@ import com.fasterxml.jackson.annotation.JsonRootName
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import school.content.TrainingModels.ACCESS_TIME_CAPTION
-import school.content.TrainingModels.CERTIFICATION_CAPTION
-import school.content.TrainingModels.EVALUATIONS_CAPTION
-import school.content.TrainingModels.INFRASTRUCTURE_CAPTION
-import school.content.TrainingModels.MEANS_CAPTION
-import school.content.TrainingModels.MINDMAP_CAPTION
-import school.content.TrainingModels.MOBILITY_CAPTION
-import school.content.TrainingModels.OBJECTIVES_CAPTION
-import school.content.TrainingModels.PLACE_CAPTION
-import school.content.TrainingModels.PRESENTATION_CAPTION
-import school.content.TrainingModels.PRICE_CAPTION
-import school.content.TrainingModels.PROGRAM_CAPTION
-import school.content.TrainingModels.PUBLIC_PROSPECT_CAPTION
-import school.content.TrainingModels.PURSUIT_CAPTION
-import school.content.TrainingModels.SKILLS_CAPTION
-import school.content.TrainingModels.TESTIMONY_CAPTION
-import school.content.TrainingModels.TESTIMONY_CUSTOMER_CAPTION
-import school.content.TrainingModels.THEME_CAPTION
-import school.content.TrainingModels.TIMING_CAPTION
-import school.content.TrainingModels.TITLE_CAPTION
+import school.content.TrainingData.ACCESS_TIME_CAPTION
+import school.content.TrainingData.CERTIFICATION_CAPTION
+import school.content.TrainingData.EVALUATIONS_CAPTION
+import school.content.TrainingData.INFRASTRUCTURE_CAPTION
+import school.content.TrainingData.MEANS_CAPTION
+import school.content.TrainingData.MINDMAP_CAPTION
+import school.content.TrainingData.MOBILITY_CAPTION
+import school.content.TrainingData.OBJECTIVES_CAPTION
+import school.content.TrainingData.PLACE_CAPTION
+import school.content.TrainingData.PRESENTATION_CAPTION
+import school.content.TrainingData.PRICE_CAPTION
+import school.content.TrainingData.PROGRAM_CAPTION
+import school.content.TrainingData.PUBLIC_PROSPECT_CAPTION
+import school.content.TrainingData.PURSUIT_CAPTION
+import school.content.TrainingData.SKILLS_CAPTION
+import school.content.TrainingData.TESTIMONY_CAPTION
+import school.content.TrainingData.TESTIMONY_CUSTOMER_CAPTION
+import school.content.TrainingData.THEME_CAPTION
+import school.content.TrainingData.TIMING_CAPTION
+import school.content.TrainingData.TITLE_CAPTION
 import java.io.File
 
 /*prompt: Genere moi un jeux de valeur en json pour cette classe, le sujet de la formation sera kotlin et langchain4j.  @JvmRecord @JsonRootName(value = "SPG") data class SPG(     val theme: Map<String, String> = mapOf("Thème" to ""),     val title: Map<String, String> = mapOf("Titre" to ""),     val presentation: String = "Présentation et description",     val mindmap: String = "Carte thématique",     @JsonProperty("public_ prospect" )      val publicProspect: String = "Public",     val prerequiz: String = "Pré-requis et conditions d’accès à la formation (Qualiopi)",     val objs: String = "Objectifs pédagogiques (Qualiopi)",     val competences: String = "Compétences visées (Qualiopi)",     val timing: String = "Durée (Temporisation)] (Qualiopi)",     val means: String = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)",     val prgm: String = "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement",     val eval: String = "Modalités d’évaluations] (Qualiopi)",     val certif: String = "Modalités de certification et Certification visé] (Qualiopi)",     val place: String = "Lieux] (Qualiopi)",     val price: String = "Tarifs",     val infra: String = "Moyens logistiques et matériels] (Qualiopi)",     val pursuit: String = "Poursuite en formation] (Qualiopi)",     @JsonProperty("access_ time" )      val accessTime: String = "Délais d’accès] (Réglementaire)",     val mobility: String = "Accessibilité et Handicap] (Qualiopi)",     val testimony: String = "Témoignage Evaluation de la formation] (Qualiopi)",     @JsonProperty("testimony_ customer" )      val testimonyCustomer: String = "Témoignage apprenant/commanditaire" ,  )*/
@@ -120,7 +120,7 @@ data class SPD(
     val objectif: String = ""
 )
 
-object TrainingModels {
+object TrainingData {
     @JvmStatic
     fun main(args: Array<String>): Unit {
         val trainingPath = "/workspace/school/buildSrc/src/main/resources/training_8.json"
