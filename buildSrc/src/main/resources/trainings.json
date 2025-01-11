@@ -1,0 +1,587 @@
+[
+  {
+    "theme": {
+      "Thème": "Développement d'applications web"
+    },
+    "title": {
+      "Titre": "Formation Kotlin Avancée"
+    },
+    "presentation": {
+      "Présentation et description": "Ce cours explore les fonctionnalités avancées de Kotlin pour construire des applications robustes et performantes."
+    },
+    "mindmap": {
+      "Carte thématique": "https://example.com/mindmap.png"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Kotlin ayant une connaissance de base du langage."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d’accès à la formation (Qualiopi)": "Connaissance de la syntaxe Kotlin et des concepts de programmation orientée objet."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Maîtriser les coroutines, les génériques et les DSL en Kotlin."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Développer des applications Kotlin avec des fonctionnalités avancées."
+    },
+    "timing": {
+      "Durée (Temporisation)] (Qualiopi)": "3 jours"
+    },
+    "means": {
+      "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)": "Encadrement par un formateur expert, support en ligne et exercices pratiques."
+    },
+    "program": {
+      "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement": "Introduction aux coroutines, gestion des flux asynchrones, création de DSL, utilisation avancée des génériques."
+    },
+    "evaluations": {
+      "Modalités d’évaluations] (Qualiopi)": "Exercices pratiques et projet final."
+    },
+    "certification": {
+      "Modalités de certification et Certification visé] (Qualiopi)": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux] (Qualiopi)": "En ligne ou en présentiel."
+    },
+    "price": {
+      "Tarifs": "1200€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels] (Qualiopi)": "Salle de formation équipée, accès internet haut débit."
+    },
+    "pursuit": {
+      "Poursuite en formation] (Qualiopi)": "Possibilité de suivre une formation d'expert Kotlin."
+    },
+    "access_time": {
+      "Délais d’accès] (Réglementaire)": "Inscription possible jusqu'à une semaine avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap] (Qualiopi)": "Accès handicapés, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation] (Qualiopi)": "Excellente formation, très complète et pratique. Le formateur est un expert passionné."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer mes compétences en Kotlin et développer des applications plus performantes."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Spring Boot Reactive"
+    },
+    "title": {
+      "Titre": "Maîtriser Spring Boot Reactive"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra d'acquérir les compétences nécessaires pour développer des applications réactives performantes avec Spring Boot."
+    },
+    "mindmap": {
+      "Carte thématique": "https://example.com/mindmap-spring-reactive.png"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Java/Kotlin ayant une connaissance de base de Spring."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de Java/Kotlin et des principes de base de Spring."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre et appliquer les principes de la programmation réactive avec Spring WebFlux. Développer des API REST réactives. Gérer les flux de données asynchrones."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Être capable de concevoir et développer des applications Spring Boot réactives. Maîtriser les concepts de WebFlux et la gestion des flux asynchrones."
+    },
+    "timing": {
+      "Durée (Temporisation)] (Qualiopi)": "2 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, accès à une plateforme d'apprentissage en ligne."
+    },
+    "program": {
+      "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement": "Introduction à la programmation réactive. Découverte de Spring WebFlux. Création d'API REST réactives. Gestion des erreurs et des exceptions. Tests unitaires et d'intégration. Déploiement d'applications réactives."
+    },
+    "evaluations": {
+      "Modalités d'évaluations] (Qualiopi)": "QCM et mise en pratique avec un projet."
+    },
+    "certification": {
+      "Modalités de certification et Certification visé] (Qualiopi)": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux] (Qualiopi)": "À distance ou en présentiel (Paris)."
+    },
+    "price": {
+      "Tarifs": "800€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels] (Qualiopi)": "Ordinateur portable, connexion internet stable."
+    },
+    "pursuit": {
+      "Poursuite en formation] (Qualiopi)": "Possibilité de poursuivre avec une formation sur Spring Cloud."
+    },
+    "access_time": {
+      "Délais d'accès] (Réglementaire)": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap] (Qualiopi)": "Formation accessible aux personnes à mobilité réduite."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation] (Qualiopi)": "Formation très enrichissante, les concepts sont clairs et les exercices pratiques permettent de bien assimiler la matière."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "J'ai pu appliquer directement les connaissances acquises lors de cette formation à mon projet professionnel. Je recommande vivement !"
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Gradle"
+    },
+    "title": {
+      "Titre": "Maîtriser Gradle : Automatisation de builds pour projets Java/Kotlin"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de maîtriser Gradle, l'outil de build incontournable pour les projets Java/Kotlin."
+    },
+    "mindmap": {
+      "Carte thématique": "https://example.com/mindmap-gradle.png"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Java/Kotlin souhaitant automatiser leurs builds et améliorer leur productivité."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de base de Java ou Kotlin et d'un IDE comme IntelliJ IDEA ou Eclipse."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les fondamentaux de Gradle. Écrire et configurer des scripts Gradle. Gérer les dépendances. Automatiser les tâches de build, de test et de déploiement."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Configurer et utiliser Gradle pour gérer des projets Java/Kotlin. Créer des builds robustes et reproductibles. Intégrer Gradle avec d'autres outils de développement."
+    },
+    "timing": {
+      "Durée": "3 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, assistance personnalisée du formateur."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction à Gradle et à son écosystème. Configuration de projets. Gestion des dépendances avec des repositories. Tâches de build personnalisées. Tests unitaires et d'intégration avec Gradle. Automatisation du déploiement. Bonnes pratiques et astuces."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En présentiel à Paris ou à distance."
+    },
+    "price": {
+      "Tarifs": "900€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à une plateforme d'apprentissage en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur l'automatisation DevOps."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à une semaine avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation très pragmatique et bien structurée. Le formateur est très compétent et disponible."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Gradle n'a plus de secrets pour moi ! Cette formation m'a permis de gagner beaucoup de temps dans la gestion de mes projets."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Spring Cloud"
+    },
+    "title": {
+      "Titre": "Microservices avec Spring Cloud"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de maîtriser les concepts et les outils de Spring Cloud pour construire et déployer des architectures microservices robustes et scalables."
+    },
+    "mindmap": {
+      "Carte thématique": "https://example.com/mindmap-spring-cloud.png"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Java/Kotlin expérimentés avec une connaissance de Spring Boot."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Bonne compréhension de Spring Boot et des principes des microservices."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les différents composants de Spring Cloud (Eureka, Ribbon, Feign, Zuul/Gateway). Mettre en œuvre des patterns de communication entre microservices. Gérer la configuration et la sécurité des microservices."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Concevoir et développer des architectures microservices avec Spring Cloud. Déployer et gérer des applications microservices dans un environnement distribué."
+    },
+    "timing": {
+      "Durée": "3 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction aux microservices et à Spring Cloud. Service Discovery avec Eureka. Client-side load balancing avec Ribbon. Développement d'API REST avec Feign. API Gateway avec Zuul/Gateway. Gestion de la configuration avec Spring Cloud Config. Sécurité des microservices avec Spring Cloud Security. Déploiement avec Docker et Kubernetes."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En présentiel à Paris ou à distance."
+    },
+    "price": {
+      "Tarifs": "1200€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement cloud."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur Kubernetes et les architectures distribuées."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation complète et pertinente, très bon formateur."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Cette formation m'a permis d'acquérir les compétences nécessaires pour mettre en place une architecture microservices dans mon entreprise."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Développement Web"
+    },
+    "title": {
+      "Titre": "Formation TypeScript et React"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de maîtriser TypeScript et React pour développer des applications web modernes et robustes."
+    },
+    "mindmap": {
+      "Carte thématique": "Lien vers la mindmap"
+    },
+    "public_prospect": {
+      "Public": "Développeurs web ayant des connaissances de base en JavaScript."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de HTML, CSS et JavaScript."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les concepts clés de TypeScript et React. Développer des composants React réutilisables. Mettre en place une architecture d'application robuste. Intégrer des API REST."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Développer des applications web modernes avec TypeScript et React. Maîtriser le cycle de vie des composants React. Utiliser les hooks et le contexte React. Intégrer des librairies tierces."
+    },
+    "timing": {
+      "Durée": "5 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction à TypeScript et à la programmation orientée objet. Découverte de React et de ses concepts fondamentaux. Création de composants fonctionnels et à base de classes. Gestion du state et des props. Mise en place du routage. Consommation d'API REST. Tests unitaires et d'intégration. Déploiement de l'application."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En présentiel à Paris ou à distance."
+    },
+    "price": {
+      "Tarifs": "1500€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur React Native, Redux, ou Next.js."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation très complète et bien structurée. Le formateur était excellent et très pédagogue."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu acquérir les compétences nécessaires pour développer des applications web performantes avec TypeScript et React."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Développement Web"
+    },
+    "title": {
+      "Titre": "TypeScript Fonctionnel"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation explore les principes et les techniques de la programmation fonctionnelle appliqués à TypeScript, pour écrire du code plus clair, concis et maintenable."
+    },
+    "mindmap": {
+      "Carte thématique": "Lien vers la mindmap (à compléter)"
+    },
+    "public_prospect": {
+      "Public": "Développeurs TypeScript souhaitant améliorer la qualité de leur code et découvrir les avantages de la programmation fonctionnelle."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de base de TypeScript et de JavaScript."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les concepts clés de la programmation fonctionnelle. Appliquer les principes de la programmation fonctionnelle en TypeScript. Utiliser des librairies fonctionnelles courantes. Améliorer la qualité et la maintenabilité du code."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Ecrire du code TypeScript fonctionnel, plus clair, concis et maintenable. Maîtriser les concepts d'immutabilité, de fonctions pures et de composition de fonctions. Intégrer des librairies fonctionnelles dans des projets TypeScript."
+    },
+    "timing": {
+      "Durée": "3 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, assistance personnalisée."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction à la programmation fonctionnelle. Fonctions pures, immutabilité, composition de fonctions. Gestion des effets de bord. Manipulation de données avec des fonctions d'ordre supérieur (map, filter, reduce). Utilisation de librairies fonctionnelles comme fp-ts ou Ramda. Mise en pratique avec des exemples concrets en TypeScript."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Exercices pratiques et revue de code."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En ligne ou en présentiel (à définir)"
+    },
+    "price": {
+      "Tarifs": "900€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur la programmation réactive fonctionnelle (RxJS)."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à une semaine avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation très instructive, les concepts sont bien expliqués et les exercices permettent de mettre en pratique les notions abordées."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer la qualité de mon code TypeScript et adopter une approche plus fonctionnelle."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Développement Web"
+    },
+    "title": {
+      "Titre": "Programmation Fonctionnelle et Design Patterns en TypeScript"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de maîtriser les concepts de la programmation fonctionnelle et des design patterns pour améliorer la qualité et la maintenabilité de votre code TypeScript."
+    },
+    "mindmap": {
+      "Carte thématique": "Lien vers la mindmap (à compléter)"
+    },
+    "public_prospect": {
+      "Public": "Développeurs TypeScript ayant une connaissance de base du langage."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de base de TypeScript et de JavaScript."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les principes de la programmation fonctionnelle. Appliquer les design patterns les plus courants en TypeScript. Écrire du code plus propre, plus maintenable et plus testable."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Mettre en œuvre les concepts de la programmation fonctionnelle en TypeScript. Choisir et implémenter les design patterns appropriés. Améliorer la qualité globale du code."
+    },
+    "timing": {
+      "Durée": "4 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction à la programmation fonctionnelle : immutabilité, fonctions pures, fonctions d'ordre supérieur. Design patterns : stratégie, observateur, décorateur, façade, etc. Exemples concrets d'application en TypeScript. Bonnes pratiques et pièges à éviter."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En présentiel à Paris ou à distance."
+    },
+    "price": {
+      "Tarifs": "1200€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur la programmation réactive fonctionnelle (RxJS)."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation très complète et bien menée. Les concepts sont expliqués clairement et les exercices permettent de bien les assimiler."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer significativement la qualité de mon code TypeScript en appliquant les principes de la programmation fonctionnelle et les design patterns."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Développement Kotlin"
+    },
+    "title": {
+      "Titre": "Kotlin et Langchain4j"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de découvrir et maîtriser Langchain4j, une librairie Kotlin pour faciliter le développement d'applications basées sur les chaînes."
+    },
+    "mindmap": {
+      "Carte thématique": "Lien vers la mindmap (à compléter)"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Kotlin intéressés par l'utilisation des chaînes et des agents conversationnels."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d’accès à la formation (Qualiopi)": "Connaissance de base de Kotlin et des principes de la programmation orientée objet."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les concepts clés de Langchain4j.  Développer des applications utilisant des chaînes et des agents.  Intégrer Langchain4j avec d'autres librairies Kotlin."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Construire des applications utilisant Langchain4j pour des tâches telles que la génération de texte, la réponse aux questions et la création d'agents conversationnels."
+    },
+    "timing": {
+      "Durée (Temporisation)] (Qualiopi)": "2 jours"
+    },
+    "means": {
+      "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, assistance personnalisée."
+    },
+    "program": {
+      "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement": "Introduction à Langchain4j et à ses concepts fondamentaux.  Construction de chaînes simples et complexes.  Création d'agents conversationnels.  Intégration avec des modèles de langage.  Exemples pratiques et cas d'utilisation."
+    },
+    "evaluations": {
+      "Modalités d’évaluations] (Qualiopi)": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Modalités de certification et Certification visé] (Qualiopi)": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux] (Qualiopi)": "En ligne ou en présentiel (à définir)"
+    },
+    "price": {
+      "Tarifs": "800€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels] (Qualiopi)": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation] (Qualiopi)": "Formations avancées sur le développement d'agents conversationnels et l'intelligence artificielle."
+    },
+    "access_time": {
+      "Délais d’accès] (Réglementaire)": "Inscription possible jusqu'à une semaine avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap] (Qualiopi)": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation] (Qualiopi)": "Formation concise et efficace, permettant une rapide prise en main de Langchain4j."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu intégrer Langchain4j dans mon projet et développer un agent conversationnel performant."
+    }
+  },
+  {
+    "theme": {
+      "Thème": "Développement Kotlin"
+    },
+    "title": {
+      "Titre": "Programmation Fonctionnelle et Design Patterns en Kotlin"
+    },
+    "presentation": {
+      "Présentation et description": "Cette formation vous permettra de maîtriser les concepts de la programmation fonctionnelle et des design patterns en Kotlin pour écrire du code plus élégant, maintenable et testable."
+    },
+    "mindmap": {
+      "Carte thématique": "Lien vers la mindmap (à compléter)"
+    },
+    "public_prospect": {
+      "Public": "Développeurs Kotlin souhaitant améliorer leurs compétences et adopter une approche plus fonctionnelle."
+    },
+    "pre_requis": {
+      "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de base de Kotlin et de la programmation orientée objet."
+    },
+    "objectives": {
+      "Objectifs pédagogiques (Qualiopi)": "Comprendre les principes de la programmation fonctionnelle : immutabilité, fonctions pures, fonctions d'ordre supérieur. Appliquer les design patterns les plus courants en Kotlin. Concevoir des architectures logicielles plus robustes et évolutives."
+    },
+    "skills": {
+      "Compétences visées (Qualiopi)": "Ecrire du code Kotlin fonctionnel, clair et concis. Mettre en œuvre les design patterns appropriés pour résoudre des problèmes de conception courants. Améliorer la qualité et la maintenabilité du code."
+    },
+    "timing": {
+      "Durée": "4 jours"
+    },
+    "means": {
+      "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, assistance personnalisée du formateur."
+    },
+    "program": {
+      "Programme pédagogique": "Introduction à la programmation fonctionnelle en Kotlin. Fonctions d'ordre supérieur, lambdas, fonctions pures. Design patterns : stratégie, observateur, décorateur, etc. Exemples concrets d'application en Kotlin. Bonnes pratiques et pièges à éviter."
+    },
+    "evaluations": {
+      "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+    },
+    "certification": {
+      "Certification": "Certificat de réussite délivré à la fin de la formation."
+    },
+    "place": {
+      "Lieux": "En présentiel à Paris ou à distance."
+    },
+    "price": {
+      "Tarifs": "1200€"
+    },
+    "infrastructure": {
+      "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+    },
+    "pursuit": {
+      "Poursuite en formation": "Formations avancées sur Kotlin et les architectures logicielles."
+    },
+    "access_time": {
+      "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+    },
+    "mobility": {
+      "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+    },
+    "testimony": {
+      "Témoignage Evaluation de la formation": "Formation très enrichissante et pragmatique. Le formateur est un expert passionné et pédagogue."
+    },
+    "testimony_customer": {
+      "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer significativement la qualité de mon code Kotlin et acquérir une nouvelle vision de la programmation."
+    }
+  }
+]
