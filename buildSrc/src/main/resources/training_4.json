@@ -1,29 +1,65 @@
 {
-  "theme": [
-    "Thème",
-    "Spring Cloud"
-  ],
-  "title": [
-    "Titre",
-    "Microservices avec Spring Cloud"
-  ],
-  "presentation": "Cette formation vous permettra de maîtriser les concepts et les outils de Spring Cloud pour construire et déployer des architectures microservices robustes et scalables.",
-  "mindmap": "https://example.com/mindmap-spring-cloud.png",
-  "public_prospect": "Développeurs Java/Kotlin expérimentés avec une connaissance de Spring Boot.",
-  "prerequiz": "Bonne compréhension de Spring Boot et des principes des microservices.",
-  "objs": "Comprendre les différents composants de Spring Cloud (Eureka, Ribbon, Feign, Zuul/Gateway).  Mettre en œuvre des patterns de communication entre microservices.  Gérer la configuration et la sécurité des microservices.",
-  "competences": "Concevoir et développer des architectures microservices avec Spring Cloud.  Déployer et gérer des applications microservices dans un environnement distribué.",
-  "timing": "3 jours",
-  "means": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée.",
-  "prgm": "Introduction aux microservices et à Spring Cloud.  Service Discovery avec Eureka.  Client-side load balancing avec Ribbon.  Développement d'API REST avec Feign.  API Gateway avec Zuul/Gateway.  Gestion de la configuration avec Spring Cloud Config.  Sécurité des microservices avec Spring Cloud Security.  Déploiement avec Docker et Kubernetes.",
-  "eval": "Évaluation continue basée sur des exercices pratiques et un projet final.",
-  "certif": "Certificat de réussite délivré à la fin de la formation.",
-  "place": "En présentiel à Paris ou à distance.",
-  "price": "1200€",
-  "infra": "Salle de formation équipée ou accès à un environnement cloud.",
-  "pursuit": "Formations avancées sur Kubernetes et les architectures distribuées.",
-  "access_time": "Inscription possible jusqu'à 2 semaines avant le début de la formation.",
-  "mobility": "Accès aux personnes à mobilité réduite, supports de cours adaptés.",
-  "testimony": "Formation complète et pertinente, très bon formateur.",
-  "testimony_customer": "Cette formation m'a permis d'acquérir les compétences nécessaires pour mettre en place une architecture microservices dans mon entreprise."
+  "theme": {
+    "Thème": "Spring Cloud"
+  },
+  "title": {
+    "Titre": "Microservices avec Spring Cloud"
+  },
+  "presentation": {
+    "Présentation et description": "Cette formation vous permettra de maîtriser les concepts et les outils de Spring Cloud pour construire et déployer des architectures microservices robustes et scalables."
+  },
+  "mindmap": {
+    "Carte thématique": "https://example.com/mindmap-spring-cloud.png"
+  },
+  "public_prospect": {
+    "Public": "Développeurs Java/Kotlin expérimentés avec une connaissance de Spring Boot."
+  },
+  "pre_requis": {
+    "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Bonne compréhension de Spring Boot et des principes des microservices."
+  },
+  "objectives": {
+    "Objectifs pédagogiques (Qualiopi)": "Comprendre les différents composants de Spring Cloud (Eureka, Ribbon, Feign, Zuul/Gateway). Mettre en œuvre des patterns de communication entre microservices. Gérer la configuration et la sécurité des microservices."
+  },
+  "skills": {
+    "Compétences visées (Qualiopi)": "Concevoir et développer des architectures microservices avec Spring Cloud. Déployer et gérer des applications microservices dans un environnement distribué."
+  },
+  "timing": {
+    "Durée": "3 jours"
+  },
+  "means": {
+    "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, projets guidés, assistance personnalisée."
+  },
+  "program": {
+    "Programme pédagogique": "Introduction aux microservices et à Spring Cloud. Service Discovery avec Eureka. Client-side load balancing avec Ribbon. Développement d'API REST avec Feign. API Gateway avec Zuul/Gateway. Gestion de la configuration avec Spring Cloud Config. Sécurité des microservices avec Spring Cloud Security. Déploiement avec Docker et Kubernetes."
+  },
+  "evaluations": {
+    "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+  },
+  "certification": {
+    "Certification": "Certificat de réussite délivré à la fin de la formation."
+  },
+  "place": {
+    "Lieux": "En présentiel à Paris ou à distance."
+  },
+  "price": {
+    "Tarifs": "1200€"
+  },
+  "infrastructure": {
+    "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement cloud."
+  },
+  "pursuit": {
+    "Poursuite en formation": "Formations avancées sur Kubernetes et les architectures distribuées."
+  },
+  "access_time": {
+    "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+  },
+  "mobility": {
+    "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+  },
+  "testimony": {
+    "Témoignage Evaluation de la formation": "Formation complète et pertinente, très bon formateur."
+  },
+  "testimony_customer": {
+    "Témoignage apprenant/commanditaire": "Cette formation m'a permis d'acquérir les compétences nécessaires pour mettre en place une architecture microservices dans mon entreprise."
+  }
 }

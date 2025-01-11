@@ -9,23 +9,57 @@
     "Présentation et description": "Ce cours explore les fonctionnalités avancées de Kotlin pour construire des applications robustes et performantes."
   },
   "mindmap": {
-    "Carte thématique":"https://example.com/mindmap.png"
+    "Carte thématique": "https://example.com/mindmap.png"
   },
-//  "public_prospect": "Développeurs Kotlin ayant une connaissance de base du langage.",
-//  "prerequiz": "Connaissance de la syntaxe Kotlin et des concepts de programmation orientée objet.",
-//  "objs": "Maîtriser les coroutines, les génériques et les DSL en Kotlin.",
-//  "competences": "Développer des applications Kotlin avec des fonctionnalités avancées.",
-//  "timing": "3 jours",
-//  "means": "Encadrement par un formateur expert, support en ligne et exercices pratiques.",
-//  "prgm": "Introduction aux coroutines, gestion des flux asynchrones, création de DSL, utilisation avancée des génériques.",
-//  "eval": "Exercices pratiques et projet final.",
-//  "certif": "Certificat de réussite délivré à la fin de la formation.",
-//  "place": "En ligne ou en présentiel.",
-//  "price": "1200€",
-//  "infra": "Salle de formation équipée, accès internet haut débit.",
-//  "pursuit": "Possibilité de suivre une formation d'expert Kotlin.",
-//  "access_time": "Inscription possible jusqu'à une semaine avant le début de la formation.",
-//  "mobility": "Accès handicapés, supports de cours adaptés.",
-//  "testimony": "Excellente formation, très complète et pratique. Le formateur est un expert passionné.",
-//  "testimony_customer": "Grâce à cette formation, j'ai pu améliorer mes compétences en Kotlin et développer des applications plus performantes."
+  "public_prospect": {
+    "Public": "Développeurs Kotlin ayant une connaissance de base du langage."
+  },
+  "pre_requis": {
+    "Pré-requis et conditions d’accès à la formation (Qualiopi)": "Connaissance de la syntaxe Kotlin et des concepts de programmation orientée objet."
+  },
+  "objectives": {
+    "Objectifs pédagogiques (Qualiopi)": "Maîtriser les coroutines, les génériques et les DSL en Kotlin."
+  },
+  "skills": {
+    "Compétences visées (Qualiopi)": "Développer des applications Kotlin avec des fonctionnalités avancées."
+  },
+  "timing": {
+    "Durée (Temporisation)] (Qualiopi)": "3 jours"
+  },
+  "means": {
+    "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)": "Encadrement par un formateur expert, support en ligne et exercices pratiques."
+  },
+  "program": {
+    "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement": "Introduction aux coroutines, gestion des flux asynchrones, création de DSL, utilisation avancée des génériques."
+  },
+  "evaluations": {
+    "Modalités d’évaluations] (Qualiopi)": "Exercices pratiques et projet final."
+  },
+  "certification": {
+    "Modalités de certification et Certification visé] (Qualiopi)": "Certificat de réussite délivré à la fin de la formation."
+  },
+  "place": {
+    "Lieux] (Qualiopi)": "En ligne ou en présentiel."
+  },
+  "price": {
+    "Tarifs": "1200€"
+  },
+  "infrastructure": {
+    "Moyens logistiques et matériels] (Qualiopi)": "Salle de formation équipée, accès internet haut débit."
+  },
+  "pursuit": {
+    "Poursuite en formation] (Qualiopi)": "Possibilité de suivre une formation d'expert Kotlin."
+  },
+  "access_time": {
+    "Délais d’accès] (Réglementaire)": "Inscription possible jusqu'à une semaine avant le début de la formation."
+  },
+  "mobility": {
+    "Accessibilité et Handicap] (Qualiopi)": "Accès handicapés, supports de cours adaptés."
+  },
+  "testimony": {
+    "Témoignage Evaluation de la formation] (Qualiopi)": "Excellente formation, très complète et pratique. Le formateur est un expert passionné."
+  },
+  "testimony_customer": {
+    "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer mes compétences en Kotlin et développer des applications plus performantes."
+  }
 }

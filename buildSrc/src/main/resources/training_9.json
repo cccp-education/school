@@ -1,29 +1,65 @@
 {
-  "theme": [
-    "Thème",
-    "Développement Kotlin"
-  ],
-  "title": [
-    "Titre",
-    "Programmation Fonctionnelle et Design Patterns en Kotlin"
-  ],
-  "presentation": "Cette formation vous permettra de maîtriser les concepts de la programmation fonctionnelle et des design patterns en Kotlin pour écrire du code plus élégant, maintenable et testable.",
-  "mindmap": "Lien vers la mindmap (à compléter)",
-  "public_prospect": "Développeurs Kotlin souhaitant améliorer leurs compétences et adopter une approche plus fonctionnelle.",
-  "prerequiz": "Connaissance de base de Kotlin et de la programmation orientée objet.",
-  "objs": "Comprendre les principes de la programmation fonctionnelle : immutabilité, fonctions pures, fonctions d'ordre supérieur.  Appliquer les design patterns les plus courants en Kotlin.  Concevoir des architectures logicielles plus robustes et évolutives.",
-  "competences": "Ecrire du code Kotlin fonctionnel, clair et concis.  Mettre en œuvre les design patterns appropriés pour résoudre des problèmes de conception courants.  Améliorer la qualité et la maintenabilité du code.",
-  "timing": "4 jours",
-  "means": "Support de cours, exercices pratiques, assistance personnalisée du formateur.",
-  "prgm": "Introduction à la programmation fonctionnelle en Kotlin.  Fonctions d'ordre supérieur, lambdas, fonctions pures.  Design patterns : stratégie, observateur, décorateur, etc.  Exemples concrets d'application en Kotlin.  Bonnes pratiques et pièges à éviter.",
-  "eval": "Évaluation continue basée sur des exercices pratiques et un projet final.",
-  "certif": "Certificat de réussite délivré à la fin de la formation.",
-  "place": "En présentiel à Paris ou à distance.",
-  "price": "1200€",
-  "infra": "Salle de formation équipée ou accès à un environnement de développement en ligne.",
-  "pursuit": "Formations avancées sur Kotlin et les architectures logicielles.",
-  "access_time": "Inscription possible jusqu'à 2 semaines avant le début de la formation.",
-  "mobility": "Accès aux personnes à mobilité réduite, supports de cours adaptés.",
-  "testimony": "Formation très enrichissante et pragmatique. Le formateur est un expert passionné et pédagogue.",
-  "testimony_customer": "Grâce à cette formation, j'ai pu améliorer significativement la qualité de mon code Kotlin et acquérir une nouvelle vision de la programmation."
+  "theme": {
+    "Thème": "Développement Kotlin"
+  },
+  "title": {
+    "Titre": "Programmation Fonctionnelle et Design Patterns en Kotlin"
+  },
+  "presentation": {
+    "Présentation et description": "Cette formation vous permettra de maîtriser les concepts de la programmation fonctionnelle et des design patterns en Kotlin pour écrire du code plus élégant, maintenable et testable."
+  },
+  "mindmap": {
+    "Carte thématique": "Lien vers la mindmap (à compléter)"
+  },
+  "public_prospect": {
+    "Public": "Développeurs Kotlin souhaitant améliorer leurs compétences et adopter une approche plus fonctionnelle."
+  },
+  "pre_requis": {
+    "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de base de Kotlin et de la programmation orientée objet."
+  },
+  "objectives": {
+    "Objectifs pédagogiques (Qualiopi)": "Comprendre les principes de la programmation fonctionnelle : immutabilité, fonctions pures, fonctions d'ordre supérieur. Appliquer les design patterns les plus courants en Kotlin. Concevoir des architectures logicielles plus robustes et évolutives."
+  },
+  "skills": {
+    "Compétences visées (Qualiopi)": "Ecrire du code Kotlin fonctionnel, clair et concis. Mettre en œuvre les design patterns appropriés pour résoudre des problèmes de conception courants. Améliorer la qualité et la maintenabilité du code."
+  },
+  "timing": {
+    "Durée": "4 jours"
+  },
+  "means": {
+    "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, assistance personnalisée du formateur."
+  },
+  "program": {
+    "Programme pédagogique": "Introduction à la programmation fonctionnelle en Kotlin. Fonctions d'ordre supérieur, lambdas, fonctions pures. Design patterns : stratégie, observateur, décorateur, etc. Exemples concrets d'application en Kotlin. Bonnes pratiques et pièges à éviter."
+  },
+  "evaluations": {
+    "Modalités d'évaluations": "Évaluation continue basée sur des exercices pratiques et un projet final."
+  },
+  "certification": {
+    "Certification": "Certificat de réussite délivré à la fin de la formation."
+  },
+  "place": {
+    "Lieux": "En présentiel à Paris ou à distance."
+  },
+  "price": {
+    "Tarifs": "1200€"
+  },
+  "infrastructure": {
+    "Moyens logistiques et matériels": "Salle de formation équipée ou accès à un environnement de développement en ligne."
+  },
+  "pursuit": {
+    "Poursuite en formation": "Formations avancées sur Kotlin et les architectures logicielles."
+  },
+  "access_time": {
+    "Délais d'accès": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+  },
+  "mobility": {
+    "Accessibilité et Handicap": "Accès aux personnes à mobilité réduite, supports de cours adaptés."
+  },
+  "testimony": {
+    "Témoignage Evaluation de la formation": "Formation très enrichissante et pragmatique. Le formateur est un expert passionné et pédagogue."
+  },
+  "testimony_customer": {
+    "Témoignage apprenant/commanditaire": "Grâce à cette formation, j'ai pu améliorer significativement la qualité de mon code Kotlin et acquérir une nouvelle vision de la programmation."
+  }
 }

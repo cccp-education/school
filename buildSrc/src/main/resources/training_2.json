@@ -1,29 +1,65 @@
 {
-  "theme": [
-    "Thème",
-    "Spring Boot Reactive"
-  ],
-  "title": [
-    "Titre",
-    "Maîtriser Spring Boot Reactive"
-  ],
-  "presentation": "Cette formation vous permettra d'acquérir les compétences nécessaires pour développer des applications réactives performantes avec Spring Boot.",
-  "mindmap": "https://example.com/mindmap-spring-reactive.png",
-  "public_prospect": "Développeurs Java/Kotlin ayant une connaissance de base de Spring.",
-  "prerequiz": "Connaissance de Java/Kotlin et des principes de base de Spring.",
-  "objs": "Comprendre et appliquer les principes de la programmation réactive avec Spring WebFlux. Développer des API REST réactives.  Gérer les flux de données asynchrones.",
-  "competences": "Être capable de concevoir et développer des applications Spring Boot réactives. Maîtriser les concepts de WebFlux et la gestion des flux asynchrones.",
-  "timing": "2 jours",
-  "means": "Support de cours, exercices pratiques, accès à une plateforme d'apprentissage en ligne.",
-  "prgm": "Introduction à la programmation réactive.  Découverte de Spring WebFlux.  Création d'API REST réactives.  Gestion des erreurs et des exceptions.  Tests unitaires et d'intégration.  Déploiement d'applications réactives.",
-  "eval": "QCM et mise en pratique avec un projet.",
-  "certif": "Certificat de réussite délivré à la fin de la formation.",
-  "place": "À distance ou en présentiel (Paris).",
-  "price": "800€",
-  "infra": "Ordinateur portable, connexion internet stable.",
-  "pursuit": "Possibilité de poursuivre avec une formation sur Spring Cloud.",
-  "access_time": "Inscription possible jusqu'à 2 semaines avant le début de la formation.",
-  "mobility": "Formation accessible aux personnes à mobilité réduite.",
-  "testimony": "Formation très enrichissante, les concepts sont clairs et les exercices pratiques permettent de bien assimiler la matière.",
-  "testimony_customer": "J'ai pu appliquer directement les connaissances acquises lors de cette formation à mon projet professionnel.  Je recommande vivement !"
+  "theme": {
+    "Thème": "Spring Boot Reactive"
+  },
+  "title": {
+    "Titre": "Maîtriser Spring Boot Reactive"
+  },
+  "presentation": {
+    "Présentation et description": "Cette formation vous permettra d'acquérir les compétences nécessaires pour développer des applications réactives performantes avec Spring Boot."
+  },
+  "mindmap": {
+    "Carte thématique": "https://example.com/mindmap-spring-reactive.png"
+  },
+  "public_prospect": {
+    "Public": "Développeurs Java/Kotlin ayant une connaissance de base de Spring."
+  },
+  "pre_requis": {
+    "Pré-requis et conditions d'accès à la formation (Qualiopi)": "Connaissance de Java/Kotlin et des principes de base de Spring."
+  },
+  "objectives": {
+    "Objectifs pédagogiques (Qualiopi)": "Comprendre et appliquer les principes de la programmation réactive avec Spring WebFlux. Développer des API REST réactives. Gérer les flux de données asynchrones."
+  },
+  "skills": {
+    "Compétences visées (Qualiopi)": "Être capable de concevoir et développer des applications Spring Boot réactives. Maîtriser les concepts de WebFlux et la gestion des flux asynchrones."
+  },
+  "timing": {
+    "Durée (Temporisation)] (Qualiopi)": "2 jours"
+  },
+  "means": {
+    "Moyen d'accompagnement et Suivi pédagogique (Qualiopi)": "Support de cours, exercices pratiques, accès à une plateforme d'apprentissage en ligne."
+  },
+  "program": {
+    "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement": "Introduction à la programmation réactive. Découverte de Spring WebFlux. Création d'API REST réactives. Gestion des erreurs et des exceptions. Tests unitaires et d'intégration. Déploiement d'applications réactives."
+  },
+  "evaluations": {
+    "Modalités d'évaluations] (Qualiopi)": "QCM et mise en pratique avec un projet."
+  },
+  "certification": {
+    "Modalités de certification et Certification visé] (Qualiopi)": "Certificat de réussite délivré à la fin de la formation."
+  },
+  "place": {
+    "Lieux] (Qualiopi)": "À distance ou en présentiel (Paris)."
+  },
+  "price": {
+    "Tarifs": "800€"
+  },
+  "infrastructure": {
+    "Moyens logistiques et matériels] (Qualiopi)": "Ordinateur portable, connexion internet stable."
+  },
+  "pursuit": {
+    "Poursuite en formation] (Qualiopi)": "Possibilité de poursuivre avec une formation sur Spring Cloud."
+  },
+  "access_time": {
+    "Délais d'accès] (Réglementaire)": "Inscription possible jusqu'à 2 semaines avant le début de la formation."
+  },
+  "mobility": {
+    "Accessibilité et Handicap] (Qualiopi)": "Formation accessible aux personnes à mobilité réduite."
+  },
+  "testimony": {
+    "Témoignage Evaluation de la formation] (Qualiopi)": "Formation très enrichissante, les concepts sont clairs et les exercices pratiques permettent de bien assimiler la matière."
+  },
+  "testimony_customer": {
+    "Témoignage apprenant/commanditaire": "J'ai pu appliquer directement les connaissances acquises lors de cette formation à mon projet professionnel. Je recommande vivement !"
+  }
 }
