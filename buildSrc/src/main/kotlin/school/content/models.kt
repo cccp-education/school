@@ -7,41 +7,28 @@ import com.fasterxml.jackson.annotation.JsonRootName
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import school.content.TrainingData.ACCESS_TIME_CAPTION
-import school.content.TrainingData.CERTIFICATION_CAPTION
-import school.content.TrainingData.EVALUATIONS_CAPTION
-import school.content.TrainingData.INFRASTRUCTURE_CAPTION
-import school.content.TrainingData.MEANS_CAPTION
-import school.content.TrainingData.MINDMAP_CAPTION
-import school.content.TrainingData.MOBILITY_CAPTION
-import school.content.TrainingData.OBJECTIVES_CAPTION
-import school.content.TrainingData.PLACE_CAPTION
-import school.content.TrainingData.PRESENTATION_CAPTION
-import school.content.TrainingData.PRICE_CAPTION
-import school.content.TrainingData.PROGRAM_CAPTION
-import school.content.TrainingData.PUBLIC_PROSPECT_CAPTION
-import school.content.TrainingData.PURSUIT_CAPTION
-import school.content.TrainingData.SKILLS_CAPTION
-import school.content.TrainingData.TESTIMONY_CAPTION
-import school.content.TrainingData.TESTIMONY_CUSTOMER_CAPTION
-import school.content.TrainingData.THEME_CAPTION
-import school.content.TrainingData.TIMING_CAPTION
-import school.content.TrainingData.TITLE_CAPTION
-import java.io.File
+import school.content.SPG.Data.ACCESS_TIME_CAPTION
+import school.content.SPG.Data.CERTIFICATION_CAPTION
+import school.content.SPG.Data.EVALUATIONS_CAPTION
+import school.content.SPG.Data.INFRASTRUCTURE_CAPTION
+import school.content.SPG.Data.MEANS_CAPTION
+import school.content.SPG.Data.MINDMAP_CAPTION
+import school.content.SPG.Data.MOBILITY_CAPTION
+import school.content.SPG.Data.OBJECTIVES_CAPTION
+import school.content.SPG.Data.PLACE_CAPTION
+import school.content.SPG.Data.PRESENTATION_CAPTION
+import school.content.SPG.Data.PRICE_CAPTION
+import school.content.SPG.Data.PROGRAM_CAPTION
+import school.content.SPG.Data.PUBLIC_PROSPECT_CAPTION
+import school.content.SPG.Data.PURSUIT_CAPTION
+import school.content.SPG.Data.SKILLS_CAPTION
+import school.content.SPG.Data.TESTIMONY_CAPTION
+import school.content.SPG.Data.TESTIMONY_CUSTOMER_CAPTION
+import school.content.SPG.Data.THEME_CAPTION
+import school.content.SPG.Data.TIMING_CAPTION
+import school.content.SPG.Data.TITLE_CAPTION
 
-/*prompt: Genere moi un jeux de valeur en json pour cette classe, le sujet de la formation sera kotlin et langchain4j.  @JvmRecord @JsonRootName(value = "SPG") data class SPG(     val theme: Map<String, String> = mapOf("Thème" to ""),     val title: Map<String, String> = mapOf("Titre" to ""),     val presentation: String = "Présentation et description",     val mindmap: String = "Carte thématique",     @JsonProperty("public_ prospect" )      val publicProspect: String = "Public",     val prerequiz: String = "Pré-requis et conditions d’accès à la formation (Qualiopi)",     val objs: String = "Objectifs pédagogiques (Qualiopi)",     val competences: String = "Compétences visées (Qualiopi)",     val timing: String = "Durée (Temporisation)] (Qualiopi)",     val means: String = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)",     val prgm: String = "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement",     val eval: String = "Modalités d’évaluations] (Qualiopi)",     val certif: String = "Modalités de certification et Certification visé] (Qualiopi)",     val place: String = "Lieux] (Qualiopi)",     val price: String = "Tarifs",     val infra: String = "Moyens logistiques et matériels] (Qualiopi)",     val pursuit: String = "Poursuite en formation] (Qualiopi)",     @JsonProperty("access_ time" )      val accessTime: String = "Délais d’accès] (Réglementaire)",     val mobility: String = "Accessibilité et Handicap] (Qualiopi)",     val testimony: String = "Témoignage Evaluation de la formation] (Qualiopi)",     @JsonProperty("testimony_ customer" )      val testimonyCustomer: String = "Témoignage apprenant/commanditaire" ,  )*/
-@JvmRecord
-data class Formation(
-    val nom: String,
-    val spg: SPG
-)
 
-data class Training(
-    val spg: SPG,
-    val spds: Set<SPD> = emptySet()
-)
-
-// TODO: A la place de caption on mettra la caption_lang_key
 val content: List<Triple</*json_key*/String,/*caption*/String, /*attribute*/String>> = listOf(
     Triple("theme", "Thème", "theme"),
     Triple("title", "Titre", "titre"),
@@ -69,8 +56,16 @@ val content: List<Triple</*json_key*/String,/*caption*/String, /*attribute*/Stri
     Triple("testimony", "Témoignage Evaluation de la formation] (Qualiopi)", "testimony"),
     Triple("testimony_customer", "Témoignage apprenant/commanditaire", "testimonyCustomer")
 )
+/*prompt: Genere moi un jeux de valeur en json pour cette classe, le sujet de la formation sera kotlin et langchain4j.  @JvmRecord @JsonRootName(value = "SPG") data class SPG(     val theme: Map<String, String> = mapOf("Thème" to ""),     val title: Map<String, String> = mapOf("Titre" to ""),     val presentation: String = "Présentation et description",     val mindmap: String = "Carte thématique",     @JsonProperty("public_ prospect" )      val publicProspect: String = "Public",     val prerequiz: String = "Pré-requis et conditions d’accès à la formation (Qualiopi)",     val objs: String = "Objectifs pédagogiques (Qualiopi)",     val competences: String = "Compétences visées (Qualiopi)",     val timing: String = "Durée (Temporisation)] (Qualiopi)",     val means: String = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)",     val prgm: String = "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement",     val eval: String = "Modalités d’évaluations] (Qualiopi)",     val certif: String = "Modalités de certification et Certification visé] (Qualiopi)",     val place: String = "Lieux] (Qualiopi)",     val price: String = "Tarifs",     val infra: String = "Moyens logistiques et matériels] (Qualiopi)",     val pursuit: String = "Poursuite en formation] (Qualiopi)",     @JsonProperty("access_ time" )      val accessTime: String = "Délais d’accès] (Réglementaire)",     val mobility: String = "Accessibilité et Handicap] (Qualiopi)",     val testimony: String = "Témoignage Evaluation de la formation] (Qualiopi)",     @JsonProperty("testimony_ customer" )      val testimonyCustomer: String = "Témoignage apprenant/commanditaire" ,  )*/
+@JvmRecord
+@JsonRootName(value = "Training")
+data class Training(
+    val spg: SPG,
+    val spds: Set<SPD> = emptySet()
+)
 
 /** SPG: Scénario Pédagogique Global */
+// TODO: A la place de caption on mettra la caption_lang_key
 @JvmRecord
 @JsonRootName(value = "SPG")
 data class SPG(
@@ -99,7 +94,49 @@ data class SPG(
     val testimony: Map<String, String> = mapOf(TESTIMONY_CAPTION to ""),
     @JsonProperty("testimony_customer")
     val testimonyCustomer: Map<String, String> = mapOf(TESTIMONY_CUSTOMER_CAPTION to ""),
+){
+    object Data {
+        const val THEME_CAPTION = "Thème"
+        const val TITLE_CAPTION = "Titre"
+        const val PRESENTATION_CAPTION = "Présentation et description"
+        const val MINDMAP_CAPTION = "Carte thématique"
+        const val PUBLIC_PROSPECT_CAPTION = "Public"
+        const val PRE_REQUIS_CAPTION = "Pré-requis et conditions d’accès à la formation (Qualiopi)"
+        const val OBJECTIVES_CAPTION = "Objectifs pédagogiques (Qualiopi)"
+        const val SKILLS_CAPTION = "Compétences visées (Qualiopi)"
+        const val TIMING_CAPTION = "Durée (Temporisation)] (Qualiopi)"
+        const val MEANS_CAPTION = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)"
+        const val PROGRAM_CAPTION =
+            "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement"
+        const val EVALUATIONS_CAPTION = "Modalités d’évaluations] (Qualiopi)"
+        const val CERTIFICATION_CAPTION = "Modalités de certification et Certification visé] (Qualiopi)"
+        const val PLACE_CAPTION = "Lieux] (Qualiopi)"
+        const val PRICE_CAPTION = "Tarifs"
+        const val INFRASTRUCTURE_CAPTION = "Moyens logistiques et matériels] (Qualiopi)"
+        const val PURSUIT_CAPTION = "Poursuite en formation] (Qualiopi)"
+        const val ACCESS_TIME_CAPTION = "Délais d’accès] (Réglementaire)"
+        const val MOBILITY_CAPTION = "Accessibilité et Handicap] (Qualiopi)"
+        const val TESTIMONY_CAPTION = "Témoignage Evaluation de la formation] (Qualiopi)"
+        const val TESTIMONY_CUSTOMER_CAPTION = "Témoignage apprenant/commanditaire"
+    }
+}
+
+/** SPD: Scénario Pédagogique Détaillé */
+@JvmRecord
+@JsonRootName(value = "SPD")
+data class SPD(
+    val titre: String = "",
+    val objectif: String = ""
 )
+
+val SPD.toYaml: String
+    get() = run(YAMLMapper()::writeValueAsString)
+val SPD.toJson: String
+    get() = run(JsonMapper()::writeValueAsString)
+val String.spdYamlMapper: SPD
+    get() = run(YAMLMapper()::readValue)
+val String.spdJsonMapper: SPD
+    get() = run(JsonMapper()::readValue)
 
 val SPG.toYaml: String
     get() = run(YAMLMapper()::writeValueAsString)
@@ -110,51 +147,11 @@ val String.spgYamlMapper: SPG
 val String.spgJsonMapper: SPG
     get() = run(JsonMapper()::readValue)
 
-
-/**
- * SPD : Scénario Pédagogique Détaillé
- */
-@JvmRecord
-data class SPD(
-    val titre: String = "",
-    val objectif: String = ""
-)
-
-object TrainingData {
-    @JvmStatic
-    fun main(args: Array<String>): Unit {
-        val trainingPath = "/workspace/school/buildSrc/src/main/resources/training_8.json"
-        SPG().toJson.run(::println)
-        SPG().toYaml.run(::println)
-        "${System.getProperty("user.home")}$trainingPath"
-            .run(::File)
-            .readText()
-            .apply(::println)
-            .run(String::spgJsonMapper)
-            .run(::println)
-
-    }
-
-    const val THEME_CAPTION = "Thème"
-    const val TITLE_CAPTION = "Titre"
-    const val PRESENTATION_CAPTION = "Présentation et description"
-    const val MINDMAP_CAPTION = "Carte thématique"
-    const val PUBLIC_PROSPECT_CAPTION = "Public"
-    const val PRE_REQUIS_CAPTION = "Pré-requis et conditions d’accès à la formation (Qualiopi)"
-    const val OBJECTIVES_CAPTION = "Objectifs pédagogiques (Qualiopi)"
-    const val SKILLS_CAPTION = "Compétences visées (Qualiopi)"
-    const val TIMING_CAPTION = "Durée (Temporisation)] (Qualiopi)"
-    const val MEANS_CAPTION = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)"
-    const val PROGRAM_CAPTION =
-        "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement"
-    const val EVALUATIONS_CAPTION = "Modalités d’évaluations] (Qualiopi)"
-    const val CERTIFICATION_CAPTION = "Modalités de certification et Certification visé] (Qualiopi)"
-    const val PLACE_CAPTION = "Lieux] (Qualiopi)"
-    const val PRICE_CAPTION = "Tarifs"
-    const val INFRASTRUCTURE_CAPTION = "Moyens logistiques et matériels] (Qualiopi)"
-    const val PURSUIT_CAPTION = "Poursuite en formation] (Qualiopi)"
-    const val ACCESS_TIME_CAPTION = "Délais d’accès] (Réglementaire)"
-    const val MOBILITY_CAPTION = "Accessibilité et Handicap] (Qualiopi)"
-    const val TESTIMONY_CAPTION = "Témoignage Evaluation de la formation] (Qualiopi)"
-    const val TESTIMONY_CUSTOMER_CAPTION = "Témoignage apprenant/commanditaire"
-}
+val Training.toYaml: String
+    get() = run(YAMLMapper()::writeValueAsString)
+val Training.toJson: String
+    get() = run(JsonMapper()::writeValueAsString)
+val String.trainingYamlMapper: Training
+    get() = run(YAMLMapper()::readValue)
+val String.trainingJsonMapper: Training
+    get() = run(JsonMapper()::readValue)

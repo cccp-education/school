@@ -2,6 +2,7 @@
 
 package school
 
+import org.apache.commons.lang3.SystemUtils.USER_HOME_KEY
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -28,12 +29,17 @@ import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisatio
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject.ProjectBuild
+import school.content.*
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
 import school.jbake.JBakeGhPagesPlugin
+import java.io.File
 import java.lang.System.out
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 
 //Deskboard-Bibliotheque-Tiroir-Thematique-Dossier
@@ -140,7 +146,33 @@ class PluginTests {
         }
     }
 
+    @Test
+    fun `check training, spg, spd`(): Unit = SPG_PATH.run path@{
+        SPG().toJson.run(::println)
+        SPG().toYaml.run(::println)
+        USER_HOME_KEY
+            .run(System::getProperty)
+            .let { "$it$this" }
+            .run(::File)
+            .readText()
+            .apply(::println)
+            .run(String::spgJsonMapper)
+            .run(::println)
+
+        Training(
+            spg = USER_HOME_KEY
+                .run(System::getProperty)
+                .let { "$it$this" }
+                .run(::File)
+                .readText()
+                .apply(::println)
+                .run(String::spgJsonMapper),
+            spds = emptySet()
+        ).toJson.apply(::println)
+    }
+
     companion object {
+        private const val SPG_PATH = "/workspace/school/buildSrc/src/main/resources/training_8.json"
         /**
          * return the project workspace configuration
          */
@@ -202,12 +234,13 @@ class PluginTests {
 
 
     @Test
-    fun `test when loading with workspaceWrapper ext fun of the project if yaml config is provided`(): Unit = assertDoesNotThrow {
-        assertEquals(
-            "${System.getProperty("user.home")}/workspace/bibliotheque/slides",
-            projectInstance.testConfiguration.workspace.office.slides.path
-        )
-    }
+    fun `test when loading with workspaceWrapper ext fun of the project if yaml config is provided`(): Unit =
+        assertDoesNotThrow {
+            assertEquals(
+                "${System.getProperty("user.home")}/workspace/bibliotheque/slides",
+                projectInstance.testConfiguration.workspace.office.slides.path
+            )
+        }
 
 
     @Test

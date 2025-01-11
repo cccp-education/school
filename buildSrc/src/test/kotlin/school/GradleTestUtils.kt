@@ -37,10 +37,9 @@ object GradleTestUtils {
                 .apply { "$this yaml data schema : \n${generateYamlSchema()}".run(::println) }
                 .apply { "$this xml DTD : ".run(::println).run { generateXmlSchema() } }
         }
-
     }
 
-    fun Project.displayWorkspaceDataSchemaStructure(): Unit {
+    fun Project.displayWorkspaceDataSchemaStructure() {
         println(testConfiguration)
     }
 
@@ -62,7 +61,6 @@ object GradleTestUtils {
                     let(::PrintStream).let(System::setOut)
                 }
             }
-
 
     val PrintStream.releaseOutput
         get() = let(System::setOut)
