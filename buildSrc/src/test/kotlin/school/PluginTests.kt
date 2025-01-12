@@ -2,6 +2,8 @@
 
 package school
 
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.commons.lang3.SystemUtils.USER_HOME_KEY
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -146,33 +148,10 @@ class PluginTests {
         }
     }
 
-    @Test
-    fun `check training, spg, spd`(): Unit = SPG_PATH.run path@{
-        SPG().toJson.run(::println)
-        SPG().toYaml.run(::println)
-        USER_HOME_KEY
-            .run(System::getProperty)
-            .let { "$it$this" }
-            .run(::File)
-            .readText()
-            .apply(::println)
-            .run(String::spgJsonMapper)
-            .run(::println)
-
-        Training(
-            spg = USER_HOME_KEY
-                .run(System::getProperty)
-                .let { "$it$this" }
-                .run(::File)
-                .readText()
-                .apply(::println)
-                .run(String::spgJsonMapper),
-            spds = emptySet()
-        ).toJson.apply(::println)
-    }
-
     companion object {
         private const val SPG_PATH = "/workspace/school/buildSrc/src/main/resources/training_8.json"
+        private const val SPGS_PATH = "/workspace/school/buildSrc/src/main/resources/trainings.json"
+
         /**
          * return the project workspace configuration
          */
@@ -224,6 +203,40 @@ class PluginTests {
                     )
                 ),
             )
+    }
+
+    @Test
+    fun `play with training, spg, spd`(): Unit = assertDoesNotThrow {
+        SPG_PATH.run {
+            SPG().toJson.run(::println)
+            SPG().toYaml.run(::println)
+
+            Training(
+                spg = USER_HOME_KEY
+                    .run(System::getProperty)
+                    .let { "$it$this" }
+                    .run(::File)
+                    .readText()
+                    .run(String::spgJsonMapper),
+                spds = emptySet()
+            ).toJson.apply(::println)
+
+            USER_HOME_KEY
+                .run(System::getProperty)
+                .let { "$it$this" }
+                .run(::File)
+                .readText()
+                .run(String::spgJsonMapper)
+                .run(::println)
+
+            USER_HOME_KEY
+                .run(System::getProperty)
+                .let { "$it${SPGS_PATH}" }
+                .run(::File)
+                .readText()
+                .run { JsonMapper().readerForListOf(SPG::class.java).readValue<List<SPG>>(this) }
+                .forEach(::println)
+        }
     }
 
     @Test
