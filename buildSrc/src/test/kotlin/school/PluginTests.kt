@@ -3,7 +3,6 @@
 package school
 
 import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.apache.commons.lang3.SystemUtils.USER_HOME_KEY
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -31,11 +30,14 @@ import school.PluginTests.Workspace.WorkspaceEntry.OrganisationEntry.Organisatio
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject
 import school.PluginTests.Workspace.WorkspaceEntry.PortfolioEntry.Portfolio.PortfolioProject.ProjectBuild
-import school.content.*
+import school.training.content.*
 import school.forms.FormPlugin
 import school.frontend.SchoolPlugin
 import school.frontend.SchoolPlugin.Companion.TASK_HELLO
 import school.jbake.JBakeGhPagesPlugin
+import school.training.content.SchoolContentManager.spgJsonMapper
+import school.training.content.SchoolContentManager.toJson
+import school.training.content.SchoolContentManager.toYaml
 import java.io.File
 import java.lang.System.out
 import kotlin.test.Test
@@ -217,7 +219,7 @@ class PluginTests {
                     .let { "$it$this" }
                     .run(::File)
                     .readText()
-                    .run(String::spgJsonMapper),
+                    .spgJsonMapper,
                 spds = emptySet()
             ).toJson.apply(::println)
 
@@ -226,7 +228,7 @@ class PluginTests {
                 .let { "$it$this" }
                 .run(::File)
                 .readText()
-                .run(String::spgJsonMapper)
+                .spgJsonMapper
                 .run(::println)
 
             USER_HOME_KEY

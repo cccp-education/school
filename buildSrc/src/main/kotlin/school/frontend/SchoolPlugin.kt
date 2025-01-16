@@ -10,8 +10,8 @@ import school.workspace.WorkspaceManager.printConf
 import school.workspace.WorkspaceUtils
 import school.workspace.WorkspaceUtils.lsWorkingDir
 import school.workspace.WorkspaceUtils.yamlMapper
-import school.content.SPG
-import school.content.SchoolContentManager
+import school.training.content.SPG
+import school.training.content.SchoolContentManager
 import school.frontend.SchoolOpsManager.fixEncodage
 import school.frontend.SchoolOpsManager.loadSchoolFrontend
 import school.frontend.SchoolOpsManager.processSchoolFrontendCnameFile

@@ -1,40 +1,28 @@
-package school.content
+package school.training.content
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonRootName
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import school.content.SPG.Data.ACCESS_TIME_CAPTION
-import school.content.SPG.Data.CERTIFICATION_CAPTION
-import school.content.SPG.Data.EVALUATIONS_CAPTION
-import school.content.SPG.Data.INFRASTRUCTURE_CAPTION
-import school.content.SPG.Data.MEANS_CAPTION
-import school.content.SPG.Data.MINDMAP_CAPTION
-import school.content.SPG.Data.MOBILITY_CAPTION
-import school.content.SPG.Data.OBJECTIVES_CAPTION
-import school.content.SPG.Data.PLACE_CAPTION
-import school.content.SPG.Data.PRESENTATION_CAPTION
-import school.content.SPG.Data.PRE_REQUIS_CAPTION
-import school.content.SPG.Data.PRICE_CAPTION
-import school.content.SPG.Data.PROGRAM_CAPTION
-import school.content.SPG.Data.PUBLIC_PROSPECT_CAPTION
-import school.content.SPG.Data.PURSUIT_CAPTION
-import school.content.SPG.Data.SKILLS_CAPTION
-import school.content.SPG.Data.TESTIMONY_CAPTION
-import school.content.SPG.Data.TESTIMONY_CUSTOMER_CAPTION
-import school.content.SPG.Data.THEME_CAPTION
-import school.content.SPG.Data.TIMING_CAPTION
-import school.content.SPG.Data.TITLE_CAPTION
-
-
-/*prompt: Genere moi un jeux de valeur en json pour cette classe, le sujet de la formation sera kotlin et langchain4j.  @JvmRecord @JsonRootName(value = "SPG") data class SPG(     val theme: Map<String, String> = mapOf("Thème" to ""),     val title: Map<String, String> = mapOf("Titre" to ""),     val presentation: String = "Présentation et description",     val mindmap: String = "Carte thématique",     @JsonProperty("public_ prospect" )      val publicProspect: String = "Public",     val prerequiz: String = "Pré-requis et conditions d’accès à la formation (Qualiopi)",     val objs: String = "Objectifs pédagogiques (Qualiopi)",     val competences: String = "Compétences visées (Qualiopi)",     val timing: String = "Durée (Temporisation)] (Qualiopi)",     val means: String = "Moyen d’accompagnement et Suivi pédagogique (Qualiopi)",     val prgm: String = "Programme pédagogique (Modalités pédagogiques)] (Qualiopi) : du contenu et du séquencement",     val eval: String = "Modalités d’évaluations] (Qualiopi)",     val certif: String = "Modalités de certification et Certification visé] (Qualiopi)",     val place: String = "Lieux] (Qualiopi)",     val price: String = "Tarifs",     val infra: String = "Moyens logistiques et matériels] (Qualiopi)",     val pursuit: String = "Poursuite en formation] (Qualiopi)",     @JsonProperty("access_ time" )      val accessTime: String = "Délais d’accès] (Réglementaire)",     val mobility: String = "Accessibilité et Handicap] (Qualiopi)",     val testimony: String = "Témoignage Evaluation de la formation] (Qualiopi)",     @JsonProperty("testimony_ customer" )      val testimonyCustomer: String = "Témoignage apprenant/commanditaire" ,  )*/
-@JvmRecord
-@JsonRootName(value = "Training")
-data class Training(
-    val spg: SPG,
-    val spds: Set<SPD> = emptySet()
-)
+import school.training.content.SPG.Data.ACCESS_TIME_CAPTION
+import school.training.content.SPG.Data.CERTIFICATION_CAPTION
+import school.training.content.SPG.Data.EVALUATIONS_CAPTION
+import school.training.content.SPG.Data.INFRASTRUCTURE_CAPTION
+import school.training.content.SPG.Data.MEANS_CAPTION
+import school.training.content.SPG.Data.MINDMAP_CAPTION
+import school.training.content.SPG.Data.MOBILITY_CAPTION
+import school.training.content.SPG.Data.OBJECTIVES_CAPTION
+import school.training.content.SPG.Data.PLACE_CAPTION
+import school.training.content.SPG.Data.PRESENTATION_CAPTION
+import school.training.content.SPG.Data.PRE_REQUIS_CAPTION
+import school.training.content.SPG.Data.PRICE_CAPTION
+import school.training.content.SPG.Data.PROGRAM_CAPTION
+import school.training.content.SPG.Data.PUBLIC_PROSPECT_CAPTION
+import school.training.content.SPG.Data.PURSUIT_CAPTION
+import school.training.content.SPG.Data.SKILLS_CAPTION
+import school.training.content.SPG.Data.TESTIMONY_CAPTION
+import school.training.content.SPG.Data.TESTIMONY_CUSTOMER_CAPTION
+import school.training.content.SPG.Data.THEME_CAPTION
+import school.training.content.SPG.Data.TIMING_CAPTION
+import school.training.content.SPG.Data.TITLE_CAPTION
 
 /** SPG: Scénario Pédagogique Global */
 // TODO: A la place de caption on mettra la caption_lang_key
@@ -232,38 +220,3 @@ data class SPG(
         )
     }
 }
-
-/** SPD: Scénario Pédagogique Détaillé */
-@JvmRecord
-@JsonRootName(value = "SPD")
-data class SPD(
-    val titre: String = "",
-    val objectif: String = ""
-)
-
-val SPD.toYaml: String
-    get() = run(YAMLMapper()::writeValueAsString)
-val SPD.toJson: String
-    get() = run(JsonMapper()::writeValueAsString)
-val String.spdYamlMapper: SPD
-    get() = run(YAMLMapper()::readValue)
-val String.spdJsonMapper: SPD
-    get() = run(JsonMapper()::readValue)
-
-val SPG.toYaml: String
-    get() = run(YAMLMapper()::writeValueAsString)
-val SPG.toJson: String
-    get() = run(JsonMapper()::writeValueAsString)
-val String.spgYamlMapper: SPG
-    get() = run(YAMLMapper()::readValue)
-val String.spgJsonMapper: SPG
-    get() = run(JsonMapper()::readValue)
-
-val Training.toYaml: String
-    get() = run(YAMLMapper()::writeValueAsString)
-val Training.toJson: String
-    get() = run(JsonMapper()::writeValueAsString)
-val String.trainingYamlMapper: Training
-    get() = run(YAMLMapper()::readValue)
-val String.trainingJsonMapper: Training
-    get() = run(JsonMapper()::readValue)
