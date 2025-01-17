@@ -41,7 +41,7 @@ object AssistantManager {
 
     // Creating tasks for each model
     @JvmStatic
-    fun Project.createChatTasks() = localModels.forEach {
+    fun Project.createChatTasks(): Unit = localModels.forEach {
         createChatTask(it.first, "helloOllama${it.second}")
         createStreamingChatTask(it.first, "helloOllamaStream${it.second}")
     }
