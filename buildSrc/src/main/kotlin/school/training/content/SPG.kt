@@ -69,7 +69,8 @@ data class SPG(
         const val PROGRAM_CAPTION =
             "Programme pédagogique (Modalités pédagogiques) (Qualiopi) : du contenu et du séquencement"
         const val EVALUATIONS_CAPTION = "Modalités d’évaluations (Qualiopi)"
-        const val CERTIFICATION_CAPTION = "Modalités de certification et Certification visé (Qualiopi)"
+        const val CERTIFICATION_CAPTION =
+            "Modalités de certification et Certification visé (Qualiopi)"
         const val PLACE_CAPTION = "Lieux] (Qualiopi)"
         const val PRICE_CAPTION = "Tarifs"
         const val INFRASTRUCTURE_CAPTION = "Moyens logistiques et matériels (Qualiopi)"
@@ -95,7 +96,8 @@ data class SPG(
         a) Cible privilégié pour les personnes amenés à suivre la formation, on ne donne pas de restriction sur les situations des personnes et sur les commanditaires, on va donner des critères d’expériences, d’objectif professionnelles, parfois d’âges, etc...
         b) On précise le nombre de personne minimum et maximum par session de formation."""
 
-        const val PRE_REQUIS_EXPECTATIONS = """Pré-requis et conditions d’accès à la formation (Qualiopi) : 
+        const val PRE_REQUIS_EXPECTATIONS =
+            """Pré-requis et conditions d’accès à la formation (Qualiopi) : 
         a) Il faut préciser de manière spécifique les conditions minimales à maîtriser ou posséder : diplômes, âges, expériences. 
         b) Le pré-requis ne concerne que la situation de la personne au moment de son entrée en formation, elle n’est pas dépendante de son évolution dans la formation (sur le plan pédagogique)"""
 
@@ -162,7 +164,8 @@ data class SPG(
         a) Le recueil des besoins en début de formation et l’évaluation diagnostique : il est nécessaire pour comprendre les attentes mais aussi les acquis de manière précise, c’est un gros test réalisé en général en amont du recrutement dont on doit tenir
         b) On précise les différentes évaluations, leurs sens et ce qui sera évalué, pour permettre à chacun de comprendre le parcours évaluatif de la formation en précisant ce qui vient ou non dans un objectif de certification"""
 
-        const val CERTIFICATION_EXPECTATIONS = """Modalités de certification et Certification visé : 
+        const val CERTIFICATION_EXPECTATIONS =
+            """Modalités de certification et Certification visé : 
         a) Modalités de certification : L’ensemble des critères évaluations et hors évaluations qui sont nécessaire à l’obtention de la certification
         b) Certification visé : On explique le lien avec la certification ou les certifications qui composent la formation, préciser la nature de la certification (RNCP, autres certificateurs, etc), le nom précis et complet, le numéro de délivrance (RNCP), la date de validité/publication (RNCP)  et la date de publication du décret sur l’avis de France Compétences sur le diplôme (RNCP), le propriétaire de la certification."""
 

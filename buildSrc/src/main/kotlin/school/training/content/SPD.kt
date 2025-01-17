@@ -6,6 +6,15 @@ import com.fasterxml.jackson.annotation.JsonRootName
 @JvmRecord
 @JsonRootName(value = "SPD")
 data class SPD(
-    val titre: String = "",
-    val objectif: String = ""
-)
+//    val titre: String,
+//    val objectif: String,
+    val table:Pair<SequenceTable,TimingTable>
+) {
+    class SequenceTable {
+
+    }
+
+    class TimingTable {
+
+    }
+}
