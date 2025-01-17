@@ -29,7 +29,7 @@ object WorkspaceUtils {
 //                SystemUtils.USER_HOME_KEY
 //                    .run(System::getProperty)
 //                    .run { "$this$it" }
-//            }.run(_root_ide_package_.java.io::File)
+//            }.run(java.io::File)
 //                .inputStream()
 //                .use(::load)
 //        }::get).toString()
