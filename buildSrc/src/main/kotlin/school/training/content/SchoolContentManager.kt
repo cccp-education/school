@@ -10,14 +10,6 @@ import java.io.FileInputStream
 
 
 object SchoolContentManager {
-    val SPD.toYaml: String
-        get() = run(YAMLMapper()::writeValueAsString)
-    val SPD.toJson: String
-        get() = run(JsonMapper()::writeValueAsString)
-    val String.spdYamlMapper: SPD
-        get() = run(YAMLMapper()::readValue)
-    val String.spdJsonMapper: SPD
-        get() = run(JsonMapper()::readValue)
 
     val SPG.toYaml: String
         get() = run(YAMLMapper()::writeValueAsString)
@@ -26,6 +18,15 @@ object SchoolContentManager {
     val String.spgYamlMapper: SPG
         get() = run(YAMLMapper()::readValue)
     val String.spgJsonMapper: SPG
+        get() = run(JsonMapper()::readValue)
+
+    val SPD.toYaml: String
+        get() = run(YAMLMapper()::writeValueAsString)
+    val SPD.toJson: String
+        get() = run(JsonMapper()::writeValueAsString)
+    val String.spdYamlMapper: SPD
+        get() = run(YAMLMapper()::readValue)
+    val String.spdJsonMapper: SPD
         get() = run(JsonMapper()::readValue)
 
     val Training.toYaml: String
