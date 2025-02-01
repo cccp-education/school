@@ -11,7 +11,7 @@ Le projet School est basé sur le logiciel link:https://gradle.org/[gradle] comm
 .Les taches prévues sont :
 - Création d'un site internet pour un professionnel indépendant, tests,  construction et déploiement.
 - Création d'un site internet pour un organisme formateur, tests,  construction et déploiement.
-- Création d'une instance de moodle comme système d'enseignement, lancement en local pour le développement et déploiement vers un hébergeur en ligne.
+// - Création d'une instance de moodle comme système d'enseignement, lancement en local pour le développement et déploiement vers un hébergeur en ligne.
 
 .Mise en pratique :
 - Site organisme formateur : link:http://cheroliv.github.io/talaria[cheroliv.github.io/talaria]

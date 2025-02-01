@@ -11,7 +11,7 @@ The School project is based on the link:https://gradle.org/[Gradle] software as 
 .The planned tasks are:
 - Creating a website for an independent professional, tests, construction, and deployment.
 - Creating a website for a training organization, tests, construction, and deployment.
-- Creating a Moodle instance as an educational system, launching locally for development, and deploying to an online host.
+// - Creating a Moodle instance as an educational system, launching locally for development, and deploying to an online host.
 
 .Practical implementation:
 - Training organization site: link:http://cheroliv.github.io/talaria[cheroliv.github.io/talaria]
