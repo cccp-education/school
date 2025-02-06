@@ -1,13 +1,13 @@
 package school.training.content
 
 data class QuintilianApproach(
-    val why: String,
-    val what: String,
-    val worth: String,
-    val whoms: String,
-    val `when`: String,
-    val would: String,
-    val who: String
+    val why: String="",
+    val what: String="",
+    val worth: String="",
+    val whoms: String="",
+    val `when`: String="",
+    val would: String="",
+    val who: String="",
 )
 // Why do we need this training
 // What are we going to achieve

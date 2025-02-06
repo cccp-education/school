@@ -2,7 +2,6 @@ import Build_gradle.Constants.arrowKtVersion
 import Build_gradle.Constants.asciidoctorGradleVersion
 import Build_gradle.Constants.jacksonVersion
 import Build_gradle.Constants.jgitVersion
-import Build_gradle.Constants.schoolVersion
 import Build_gradle.Constants.langchain4jVersion
 
 plugins { `kotlin-dsl` }
@@ -22,13 +21,10 @@ repositories {
 
 object Constants {
     const val langchain4jVersion = "0.36.2"
-    const val testcontainersVersion = "1.20.1"
     const val asciidoctorGradleVersion = "4.0.0-alpha.1"
-    const val commonsIoVersion = "2.13.0"
     const val jacksonVersion = "2.17.2"//2.18.0
     const val arrowKtVersion = "1.2.4"
     const val jgitVersion = "6.10.0.202406032230-r"
-    const val schoolVersion = "0.0.1"
 }
 
 dependencies {

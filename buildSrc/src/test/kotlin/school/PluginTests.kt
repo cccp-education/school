@@ -220,7 +220,7 @@ class PluginTests {
                     .run(::File)
                     .readText()
                     .spgJsonMapper,
-                spds = emptySet()
+                pilotage = QuintilianApproach()
             ).toJson.apply(::println)
 
             USER_HOME_KEY
