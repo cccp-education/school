@@ -10,6 +10,7 @@ object School {
     const val GROUP_KEY = "artifact.group"
     const val VERSION_KEY = "artifact.version"
     const val SPRING_PROFILE_KEY = "spring.profiles.active"
+    const val LOCAL_PROFILE = "local"
 }
 
 allprojects {
@@ -75,7 +76,7 @@ tasks.run {
         group = "api"
         commandLine(
             "java",
-            "-D${School.SPRING_PROFILE_KEY}=local",
+            "-D${School.SPRING_PROFILE_KEY}=${School.LOCAL_PROFILE}",
             "-jar",
             "../api/build/libs/api-${project.properties["artifact.version"]}.jar"
         )
