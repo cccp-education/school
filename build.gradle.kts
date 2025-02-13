@@ -82,6 +82,7 @@ tasks.run {
     }
 }
 
+//TODO: Create another module in api to get cli its own archive(task jar)
 tasks.register<Exec>("runCli") {
     group = "api"
     commandLine(
