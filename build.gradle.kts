@@ -9,14 +9,7 @@ apply<school.translate.TranslatorPlugin>()
 object School {
     const val GROUP_KEY = "artifact.group"
     const val VERSION_KEY = "artifact.version"
-    const val SERVER = "app.Server"
-    const val CLI = "app.CommandLine"
-    const val SQL_SCHEMA = "app.users.api.dao.DatabaseConfiguration"
     const val SPRING_PROFILE_KEY = "spring.profiles.active"
-    const val MOCKITO_AGENT = "mockito-agent"
-    const val KOTLIN_COMPILER_OPTION_JSR305 = "-Xjsr305=strict"
-    const val MAIN_FUNCTION = "main"
-    const val NODE_MODULES = "node_modules"
 }
 
 allprojects {
