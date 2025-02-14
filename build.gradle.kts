@@ -41,7 +41,7 @@ tasks.run {
             "-s",
             "-p",
             "../api",
-            ":apiCheckFirefox"
+            ":reportTests"
         )
     }
     register<Exec>("testApi") {
