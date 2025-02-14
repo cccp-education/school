@@ -10,6 +10,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.Project
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.OutputStream
 import java.nio.file.FileSystems
 import java.util.*
 
@@ -63,32 +64,33 @@ object WorkspaceUtils {
     }
 
     @Throws(RuntimeException::class)
-    fun Project.lsWorkingDir() = ByteArrayOutputStream().use { outputStream ->
-        exec {
-            standardOutput = outputStream
-            workingDir = projectDir
-            when {
-                "os.name"
-                    .run(System::getProperty)
-                    .lowercase()
-                    .contains("windows") -> commandLine(
-                    "cmd.exe",
-                    "/c",
-                    "dir",
-                    workingDir,
-                    "/b"
-                )
+    fun Project.lsWorkingDir() =
+        ByteArrayOutputStream().use { outputStream: OutputStream ->
+            exec {
+                standardOutput = outputStream
+                workingDir = projectDir
+                when {
+                    "os.name"
+                        .run(System::getProperty)
+                        .lowercase()
+                        .contains("windows") -> commandLine(
+                        "cmd.exe",
+                        "/c",
+                        "dir",
+                        workingDir,
+                        "/b"
+                    )
 
-                else -> commandLine("ls", workingDir)
-            }
-        }.let { result ->
-            when {
-                result.exitValue != 0 -> throw RuntimeException("Command ls failed.")
-                else -> outputStream.toString()
-                    .trim()
-                    .run { "Command ls output:\n$this" }
-                    .let(::println)
+                    else -> commandLine("ls", workingDir)
+                }
+            }.let { result ->
+                when {
+                    result.exitValue != 0 -> throw RuntimeException("Command ls failed.")
+                    else -> outputStream.toString()
+                        .trim()
+                        .run { "Command ls output:\n$this" }
+                        .let(::println)
+                }
             }
         }
-    }
 }
