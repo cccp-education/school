@@ -23,7 +23,8 @@ allprojects {
 
 tasks.run {
     wrapper {
-        gradleVersion = "8.6"
+//        gradleVersion = Wrapper.DistributionType
+        gradleVersion = "8.6"//Wrapper.DistributionType
         distributionType = Wrapper.DistributionType.BIN
     }
     withType<JavaExec> {
@@ -35,50 +36,31 @@ tasks.run {
     }
     register<Exec>("reportTestApi") {
         group = "api"
-        commandLine(
-            "./gradlew",
-            "-q",
-            "-s",
-            "-p",
-            "../api",
-            ":reportTests"
-        )
+        commandLine("./gradlew", "-q", "-s", "-p", "../api", ":reportTests")
     }
     register<Exec>("testApi") {
         group = "api"
-        commandLine(
-            "./gradlew",
-            "-q",
-            "-s",
-            "-p",
-            "../api",
-            ":check",
-            "--rerun-tasks",
-        )
+        commandLine("./gradlew", "-q", "-s", "-p", "../api", ":check", "--rerun-tasks")
     }
     register<Exec>("runInstaller") {
         group = "installer"
         commandLine(
-            "java",
-            "-jar",
+            "java", "-jar",
             "../api/installer/build/libs/installer-${project.properties["artifact.version"]}.jar"
         )
     }
     register<Exec>("runApi") {
         group = "api"
         commandLine(
-            "java",
-            "-jar",
+            "java", "-jar",
             "../api/build/libs/api-${project.properties["artifact.version"]}.jar"
         )
     }
     register<Exec>("runLocalApi") {
         group = "api"
         commandLine(
-            "java",
-            "-D${School.SPRING_PROFILE_KEY}=${School.LOCAL_PROFILE}",
-            "-jar",
-            "../api/build/libs/api-${project.properties["artifact.version"]}.jar"
+            "java", "-D${School.SPRING_PROFILE_KEY}=${School.LOCAL_PROFILE}",
+            "-jar", "../api/build/libs/api-${project.properties["artifact.version"]}.jar"
         )
     }
 }
@@ -86,12 +68,5 @@ tasks.run {
 //TODO: Create another module in api to get cli its own archive(task jar)
 tasks.register<Exec>("runCli") {
     group = "api"
-    commandLine(
-        "./gradlew",
-        "-q",
-        "-s",
-        "-p",
-        "../api",
-        ":cli"
-    )
+    commandLine("./gradlew", "-q", "-s", "-p", "../api", ":cli")
 }
