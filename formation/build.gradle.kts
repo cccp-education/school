@@ -34,6 +34,7 @@ plugins {
     id("org.jbake.site")
     id("org.asciidoctor.jvm.revealjs")
 }
+
 apply<SlidesPlugin>()
 apply<CoursesPlugin>()
 
