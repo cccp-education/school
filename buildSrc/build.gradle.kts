@@ -20,7 +20,7 @@ repositories {
 }
 
 object Constants {
-    const val langchain4jVersion = "0.36.2"
+    const val langchain4jVersion = "1.0.0-beta1"//"0.36.2"
     const val asciidoctorGradleVersion = "4.0.0-alpha.1"
     const val jacksonVersion = "2.17.2"//2.18.0
     const val arrowKtVersion = "1.2.4"

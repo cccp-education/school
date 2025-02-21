@@ -12,6 +12,11 @@ import school.workspace.WorkspaceManager.localConf
 import school.workspace.WorkspaceUtils.yamlMapper
 import java.io.File
 
+
+/**
+ * repos needed:
+ *  - slideshowroom
+ */
 class SlidesPlugin : Plugin<Project> {
     object RevealJsSlides {
         const val GROUP_TASK_SLIDER = "slider"

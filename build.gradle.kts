@@ -23,8 +23,7 @@ allprojects {
 
 tasks.run {
     wrapper {
-//        gradleVersion = Wrapper.DistributionType
-        gradleVersion = "8.6"//Wrapper.DistributionType
+        gradleVersion = "8.6"
         distributionType = Wrapper.DistributionType.BIN
     }
     withType<JavaExec> {

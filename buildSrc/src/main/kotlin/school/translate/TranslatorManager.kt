@@ -1,7 +1,4 @@
-@file:Suppress(
-    "MemberVisibilityCanBePrivate",
-    "MayBeConstant"
-)
+@file:Suppress("MemberVisibilityCanBePrivate")
 
 package school.translate
 
@@ -19,13 +16,21 @@ import school.ai.AssistantManager.generateStreamingResponse
 import school.translate.TranslatorManager.PromptManager.getTranslatePromptMessage
 import school.translate.TranslatorManager.PromptManager.userLanguage
 import school.workspace.WorkspaceUtils.uppercaseFirstChar
-import java.util.Locale.*
+import java.util.Locale.ENGLISH
+import java.util.Locale.FRENCH
+import java.util.Locale.GERMAN
+import java.util.Locale.ITALIAN
+import java.util.Locale.SIMPLIFIED_CHINESE
+import java.util.Locale.forLanguageTag
+import kotlin.collections.filter
+import kotlin.collections.forEach
 
 object TranslatorManager {
-    const val MODEL = "aya:8b"
+    const val MODEL = "llama3.2:3b-instruct-q8_0"
 
     @JvmStatic
     fun main(args: Array<String>) {
+        @Suppress("SimplifyNestedEachInScopeFunction")
         supportedLanguages
             .translationTasks()
             .apply { forEach(::println) }
@@ -72,7 +77,9 @@ object TranslatorManager {
 
         @JvmStatic
         fun Pair<String, String>.getTranslatePromptMessage(text: String): String =
-            """Translate this sentence from ${forLanguageTag(first).getDisplayLanguage(ENGLISH).lowercase()} to ${
+            """Translate this sentence from ${
+                forLanguageTag(first).getDisplayLanguage(ENGLISH).lowercase()
+            } to ${
                 forLanguageTag(second).getDisplayLanguage(
                     ENGLISH
                 ).lowercase()
@@ -81,29 +88,29 @@ $text""".trimMargin()
     }
 
 
-    fun Project.createDisplaySupportedLanguagesTask() = task<DefaultTask>("displaySupportedLanguages") {
-        group = "translator"
-        description = "Dislpay supported languages"
-        doFirst {
-            supportedLanguages.map { "${forLanguageTag(it).displayLanguage}($it) " }
-                .run { "supportedLanguages : $this" }
-                .run(::println)
+    fun Project.createDisplaySupportedLanguagesTask() =
+        task<DefaultTask>("displaySupportedLanguages") {
+            group = "translator"
+            description = "Dislpay supported languages"
+            doFirst {
+                supportedLanguages.map { "${forLanguageTag(it).displayLanguage}($it) " }
+                    .run { "supportedLanguages : $this" }
+                    .run(::println)
+            }
         }
-    }
 
 
     // Creating tasks for each model
-    fun Project.createTranslationTasks() = run {
+    fun Project.createTranslationTasks(): Unit = run {
         supportedLanguages
             .translationTasks()
-            .forEach<Pair<String, Pair<String, String>>> {
+            .forEach {
                 createTranslationChatTask(MODEL, it)
                 createStreamingTranslationChatTask(MODEL, it)
             }
     }
 
     open class InputTranslationTextTask : DefaultTask() {
-        @Suppress("UnstableApiUsage")
         @set:Option(option = "text", description = "The text to translate")
         @get:Input
         lateinit var text: String

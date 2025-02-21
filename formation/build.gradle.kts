@@ -40,6 +40,7 @@ apply<CoursesPlugin>()
 
 repositories { ruby { gems() } }
 
+@Suppress("LocalVariableName")
 tasks.getByName<AsciidoctorJRevealJSTask>(TASK_ASCIIDOCTOR_REVEALJS) {
     group = GROUP_TASK_SLIDER
     description = "Slider settings"
